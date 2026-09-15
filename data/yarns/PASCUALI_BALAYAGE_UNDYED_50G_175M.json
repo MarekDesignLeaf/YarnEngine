@@ -1,0 +1,19 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "PASCUALI_BALAYAGE_UNDYED_50G_175M",
+  "brand": "Pascuali",
+  "product": "Balayage Undyed",
+  "variant": "Undyed",
+  "cyc_weight": 1,
+  "package_mass_g": 50,
+  "package_length_m": 175,
+  "fibre_composition": {"Baby alpaca": 80, "Merino wool": 20},
+  "tex": 285.714,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 3.25,
+  "recommended_needle_max_mm": 3.25,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.pascuali.de/en-uk/products/balayage-undyed",
+  "evidence_level": "manufacturer_declared"
+}
