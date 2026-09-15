@@ -1,7 +1,7 @@
 {
-  "name": "YarnEngine",
-  "short_name": "YarnEngine",
-  "description": "Knitting and crochet yarn consumption, calibration and project calculator",
+  "name": "Crochet Yarn Engine",
+  "short_name": "CrochetEngine",
+  "description": "Crochet and amigurumi yarn consumption, measurement and calibration application",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
