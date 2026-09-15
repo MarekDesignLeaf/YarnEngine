@@ -1,94 +1,152 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Crochet Yarn Engine</title>
-  <link rel="manifest" href="/manifest.webmanifest">
-  <meta name="theme-color" content="#202a2f">
-  <style>
-    :root{font-family:Inter,system-ui,sans-serif;background:#f6f4ef;color:#202a2f}
-    *{box-sizing:border-box} body{margin:0}.shell{max-width:1180px;margin:auto;padding:20px}.hero{padding:24px 0}.eyebrow{font-size:.78rem;letter-spacing:.12em;font-weight:700;opacity:.65}.hero h1{font-size:clamp(2rem,5vw,4rem);margin:.35rem 0}.hero p{max-width:760px;line-height:1.55}.status{display:inline-block;padding:8px 12px;border:1px solid #c9c5bd;border-radius:999px;background:white}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8d4cc;border-radius:18px;padding:18px}.panel h2{margin-top:0}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.two{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}label{display:block;font-size:.9rem;font-weight:650;margin:10px 0}input,select,textarea,button{width:100%;font:inherit}input,select,textarea{margin-top:5px;padding:10px;border:1px solid #c8c4bc;border-radius:10px;background:#fff}textarea{min-height:180px;font-family:ui-monospace,monospace}button{padding:11px 14px;border:0;border-radius:10px;background:#202a2f;color:white;font-weight:700;cursor:pointer}.secondary{background:#ece8df;color:#202a2f}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.metric{padding:14px;border-radius:12px;background:#f3f0e9}.metric strong{display:block;font-size:1.6rem;margin-top:5px}.ok{color:#0d6b42}.bad{color:#9f2f2f}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0e9;padding:12px;border-radius:10px;max-height:360px;overflow:auto}.note{font-size:.9rem;line-height:1.5;opacity:.8}.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}.op{padding:7px 9px;border-radius:8px;background:#f3f0e9;text-align:center;font-size:.85rem}.hidden{display:none}@media(max-width:800px){.grid,.three,.two,.metrics{grid-template-columns:1fr}.ops{grid-template-columns:repeat(2,1fr)}.shell{padding:14px}}
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Crochet Yarn Engine</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#202a2f">
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--ink:#202a2f;--muted:#667078;--line:#d9d6cf;--accent:#d9795e;--accent2:#567b8c;--good:#376d4c;--bad:#9b4038}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}.shell{max-width:1180px;margin:auto;padding:18px}.hero,.bar,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px}.hero{padding:24px;margin-bottom:14px}.hero h1{margin:4px 0 6px;font-size:clamp(28px,5vw,48px)}.eyebrow{font-size:12px;letter-spacing:.12em;font-weight:750;color:var(--accent2)}.muted{color:var(--muted)}.bar{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}.actions{display:flex;gap:8px;flex-wrap:wrap}button{border:0;border-radius:10px;background:var(--ink);color:white;padding:11px 15px;font-weight:700;cursor:pointer;min-height:44px}button.alt{background:#edf0f1;color:var(--ink)}button.accent{background:var(--accent)}button:disabled{opacity:.55;cursor:not-allowed}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.panel{padding:18px;margin-bottom:14px}.panel h2{margin:0 0 12px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}label{display:grid;gap:5px;font-weight:650}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink);font:inherit}textarea{min-height:160px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.status{padding:10px 12px;border-radius:9px;background:#eef1f1;margin-top:10px}.status.good{background:#e8f3eb;color:var(--good)}.status.bad{background:#f7e9e7;color:var(--bad)}.hidden{display:none!important}.pattern-list,.project-list{display:grid;gap:9px;max-height:520px;overflow:auto}.pattern-card,.project-card{border:1px solid var(--line);border-radius:11px;padding:11px;background:#faf9f6;cursor:pointer}.pattern-card:hover,.project-card:hover{border-color:var(--accent2)}.pattern-card.active{outline:2px solid var(--accent)}.pattern-card strong,.project-card strong{display:block}.tag{display:inline-block;font-size:11px;padding:3px 7px;border-radius:20px;background:#e9eef0;margin:4px 5px 0 0}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{border:1px solid var(--line);border-radius:10px;padding:10px}.metric strong{display:block;font-size:22px}.rounds{white-space:pre-wrap;background:#11181c;color:#eaf0f2;padding:12px;border-radius:10px;overflow:auto;max-height:360px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:18px;z-index:10}.modal-card{background:white;border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:18px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}@media(max-width:820px){.grid{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr}.shell{padding:10px}.hero{padding:18px}}
+</style>
 </head>
 <body>
 <main class="shell">
-  <header class="hero">
-    <div class="eyebrow">CROCHET YARN ENGINE · AMIGURUMI · M11</div>
-    <h1>Crochet yarn consumption and calibration</h1>
-    <p>This application is built around crochet and amigurumi. Define round by round stitch operations, analyse stitch count changes, record real hook and yarn measurements, and build a measured production model instead of relying on invented yarn coefficients.</p>
-    <div class="status" id="apiStatus">Checking engine…</div>
-  </header>
+<section class="hero">
+<div class="eyebrow">CROCHET YARN ENGINE · AMIGURUMI FIRST</div>
+<h1>Crochet yarn planning and pattern analysis</h1>
+<div class="muted">Crochet and amigurumi workflow using canonical stitch operations, physical gauge and measured calibration evidence.</div>
+<div id="apiStatus" class="status">Connecting…</div>
+</section>
 
-  <section class="grid">
-    <article class="panel">
-      <h2>Amigurumi round analyser</h2>
-      <p class="note">Use canonical crochet operations. The engine validates how many stitches each round consumes and produces.</p>
-      <div class="three">
-        <label>Initial stitches<input id="initialStitches" type="number" min="0" value="6"></label>
-        <label>Hook size mm<input id="hookMm" type="number" min="0.1" step="0.1" value="3.0"></label>
-        <label>Construction<select id="construction"><option value="spiral">Spiral</option><option value="round">Joined rounds</option><option value="flat">Flat crochet</option></select></label>
-      </div>
-      <div class="ops">
-        <div class="op">SC</div><div class="op">SC_INC</div><div class="op">SC2TOG</div><div class="op">SC_BLO</div>
-        <div class="op">SC_FLO</div><div class="op">SLST</div><div class="op">CH</div><div class="op">HDC / DC</div>
-      </div>
-      <label>Rounds JSON<textarea id="rounds">[
-  {"operations":{"SC":6}},
-  {"operations":{"SC_INC":6}},
-  {"operations":{"SC":6,"SC_INC":6}},
-  {"operations":{"SC":12,"SC_INC":6}}
-]</textarea></label>
-      <button id="analyse">Analyse crochet rounds</button>
-      <div id="analysisMessage" class="note"></div>
-      <pre id="analysisOutput">No analysis yet.</pre>
-    </article>
+<section class="bar">
+<div><div class="eyebrow">PROJECT WORKSPACE</div><strong id="projectName">Unsaved crochet project</strong></div>
+<div class="actions">
+<button id="newBtn" class="alt">New</button>
+<button id="openBtn" class="alt">Open</button>
+<button id="saveBtn">Save</button>
+</div>
+</section>
 
-    <article class="panel">
-      <h2>Measured crochet calibration</h2>
-      <p class="note">Physical measurements are the authority for production estimates. Record the yarn, hook, gauge and measured yarn usage from a real crochet sample.</p>
-      <div class="three">
-        <label>Record ID<input id="recordId" placeholder="PILOOP_SC_001"></label>
-        <label>Yarn ID<input id="yarnId" placeholder="YARN_001"></label>
-        <label>Crocheter ID<input id="crocheterId" placeholder="OPERATOR_01"></label>
-      </div>
-      <div class="three">
-        <label>Gauge stitches / 10 cm<input id="gaugeSt" type="number" min="0.1" step="0.1"></label>
-        <label>Gauge rounds / 10 cm<input id="gaugeRows" type="number" min="0.1" step="0.1"></label>
-        <label>Yarn diameter mm<input id="diameter" type="number" min="0.01" step="0.01"></label>
-      </div>
-      <div class="three">
-        <label>Measured width mm<input id="widthMm" type="number" min="0.1" step="0.1"></label>
-        <label>Measured height mm<input id="heightMm" type="number" min="0.1" step="0.1"></label>
-        <label>Yarn used m<input id="yarnUsed" type="number" min="0.001" step="0.001"></label>
-      </div>
-      <label>Operation counts JSON<textarea id="operationCounts">{"SC":400}</textarea></label>
-      <button id="saveMeasurement">Save crochet measurement</button>
-      <button class="secondary" id="refreshCalibration">Refresh calibration status</button>
-      <div id="calibrationMessage" class="note"></div>
-      <pre id="calibrationOutput">No calibration data loaded.</pre>
-    </article>
-  </section>
+<div class="grid">
+<div>
+<section class="panel">
+<h2>Project setup</h2>
+<div class="fields">
+<label>Pattern<select id="pattern"></select></label>
+<label>Yarn<select id="yarn"></select></label>
+<label>Hook size mm<input id="hook" type="number" step="0.1" min="0.1" value="3.0"></label>
+<label>Construction<select id="construction"><option value="spiral">Spiral</option><option value="round">Joined rounds</option><option value="flat">Flat crochet</option></select></label>
+<label>Gauge stitches / 10 cm<input id="gaugeSt" type="number" step="0.1" min="0.1" value="24"></label>
+<label>Gauge rounds / 10 cm<input id="gaugeRows" type="number" step="0.1" min="0.1" value="26"></label>
+</div>
+<div class="toolbar"><button id="selectPatternBtn" class="accent">Pattern library</button><button id="calibrationBtn" class="alt">Calibration</button></div>
+</section>
 
-  <section class="panel" style="margin-top:18px">
-    <h2>Production model status</h2>
-    <div class="metrics">
-      <div class="metric"><span>Technique</span><strong>Crochet</strong></div>
-      <div class="metric"><span>Primary use</span><strong>Amigurumi</strong></div>
-      <div class="metric"><span>Evidence</span><strong>Measured</strong></div>
-    </div>
-    <p class="note">No crochet length coefficient is invented by the application. A production consumption model must be fitted from real calibration records that pass the evidence and quality gates.</p>
-  </section>
+<section class="panel">
+<h2>Amigurumi round program</h2>
+<div class="muted">Each round records canonical stitch counts. No yarn consumption coefficient is invented here.</div>
+<div class="fields" style="margin-top:10px"><label>Initial stitches<input id="initialStitches" type="number" min="0" value="6"></label><label>Template<select id="template"><option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="limb">Limb</option><option value="ear">Ear / cone</option><option value="custom">Custom</option></select></label></div>
+<textarea id="roundsJson" spellcheck="false"></textarea>
+<div class="toolbar"><button id="analyseBtn">Analyse rounds</button><button id="consumeBtn" class="accent">Calculate yarn with approved model</button></div>
+<div id="analysisStatus" class="status hidden"></div>
+</section>
+
+<section id="resultsPanel" class="panel hidden">
+<h2>Analysis</h2>
+<div class="metric-grid"><div class="metric"><span>Initial</span><strong id="mInitial">0</strong></div><div class="metric"><span>Final stitches</span><strong id="mFinal">0</strong></div><div class="metric"><span>Total operations</span><strong id="mOps">0</strong></div></div>
+<h3>Operation totals</h3><pre id="operationTotals" class="rounds"></pre>
+<h3>Round trace</h3><pre id="roundTrace" class="rounds"></pre>
+</section>
+</div>
+
+<div>
+<section class="panel">
+<h2>Crochet pattern library</h2>
+<div id="patternCount" class="muted">Loading…</div>
+<input id="patternSearch" placeholder="Search SC, BLO, popcorn, amigurumi…" style="margin:10px 0">
+<div id="patternList" class="pattern-list"></div>
+</section>
+<section class="panel">
+<h2>Evidence status</h2>
+<div class="muted">Production yarn estimates require an approved calibration model based on physical measurements. Pattern structure can be analysed without one.</div>
+<div id="modelStatus" class="status">Checking production model…</div>
+</section>
+</div>
+</div>
 </main>
+
+<div id="projectsModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">SAVED PROJECTS</div><h2 style="margin:0">Open project</h2></div><button id="closeProjects" class="alt">Close</button></div><div id="projectsList" class="project-list"></div></div></div>
+
+<div id="calibrationModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">CROCHET CALIBRATION</div><h2 style="margin:0">Measurement status</h2></div><button id="closeCalibration" class="alt">Close</button></div><div id="calibrationStatus" class="status">Loading…</div><div id="calibrationRecords" class="project-list" style="margin-top:12px"></div></div></div>
+
 <script>
 const $=id=>document.getElementById(id);
-async function jsonFetch(url,opts={}){const r=await fetch(url,{headers:{'Content-Type':'application/json'},...opts});const t=await r.text();let d;try{d=JSON.parse(t)}catch{d=t}if(!r.ok)throw new Error(typeof d==='string'?d:JSON.stringify(d));return d}
-async function health(){try{const d=await jsonFetch('/api/health');$('apiStatus').textContent=`Engine online · ${d.version}`;$('apiStatus').className='status ok'}catch(e){$('apiStatus').textContent='Engine unavailable';$('apiStatus').className='status bad'}}
-$('analyse').onclick=async()=>{try{const rounds=JSON.parse($('rounds').value);const payload={initial_stitches:Number($('initialStitches').value),rounds};const d=await jsonFetch('/api/crochet/amigurumi/analyse',{method:'POST',body:JSON.stringify(payload)});$('analysisOutput').textContent=JSON.stringify(d,null,2);$('analysisMessage').textContent=d.valid?`Valid crochet program. Final stitch count: ${d.final_stitches}`:`Crochet program needs correction.`;$('analysisMessage').className=d.valid?'note ok':'note bad'}catch(e){$('analysisMessage').textContent=e.message;$('analysisMessage').className='note bad'}};
-$('saveMeasurement').onclick=async()=>{try{const payload={record_id:$('recordId').value,yarn_id:$('yarnId').value,crocheter_id:$('crocheterId').value,hook_mm:Number($('hookMm').value),construction:$('construction').value,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),measured_width_mm:Number($('widthMm').value),measured_height_mm:Number($('heightMm').value),yarn_used_m:Number($('yarnUsed').value),yarn_diameter_mm:Number($('diameter').value),operation_counts:JSON.parse($('operationCounts').value)};const d=await jsonFetch('/api/crochet/calibration/records',{method:'POST',body:JSON.stringify(payload)});$('calibrationMessage').textContent='Crochet measurement saved.';$('calibrationMessage').className='note ok';$('calibrationOutput').textContent=JSON.stringify(d,null,2)}catch(e){$('calibrationMessage').textContent=e.message;$('calibrationMessage').className='note bad'}};
-$('refreshCalibration').onclick=async()=>{try{const d=await jsonFetch('/api/crochet/calibration/status');$('calibrationOutput').textContent=JSON.stringify(d,null,2);$('calibrationMessage').textContent=d.ready?'Calibration evidence gate passed.':'More measured crochet evidence is required.';$('calibrationMessage').className=d.ready?'note ok':'note'}catch(e){$('calibrationMessage').textContent=e.message;$('calibrationMessage').className='note bad'}};
-health();
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+let patterns=[],crochetPatterns=[],yarns=[],currentProjectId=null,lastAnalysis=null;
+const templates={
+ sphere:{initial_stitches:6,rounds:[{operations:{SC_INC:6}},{operations:{SC:6,SC_INC:6}},{operations:{SC:12,SC_INC:6}},{operations:{SC:18,SC_INC:6}},{operations:{SC:24}},{operations:{SC:24}},{operations:{SC:18,SC2TOG:3}},{operations:{SC:12,SC2TOG:3}},{operations:{SC:6,SC2TOG:3}}]},
+ cylinder:{initial_stitches:6,rounds:[{operations:{SC_INC:6}},{operations:{SC:6,SC_INC:6}},{operations:{SC:12,SC_INC:6}},{operations:{SC:18}},{operations:{SC:18}},{operations:{SC:18}},{operations:{SC:18}}]},
+ limb:{initial_stitches:6,rounds:[{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}}]},
+ ear:{initial_stitches:4,rounds:[{operations:{SC:4}},{operations:{SC:2,SC_INC:2}},{operations:{SC:6}},{operations:{SC:4,SC_INC:2}},{operations:{SC:8}}]}
+};
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function status(el,msg,kind=''){el.textContent=msg;el.className='status '+kind;}
+function crochetLike(p){const s=`${p.pattern_id||''} ${p.name||''} ${p.family_id||''}`.toLowerCase();return s.includes('crochet')||s.includes('amigurumi')||/^amigurumi_/i.test(p.pattern_id||'')||s.includes('sc_')||s.includes('hdc_')||s.includes('dc_')||s.includes('popcorn')||s.includes('puff');}
+function renderPatterns(filter=''){
+ const q=filter.trim().toLowerCase();const rows=crochetPatterns.filter(p=>!q||`${p.pattern_id} ${p.name} ${p.family_id}`.toLowerCase().includes(q));
+ $('patternCount').textContent=`${rows.length} crochet patterns available`;
+ $('patternList').innerHTML=rows.map(p=>`<div class="pattern-card" data-p="${esc(p.pattern_id)}|${esc(p.version)}"><strong>${esc(p.name)}</strong><span class="tag">${esc(p.pattern_id)}</span><span class="tag">${esc(p.family_id||'crochet')}</span></div>`).join('')||'<div class="muted">No matching crochet patterns.</div>';
+ document.querySelectorAll('.pattern-card').forEach(c=>c.onclick=()=>{$('pattern').value=c.dataset.p;document.querySelectorAll('.pattern-card').forEach(x=>x.classList.remove('active'));c.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});});
+}
+function populatePatternSelect(){
+ $('pattern').innerHTML=crochetPatterns.map(p=>`<option value="${esc(p.pattern_id)}|${esc(p.version)}">${esc(p.name)} · ${esc(p.family_id||'crochet')}</option>`).join('');
+}
+function setTemplate(name){if(name==='custom')return;const t=templates[name];$('initialStitches').value=t.initial_stitches;$('roundsJson').value=JSON.stringify(t.rounds,null,2);}
+async function boot(){
+ try{
+  const [h,p,y,m]=await Promise.all([fetch('/api/health').then(r=>r.json()),fetch('/api/patterns').then(r=>r.json()),fetch('/api/yarns').then(r=>r.json()),fetch('/api/models/production/current').then(r=>r.json()).catch(()=>({active:false}))]);
+  patterns=p;crochetPatterns=p.filter(crochetLike);yarns=y;
+  populatePatternSelect();renderPatterns();
+  $('yarn').innerHTML='<option value="">Select yarn</option>'+y.map(x=>`<option value="${esc(x.yarn_id)}">${esc(x.brand)} · ${esc(x.product)}</option>`).join('');
+  status($('apiStatus'),`Engine ${h.version} online · ${crochetPatterns.length} crochet patterns loaded`,'good');
+  status($('modelStatus'),m.active?`Approved model: ${m.model?.name||m.model?.model_id||'production'}`:'No approved production crochet model. Structural analysis is available; production yarn estimates remain gated.',m.active?'good':'');
+  setTemplate('sphere');
+ }catch(e){status($('apiStatus'),'Engine error: '+e.message,'bad');}
+}
+async function analyse(){
+ let rounds;try{rounds=JSON.parse($('roundsJson').value);}catch(e){status($('analysisStatus'),'Rounds must be valid JSON.','bad');$('analysisStatus').classList.remove('hidden');return null;}
+ const payload={initial_stitches:Number($('initialStitches').value),rounds};
+ const r=await fetch('/api/crochet/amigurumi/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();
+ $('analysisStatus').classList.remove('hidden');if(!r.ok||!d.valid){status($('analysisStatus'),'Pattern invalid: '+JSON.stringify(d.detail||d.issues),'bad');return null;}
+ lastAnalysis=d;status($('analysisStatus'),'Pattern structure valid.','good');$('resultsPanel').classList.remove('hidden');$('mInitial').textContent=d.initial_stitches;$('mFinal').textContent=d.final_stitches;$('mOps').textContent=Object.values(d.operation_counts||{}).reduce((a,b)=>a+Number(b),0);$('operationTotals').textContent=JSON.stringify(d.operation_counts,null,2);$('roundTrace').textContent=JSON.stringify(d.trace,null,2);return d;
+}
+async function calculateConsumption(){
+ const d=lastAnalysis||await analyse();if(!d)return;
+ const yarnId=$('yarn').value;if(!yarnId){status($('analysisStatus'),'Select a yarn first.','bad');return;}
+ const payload={program_type:'amigurumi',program:{initial_stitches:Number($('initialStitches').value),rounds:JSON.parse($('roundsJson').value)},yarn_id:yarnId,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:5,domain_policy:'strict'};
+ const r=await fetch('/api/complex-consumption/calculate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const x=await r.json();
+ if(!r.ok){status($('analysisStatus'),'Yarn estimate unavailable: '+(typeof x.detail==='string'?x.detail:JSON.stringify(x.detail)),'bad');return;}
+ status($('analysisStatus'),`Recommended yarn: ${x.calculation?.recommended_length_m?.toFixed?.(2)||x.calculation?.recommended_length_m} m · model ${x.model_id}`,'good');
+}
+function newProject(){currentProjectId=null;lastAnalysis=null;$('projectName').textContent='Unsaved crochet project';$('resultsPanel').classList.add('hidden');$('analysisStatus').classList.add('hidden');$('patternSearch').value='';renderPatterns();setTemplate('sphere');}
+async function openProjects(){
+ $('projectsModal').classList.remove('hidden');const box=$('projectsList');box.innerHTML='<div class="muted">Loading…</div>';
+ try{const list=await fetch('/api/projects').then(r=>r.json());box.innerHTML=list.length?list.map(p=>`<div class="project-card" data-id="${p.project_id}"><strong>${esc(p.name)}</strong><span class="tag">${esc(p.status)}</span><div class="muted">${esc(p.pattern_id||'')} ${esc(p.pattern_version||'')}</div></div>`).join(''):'<div class="muted">No saved projects yet.</div>';box.querySelectorAll('[data-id]').forEach(c=>c.onclick=()=>loadProject(Number(c.dataset.id)));}catch(e){box.innerHTML='<div class="status bad">'+esc(e.message)+'</div>';}
+}
+async function loadProject(id){
+ const r=await fetch('/api/projects/'+id);const p=await r.json();if(!r.ok)return;currentProjectId=p.project_id;$('projectName').textContent=p.name||'Crochet project';const c=p.request||p.calculation||{};if(c.pattern_id&&c.pattern_version)$('pattern').value=`${c.pattern_id}|${c.pattern_version}`;if(c.yarn_id)$('yarn').value=c.yarn_id;if(c.gauge_stitches_per_10cm)$('gaugeSt').value=c.gauge_stitches_per_10cm;if(c.gauge_rows_per_10cm)$('gaugeRows').value=c.gauge_rows_per_10cm;$('projectsModal').classList.add('hidden');
+}
+async function saveProject(){
+ const [pattern_id,pattern_version]=($('pattern').value||'|').split('|');const name=currentProjectId?$('projectName').textContent:prompt('Project name','Crochet amigurumi project');if(!name)return;
+ const calc={pattern_id,pattern_version,yarn_id:$('yarn').value||null,width_cm:10,height_cm:10,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:5,partial_repeat_mode:'crop',edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'swatch',swatch:{stitches:24,rows:26,yarn_length_m:1},yarn_diameter_mm:null};
+ const payload={name,description:'Crochet / amigurumi project',calculation:calc,result:null,status:lastAnalysis?'calculated':'draft'};const url=currentProjectId?'/api/projects/'+currentProjectId:'/api/projects';const method=currentProjectId?'PUT':'POST';const r=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok){status($('apiStatus'),'Save failed: '+JSON.stringify(d.detail),'bad');return;}currentProjectId=d.project_id;$('projectName').textContent=d.name;status($('apiStatus'),'Project saved.','good');
+}
+async function openCalibration(){
+ $('calibrationModal').classList.remove('hidden');try{const [s,recs]=await Promise.all([fetch('/api/crochet/calibration/status').then(r=>r.json()),fetch('/api/crochet/calibration/records').then(r=>r.json())]);status($('calibrationStatus'),s.ready?'Calibration evidence gate READY':'Not ready: '+(s.reasons||[]).join(' | '),s.ready?'good':'');$('calibrationRecords').innerHTML=(recs||[]).map(x=>`<div class="project-card"><strong>${esc(x.record_id)}</strong><div class="muted">${esc(x.yarn_id)} · ${esc(x.construction)} · ${x.yarn_length_m} m</div></div>`).join('')||'<div class="muted">No physical crochet measurements stored.</div>';}catch(e){status($('calibrationStatus'),e.message,'bad');}
+}
+$('newBtn').onclick=newProject;$('openBtn').onclick=openProjects;$('saveBtn').onclick=saveProject;$('closeProjects').onclick=()=> $('projectsModal').classList.add('hidden');$('calibrationBtn').onclick=openCalibration;$('closeCalibration').onclick=()=> $('calibrationModal').classList.add('hidden');$('analyseBtn').onclick=analyse;$('consumeBtn').onclick=calculateConsumption;$('template').onchange=e=>setTemplate(e.target.value);$('patternSearch').oninput=e=>renderPatterns(e.target.value);$('selectPatternBtn').onclick=()=>{$('patternSearch').focus();$('patternList').scrollIntoView({behavior:'smooth'});};
+boot();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
 </script>
-</body>
-</html>
+</body></html>
