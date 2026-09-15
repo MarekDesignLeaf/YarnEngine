@@ -1,382 +1,94 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Yarn Consumption Engine</title>
-  <link rel="stylesheet" href="/static/styles.css" />
-<link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#202a2f">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="YarnEngine">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crochet Yarn Engine</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#202a2f">
+  <style>
+    :root{font-family:Inter,system-ui,sans-serif;background:#f6f4ef;color:#202a2f}
+    *{box-sizing:border-box} body{margin:0}.shell{max-width:1180px;margin:auto;padding:20px}.hero{padding:24px 0}.eyebrow{font-size:.78rem;letter-spacing:.12em;font-weight:700;opacity:.65}.hero h1{font-size:clamp(2rem,5vw,4rem);margin:.35rem 0}.hero p{max-width:760px;line-height:1.55}.status{display:inline-block;padding:8px 12px;border:1px solid #c9c5bd;border-radius:999px;background:white}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #d8d4cc;border-radius:18px;padding:18px}.panel h2{margin-top:0}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.two{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}label{display:block;font-size:.9rem;font-weight:650;margin:10px 0}input,select,textarea,button{width:100%;font:inherit}input,select,textarea{margin-top:5px;padding:10px;border:1px solid #c8c4bc;border-radius:10px;background:#fff}textarea{min-height:180px;font-family:ui-monospace,monospace}button{padding:11px 14px;border:0;border-radius:10px;background:#202a2f;color:white;font-weight:700;cursor:pointer}.secondary{background:#ece8df;color:#202a2f}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}.metric{padding:14px;border-radius:12px;background:#f3f0e9}.metric strong{display:block;font-size:1.6rem;margin-top:5px}.ok{color:#0d6b42}.bad{color:#9f2f2f}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f3f0e9;padding:12px;border-radius:10px;max-height:360px;overflow:auto}.note{font-size:.9rem;line-height:1.5;opacity:.8}.ops{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}.op{padding:7px 9px;border-radius:8px;background:#f3f0e9;text-align:center;font-size:.85rem}.hidden{display:none}@media(max-width:800px){.grid,.three,.two,.metrics{grid-template-columns:1fr}.ops{grid-template-columns:repeat(2,1fr)}.shell{padding:14px}}
+  </style>
 </head>
 <body>
-  <main class="shell">
-    <header class="hero">
-      <div>
-        <div class="eyebrow">YARN CONSUMPTION ENGINE · M11.0</div>
-        <h1>Pattern aware yarn estimation</h1>
-        <p>Choose a pattern, yarn and gauge. Use a measured swatch for production estimates or the research geometry baseline for Stockinette.</p>
+<main class="shell">
+  <header class="hero">
+    <div class="eyebrow">CROCHET YARN ENGINE · AMIGURUMI · M11</div>
+    <h1>Crochet yarn consumption and calibration</h1>
+    <p>This application is built around crochet and amigurumi. Define round by round stitch operations, analyse stitch count changes, record real hook and yarn measurements, and build a measured production model instead of relying on invented yarn coefficients.</p>
+    <div class="status" id="apiStatus">Checking engine…</div>
+  </header>
+
+  <section class="grid">
+    <article class="panel">
+      <h2>Amigurumi round analyser</h2>
+      <p class="note">Use canonical crochet operations. The engine validates how many stitches each round consumes and produces.</p>
+      <div class="three">
+        <label>Initial stitches<input id="initialStitches" type="number" min="0" value="6"></label>
+        <label>Hook size mm<input id="hookMm" type="number" min="0.1" step="0.1" value="3.0"></label>
+        <label>Construction<select id="construction"><option value="spiral">Spiral</option><option value="round">Joined rounds</option><option value="flat">Flat crochet</option></select></label>
       </div>
-      <div class="status" id="apiStatus">Checking engine…</div>
-    </header>
-
-
-    <section class="workspace-bar panel">
-      <div>
-        <div class="eyebrow">PROJECT WORKSPACE</div>
-        <strong id="currentProjectLabel">Unsaved project</strong>
+      <div class="ops">
+        <div class="op">SC</div><div class="op">SC_INC</div><div class="op">SC2TOG</div><div class="op">SC_BLO</div>
+        <div class="op">SC_FLO</div><div class="op">SLST</div><div class="op">CH</div><div class="op">HDC / DC</div>
       </div>
-      <div class="workspace-actions">
-        <button type="button" class="ghost-button" id="newProject">New</button>
-        <button type="button" class="ghost-button" id="openProjects">Open</button>
-        <button type="button" class="ghost-button" id="saveProject">Save</button>
-<button type="button" class="ghost-button" id="openYarnManager">Yarns</button>
-<button type="button" class="ghost-button" id="openSwatches">Swatches</button><button type="button" class="ghost-button" id="openCrochetCalibration">Crochet calibration</button><button type="button" class="ghost-button" id="openLab">Calibration Lab</button><button type="button" class="ghost-button" id="openImportStudio">Import Studio</button>
-<button type="button" class="ghost-button" id="openAcquisition">Acquisition</button>
-<button type="button" class="ghost-button" id="openShaping">Shaping</button>
-<button type="button" class="ghost-button" id="openSpatial">Spatial</button>
-<button type="button" class="ghost-button" id="openGroups">Groups</button>
-      </div>
-    </section>
-
-
-
-
-
-
-
-
-    <section id="groupsPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div><div class="section-title preview-title">Multi Section Parts & Stitch Groups</div>
-        <div class="chart-meta">Model hold, resume, split, join and close operations across active stitch groups.</div></div>
-        <button type="button" class="ghost-button" id="closeGroups">Close</button>
-      </div>
-      <label>Initial stitches<input id="groupsInitial" type="number" min="1" value="12"></label>
-      <label>Events JSON<textarea id="groupsEvents" rows="12" spellcheck="false">[
-  {"step":1,"action":"split","source_ids":["G0"],"target_ids":["LEFT","RIGHT"],"counts":[6,6]},
-  {"step":2,"action":"hold","source_ids":["RIGHT"]},
-  {"step":3,"action":"resume","source_ids":["RIGHT"]},
-  {"step":4,"action":"join","source_ids":["LEFT","RIGHT"],"target_ids":["BODY"]}
+      <label>Rounds JSON<textarea id="rounds">[
+  {"operations":{"SC":6}},
+  {"operations":{"SC_INC":6}},
+  {"operations":{"SC":6,"SC_INC":6}},
+  {"operations":{"SC":12,"SC_INC":6}}
 ]</textarea></label>
-      <button type="button" id="analyseGroups">Analyse stitch groups</button>
-      <div id="groupsReport" class="editor-validation"></div>
-      <pre id="groupsPreview"></pre>
-    </section>
+      <button id="analyse">Analyse crochet rounds</button>
+      <div id="analysisMessage" class="note"></div>
+      <pre id="analysisOutput">No analysis yet.</pre>
+    </article>
 
-    <section id="spatialPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div><div class="section-title preview-title">Spatial Shaping & Topology</div>
-        <div class="chart-meta">Locate increases and decreases across each row and build a stitch-count outline.</div></div>
-        <button type="button" class="ghost-button" id="closeSpatial">Close</button>
+    <article class="panel">
+      <h2>Measured crochet calibration</h2>
+      <p class="note">Physical measurements are the authority for production estimates. Record the yarn, hook, gauge and measured yarn usage from a real crochet sample.</p>
+      <div class="three">
+        <label>Record ID<input id="recordId" placeholder="PILOOP_SC_001"></label>
+        <label>Yarn ID<input id="yarnId" placeholder="YARN_001"></label>
+        <label>Crocheter ID<input id="crocheterId" placeholder="OPERATOR_01"></label>
       </div>
       <div class="three">
-        <label>Pattern ID<input id="spatialId" value="SPATIAL_PART"></label>
-        <label>Initial stitches<input id="spatialInitial" type="number" min="1" value="8"></label>
-        <label>Stitch width mm<input id="spatialStitchWidth" type="number" step="0.1" min="0.1" value="4"></label>
-      </div>
-      <label>Row height mm<input id="spatialRowHeight" type="number" step="0.1" min="0.1" value="3"></label>
-      <label>Rows<textarea id="spatialRows" rows="10" spellcheck="false" placeholder="KFB, K6, KFB&#10;K10&#10;K2TOG, K6, K2TOG"></textarea></label>
-      <button type="button" id="analyseSpatial">Analyse topology</button>
-      <div id="spatialReport" class="editor-validation"></div>
-      <pre id="spatialPreview"></pre>
-    </section>
-
-    <section id="shapingPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div><div class="section-title preview-title">Shaping & Variable Stitch Count</div>
-        <div class="chart-meta">Track stitch count row by row through increases and decreases.</div></div>
-        <button type="button" class="ghost-button" id="closeShaping">Close</button>
+        <label>Gauge stitches / 10 cm<input id="gaugeSt" type="number" min="0.1" step="0.1"></label>
+        <label>Gauge rounds / 10 cm<input id="gaugeRows" type="number" min="0.1" step="0.1"></label>
+        <label>Yarn diameter mm<input id="diameter" type="number" min="0.01" step="0.01"></label>
       </div>
       <div class="three">
-        <label>Pattern ID<input id="shapeId" value="SHAPED_PART"></label>
-        <label>Name<input id="shapeName" value="Shaped Part"></label>
-        <label>Initial stitches<input id="shapeInitial" type="number" min="1" value="8"></label>
+        <label>Measured width mm<input id="widthMm" type="number" min="0.1" step="0.1"></label>
+        <label>Measured height mm<input id="heightMm" type="number" min="0.1" step="0.1"></label>
+        <label>Yarn used m<input id="yarnUsed" type="number" min="0.001" step="0.001"></label>
       </div>
-      <label>Rows, one instruction per line<textarea id="shapeRows" rows="10" spellcheck="false" placeholder="K8&#10;KFB, K6, KFB&#10;K2TOG, K6, K2TOG"></textarea></label>
-      <button type="button" id="translateShaping">Analyse shaping</button>
-      <div id="shapeReport" class="editor-validation"></div>
-      <pre id="shapePreview"></pre>
-    </section>
+      <label>Operation counts JSON<textarea id="operationCounts">{"SC":400}</textarea></label>
+      <button id="saveMeasurement">Save crochet measurement</button>
+      <button class="secondary" id="refreshCalibration">Refresh calibration status</button>
+      <div id="calibrationMessage" class="note"></div>
+      <pre id="calibrationOutput">No calibration data loaded.</pre>
+    </article>
+  </section>
 
-    <section id="acquisitionPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div><div class="section-title preview-title">Pattern Acquisition & Translation</div>
-        <div class="chart-meta">Advanced grammar supports explicit groups and width-bounded repeats. Ambiguous instructions still go to review.</div></div>
-        <button type="button" class="ghost-button" id="closeAcquisition">Close</button>
-      </div>
-      <div class="three">
-        <label>Pattern ID<input id="acqId" value="NEW_PATTERN"></label>
-        <label>Name<input id="acqName" value="New Pattern"></label>
-        <label>Repeat width<input id="acqWidth" type="number" min="1" value="4"></label>
-      </div>
-      <label>Rows, one instruction per line<textarea id="acqRows" rows="10" spellcheck="false" placeholder="(K2, P2) x4&#10;K2, P2, repeat to end"></textarea></label>
-      <button type="button" id="translateAcquisition">Translate & validate</button>
-      <div id="acqReport" class="editor-validation"></div>
-      <pre id="acqPreview"></pre>
-    </section>
-
-    <section id="importStudioPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head"><div><div class="section-title preview-title">Pattern Import Studio</div><div class="chart-meta">Structured JSON → normalize → validate → provenance review → library.</div></div><button type="button" class="ghost-button" id="closeImportStudio">Close</button></div>
-      <label>Pattern bundle JSON<textarea id="importJson" rows="14" spellcheck="false" placeholder='{"pattern": {...}, "metadata": {...}}'></textarea></label>
-      <div class="editor-actions"><button type="button" class="ghost-button" id="inspectImport">Inspect</button><button type="button" id="acceptImport" disabled>Accept to library</button></div>
-      <div id="importReport" class="editor-validation"></div>
-      <div id="importPreview"></div>
-    </section>
-
-    <section id="labPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head"><div><div class="section-title preview-title">Calibration Laboratory</div><div class="chart-meta">Real-data coverage, eligibility and research model validation.</div></div><button type="button" class="ghost-button" id="closeLab">Close</button></div>
-      <div id="labStatus" class="calibration-cards"></div>
-      <div class="editor-actions"><button type="button" class="ghost-button" id="refreshLab">Refresh analysis</button><button type="button" id="fitLab">Fit research model</button><button type="button" id="registerModel">Fit & register</button></div>
-      <div id="labReport" class="editor-validation"></div>
-<div class="section-title">Replicate quality</div><div id="replicateReport" class="editor-validation"></div>
-<div class="section-title">Model registry</div><div id="modelRegistry" class="projects-list"></div>
-    </section>
-
-    <section id="yarnManagerPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head"><div><div class="section-title preview-title">Yarn manager</div><div class="chart-meta">Add real yarn data from the package label or measured data.</div></div><button type="button" class="ghost-button" id="closeYarnManager">Close</button></div>
-      <div class="three editor-fields">
-        <label>Yarn ID<input id="ymId" placeholder="MY_YARN_001"></label>
-        <label>Brand<input id="ymBrand"></label><label>Product<input id="ymProduct"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Variant<input id="ymVariant"></label>
-        <label>Package mass (g)<input id="ymMass" type="number" min="0.01" step="0.01"></label>
-        <label>Package length (m)<input id="ymLength" type="number" min="0.01" step="0.01"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>CYC weight 0–7<input id="ymWeight" type="number" min="0" max="7"></label>
-        <label>Diameter (mm)<input id="ymDiameter" type="number" min="0.01" step="0.01"></label>
-        <label>Fibre <span>simple: Wool 100</span><input id="ymFibre" value="Wool 100"></label>
-      </div>
-      <div class="editor-actions"><button type="button" id="createYarn">Add yarn</button></div>
-      <div id="yarnManagerStatus" class="editor-validation"></div>
-    </section>
-
-    
-    <section id="crochetCalibrationPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div><div class="section-title preview-title">Crochet Calibration</div>
-        <div class="chart-meta">Create a printable measurement sheet, record physical values, then enter the completed sheet for calibration.</div></div>
-        <button type="button" class="ghost-button" id="closeCrochetCalibration">Close</button>
-      </div>
-      <div class="three editor-fields">
-        <label>Form ID<input id="ccFormId" placeholder="PILOOP_SC_001"></label>
-        <label>Operator / crocheter<input id="ccCrocheter" placeholder="Operator ID"></label>
-        <label>Yarn ID<input id="ccYarn" placeholder="Yarn ID"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Hook (mm)<input id="ccHook" type="number" min="0.1" step="0.1"></label>
-        <label>Construction<select id="ccConstruction"><option>spiral</option><option>round</option><option>flat</option></select></label>
-        <label>Replicate group<input id="ccGroup" placeholder="SC_YARN01_HOOK30"></label>
-      </div>
-      <div class="editor-actions">
-        <button type="button" id="printCrochetForm">Generate & print measurement form</button><button type="button" class="ghost-button" id="generateCrochetPlan">Generate missing experiment plan</button><button type="button" class="ghost-button" id="printCrochetPlan">Print experiment plan</button>
-        <button type="button" class="ghost-button" id="refreshCrochetCalibration">Refresh calibration status</button>
-<button type="button" class="ghost-button" id="checkCrochetQuality">Check measurement quality</button>
-<button type="button" class="ghost-button" id="printCrochetAudit">Print calibration audit</button>
-      </div>
-      <div id="crochetExperimentPlan" class="projects-list"></div><div class="section-title">Enter completed measurement</div>
-      <div class="three editor-fields">
-        <label>Record ID<input id="ccRecordId" placeholder="MEAS_001"></label>
-        <label>Gauge stitches<input id="ccGaugeSt" type="number" min="1"></label>
-        <label>Gauge rounds / rows<input id="ccGaugeRows" type="number" min="1"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Measured width (mm)<input id="ccWidth" type="number" min="0.1" step="0.1"></label>
-        <label>Measured height (mm)<input id="ccHeight" type="number" min="0.1" step="0.1"></label>
-        <label>Yarn used (m)<input id="ccUsedM" type="number" min="0.001" step="0.001"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Yarn mass used (g)<input id="ccMassG" type="number" min="0.001" step="0.001"></label>
-        <label>Yarn diameter (mm)<input id="ccDiameter" type="number" min="0.01" step="0.01"></label>
-        <label>Evidence reference<input id="ccEvidence" placeholder="photo/file/reference"></label>
-      </div>
-      <label>Operation counts JSON<textarea id="ccOps" rows="4" spellcheck="false">{"SC": 400}</textarea></label>
-      <div class="editor-actions"><button type="button" id="saveCrochetMeasurement">Save measured record</button><button type="button" id="fitCrochetCalibration">Fit & register when ready</button></div>
-      <div id="crochetCalibrationStatus" class="editor-validation"></div>
-<div id="crochetQualityStatus" class="editor-validation"></div>
-      <div id="crochetCalibrationRecords" class="projects-list"></div>
-    </section>
-
-<section id="swatchesPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head"><div><div class="section-title preview-title">Measured swatches</div><div class="chart-meta">Empirical measurements are stored separately from estimates.</div></div><button type="button" class="ghost-button" id="closeSwatches">Close</button></div>
-      <div class="three editor-fields">
-        <label>Name<input id="swName" placeholder="Stockinette test 1"></label>
-        <label>Pattern<select id="swPattern"></select></label>
-        <label>Yarn<select id="swYarn"></select></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Stitches<input id="swStitches" type="number" min="1"></label>
-        <label>Rows<input id="swRows" type="number" min="1"></label>
-        <label>Needle (mm)<input id="swNeedle" type="number" min="0.1" step="0.1"></label>
-      </div>
-      <div class="three editor-fields">
-        <label>Width (cm)<input id="swWidth" type="number" min="0.1" step="0.1"></label>
-        <label>Height (cm)<input id="swHeight" type="number" min="0.1" step="0.1"></label>
-        <label>Yarn used (m)<input id="swLength" type="number" min="0.01" step="0.01"></label>
-      </div>
-      <div class="editor-actions"><button type="button" id="createSwatch">Save measured swatch</button></div>
-      <div id="swatchStatus" class="editor-validation"></div>
-      <div id="swatchList" class="projects-list"></div>
-    </section>
-
-    <section id="projectsPanel" class="panel projects-panel hidden">
-      <div class="pattern-preview-head">
-        <div>
-          <div class="section-title preview-title">Saved projects</div>
-          <div class="chart-meta">Projects include calculation inputs, result and audit snapshot.</div>
-        </div>
-        <button type="button" class="ghost-button" id="closeProjects">Close</button>
-      </div>
-      <div id="projectsList" class="projects-list"></div>
-    </section>
-
-    <section class="grid">
-      <form id="calcForm" class="panel form-panel">
-        <div class="section-title">Project</div>
-        <div class="two">
-          <label>Pattern<select id="pattern" required></select></label>
-          <label>Yarn<select id="yarn"><option value="">No yarn selected</option></select></label>
-        </div>
-
-        <div class="pattern-preview-card">
-          <div class="pattern-preview-head">
-            <div>
-              <div class="section-title preview-title">Pattern chart</div>
-              <div id="chartMeta" class="chart-meta">Select a pattern to preview its repeat.</div>
-            </div>
-            <div class="preview-actions"><button type="button" class="ghost-button" id="editPattern">Edit pattern</button><button type="button" class="ghost-button" id="expandChart">Expand</button></div>
-          </div>
-          <div id="patternChart" class="pattern-chart" aria-live="polite"></div>
-          <div id="patternLegend" class="pattern-legend"></div>
-        </div>
-
-        <div id="editorPanel" class="pattern-editor hidden">
-          <div class="pattern-preview-head">
-            <div>
-              <div class="section-title preview-title">Interactive pattern editor</div>
-              <div class="chart-meta">Select an operation, then click a stitch position. Save creates a new versioned pattern.</div>
-            </div>
-            <button type="button" class="ghost-button" id="closeEditor">Close editor</button>
-          </div>
-          <div class="editor-fields three">
-            <label>Pattern ID<input id="editorId" type="text"></label>
-            <label>Version<input id="editorVersion" type="text" value="1.0.1"></label>
-            <label>Name<input id="editorName" type="text"></label>
-          </div>
-          <div class="editor-fields two">
-            <label>Repeat width<input id="editorWidth" type="number" min="1" max="500"></label>
-            <label>Repeat height<input id="editorHeight" type="number" min="1" max="500"></label>
-          </div>
-          <div class="section-title">Operation palette</div>
-          <div id="operationPalette" class="operation-palette"></div>
-          <div id="editorGrid" class="editor-grid-wrap"></div>
-          <div id="editorValidation" class="editor-validation"></div>
-          <div class="editor-actions">
-            <button type="button" class="ghost-button" id="validateEditor">Validate</button>
-            <button type="button" id="saveEditor">Save new pattern version</button>
-          </div>
-        </div>
-
-        <div class="two">
-          <label>Width <span>cm</span><input id="width" type="number" min="1" step="0.1" value="100" required></label>
-          <label>Height <span>cm</span><input id="height" type="number" min="1" step="0.1" value="150" required></label>
-        </div>
-
-        <div class="section-title">Gauge</div>
-        <div class="two">
-          <label>Stitches / 10 cm<input id="gaugeSt" type="number" min="1" value="20" required></label>
-          <label>Rows / 10 cm<input id="gaugeRows" type="number" min="1" value="28" required></label>
-        </div>
-
-        <div class="section-title">Pattern placement</div>
-        <div class="three">
-          <label>Left edge<input id="edgeLeft" type="number" min="0" value="0"></label>
-          <label>Right edge<input id="edgeRight" type="number" min="0" value="0"></label>
-          <label>Partial repeats<select id="partial"><option value="reject">Reject</option><option value="split">Split</option><option value="center">Center</option><option value="left">Left</option><option value="right">Right</option></select></label>
-        </div>
-
-        <div class="section-title">Calculation mode</div>
-        <div class="mode-switch">
-          <label><input type="radio" name="mode" value="swatch" checked>Measured swatch</label>
-          <label><input type="radio" name="mode" value="geometry">Research geometry</label><label><input type="radio" name="mode" value="calibrated">Approved model</label>
-        </div>
-
-        <div id="swatchFields" class="mode-card">
-          <div class="three">
-            <label>Swatch stitches<input id="swatchSt" type="number" min="1" value="40"></label>
-            <label>Swatch rows<input id="swatchRows" type="number" min="1" value="56"></label>
-            <label>Yarn used <span>m</span><input id="swatchLength" type="number" min="0.01" step="0.01" value="15"></label>
-          </div>
-          <p>The yarn length must correspond to the same core fabric region represented by the stitch and row counts.</p>
-        </div>
-
-        <div id="calibratedFields" class="mode-card hidden">
-          <strong id="productionModelLabel">No approved production model</strong>
-          <p>The approved model is used only with runtime domain checks. Out-of-domain predictions are explicitly flagged.</p>
-        </div>
-        <div id="geometryFields" class="mode-card hidden">
-          <label>Measured yarn diameter <span>mm</span><input id="diameter" type="number" min="0.01" step="0.01" value="1.0"></label>
-          <p>Available only for Stockinette. This is a research baseline, not a validated hand knitting estimate.</p>
-        </div>
-
-        <div class="two footer-inputs">
-          <label>Allowance <span>%</span><input id="allowance" type="number" min="0" max="50" step="0.5" value="0"></label>
-          <button type="submit">Calculate yarn</button>
-        </div>
-      </form>
-
-      <section class="panel results-panel">
-        <div id="emptyState" class="empty">
-          <div class="orb">∿</div>
-          <h2>Ready to calculate</h2>
-          <p>The result will show yarn length, mass, package count, project grid, pattern operations and audit warnings.</p>
-        </div>
-
-        <div id="results" class="hidden">
-          <div class="result-head">
-            <div>
-              <div class="eyebrow" id="resultTier">TIER</div>
-              <h2 id="resultTitle">Result</h2>
-            </div>
-            <div class="badge" id="confidenceBadge">Confidence</div>
-          </div>
-
-          <div class="metrics">
-            <div class="metric primary"><span>Recommended yarn</span><strong id="recommended">—</strong><small>metres incl. allowance</small></div>
-            <div class="metric"><span>Core estimate</span><strong id="core">—</strong><small>metres</small></div>
-            <div class="metric"><span>Mass</span><strong id="mass">—</strong><small>grams</small></div>
-            <div class="metric"><span>Packages</span><strong id="packages">—</strong><small>rounded up</small></div>
-          </div>
-
-          <div class="info-grid">
-            <article><span>Project grid</span><strong id="gridValue">—</strong><small id="achieved">—</small></article>
-            <article><span>Pattern</span><strong id="patternValue">—</strong><small id="familyValue">—</small></article>
-            <article><span>Yarn</span><strong id="yarnValue">—</strong><small id="yarnEvidence">—</small></article>
-          </div>
-
-          <div class="section-title">Warnings and model status</div>
-          <div id="warnings" class="warnings"></div>
-
-          <details>
-            <summary>Calculation audit</summary>
-            <pre id="audit"></pre>
-          </details>
-          <details>
-            <summary>Operation counts</summary>
-            <pre id="operations"></pre>
-          </details>
-        </div>
-
-        <div id="errorBox" class="error hidden"></div>
-      </section>
-    </section>
-  </main>
-  <script src="/static/app.js"></script>
+  <section class="panel" style="margin-top:18px">
+    <h2>Production model status</h2>
+    <div class="metrics">
+      <div class="metric"><span>Technique</span><strong>Crochet</strong></div>
+      <div class="metric"><span>Primary use</span><strong>Amigurumi</strong></div>
+      <div class="metric"><span>Evidence</span><strong>Measured</strong></div>
+    </div>
+    <p class="note">No crochet length coefficient is invented by the application. A production consumption model must be fitted from real calibration records that pass the evidence and quality gates.</p>
+  </section>
+</main>
 <script>
-if ("serviceWorker" in navigator) window.addEventListener("load",()=>navigator.serviceWorker.register("/sw.js"));
-</script></body>
+const $=id=>document.getElementById(id);
+async function jsonFetch(url,opts={}){const r=await fetch(url,{headers:{'Content-Type':'application/json'},...opts});const t=await r.text();let d;try{d=JSON.parse(t)}catch{d=t}if(!r.ok)throw new Error(typeof d==='string'?d:JSON.stringify(d));return d}
+async function health(){try{const d=await jsonFetch('/api/health');$('apiStatus').textContent=`Engine online · ${d.version}`;$('apiStatus').className='status ok'}catch(e){$('apiStatus').textContent='Engine unavailable';$('apiStatus').className='status bad'}}
+$('analyse').onclick=async()=>{try{const rounds=JSON.parse($('rounds').value);const payload={initial_stitches:Number($('initialStitches').value),rounds};const d=await jsonFetch('/api/crochet/amigurumi/analyse',{method:'POST',body:JSON.stringify(payload)});$('analysisOutput').textContent=JSON.stringify(d,null,2);$('analysisMessage').textContent=d.valid?`Valid crochet program. Final stitch count: ${d.final_stitches}`:`Crochet program needs correction.`;$('analysisMessage').className=d.valid?'note ok':'note bad'}catch(e){$('analysisMessage').textContent=e.message;$('analysisMessage').className='note bad'}};
+$('saveMeasurement').onclick=async()=>{try{const payload={record_id:$('recordId').value,yarn_id:$('yarnId').value,crocheter_id:$('crocheterId').value,hook_mm:Number($('hookMm').value),construction:$('construction').value,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),measured_width_mm:Number($('widthMm').value),measured_height_mm:Number($('heightMm').value),yarn_used_m:Number($('yarnUsed').value),yarn_diameter_mm:Number($('diameter').value),operation_counts:JSON.parse($('operationCounts').value)};const d=await jsonFetch('/api/crochet/calibration/records',{method:'POST',body:JSON.stringify(payload)});$('calibrationMessage').textContent='Crochet measurement saved.';$('calibrationMessage').className='note ok';$('calibrationOutput').textContent=JSON.stringify(d,null,2)}catch(e){$('calibrationMessage').textContent=e.message;$('calibrationMessage').className='note bad'}};
+$('refreshCalibration').onclick=async()=>{try{const d=await jsonFetch('/api/crochet/calibration/status');$('calibrationOutput').textContent=JSON.stringify(d,null,2);$('calibrationMessage').textContent=d.ready?'Calibration evidence gate passed.':'More measured crochet evidence is required.';$('calibrationMessage').className=d.ready?'note ok':'note'}catch(e){$('calibrationMessage').textContent=e.message;$('calibrationMessage').className='note bad'}};
+health();
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+</script>
+</body>
 </html>
