@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>YarnEngine – kalkulačka příze pro háčkování</title>
+<title>YarnEngine – Crochet Yarn Calculator</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#202a2f">
 <style>
@@ -48,25 +48,24 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ===================== LOGIN ===================== -->
 <section id="viewLogin" class="card login hidden">
   <div class="eyebrow">YARNENGINE</div>
-  <h1 data-i18n="login.title">Přihlášení</h1>
-  <p class="muted small" data-i18n="login.intro">Kalkulačka spotřeby příze pro háčkování a amigurumi s grafickou databází vzorů. Přístup mají jen registrovaní uživatelé.</p>
+  <h1>Sign in</h1>
+  <p class="muted small">Crochet & amigurumi yarn calculator with a graphical pattern library. Registered users only.</p>
   <div class="fields" style="grid-template-columns:1fr">
-    <label><span data-i18n="login.user">Uživatelské jméno</span><input id="loginUser" autocomplete="username"></label>
-    <label><span data-i18n="login.pass">Heslo</span><input id="loginPass" type="password" autocomplete="current-password"></label>
+    <label><span>Username</span><input id="loginUser" autocomplete="username"></label>
+    <label><span>Password</span><input id="loginPass" type="password" autocomplete="current-password"></label>
   </div>
   <div class="toolbar">
-    <button id="btnLogin" class="accent" data-i18n="login.button">Přihlásit</button>
-    <button id="btnShowRegister" class="alt" data-i18n="login.register">Registrovat nový účet</button>
-    <button id="btnLang" class="link">EN</button>
+    <button id="btnLogin" class="accent">Sign in</button>
+    <button id="btnShowRegister" class="alt">Register a new account</button>
   </div>
   <div id="registerBox" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-    <h3 data-i18n="reg.title">Registrace</h3>
+    <h3>Registration</h3>
     <div class="fields" style="grid-template-columns:1fr">
-      <label><span data-i18n="login.user">Uživatelské jméno</span><input id="regUser" autocomplete="username"></label>
-      <label><span data-i18n="reg.pass">Heslo (min. 8 znaků)</span><input id="regPass" type="password" autocomplete="new-password"></label>
-      <label><span data-i18n="reg.pass2">Heslo znovu</span><input id="regPass2" type="password" autocomplete="new-password"></label>
+      <label><span>Username</span><input id="regUser" autocomplete="username"></label>
+      <label><span>Password (min. 8 characters)</span><input id="regPass" type="password" autocomplete="new-password"></label>
+      <label><span>Repeat password</span><input id="regPass2" type="password" autocomplete="new-password"></label>
     </div>
-    <div class="toolbar"><button id="btnRegister" data-i18n="reg.button">Vytvořit účet</button></div>
+    <div class="toolbar"><button id="btnRegister">Create account</button></div>
   </div>
   <div id="loginStatus" class="status hidden"></div>
 </section>
@@ -74,20 +73,19 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ===================== APP ===================== -->
 <div id="viewApp" class="hidden">
 <div class="topbar">
-  <div><div class="eyebrow">YARNENGINE · <span data-i18n="app.eyebrow">HÁČKOVÁNÍ &amp; AMIGURUMI</span></div><h1 data-i18n="app.title">Kalkulačka spotřeby příze</h1></div>
+  <div><div class="eyebrow">YARNENGINE · <span>CROCHET & AMIGURUMI</span></div><h1>Yarn consumption calculator</h1></div>
   <div class="toolbar" style="margin:0">
     <span class="pill" id="whoami"></span>
-    <button id="btnLang2" class="alt">EN</button>
-    <button id="btnAccount" class="alt" data-i18n="app.account">Účet</button>
-    <button id="btnLogout" class="alt" data-i18n="app.logout">Odhlásit</button>
+    <button id="btnAccount" class="alt">Account</button>
+    <button id="btnLogout" class="alt">Sign out</button>
   </div>
 </div>
 <nav class="tabs">
-  <button data-tab="calc" class="active" data-i18n="tab.calc">Kalkulačka</button>
-  <button data-tab="patterns" data-i18n="tab.patterns">Databáze vzorů</button>
-  <button data-tab="yarns" data-i18n="tab.yarns">Příze</button>
-  <button data-tab="projects" data-i18n="tab.projects">Projekty</button>
-  <button data-tab="admin" id="tabAdmin" class="hidden" data-i18n="tab.admin">Správa uživatelů</button>
+  <button data-tab="calc" class="active">Calculator</button>
+  <button data-tab="patterns">Pattern library</button>
+  <button data-tab="yarns">Yarns</button>
+  <button data-tab="projects">Projects</button>
+  <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
 </nav>
 
 <!-- ---------- CALCULATOR ---------- -->
@@ -95,80 +93,80 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <div class="grid2">
 <div>
   <div class="card">
-    <h2 data-i18n="calc.mode">Co počítáte?</h2>
+    <h2>What are you making?</h2>
     <div class="toolbar" style="margin-top:0">
-      <button id="modeFlat" class="accent" data-i18n="calc.flat">Plošný díl podle vzoru</button>
-      <button id="modeAmi" class="alt" data-i18n="calc.ami">Amigurumi (kola)</button>
+      <button id="modeFlat" class="accent">Flat piece from a pattern</button>
+      <button id="modeAmi" class="alt">Amigurumi (rounds)</button>
     </div>
     <div id="flatBox" style="margin-top:12px">
       <div class="fields">
-        <label><span data-i18n="calc.pattern">Vzor</span><select id="pattern"></select></label>
-        <label><span data-i18n="calc.partial">Neúplný opakující se díl</span><select id="partial"><option value="center" data-i18n="calc.partial.center">Vycentrovat</option><option value="left" data-i18n="calc.partial.left">Doplnit vlevo</option><option value="right" data-i18n="calc.partial.right">Doplnit vpravo</option><option value="split" data-i18n="calc.partial.split">Rozdělit na obě strany</option><option value="reject" data-i18n="calc.partial.reject">Odmítnout (přesné násobky)</option></select></label>
-        <label><span data-i18n="calc.width">Šířka dílu (cm)</span><input id="widthCm" type="number" step="0.5" min="0.5" value="30"></label>
-        <label><span data-i18n="calc.height">Výška dílu (cm)</span><input id="heightCm" type="number" step="0.5" min="0.5" value="40"></label>
+        <label><span>Pattern</span><select id="pattern"></select></label>
+        <label><span>Partial repeat</span><select id="partial"><option value="center">Centre</option><option value="left">Fill left</option><option value="right">Fill right</option><option value="split">Split both sides</option><option value="reject">Reject (exact multiples)</option></select></label>
+        <label><span>Piece width (cm)</span><input id="widthCm" type="number" step="0.5" min="0.5" value="30"></label>
+        <label><span>Piece height (cm)</span><input id="heightCm" type="number" step="0.5" min="0.5" value="40"></label>
       </div>
       <div id="patternPreview" class="chartbox" style="margin-top:10px;max-height:240px"></div>
-      <div class="toolbar"><button id="btnPickPattern" class="alt" data-i18n="calc.pick">Vybrat z grafické databáze</button></div>
+      <div class="toolbar"><button id="btnPickPattern" class="alt">Pick from the graphical library</button></div>
     </div>
     <div id="amiBox" class="hidden" style="margin-top:12px">
       <div class="fields">
-        <label><span data-i18n="ami.template">Tvar (šablona)</span><select id="amiTemplate">
-          <option value="sphere" data-i18n="ami.sphere">Koule / hlava</option><option value="cylinder" data-i18n="ami.cylinder">Válec / tělo</option><option value="cone" data-i18n="ami.cone">Kužel / ucho</option><option value="limb" data-i18n="ami.limb">Končetina</option><option value="custom" data-i18n="ami.custom">Vlastní</option></select></label>
-        <label><span data-i18n="ami.size">Velikost šablony (max. stehů v kole)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
-        <label><span data-i18n="ami.initial">Počáteční stehy (magický kroužek)</span><input id="amiInitial" type="number" min="0" value="6"></label>
-        <label><span data-i18n="ami.copies">Počet kusů</span><input id="amiCopies" type="number" min="1" value="1"></label>
+        <label><span>Shape (template)</span><select id="amiTemplate">
+          <option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="cone">Cone / ear</option><option value="limb">Limb</option><option value="custom">Custom</option></select></label>
+        <label><span>Template size (max stitches per round)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
+        <label><span>Starting stitches (magic ring)</span><input id="amiInitial" type="number" min="0" value="6"></label>
+        <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
-      <h3 data-i18n="ami.rounds">Kola (operace: SC, SC_INC, SC2TOG, HDC, DC …)</h3>
+      <h3>Rounds (operations: SC, SC_INC, SC2TOG, HDC, DC …)</h3>
       <div id="rounds" class="rounds"></div>
-      <div class="toolbar"><button id="btnAddRound" class="alt" data-i18n="ami.add">+ kolo</button><button id="btnAnalyse" class="alt" data-i18n="ami.analyse">Zkontrolovat kola</button></div>
+      <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
     </div>
   </div>
 
   <div class="card">
-    <h2 data-i18n="calc.material">Příze, háček a hustota</h2>
+    <h2>Yarn, hook and gauge</h2>
     <div class="fields">
-      <label><span data-i18n="calc.yarn">Příze</span><select id="yarn"></select></label>
-      <label><span data-i18n="calc.hook">Háček (mm)</span><input id="hook" type="number" step="0.25" min="0.5" value="3.5"></label>
-      <label><span data-i18n="calc.gst">Stehy na 10 cm</span><input id="gaugeSt" type="number" step="0.5" min="1" value="20"></label>
-      <label><span data-i18n="calc.grows">Řady/kola na 10 cm</span><input id="gaugeRows" type="number" step="0.5" min="1" value="22"></label>
-      <label><span data-i18n="calc.diam">Průměr příze (mm, volitelné)</span><input id="diam" type="number" step="0.1" min="0.1" placeholder="auto"></label>
-      <label><span data-i18n="calc.allow">Rezerva (%)</span><input id="allowance" type="number" step="1" min="0" max="50" value="10"></label>
+      <label><span>Yarn</span><select id="yarn"></select></label>
+      <label><span>Hook (mm)</span><input id="hook" type="number" step="0.25" min="0.5" value="3.5"></label>
+      <label><span>Stitches per 10 cm</span><input id="gaugeSt" type="number" step="0.5" min="1" value="20"></label>
+      <label><span>Rows/rounds per 10 cm</span><input id="gaugeRows" type="number" step="0.5" min="1" value="22"></label>
+      <label><span>Yarn diameter (mm, optional)</span><input id="diam" type="number" step="0.1" min="0.1" placeholder="auto"></label>
+      <label><span>Allowance (%)</span><input id="allowance" type="number" step="1" min="0" max="50" value="10"></label>
     </div>
-    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650" data-i18n="calc.calib">Kalibrace naměřeným vzorkem (volitelný doplněk)</summary>
-      <p class="muted small" data-i18n="calc.calib.help">Uháčkujte malý vzorek stejným vzorem, přízí i háčkem, rozpárejte ho a změřte spotřebovanou délku. Odhad se pak nahradí přesným měřením.</p>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650">Calibrate with a measured swatch (optional supplement)</summary>
+      <p class="muted small">Crochet a small swatch in the same pattern, yarn and hook, unravel it and measure the yarn used. The estimate is then replaced by your measurement.</p>
       <div class="fields three">
-        <label><span data-i18n="calc.sw.st">Stehy vzorku</span><input id="swSt" type="number" min="1" placeholder="např. 20"></label>
-        <label><span data-i18n="calc.sw.rows">Řady vzorku</span><input id="swRows" type="number" min="1" placeholder="např. 20"></label>
-        <label><span data-i18n="calc.sw.len">Spotřeba (m)</span><input id="swLen" type="number" step="0.01" min="0.01" placeholder="např. 9.5"></label>
+        <label><span>Swatch stitches</span><input id="swSt" type="number" min="1" placeholder="e.g. 20"></label>
+        <label><span>Swatch rows</span><input id="swRows" type="number" min="1" placeholder="e.g. 20"></label>
+        <label><span>Yarn used (m)</span><input id="swLen" type="number" step="0.01" min="0.01" placeholder="e.g. 9.5"></label>
       </div>
     </details>
-    <div class="toolbar"><button id="btnCalc" class="accent" data-i18n="calc.run">Spočítat spotřebu příze</button><button id="btnSaveProject" class="alt" data-i18n="calc.save">Uložit jako projekt</button></div>
+    <div class="toolbar"><button id="btnCalc" class="accent">Calculate yarn</button><button id="btnSaveProject" class="alt">Save as project</button></div>
     <div id="calcStatus" class="status hidden"></div>
   </div>
 </div>
 
 <div>
   <div class="card" id="resultCard">
-    <h2 data-i18n="res.title">Výsledek</h2>
-    <div id="resultEmpty" class="muted" data-i18n="res.empty">Zatím nic nespočítáno.</div>
+    <h2>Result</h2>
+    <div id="resultEmpty" class="muted">Nothing calculated yet.</div>
     <div id="resultBody" class="hidden">
       <div id="resultBadge"></div>
       <div class="metrics">
-        <div class="metric"><span data-i18n="res.len">Doporučená délka</span><strong id="rLen">–</strong></div>
-        <div class="metric"><span data-i18n="res.range">Odhadované rozpětí</span><strong id="rRange" style="font-size:16px">–</strong></div>
-        <div class="metric"><span data-i18n="res.mass">Hmotnost</span><strong id="rMass">–</strong></div>
-        <div class="metric"><span data-i18n="res.packs">Klubek / přaden</span><strong id="rPacks">–</strong></div>
-        <div class="metric"><span data-i18n="res.st">Stehy celkem</span><strong id="rSt">–</strong></div>
-        <div class="metric"><span data-i18n="res.size">Dosažený rozměr</span><strong id="rSize" style="font-size:16px">–</strong></div>
+        <div class="metric"><span>Recommended length</span><strong id="rLen">–</strong></div>
+        <div class="metric"><span>Estimated range</span><strong id="rRange" style="font-size:16px">–</strong></div>
+        <div class="metric"><span>Weight</span><strong id="rMass">–</strong></div>
+        <div class="metric"><span>Balls / skeins</span><strong id="rPacks">–</strong></div>
+        <div class="metric"><span>Total stitches</span><strong id="rSt">–</strong></div>
+        <div class="metric"><span>Achieved size</span><strong id="rSize" style="font-size:16px">–</strong></div>
       </div>
-      <h3 data-i18n="res.ops">Použité operace</h3><div id="rOps" class="legend"></div>
-      <h3 data-i18n="res.notes">Poznámky k přesnosti</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
+      <h3>Operations used</h3><div id="rOps" class="legend"></div>
+      <h3>Accuracy notes</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
     </div>
   </div>
   <div class="card">
-    <h2 data-i18n="how.title">Jak se to počítá</h2>
-    <p class="small muted" data-i18n="how.text">Ze vzoru (nebo z kol amigurumi) se spočítá přesný počet každé operace. Bez kalibrace se délka příze na steh odhaduje z fyzikální geometrie stehu (hustota, průměr příze, počet provlečení háčku); pro krátký sloupek je model ukotven k publikovanému měření (Storck et al. 2022). Naměřený vzorek nebo schválený kalibrační model odhad nahradí přesnějším číslem.</p>
+    <h2>How it is calculated</h2>
+    <p class="small muted">The exact count of every operation is derived from the pattern (or the amigurumi rounds). Without calibration, yarn per stitch is estimated from stitch geometry (gauge, yarn diameter, number of hook pull-throughs); single crochet is anchored to a published measurement (Storck et al. 2022). A measured swatch or an approved calibration model replaces the estimate with a measured figure.</p>
   </div>
 </div>
 </div>
@@ -177,11 +175,11 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ---------- PATTERN DATABASE ---------- -->
 <section id="tab-patterns" class="hidden">
   <div class="card">
-    <h2 data-i18n="pat.title">Grafická databáze vzorů</h2>
+    <h2>Graphical pattern library</h2>
     <div class="fields three">
-      <label><span data-i18n="pat.search">Hledat</span><input id="patSearch" placeholder="sc, dc, puff, popcorn, blo…"></label>
-      <label><span data-i18n="pat.family">Rodina</span><select id="patFamily"><option value="">—</option></select></label>
-      <label><span data-i18n="pat.stitch">Obsahuje steh</span><select id="patStitch"><option value="">—</option></select></label>
+      <label><span>Search</span><input id="patSearch" placeholder="sc, dc, puff, popcorn, blo…"></label>
+      <label><span>Family</span><select id="patFamily"><option value="">—</option></select></label>
+      <label><span>Contains stitch</span><select id="patStitch"><option value="">—</option></select></label>
     </div>
     <div class="toolbar"><span id="patCount" class="muted small"></span></div>
     <div id="gallery" class="gallery"></div>
@@ -191,20 +189,20 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ---------- YARNS ---------- -->
 <section id="tab-yarns" class="hidden">
   <div class="grid2">
-    <div class="card"><h2 data-i18n="yarn.title">Databáze přízí</h2><div style="overflow:auto"><table id="yarnTable"><thead><tr><th data-i18n="yarn.brand">Značka</th><th data-i18n="yarn.product">Produkt</th><th>CYC</th><th>g / m</th><th data-i18n="yarn.fibre">Složení</th><th>Ø mm</th></tr></thead><tbody></tbody></table></div></div>
-    <div class="card"><h2 data-i18n="yarn.add">Přidat přízi</h2>
+    <div class="card"><h2>Yarn database</h2><div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2>Add yarn</h2>
       <div class="fields">
         <label>ID<input id="yId" placeholder="BRAND_PRODUCT_50G_120M"></label>
-        <label><span data-i18n="yarn.brand">Značka</span><input id="yBrand"></label>
-        <label><span data-i18n="yarn.product">Produkt</span><input id="yProduct"></label>
-        <label><span data-i18n="yarn.cyc">Kategorie CYC (0–7)</span><input id="yCyc" type="number" min="0" max="7" value="3"></label>
-        <label><span data-i18n="yarn.mass">Hmotnost klubka (g)</span><input id="yMass" type="number" step="1" min="1" value="50"></label>
-        <label><span data-i18n="yarn.len">Návin klubka (m)</span><input id="yLen" type="number" step="1" min="1" value="120"></label>
-        <label><span data-i18n="yarn.diam">Průměr (mm, volitelné)</span><input id="yDiam" type="number" step="0.1" min="0.1"></label>
-        <label><span data-i18n="yarn.wpi">WPI (volitelné)</span><input id="yWpi" type="number" step="0.5" min="1"></label>
-        <label style="grid-column:1/-1"><span data-i18n="yarn.fibre2">Složení (např. Cotton 100 nebo Wool 70, Acrylic 30)</span><input id="yFibre" value="Cotton 100"></label>
+        <label><span>Brand</span><input id="yBrand"></label>
+        <label><span>Product</span><input id="yProduct"></label>
+        <label><span>CYC weight (0–7)</span><input id="yCyc" type="number" min="0" max="7" value="3"></label>
+        <label><span>Ball weight (g)</span><input id="yMass" type="number" step="1" min="1" value="50"></label>
+        <label><span>Ball length (m)</span><input id="yLen" type="number" step="1" min="1" value="120"></label>
+        <label><span>Diameter (mm, optional)</span><input id="yDiam" type="number" step="0.1" min="0.1"></label>
+        <label><span>WPI (optional)</span><input id="yWpi" type="number" step="0.5" min="1"></label>
+        <label style="grid-column:1/-1"><span>Fibre (e.g. Cotton 100 or Wool 70, Acrylic 30)</span><input id="yFibre" value="Cotton 100"></label>
       </div>
-      <div class="toolbar"><button id="btnAddYarn" data-i18n="yarn.save">Uložit přízi</button></div>
+      <div class="toolbar"><button id="btnAddYarn">Save yarn</button></div>
       <div id="yarnStatus" class="status hidden"></div>
     </div>
   </div>
@@ -212,16 +210,16 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 
 <!-- ---------- PROJECTS ---------- -->
 <section id="tab-projects" class="hidden">
-  <div class="card"><h2 data-i18n="proj.title">Uložené projekty</h2><div id="projectList"></div></div>
+  <div class="card"><h2>Saved projects</h2><div id="projectList"></div></div>
 </section>
 
 <!-- ---------- ADMIN ---------- -->
 <section id="tab-admin" class="hidden">
   <div class="grid2">
-    <div class="card"><h2 data-i18n="adm.title">Uživatelé</h2><div style="overflow:auto"><table id="userTable"><thead><tr><th>ID</th><th data-i18n="login.user">Uživatel</th><th data-i18n="adm.role">Role</th><th data-i18n="adm.active">Aktivní</th><th data-i18n="adm.last">Poslední přihlášení</th><th></th></tr></thead><tbody></tbody></table></div></div>
-    <div class="card"><h2 data-i18n="adm.create">Vytvořit uživatele</h2>
-      <div class="fields"><label><span data-i18n="login.user">Uživatelské jméno</span><input id="auUser"></label><label><span data-i18n="login.pass">Heslo</span><input id="auPass" type="password"></label><label><span data-i18n="adm.role">Role</span><select id="auRole"><option value="user">user</option><option value="admin">admin</option></select></label></div>
-      <div class="toolbar"><button id="btnCreateUser" data-i18n="adm.createBtn">Vytvořit</button></div>
+    <div class="card"><h2>Users</h2><div style="overflow:auto"><table id="userTable"><thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Active</th><th>Last login</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2>Create user</h2>
+      <div class="fields"><label><span>Username</span><input id="auUser"></label><label><span>Password</span><input id="auPass" type="password"></label><label><span>Role</span><select id="auRole"><option value="user">user</option><option value="admin">admin</option></select></label></div>
+      <div class="toolbar"><button id="btnCreateUser">Create</button></div>
       <div id="adminStatus" class="status hidden"></div>
     </div>
   </div>
@@ -235,44 +233,21 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   <div class="chartbox" id="pmChart" style="margin-top:8px"></div>
   <div class="legend" id="pmLegend"></div>
   <p class="small muted" id="pmRepeat"></p>
-  <div class="toolbar"><button id="pmUse" class="accent" data-i18n="pat.use">Použít v kalkulačce</button></div>
+  <div class="toolbar"><button id="pmUse" class="accent">Use in calculator</button></div>
 </div></div>
 
 <div id="accountModal" class="modal hidden"><div class="modal-card" style="max-width:460px">
-  <div class="modal-head"><h2 style="margin:0" data-i18n="acc.title">Změna hesla</h2><button id="accClose" class="alt">✕</button></div>
-  <div class="fields" style="grid-template-columns:1fr"><label><span data-i18n="acc.cur">Současné heslo</span><input id="accCur" type="password"></label><label><span data-i18n="acc.new">Nové heslo</span><input id="accNew" type="password"></label></div>
-  <div class="toolbar"><button id="accSave" data-i18n="acc.save">Změnit</button></div><div id="accStatus" class="status hidden"></div>
+  <div class="modal-head"><h2 style="margin:0">Change password</h2><button id="accClose" class="alt">✕</button></div>
+  <div class="fields" style="grid-template-columns:1fr"><label><span>Current password</span><input id="accCur" type="password"></label><label><span>New password</span><input id="accNew" type="password"></label></div>
+  <div class="toolbar"><button id="accSave">Change</button></div><div id="accStatus" class="status hidden"></div>
 </div></div>
 
 </main>
 <script>
-/* ============================ i18n ============================ */
-const I18N={
- cs:{},
- en:{
-  "login.title":"Sign in","login.intro":"Crochet & amigurumi yarn calculator with a graphical pattern library. Registered users only.","login.user":"Username","login.pass":"Password","login.button":"Sign in","login.register":"Register a new account","reg.title":"Registration","reg.pass":"Password (min. 8 characters)","reg.pass2":"Repeat password","reg.button":"Create account",
-  "app.eyebrow":"CROCHET & AMIGURUMI","app.title":"Yarn consumption calculator","app.account":"Account","app.logout":"Sign out","tab.calc":"Calculator","tab.patterns":"Pattern library","tab.yarns":"Yarns","tab.projects":"Projects","tab.admin":"User admin",
-  "calc.mode":"What are you making?","calc.flat":"Flat piece from a pattern","calc.ami":"Amigurumi (rounds)","calc.pattern":"Pattern","calc.partial":"Partial repeat","calc.partial.center":"Centre","calc.partial.left":"Fill left","calc.partial.right":"Fill right","calc.partial.split":"Split both sides","calc.partial.reject":"Reject (exact multiples)","calc.width":"Piece width (cm)","calc.height":"Piece height (cm)","calc.pick":"Pick from the graphical library",
-  "ami.template":"Shape (template)","ami.sphere":"Sphere / head","ami.cylinder":"Cylinder / body","ami.cone":"Cone / ear","ami.limb":"Limb","ami.custom":"Custom","ami.size":"Template size (max stitches per round)","ami.initial":"Starting stitches (magic ring)","ami.copies":"Number of pieces","ami.rounds":"Rounds (operations: SC, SC_INC, SC2TOG, HDC, DC …)","ami.add":"+ round","ami.analyse":"Check rounds",
-  "calc.material":"Yarn, hook and gauge","calc.yarn":"Yarn","calc.hook":"Hook (mm)","calc.gst":"Stitches per 10 cm","calc.grows":"Rows/rounds per 10 cm","calc.diam":"Yarn diameter (mm, optional)","calc.allow":"Allowance (%)","calc.calib":"Calibrate with a measured swatch (optional supplement)","calc.calib.help":"Crochet a small swatch in the same pattern, yarn and hook, unravel it and measure the yarn used. The estimate is then replaced by your measurement.","calc.sw.st":"Swatch stitches","calc.sw.rows":"Swatch rows","calc.sw.len":"Yarn used (m)","calc.run":"Calculate yarn","calc.save":"Save as project",
-  "res.title":"Result","res.empty":"Nothing calculated yet.","res.len":"Recommended length","res.range":"Estimated range","res.mass":"Weight","res.packs":"Balls / skeins","res.st":"Total stitches","res.size":"Achieved size","res.ops":"Operations used","res.notes":"Accuracy notes",
-  "how.title":"How it is calculated","how.text":"The exact count of every operation is derived from the pattern (or the amigurumi rounds). Without calibration, yarn per stitch is estimated from stitch geometry (gauge, yarn diameter, number of hook pull-throughs); single crochet is anchored to a published measurement (Storck et al. 2022). A measured swatch or an approved calibration model replaces the estimate with a measured figure.",
-  "pat.title":"Graphical pattern library","pat.search":"Search","pat.family":"Family","pat.stitch":"Contains stitch","pat.use":"Use in calculator",
-  "yarn.title":"Yarn database","yarn.brand":"Brand","yarn.product":"Product","yarn.fibre":"Fibre","yarn.add":"Add yarn","yarn.cyc":"CYC weight (0–7)","yarn.mass":"Ball weight (g)","yarn.len":"Ball length (m)","yarn.diam":"Diameter (mm, optional)","yarn.wpi":"WPI (optional)","yarn.fibre2":"Fibre (e.g. Cotton 100 or Wool 70, Acrylic 30)","yarn.save":"Save yarn",
-  "proj.title":"Saved projects","adm.title":"Users","adm.role":"Role","adm.active":"Active","adm.last":"Last login","adm.create":"Create user","adm.createBtn":"Create","acc.title":"Change password","acc.cur":"Current password","acc.new":"New password","acc.save":"Change",
-  "msg.calibrated":"Calibrated estimate (measured swatch)","msg.model":"Calibrated estimate (approved model)","msg.baseline":"Uncalibrated estimate – stitch geometry baseline","msg.loginFail":"Sign-in failed","msg.saved":"Saved.","msg.deleted":"Deleted.","msg.confirmDel":"Delete this user?","msg.projName":"Project name","msg.open":"Open","msg.delete":"Delete","msg.noProjects":"No saved projects yet.","msg.pwMismatch":"Passwords do not match.","msg.valid":"Rounds are consistent.","msg.deact":"Deactivate","msg.act":"Activate","msg.resetPw":"Reset password","msg.newPw":"New password for","msg.yarnMissing":"Select a yarn or enter a yarn diameter."
- }
-};
-let LANG=localStorage.getItem('ye_lang')||'cs';
-const CS_DEFAULTS={};
-function t(k){return (LANG==='en'&&I18N.en[k])||CS_DEFAULTS[k]||I18N.en[k]||k;}
-function applyLang(){
- document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(!(k in CS_DEFAULTS))CS_DEFAULTS[k]=el.textContent;el.textContent=t(k);});
- document.documentElement.lang=LANG;['btnLang','btnLang2'].forEach(id=>{const b=$(id);if(b)b.textContent=LANG==='cs'?'EN':'CZ';});
-}
-/* Czech fallbacks for message keys that are not in the DOM */
-Object.assign(CS_DEFAULTS,{"msg.calibrated":"Kalibrovaný odhad (naměřený vzorek)","msg.model":"Kalibrovaný odhad (schválený model)","msg.baseline":"Nekalibrovaný odhad – geometrie stehu","msg.loginFail":"Přihlášení se nezdařilo","msg.saved":"Uloženo.","msg.deleted":"Smazáno.","msg.confirmDel":"Smazat tohoto uživatele?","msg.projName":"Název projektu","msg.open":"Otevřít","msg.delete":"Smazat","msg.noProjects":"Zatím žádné uložené projekty.","msg.pwMismatch":"Hesla se neshodují.","msg.valid":"Kola jsou konzistentní.","msg.deact":"Deaktivovat","msg.act":"Aktivovat","msg.resetPw":"Reset hesla","msg.newPw":"Nové heslo pro","msg.yarnMissing":"Vyberte přízi nebo zadejte průměr příze."});
-
+/* ============================ strings ============================ */
+const MSG={"msg.calibrated": "Calibrated estimate (measured swatch)", "msg.model": "Calibrated estimate (approved model)", "msg.baseline": "Uncalibrated estimate – stitch geometry baseline", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter."};
+function t(k){return MSG[k]||k;}
+function applyLang(){}
 /* ============================ helpers ============================ */
 const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -287,13 +262,13 @@ async function api(path,opts={}){
 }
 
 /* ============================ crochet chart symbols ============================ */
-const OPS_INFO={CH:['Řetízkové oko','Chain'],SLST:['Pevné oko','Slip stitch'],SC:['Krátký sloupek','Single crochet'],HDC:['Polodlouhý sloupek','Half double crochet'],DC:['Dlouhý sloupek','Double crochet'],TR:['Dvakrát nahozený sloupek','Treble'],DTR:['Třikrát nahozený sloupek','Double treble'],
- SC2TOG:['2 KS sháčkované','sc2tog'],SC3TOG:['3 KS sháčkované','sc3tog'],HDC2TOG:['2 PDS sháčkované','hdc2tog'],DC2TOG:['2 DS sháčkované','dc2tog'],DC3TOG:['3 DS sháčkované','dc3tog'],
- SC_INC:['Přidání (2 KS do 1)','sc increase'],HDC_INC:['Přidání (2 PDS do 1)','hdc increase'],DC_INC:['Přidání (2 DS do 1)','dc increase'],
- SC_BLO:['KS za zadní kličku','sc back loop only'],SC_FLO:['KS za přední kličku','sc front loop only'],HDC_BLO:['PDS za zadní kličku','hdc back loop only'],DC_BLO:['DS za zadní kličku','dc back loop only'],
- FPDC:['Reliéfní DS zepředu','front post dc'],BPDC:['Reliéfní DS zezadu','back post dc'],PUFF3:['Puff (3 PDS)','puff stitch'],POPCORN5:['Popcorn (5 DS)','popcorn']};
+const OPS_INFO={CH:['Chain','Chain'],SLST:['Slip stitch','Slip stitch'],SC:['Single crochet','Single crochet'],HDC:['Half double crochet','Half double crochet'],DC:['Double crochet','Double crochet'],TR:['Treble','Treble'],DTR:['Double treble','Double treble'],
+ SC2TOG:['sc2tog','sc2tog'],SC3TOG:['sc3tog','sc3tog'],HDC2TOG:['hdc2tog','hdc2tog'],DC2TOG:['dc2tog','dc2tog'],DC3TOG:['dc3tog','dc3tog'],
+ SC_INC:['sc increase','sc increase'],HDC_INC:['hdc increase','hdc increase'],DC_INC:['dc increase','dc increase'],
+ SC_BLO:['sc back loop only','sc back loop only'],SC_FLO:['sc front loop only','sc front loop only'],HDC_BLO:['hdc back loop only','hdc back loop only'],DC_BLO:['dc back loop only','dc back loop only'],
+ FPDC:['front post dc','front post dc'],BPDC:['back post dc','back post dc'],PUFF3:['puff stitch','puff stitch'],POPCORN5:['popcorn','popcorn']};
 const CONSUMES={SC2TOG:2,SC3TOG:3,HDC2TOG:2,DC2TOG:2,DC3TOG:3};
-function opName(op){const i=OPS_INFO[op];return i?(LANG==='en'?i[1]:i[0]):op;}
+function opName(op){const i=OPS_INFO[op];return i?i[1]:op;}
 /* glyphs drawn in a 20x20 box, stroke-based */
 function glyph(op){
  const S='stroke="var(--chart)" stroke-width="1.6" fill="none" stroke-linecap="round"';
@@ -370,7 +345,6 @@ $('btnShowRegister').onclick=()=>$('registerBox').classList.toggle('hidden');
 $('btnRegister').onclick=async()=>{if($('regPass').value!==$('regPass2').value){status($('loginStatus'),t('msg.pwMismatch'),'bad');return;}
  try{await api('/api/auth/register',{method:'POST',body:{username:$('regUser').value,password:$('regPass').value}});location.reload();}catch(e){status($('loginStatus'),e.message,'bad');}};
 $('btnLogout').onclick=async()=>{await api('/api/auth/logout',{method:'POST'});location.reload();};
-[$('btnLang'),$('btnLang2')].forEach(b=>b.onclick=()=>{LANG=LANG==='cs'?'en':'cs';localStorage.setItem('ye_lang',LANG);applyLang();if(ME){renderPatternSelect();renderGallery();renderYarns();}});
 $('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accClose').onclick=()=>$('accountModal').classList.add('hidden');
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
@@ -385,7 +359,7 @@ async function loadData(){
  if(PATTERNS.length)selectPattern(KEY(PATTERNS.find(p=>p.pattern_id==='CROCHET_SOLID_SC_01')||PATTERNS[0]));
 }
 function renderPatternSelect(){const sel=$('pattern');const cur=sel.value;sel.innerHTML=PATTERNS.map(p=>`<option value="${esc(KEY(p))}">${esc(p.name)} · ${esc(p.family_id)}</option>`).join('');if(cur)sel.value=cur;}
-function renderYarnSelect(){$('yarn').innerHTML=`<option value="">— ${LANG==='en'?'custom (enter diameter)':'vlastní (zadejte průměr)'} —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
+function renderYarnSelect(){$('yarn').innerHTML=`<option value="">— custom (enter diameter) —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
 function selectPattern(key){$('pattern').value=key;const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('patternPreview').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(12/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(8/(p.rows||[]).length)),cell:22,maxCells:16});}
 $('pattern').onchange=e=>selectPattern(e.target.value);
 $('btnPickPattern').onclick=()=>document.querySelector('nav.tabs button[data-tab=patterns]').click();
@@ -409,7 +383,7 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
  $('pmTags').innerHTML=(p.tags||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('');
  $('pmChart').innerHTML=chartSVG(p,{tilesX:Math.max(2,Math.ceil(16/(p.repeat?.width_stitches||1))),tilesY:Math.max(2,Math.ceil(8/(p.rows||[]).length)),cell:26,maxCells:24});
  $('pmLegend').innerHTML=legendHTML(patternOps(p));
- $('pmRepeat').textContent=(LANG==='en'?'Repeat: ':'Opakování: ')+`${p.repeat?.width_stitches} × ${p.rows.length}`+(LANG==='en'?' (stitches × rows). Rows read bottom-up; arrows show working direction.':' (stehy × řady). Řady se čtou zdola nahoru; šipky ukazují směr práce.');
+ $('pmRepeat').textContent='Repeat: '+`${p.repeat?.width_stitches} × ${p.rows.length}`+' (stitches × rows). Rows read bottom-up; arrows show working direction.';
  $('pmUse').onclick=()=>{selectPattern(key);calcSetMode('flat');$('patternModal').classList.add('hidden');document.querySelector('nav.tabs button[data-tab=calc]').click();};
  $('patternModal').classList.remove('hidden');}
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
@@ -453,7 +427,7 @@ $('btnCalc').onclick=async()=>{
    const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn'};
    const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
-   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} ${LANG==='en'?'rounds':'kol'} × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
+   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} rounds × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
   }
  }catch(e){status($('calcStatus'),e.message,'bad');}
 };
@@ -473,8 +447,8 @@ function showResult(r){
 
 /* ============================ projects ============================ */
 $('btnSaveProject').onclick=async()=>{
- if(calcMode!=='flat'){status($('calcStatus'),LANG==='en'?'Projects currently save flat-piece calculations.':'Projekty zatím ukládají výpočty plošných dílů.','warn');return;}
- const name=prompt(t('msg.projName'),$('pattern').selectedOptions[0]?.textContent||'Projekt');if(!name)return;
+ if(calcMode!=='flat'){status($('calcStatus'),'Projects currently save flat-piece calculations.','warn');return;}
+ const name=prompt(t('msg.projName'),$('pattern').selectedOptions[0]?.textContent||'Project');if(!name)return;
  const [pattern_id,pattern_version]=$('pattern').value.split('|');const c=commonInputs();
  const calculation={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
  try{const d=await api(currentProjectId?'/api/projects/'+currentProjectId:'/api/projects',{method:currentProjectId?'PUT':'POST',body:{name,description:'',calculation,result:lastResult?.response||null,status:lastResult?'calculated':'draft'}});currentProjectId=d.project_id;status($('calcStatus'),t('msg.saved'),'good');}catch(e){status($('calcStatus'),e.message,'bad');}
