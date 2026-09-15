@@ -1,0 +1,19 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "PASCUALI_MANADA_25G_200M",
+  "brand": "Pascuali",
+  "product": "Manada",
+  "variant": null,
+  "cyc_weight": 0,
+  "package_mass_g": 25,
+  "package_length_m": 200,
+  "fibre_composition": {"Superkid mohair": 45, "Mulberry silk": 25, "Yak wool": 15, "Merino wool": 15},
+  "tex": 125.0,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 2.5,
+  "recommended_needle_max_mm": 4.0,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.pascuali.de/en/products/manada",
+  "evidence_level": "manufacturer_declared"
+}
