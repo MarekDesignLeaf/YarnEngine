@@ -35,6 +35,7 @@ from src.branch_knitting.engine import execute_branch_program
 from src.crochet.amigurumi import analyse_rounds
 from src.complex_consumption.bridge import calculate_operation_program, UNCALIBRATED_BASELINE_MODEL_ID
 from src.gauge_engine.gauge import Gauge
+from src.library.yarn_geometry import estimate_yarn_diameter_mm
 from src.crochet_calibration.record import CrochetCalibrationRecord
 from src.crochet_calibration.protocol import readiness as crochet_calibration_readiness
 from src.crochet_calibration.fit import fit_crochet_model
@@ -44,26 +45,163 @@ from src.crochet_calibration.quality import replicate_quality as crochet_replica
 from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
-import datetime
+import datetime, os
+from fastapi import Request, Response, Depends
+from fastapi.responses import JSONResponse
+from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS
 
 ROOT = Path(__file__).resolve().parents[2]
-DB_PATH = ROOT / "data/db/web_app.sqlite"
+# All mutable state (sqlite files, session secret) lives under DATA_DIR so a
+# persistent volume can be mounted there in production (Railway) and survive deploys.
+DATA_DIR = Path(os.environ.get("YARNENGINE_DATA_DIR") or (ROOT / "data/db"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+DB_PATH = DATA_DIR / "web_app.sqlite"
 STATIC = Path(__file__).resolve().parent / "static"
 
 ensure_demo_database(ROOT, DB_PATH)
-model_registry = ModelRegistry(ROOT / 'data/db/model_registry.sqlite')
+model_registry = ModelRegistry(DATA_DIR / 'model_registry.sqlite')
 service = WebService(ROOT, DB_PATH, model_registry=model_registry)
-project_store = ProjectStore(ROOT / 'data/db/projects.sqlite')
-swatch_store = SwatchStore(ROOT / 'data/db/swatches.sqlite')
-crochet_cal_store = CrochetCalibrationStore(ROOT / 'data/db/crochet_calibration.sqlite')
+project_store = ProjectStore(DATA_DIR / 'projects.sqlite')
+swatch_store = SwatchStore(DATA_DIR / 'swatches.sqlite')
+crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
+user_store = UserStore(DATA_DIR / 'users.sqlite')
+user_store.seed_admin_from_env()
+session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
 
 app = FastAPI(
     title="Yarn Consumption Engine",
-    version="M11.0",
-    description="Pattern-aware yarn consumption calculator with measured-swatch and research geometry modes.",
+    version="M12.1",
+    description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+# ---------------------------------------------------------------- auth ---
+PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
+                "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status"}
+
+def _auth_disabled() -> bool:
+    return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
+
+def _current_user(request: Request):
+    token = request.cookies.get(SESSION_COOKIE)
+    if not token:
+        return None
+    uid = session_signer.verify(token)
+    if uid is None:
+        return None
+    u = user_store.get(uid)
+    if not u or not u["active"]:
+        return None
+    return UserStore.public(u)
+
+@app.middleware("http")
+async def require_login(request: Request, call_next):
+    path = request.url.path
+    if _auth_disabled() or path in PUBLIC_PATHS or path.startswith("/static/") or path.startswith("/docs") or path.startswith("/openapi"):
+        return await call_next(request)
+    user = _current_user(request)
+    if user is None:
+        return JSONResponse(status_code=401, content={"detail": "login required"})
+    request.state.user = user
+    if path.startswith("/api/admin/") and user["role"] != "admin":
+        return JSONResponse(status_code=403, content={"detail": "admin only"})
+    return await call_next(request)
+
+def _set_session(response: Response, user_id: int):
+    secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
+    response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id), max_age=SESSION_DAYS*86400,
+                        httponly=True, samesite="lax", secure=secure, path="/")
+
+@app.get("/api/auth/status")
+def auth_status():
+    return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "open") == "open",
+            "has_admin": user_store.admin_count() > 0, "auth_disabled": _auth_disabled()}
+
+@app.post("/api/auth/register")
+def auth_register(payload: dict, response: Response):
+    if os.environ.get("YARNENGINE_REGISTRATION", "open") != "open":
+        raise HTTPException(status_code=403, detail="registration is closed")
+    try:
+        # The very first account becomes administrator if none was seeded from the environment.
+        role = "admin" if user_store.count() == 0 else "user"
+        u = user_store.create(payload.get("username", ""), payload.get("password", ""), role=role)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    _set_session(response, u["id"])
+    return u
+
+@app.post("/api/auth/login")
+def auth_login(payload: dict, response: Response):
+    u = user_store.authenticate(payload.get("username", ""), payload.get("password", ""))
+    if u is None:
+        raise HTTPException(status_code=401, detail="invalid username or password")
+    _set_session(response, u["id"])
+    return u
+
+@app.post("/api/auth/logout")
+def auth_logout(response: Response):
+    response.delete_cookie(SESSION_COOKIE, path="/")
+    return {"status": "logged_out"}
+
+@app.get("/api/auth/me")
+def auth_me(request: Request):
+    u = _current_user(request)
+    if u is None:
+        raise HTTPException(status_code=401, detail="login required")
+    return u
+
+@app.post("/api/auth/change-password")
+def auth_change_password(payload: dict, request: Request):
+    u = request.state.user
+    if not user_store.authenticate(u["username"], payload.get("current_password", "")):
+        raise HTTPException(status_code=401, detail="current password incorrect")
+    try:
+        user_store.set_password(u["id"], payload.get("new_password", ""))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return {"status": "ok"}
+
+@app.get("/api/admin/users")
+def admin_users():
+    return user_store.list()
+
+@app.post("/api/admin/users")
+def admin_create_user(payload: dict):
+    try:
+        return user_store.create(payload.get("username", ""), payload.get("password", ""),
+                                 role=payload.get("role", "user"), active=bool(payload.get("active", True)))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+@app.put("/api/admin/users/{user_id}")
+def admin_update_user(user_id: int, payload: dict, request: Request):
+    target = user_store.get(user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="user not found")
+    me = request.state.user
+    try:
+        if "active" in payload:
+            if user_id == me["id"] and not payload["active"]:
+                raise ValueError("you cannot deactivate your own account")
+            user_store.set_active(user_id, bool(payload["active"]))
+        if "role" in payload:
+            if user_id == me["id"] and payload["role"] != "admin":
+                raise ValueError("you cannot remove your own admin role")
+            user_store.set_role(user_id, payload["role"])
+        if payload.get("password"):
+            user_store.set_password(user_id, payload["password"])
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return UserStore.public(user_store.get(user_id))
+
+@app.delete("/api/admin/users/{user_id}")
+def admin_delete_user(user_id: int, request: Request):
+    if user_id == request.state.user["id"]:
+        raise HTTPException(status_code=422, detail="you cannot delete your own account")
+    if not user_store.delete(user_id):
+        raise HTTPException(status_code=404, detail="user not found")
+    return {"status": "deleted", "user_id": user_id}
 
 
 @app.get("/")
@@ -81,7 +219,7 @@ def web_manifest():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": "M11.0"}
+    return {"status": "ok", "version": "M12.1"}
 
 
 def _existing_pattern_rows():
@@ -216,21 +354,24 @@ def complex_consumption_calculate(payload:dict):
         raise HTTPException(status_code=422,detail={"program_issues":analysed.get("issues",[])})
     production=model_registry.production()
     yarn=service._yarn(payload.get("yarn_id")) if payload.get("yarn_id") else None
-    diameter=(yarn.get("nominal_diameter_mm") if yarn else None) or payload.get("yarn_diameter_mm")
+    diameter,diameter_source,diameter_warnings=estimate_yarn_diameter_mm(yarn,payload.get("yarn_diameter_mm"))
     if diameter is None:
-        raise HTTPException(status_code=422,detail="yarn diameter is required")
+        raise HTTPException(status_code=422,detail="yarn diameter is required (select a yarn with diameter/WPI/weight/tex or pass yarn_diameter_mm)")
     gauge=Gauge(float(payload["gauge_stitches_per_10cm"]),float(payload["gauge_rows_per_10cm"]),100.0,100.0)
     try:
         calc,pred,audit=calculate_operation_program(
             record=production,operation_counts=analysed["operation_counts"],gauge=gauge,
             yarn_diameter_mm=float(diameter),allowance_percent=float(payload.get("allowance_percent",0)),
             tex=(yarn.get("tex") if yarn else None),package_length_m=(yarn.get("package_length_m") if yarn else None),
-            domain_policy=payload.get("domain_policy","strict"),source=kind)
+            domain_policy=payload.get("domain_policy","strict"),source=kind,
+            hook_mm=(float(payload["hook_mm"]) if payload.get("hook_mm") else None),
+            cyc_weight=(yarn.get("cyc_weight") if yarn else None))
     except ValueError as e:
         raise HTTPException(status_code=422,detail=str(e))
     return {"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
-            "prediction":{"estimate_m":pred.estimate_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
-            "audit":audit,"model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
+            "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
+            "audit":{**audit,"yarn_diameter_mm":diameter,"yarn_diameter_source":diameter_source,"yarn_diameter_warnings":list(diameter_warnings)},
+            "model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
 
 @app.post("/api/crochet/amigurumi/analyse")
 def crochet_amigurumi_analyse(payload:dict):
@@ -335,6 +476,23 @@ def patterns():
                   "source_type":m.get("source_type","user_created")
                 }
     return sorted(base.values(),key=lambda x:(x["name"],x["version"]))
+
+
+@app.get("/api/patterns/full")
+def patterns_full():
+    """Every active pattern with its repeat grid, for the graphical pattern library."""
+    store=service._store()
+    try:
+        rows=store.conn.execute("SELECT pattern_id,version,name,family_id,difficulty,tags_json,techniques_json,pattern_json FROM patterns WHERE active=1").fetchall()
+        out=[]
+        for r in rows:
+            p=json.loads(r["pattern_json"])
+            out.append({"pattern_id":r["pattern_id"],"version":r["version"],"name":r["name"],"family_id":r["family_id"],
+                        "difficulty":r["difficulty"],"tags":json.loads(r["tags_json"]),"techniques":json.loads(r["techniques_json"]),
+                        "repeat":p.get("repeat"),"rows":p.get("rows")})
+        return sorted(out,key=lambda x:(x["family_id"],x["name"],x["version"]))
+    finally:
+        store.close()
 
 
 @app.get("/api/amigurumi/constructions")

@@ -1,155 +1,511 @@
 <!doctype html>
-<html lang="en">
+<html lang="cs">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Crochet Yarn Engine</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>YarnEngine – kalkulačka příze pro háčkování</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#202a2f">
 <style>
-:root{--bg:#f5f3ee;--card:#fff;--ink:#202a2f;--muted:#667078;--line:#d9d6cf;--accent:#d9795e;--accent2:#567b8c;--good:#376d4c;--bad:#9b4038}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif}.shell{max-width:1180px;margin:auto;padding:18px}.hero,.bar,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px}.hero{padding:24px;margin-bottom:14px}.hero h1{margin:4px 0 6px;font-size:clamp(28px,5vw,48px)}.eyebrow{font-size:12px;letter-spacing:.12em;font-weight:750;color:var(--accent2)}.muted{color:var(--muted)}.bar{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}.actions{display:flex;gap:8px;flex-wrap:wrap}button{border:0;border-radius:10px;background:var(--ink);color:white;padding:11px 15px;font-weight:700;cursor:pointer;min-height:44px}button.alt{background:#edf0f1;color:var(--ink)}button.accent{background:var(--accent)}button:disabled{opacity:.55;cursor:not-allowed}.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}.panel{padding:18px;margin-bottom:14px}.panel h2{margin:0 0 12px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}label{display:grid;gap:5px;font-weight:650}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px;background:#fff;color:var(--ink);font:inherit}textarea{min-height:160px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}.status{padding:10px 12px;border-radius:9px;background:#eef1f1;margin-top:10px}.status.good{background:#e8f3eb;color:var(--good)}.status.bad{background:#f7e9e7;color:var(--bad)}.hidden{display:none!important}.pattern-list,.project-list{display:grid;gap:9px;max-height:520px;overflow:auto}.pattern-card,.project-card{border:1px solid var(--line);border-radius:11px;padding:11px;background:#faf9f6;cursor:pointer}.pattern-card:hover,.project-card:hover{border-color:var(--accent2)}.pattern-card.active{outline:2px solid var(--accent)}.pattern-card strong,.project-card strong{display:block}.tag{display:inline-block;font-size:11px;padding:3px 7px;border-radius:20px;background:#e9eef0;margin:4px 5px 0 0}.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{border:1px solid var(--line);border-radius:10px;padding:10px}.metric strong{display:block;font-size:22px}.rounds{white-space:pre-wrap;background:#11181c;color:#eaf0f2;padding:12px;border-radius:10px;overflow:auto;max-height:360px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.modal{position:fixed;inset:0;background:#0008;display:grid;place-items:center;padding:18px;z-index:10}.modal-card{background:white;border-radius:16px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:18px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:12px}@media(max-width:820px){.grid{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr}.metric-grid{grid-template-columns:1fr}.shell{padding:10px}.hero{padding:18px}}
+:root{--bg:#f5f3ee;--card:#fff;--ink:#202a2f;--muted:#667078;--line:#d9d6cf;--accent:#d9795e;--accent2:#567b8c;--good:#376d4c;--warn:#8a6414;--bad:#9b4038;--chart:#1d2a33}
+*{box-sizing:border-box}html{color-scheme:light}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.shell{max-width:1240px;margin:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h1{margin:0 0 2px;font-size:clamp(22px,4vw,34px)}h2{margin:0 0 10px;font-size:19px}h3{margin:14px 0 6px;font-size:15px}
+.eyebrow{font-size:11px;letter-spacing:.12em;font-weight:750;color:var(--accent2)}.muted{color:var(--muted)}.small{font-size:12.5px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+nav.tabs button{background:#e9ecee;color:var(--ink)}nav.tabs button.active{background:var(--ink);color:#fff}
+button{border:0;border-radius:9px;background:var(--ink);color:#fff;padding:9px 14px;font-weight:650;cursor:pointer;min-height:40px;font:inherit}
+button.alt{background:#edf0f1;color:var(--ink)}button.accent{background:var(--accent)}button.danger{background:var(--bad)}button.link{background:none;color:var(--accent2);padding:2px 4px;min-height:0;text-decoration:underline;font-weight:600}
+button:disabled{opacity:.5;cursor:not-allowed}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+label{display:grid;gap:4px;font-weight:600;font-size:13.5px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:#fff;color:var(--ink);font:inherit}
+textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:13px}
+.status{padding:10px 12px;border-radius:9px;background:#eef1f1;margin-top:10px;white-space:pre-wrap}.status.good{background:#e8f3eb;color:var(--good)}.status.warn{background:#f6efdc;color:var(--warn)}.status.bad{background:#f7e9e7;color:var(--bad)}
+.hidden{display:none!important}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:10px}.metric{border:1px solid var(--line);border-radius:10px;padding:10px}.metric strong{display:block;font-size:22px}.metric span{font-size:12px;color:var(--muted)}
+.badge{display:inline-block;font-size:11.5px;padding:3px 8px;border-radius:20px;background:#e9eef0;margin:2px 4px 0 0}.badge.good{background:#dcefe2;color:var(--good)}.badge.warn{background:#f6efdc;color:var(--warn)}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;max-height:70vh;overflow:auto;padding:2px}
+.pcard{border:1px solid var(--line);border-radius:10px;padding:8px;background:#faf9f6;cursor:pointer;display:grid;gap:6px}.pcard:hover{border-color:var(--accent2)}.pcard.active{outline:2px solid var(--accent)}
+.pcard .thumb{aspect-ratio:1;background:#fff;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;overflow:hidden}.pcard .thumb > svg{width:100%;height:100%}
+.pcard strong{font-size:13px;line-height:1.25}.pcard .small{font-size:11.5px}
+.chartbox{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}.chartbox > svg{display:block;max-width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
+.modal{position:fixed;inset:0;background:#0009;display:grid;place-items:center;padding:14px;z-index:20}.modal-card{background:#fff;border-radius:14px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:16px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.login{max-width:420px;margin:8vh auto}
+.rounds{display:grid;gap:6px}.round{display:grid;grid-template-columns:52px 1fr 36px;gap:6px;align-items:center}.round input{padding:6px}
+.pill{display:inline-block;padding:2px 8px;border-radius:14px;background:#edf0f1;font-size:12px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.fields,.fields.three{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}}
 </style>
 </head>
 <body>
 <main class="shell">
-<section class="hero">
-<div class="eyebrow">CROCHET YARN ENGINE · AMIGURUMI FIRST</div>
-<h1>Crochet yarn planning and pattern analysis</h1>
-<div class="muted">Crochet and amigurumi workflow using canonical stitch operations, physical gauge and measured calibration evidence.</div>
-<div id="apiStatus" class="status">Connecting…</div>
+
+<!-- ===================== LOGIN ===================== -->
+<section id="viewLogin" class="card login hidden">
+  <div class="eyebrow">YARNENGINE</div>
+  <h1 data-i18n="login.title">Přihlášení</h1>
+  <p class="muted small" data-i18n="login.intro">Kalkulačka spotřeby příze pro háčkování a amigurumi s grafickou databází vzorů. Přístup mají jen registrovaní uživatelé.</p>
+  <div class="fields" style="grid-template-columns:1fr">
+    <label><span data-i18n="login.user">Uživatelské jméno</span><input id="loginUser" autocomplete="username"></label>
+    <label><span data-i18n="login.pass">Heslo</span><input id="loginPass" type="password" autocomplete="current-password"></label>
+  </div>
+  <div class="toolbar">
+    <button id="btnLogin" class="accent" data-i18n="login.button">Přihlásit</button>
+    <button id="btnShowRegister" class="alt" data-i18n="login.register">Registrovat nový účet</button>
+    <button id="btnLang" class="link">EN</button>
+  </div>
+  <div id="registerBox" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+    <h3 data-i18n="reg.title">Registrace</h3>
+    <div class="fields" style="grid-template-columns:1fr">
+      <label><span data-i18n="login.user">Uživatelské jméno</span><input id="regUser" autocomplete="username"></label>
+      <label><span data-i18n="reg.pass">Heslo (min. 8 znaků)</span><input id="regPass" type="password" autocomplete="new-password"></label>
+      <label><span data-i18n="reg.pass2">Heslo znovu</span><input id="regPass2" type="password" autocomplete="new-password"></label>
+    </div>
+    <div class="toolbar"><button id="btnRegister" data-i18n="reg.button">Vytvořit účet</button></div>
+  </div>
+  <div id="loginStatus" class="status hidden"></div>
 </section>
 
-<section class="bar">
-<div><div class="eyebrow">PROJECT WORKSPACE</div><strong id="projectName">Unsaved crochet project</strong></div>
-<div class="actions">
-<button id="newBtn" class="alt">New</button>
-<button id="openBtn" class="alt">Open</button>
-<button id="saveBtn">Save</button>
+<!-- ===================== APP ===================== -->
+<div id="viewApp" class="hidden">
+<div class="topbar">
+  <div><div class="eyebrow">YARNENGINE · <span data-i18n="app.eyebrow">HÁČKOVÁNÍ &amp; AMIGURUMI</span></div><h1 data-i18n="app.title">Kalkulačka spotřeby příze</h1></div>
+  <div class="toolbar" style="margin:0">
+    <span class="pill" id="whoami"></span>
+    <button id="btnLang2" class="alt">EN</button>
+    <button id="btnAccount" class="alt" data-i18n="app.account">Účet</button>
+    <button id="btnLogout" class="alt" data-i18n="app.logout">Odhlásit</button>
+  </div>
 </div>
-</section>
+<nav class="tabs">
+  <button data-tab="calc" class="active" data-i18n="tab.calc">Kalkulačka</button>
+  <button data-tab="patterns" data-i18n="tab.patterns">Databáze vzorů</button>
+  <button data-tab="yarns" data-i18n="tab.yarns">Příze</button>
+  <button data-tab="projects" data-i18n="tab.projects">Projekty</button>
+  <button data-tab="admin" id="tabAdmin" class="hidden" data-i18n="tab.admin">Správa uživatelů</button>
+</nav>
 
-<div class="grid">
+<!-- ---------- CALCULATOR ---------- -->
+<section id="tab-calc">
+<div class="grid2">
 <div>
-<section class="panel">
-<h2>Project setup</h2>
-<div class="fields">
-<label>Pattern<select id="pattern"></select></label>
-<label>Yarn<select id="yarn"></select></label>
-<label>Hook size mm<input id="hook" type="number" step="0.1" min="0.1" value="3.0"></label>
-<label>Construction<select id="construction"><option value="spiral">Spiral</option><option value="round">Joined rounds</option><option value="flat">Flat crochet</option></select></label>
-<label>Gauge stitches / 10 cm<input id="gaugeSt" type="number" step="0.1" min="0.1" value="24"></label>
-<label>Gauge rounds / 10 cm<input id="gaugeRows" type="number" step="0.1" min="0.1" value="26"></label>
-</div>
-<div class="toolbar"><button id="selectPatternBtn" class="accent">Pattern library</button><button id="calibrationBtn" class="alt">Calibration</button></div>
-</section>
+  <div class="card">
+    <h2 data-i18n="calc.mode">Co počítáte?</h2>
+    <div class="toolbar" style="margin-top:0">
+      <button id="modeFlat" class="accent" data-i18n="calc.flat">Plošný díl podle vzoru</button>
+      <button id="modeAmi" class="alt" data-i18n="calc.ami">Amigurumi (kola)</button>
+    </div>
+    <div id="flatBox" style="margin-top:12px">
+      <div class="fields">
+        <label><span data-i18n="calc.pattern">Vzor</span><select id="pattern"></select></label>
+        <label><span data-i18n="calc.partial">Neúplný opakující se díl</span><select id="partial"><option value="center" data-i18n="calc.partial.center">Vycentrovat</option><option value="left" data-i18n="calc.partial.left">Doplnit vlevo</option><option value="right" data-i18n="calc.partial.right">Doplnit vpravo</option><option value="split" data-i18n="calc.partial.split">Rozdělit na obě strany</option><option value="reject" data-i18n="calc.partial.reject">Odmítnout (přesné násobky)</option></select></label>
+        <label><span data-i18n="calc.width">Šířka dílu (cm)</span><input id="widthCm" type="number" step="0.5" min="0.5" value="30"></label>
+        <label><span data-i18n="calc.height">Výška dílu (cm)</span><input id="heightCm" type="number" step="0.5" min="0.5" value="40"></label>
+      </div>
+      <div id="patternPreview" class="chartbox" style="margin-top:10px;max-height:240px"></div>
+      <div class="toolbar"><button id="btnPickPattern" class="alt" data-i18n="calc.pick">Vybrat z grafické databáze</button></div>
+    </div>
+    <div id="amiBox" class="hidden" style="margin-top:12px">
+      <div class="fields">
+        <label><span data-i18n="ami.template">Tvar (šablona)</span><select id="amiTemplate">
+          <option value="sphere" data-i18n="ami.sphere">Koule / hlava</option><option value="cylinder" data-i18n="ami.cylinder">Válec / tělo</option><option value="cone" data-i18n="ami.cone">Kužel / ucho</option><option value="limb" data-i18n="ami.limb">Končetina</option><option value="custom" data-i18n="ami.custom">Vlastní</option></select></label>
+        <label><span data-i18n="ami.size">Velikost šablony (max. stehů v kole)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
+        <label><span data-i18n="ami.initial">Počáteční stehy (magický kroužek)</span><input id="amiInitial" type="number" min="0" value="6"></label>
+        <label><span data-i18n="ami.copies">Počet kusů</span><input id="amiCopies" type="number" min="1" value="1"></label>
+      </div>
+      <h3 data-i18n="ami.rounds">Kola (operace: SC, SC_INC, SC2TOG, HDC, DC …)</h3>
+      <div id="rounds" class="rounds"></div>
+      <div class="toolbar"><button id="btnAddRound" class="alt" data-i18n="ami.add">+ kolo</button><button id="btnAnalyse" class="alt" data-i18n="ami.analyse">Zkontrolovat kola</button></div>
+      <div id="amiStatus" class="status hidden"></div>
+    </div>
+  </div>
 
-<section class="panel">
-<h2>Amigurumi round program</h2>
-<div class="muted">Each round records canonical stitch counts. No yarn consumption coefficient is invented here.</div>
-<div class="fields" style="margin-top:10px"><label>Initial stitches<input id="initialStitches" type="number" min="0" value="6"></label><label>Template<select id="template"><option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="limb">Limb</option><option value="ear">Ear / cone</option><option value="custom">Custom</option></select></label></div>
-<textarea id="roundsJson" spellcheck="false"></textarea>
-<div class="toolbar"><button id="analyseBtn">Analyse rounds</button><button id="consumeBtn" class="accent">Calculate yarn with approved model</button></div>
-<div id="analysisStatus" class="status hidden"></div>
-</section>
-
-<section id="resultsPanel" class="panel hidden">
-<h2>Analysis</h2>
-<div class="metric-grid"><div class="metric"><span>Initial</span><strong id="mInitial">0</strong></div><div class="metric"><span>Final stitches</span><strong id="mFinal">0</strong></div><div class="metric"><span>Total operations</span><strong id="mOps">0</strong></div></div>
-<h3>Operation totals</h3><pre id="operationTotals" class="rounds"></pre>
-<h3>Round trace</h3><pre id="roundTrace" class="rounds"></pre>
-</section>
+  <div class="card">
+    <h2 data-i18n="calc.material">Příze, háček a hustota</h2>
+    <div class="fields">
+      <label><span data-i18n="calc.yarn">Příze</span><select id="yarn"></select></label>
+      <label><span data-i18n="calc.hook">Háček (mm)</span><input id="hook" type="number" step="0.25" min="0.5" value="3.5"></label>
+      <label><span data-i18n="calc.gst">Stehy na 10 cm</span><input id="gaugeSt" type="number" step="0.5" min="1" value="20"></label>
+      <label><span data-i18n="calc.grows">Řady/kola na 10 cm</span><input id="gaugeRows" type="number" step="0.5" min="1" value="22"></label>
+      <label><span data-i18n="calc.diam">Průměr příze (mm, volitelné)</span><input id="diam" type="number" step="0.1" min="0.1" placeholder="auto"></label>
+      <label><span data-i18n="calc.allow">Rezerva (%)</span><input id="allowance" type="number" step="1" min="0" max="50" value="10"></label>
+    </div>
+    <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650" data-i18n="calc.calib">Kalibrace naměřeným vzorkem (volitelný doplněk)</summary>
+      <p class="muted small" data-i18n="calc.calib.help">Uháčkujte malý vzorek stejným vzorem, přízí i háčkem, rozpárejte ho a změřte spotřebovanou délku. Odhad se pak nahradí přesným měřením.</p>
+      <div class="fields three">
+        <label><span data-i18n="calc.sw.st">Stehy vzorku</span><input id="swSt" type="number" min="1" placeholder="např. 20"></label>
+        <label><span data-i18n="calc.sw.rows">Řady vzorku</span><input id="swRows" type="number" min="1" placeholder="např. 20"></label>
+        <label><span data-i18n="calc.sw.len">Spotřeba (m)</span><input id="swLen" type="number" step="0.01" min="0.01" placeholder="např. 9.5"></label>
+      </div>
+    </details>
+    <div class="toolbar"><button id="btnCalc" class="accent" data-i18n="calc.run">Spočítat spotřebu příze</button><button id="btnSaveProject" class="alt" data-i18n="calc.save">Uložit jako projekt</button></div>
+    <div id="calcStatus" class="status hidden"></div>
+  </div>
 </div>
 
 <div>
-<section class="panel">
-<h2>Crochet pattern library</h2>
-<div id="patternCount" class="muted">Loading…</div>
-<input id="patternSearch" placeholder="Search SC, BLO, popcorn, amigurumi…" style="margin:10px 0">
-<div id="patternList" class="pattern-list"></div>
-</section>
-<section class="panel">
-<h2>Evidence status</h2>
-<div class="muted">Yarn estimates work from the start using an uncalibrated geometry baseline. An approved calibration model, once available for this yarn/hook/gauge, replaces the baseline with a measured, narrower estimate.</div>
-<div id="modelStatus" class="status">Checking production model…</div>
-</section>
+  <div class="card" id="resultCard">
+    <h2 data-i18n="res.title">Výsledek</h2>
+    <div id="resultEmpty" class="muted" data-i18n="res.empty">Zatím nic nespočítáno.</div>
+    <div id="resultBody" class="hidden">
+      <div id="resultBadge"></div>
+      <div class="metrics">
+        <div class="metric"><span data-i18n="res.len">Doporučená délka</span><strong id="rLen">–</strong></div>
+        <div class="metric"><span data-i18n="res.range">Odhadované rozpětí</span><strong id="rRange" style="font-size:16px">–</strong></div>
+        <div class="metric"><span data-i18n="res.mass">Hmotnost</span><strong id="rMass">–</strong></div>
+        <div class="metric"><span data-i18n="res.packs">Klubek / přaden</span><strong id="rPacks">–</strong></div>
+        <div class="metric"><span data-i18n="res.st">Stehy celkem</span><strong id="rSt">–</strong></div>
+        <div class="metric"><span data-i18n="res.size">Dosažený rozměr</span><strong id="rSize" style="font-size:16px">–</strong></div>
+      </div>
+      <h3 data-i18n="res.ops">Použité operace</h3><div id="rOps" class="legend"></div>
+      <h3 data-i18n="res.notes">Poznámky k přesnosti</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
+    </div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="how.title">Jak se to počítá</h2>
+    <p class="small muted" data-i18n="how.text">Ze vzoru (nebo z kol amigurumi) se spočítá přesný počet každé operace. Bez kalibrace se délka příze na steh odhaduje z fyzikální geometrie stehu (hustota, průměr příze, počet provlečení háčku); pro krátký sloupek je model ukotven k publikovanému měření (Storck et al. 2022). Naměřený vzorek nebo schválený kalibrační model odhad nahradí přesnějším číslem.</p>
+  </div>
 </div>
 </div>
+</section>
+
+<!-- ---------- PATTERN DATABASE ---------- -->
+<section id="tab-patterns" class="hidden">
+  <div class="card">
+    <h2 data-i18n="pat.title">Grafická databáze vzorů</h2>
+    <div class="fields three">
+      <label><span data-i18n="pat.search">Hledat</span><input id="patSearch" placeholder="sc, dc, puff, popcorn, blo…"></label>
+      <label><span data-i18n="pat.family">Rodina</span><select id="patFamily"><option value="">—</option></select></label>
+      <label><span data-i18n="pat.stitch">Obsahuje steh</span><select id="patStitch"><option value="">—</option></select></label>
+    </div>
+    <div class="toolbar"><span id="patCount" class="muted small"></span></div>
+    <div id="gallery" class="gallery"></div>
+  </div>
+</section>
+
+<!-- ---------- YARNS ---------- -->
+<section id="tab-yarns" class="hidden">
+  <div class="grid2">
+    <div class="card"><h2 data-i18n="yarn.title">Databáze přízí</h2><div style="overflow:auto"><table id="yarnTable"><thead><tr><th data-i18n="yarn.brand">Značka</th><th data-i18n="yarn.product">Produkt</th><th>CYC</th><th>g / m</th><th data-i18n="yarn.fibre">Složení</th><th>Ø mm</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2 data-i18n="yarn.add">Přidat přízi</h2>
+      <div class="fields">
+        <label>ID<input id="yId" placeholder="BRAND_PRODUCT_50G_120M"></label>
+        <label><span data-i18n="yarn.brand">Značka</span><input id="yBrand"></label>
+        <label><span data-i18n="yarn.product">Produkt</span><input id="yProduct"></label>
+        <label><span data-i18n="yarn.cyc">Kategorie CYC (0–7)</span><input id="yCyc" type="number" min="0" max="7" value="3"></label>
+        <label><span data-i18n="yarn.mass">Hmotnost klubka (g)</span><input id="yMass" type="number" step="1" min="1" value="50"></label>
+        <label><span data-i18n="yarn.len">Návin klubka (m)</span><input id="yLen" type="number" step="1" min="1" value="120"></label>
+        <label><span data-i18n="yarn.diam">Průměr (mm, volitelné)</span><input id="yDiam" type="number" step="0.1" min="0.1"></label>
+        <label><span data-i18n="yarn.wpi">WPI (volitelné)</span><input id="yWpi" type="number" step="0.5" min="1"></label>
+        <label style="grid-column:1/-1"><span data-i18n="yarn.fibre2">Složení (např. Cotton 100 nebo Wool 70, Acrylic 30)</span><input id="yFibre" value="Cotton 100"></label>
+      </div>
+      <div class="toolbar"><button id="btnAddYarn" data-i18n="yarn.save">Uložit přízi</button></div>
+      <div id="yarnStatus" class="status hidden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- PROJECTS ---------- -->
+<section id="tab-projects" class="hidden">
+  <div class="card"><h2 data-i18n="proj.title">Uložené projekty</h2><div id="projectList"></div></div>
+</section>
+
+<!-- ---------- ADMIN ---------- -->
+<section id="tab-admin" class="hidden">
+  <div class="grid2">
+    <div class="card"><h2 data-i18n="adm.title">Uživatelé</h2><div style="overflow:auto"><table id="userTable"><thead><tr><th>ID</th><th data-i18n="login.user">Uživatel</th><th data-i18n="adm.role">Role</th><th data-i18n="adm.active">Aktivní</th><th data-i18n="adm.last">Poslední přihlášení</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2 data-i18n="adm.create">Vytvořit uživatele</h2>
+      <div class="fields"><label><span data-i18n="login.user">Uživatelské jméno</span><input id="auUser"></label><label><span data-i18n="login.pass">Heslo</span><input id="auPass" type="password"></label><label><span data-i18n="adm.role">Role</span><select id="auRole"><option value="user">user</option><option value="admin">admin</option></select></label></div>
+      <div class="toolbar"><button id="btnCreateUser" data-i18n="adm.createBtn">Vytvořit</button></div>
+      <div id="adminStatus" class="status hidden"></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ---------- MODALS ---------- -->
+<div id="patternModal" class="modal hidden"><div class="modal-card">
+  <div class="modal-head"><div><div class="eyebrow" id="pmFamily"></div><h2 id="pmName" style="margin:0"></h2></div><button id="pmClose" class="alt">✕</button></div>
+  <div id="pmTags"></div>
+  <div class="chartbox" id="pmChart" style="margin-top:8px"></div>
+  <div class="legend" id="pmLegend"></div>
+  <p class="small muted" id="pmRepeat"></p>
+  <div class="toolbar"><button id="pmUse" class="accent" data-i18n="pat.use">Použít v kalkulačce</button></div>
+</div></div>
+
+<div id="accountModal" class="modal hidden"><div class="modal-card" style="max-width:460px">
+  <div class="modal-head"><h2 style="margin:0" data-i18n="acc.title">Změna hesla</h2><button id="accClose" class="alt">✕</button></div>
+  <div class="fields" style="grid-template-columns:1fr"><label><span data-i18n="acc.cur">Současné heslo</span><input id="accCur" type="password"></label><label><span data-i18n="acc.new">Nové heslo</span><input id="accNew" type="password"></label></div>
+  <div class="toolbar"><button id="accSave" data-i18n="acc.save">Změnit</button></div><div id="accStatus" class="status hidden"></div>
+</div></div>
+
 </main>
-
-<div id="projectsModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">SAVED PROJECTS</div><h2 style="margin:0">Open project</h2></div><button id="closeProjects" class="alt">Close</button></div><div id="projectsList" class="project-list"></div></div></div>
-
-<div id="calibrationModal" class="modal hidden"><div class="modal-card"><div class="modal-head"><div><div class="eyebrow">CROCHET CALIBRATION</div><h2 style="margin:0">Measurement status</h2></div><button id="closeCalibration" class="alt">Close</button></div><div id="calibrationStatus" class="status">Loading…</div><div id="calibrationRecords" class="project-list" style="margin-top:12px"></div></div></div>
-
 <script>
-const $=id=>document.getElementById(id);
-let patterns=[],crochetPatterns=[],yarns=[],currentProjectId=null,lastAnalysis=null;
-const templates={
- sphere:{initial_stitches:6,rounds:[{operations:{SC_INC:6}},{operations:{SC:6,SC_INC:6}},{operations:{SC:12,SC_INC:6}},{operations:{SC:18,SC_INC:6}},{operations:{SC:24}},{operations:{SC:24}},{operations:{SC:18,SC2TOG:3}},{operations:{SC:12,SC2TOG:3}},{operations:{SC:6,SC2TOG:3}}]},
- cylinder:{initial_stitches:6,rounds:[{operations:{SC_INC:6}},{operations:{SC:6,SC_INC:6}},{operations:{SC:12,SC_INC:6}},{operations:{SC:18}},{operations:{SC:18}},{operations:{SC:18}},{operations:{SC:18}}]},
- limb:{initial_stitches:6,rounds:[{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}},{operations:{SC:6}}]},
- ear:{initial_stitches:4,rounds:[{operations:{SC:4}},{operations:{SC:2,SC_INC:2}},{operations:{SC:6}},{operations:{SC:4,SC_INC:2}},{operations:{SC:8}}]}
+/* ============================ i18n ============================ */
+const I18N={
+ cs:{},
+ en:{
+  "login.title":"Sign in","login.intro":"Crochet & amigurumi yarn calculator with a graphical pattern library. Registered users only.","login.user":"Username","login.pass":"Password","login.button":"Sign in","login.register":"Register a new account","reg.title":"Registration","reg.pass":"Password (min. 8 characters)","reg.pass2":"Repeat password","reg.button":"Create account",
+  "app.eyebrow":"CROCHET & AMIGURUMI","app.title":"Yarn consumption calculator","app.account":"Account","app.logout":"Sign out","tab.calc":"Calculator","tab.patterns":"Pattern library","tab.yarns":"Yarns","tab.projects":"Projects","tab.admin":"User admin",
+  "calc.mode":"What are you making?","calc.flat":"Flat piece from a pattern","calc.ami":"Amigurumi (rounds)","calc.pattern":"Pattern","calc.partial":"Partial repeat","calc.partial.center":"Centre","calc.partial.left":"Fill left","calc.partial.right":"Fill right","calc.partial.split":"Split both sides","calc.partial.reject":"Reject (exact multiples)","calc.width":"Piece width (cm)","calc.height":"Piece height (cm)","calc.pick":"Pick from the graphical library",
+  "ami.template":"Shape (template)","ami.sphere":"Sphere / head","ami.cylinder":"Cylinder / body","ami.cone":"Cone / ear","ami.limb":"Limb","ami.custom":"Custom","ami.size":"Template size (max stitches per round)","ami.initial":"Starting stitches (magic ring)","ami.copies":"Number of pieces","ami.rounds":"Rounds (operations: SC, SC_INC, SC2TOG, HDC, DC …)","ami.add":"+ round","ami.analyse":"Check rounds",
+  "calc.material":"Yarn, hook and gauge","calc.yarn":"Yarn","calc.hook":"Hook (mm)","calc.gst":"Stitches per 10 cm","calc.grows":"Rows/rounds per 10 cm","calc.diam":"Yarn diameter (mm, optional)","calc.allow":"Allowance (%)","calc.calib":"Calibrate with a measured swatch (optional supplement)","calc.calib.help":"Crochet a small swatch in the same pattern, yarn and hook, unravel it and measure the yarn used. The estimate is then replaced by your measurement.","calc.sw.st":"Swatch stitches","calc.sw.rows":"Swatch rows","calc.sw.len":"Yarn used (m)","calc.run":"Calculate yarn","calc.save":"Save as project",
+  "res.title":"Result","res.empty":"Nothing calculated yet.","res.len":"Recommended length","res.range":"Estimated range","res.mass":"Weight","res.packs":"Balls / skeins","res.st":"Total stitches","res.size":"Achieved size","res.ops":"Operations used","res.notes":"Accuracy notes",
+  "how.title":"How it is calculated","how.text":"The exact count of every operation is derived from the pattern (or the amigurumi rounds). Without calibration, yarn per stitch is estimated from stitch geometry (gauge, yarn diameter, number of hook pull-throughs); single crochet is anchored to a published measurement (Storck et al. 2022). A measured swatch or an approved calibration model replaces the estimate with a measured figure.",
+  "pat.title":"Graphical pattern library","pat.search":"Search","pat.family":"Family","pat.stitch":"Contains stitch","pat.use":"Use in calculator",
+  "yarn.title":"Yarn database","yarn.brand":"Brand","yarn.product":"Product","yarn.fibre":"Fibre","yarn.add":"Add yarn","yarn.cyc":"CYC weight (0–7)","yarn.mass":"Ball weight (g)","yarn.len":"Ball length (m)","yarn.diam":"Diameter (mm, optional)","yarn.wpi":"WPI (optional)","yarn.fibre2":"Fibre (e.g. Cotton 100 or Wool 70, Acrylic 30)","yarn.save":"Save yarn",
+  "proj.title":"Saved projects","adm.title":"Users","adm.role":"Role","adm.active":"Active","adm.last":"Last login","adm.create":"Create user","adm.createBtn":"Create","acc.title":"Change password","acc.cur":"Current password","acc.new":"New password","acc.save":"Change",
+  "msg.calibrated":"Calibrated estimate (measured swatch)","msg.model":"Calibrated estimate (approved model)","msg.baseline":"Uncalibrated estimate – stitch geometry baseline","msg.loginFail":"Sign-in failed","msg.saved":"Saved.","msg.deleted":"Deleted.","msg.confirmDel":"Delete this user?","msg.projName":"Project name","msg.open":"Open","msg.delete":"Delete","msg.noProjects":"No saved projects yet.","msg.pwMismatch":"Passwords do not match.","msg.valid":"Rounds are consistent.","msg.deact":"Deactivate","msg.act":"Activate","msg.resetPw":"Reset password","msg.newPw":"New password for","msg.yarnMissing":"Select a yarn or enter a yarn diameter."
+ }
 };
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function status(el,msg,kind=''){el.textContent=msg;el.className='status '+kind;}
-function crochetLike(p){const s=`${p.pattern_id||''} ${p.name||''} ${p.family_id||''}`.toLowerCase();return s.includes('crochet')||s.includes('amigurumi')||/^amigurumi_/i.test(p.pattern_id||'')||s.includes('sc_')||s.includes('hdc_')||s.includes('dc_')||s.includes('popcorn')||s.includes('puff');}
-function renderPatterns(filter=''){
- const q=filter.trim().toLowerCase();const rows=crochetPatterns.filter(p=>!q||`${p.pattern_id} ${p.name} ${p.family_id}`.toLowerCase().includes(q));
- $('patternCount').textContent=`${rows.length} crochet patterns available`;
- $('patternList').innerHTML=rows.map(p=>`<div class="pattern-card" data-p="${esc(p.pattern_id)}|${esc(p.version)}"><strong>${esc(p.name)}</strong><span class="tag">${esc(p.pattern_id)}</span><span class="tag">${esc(p.family_id||'crochet')}</span></div>`).join('')||'<div class="muted">No matching crochet patterns.</div>';
- document.querySelectorAll('.pattern-card').forEach(c=>c.onclick=()=>{$('pattern').value=c.dataset.p;document.querySelectorAll('.pattern-card').forEach(x=>x.classList.remove('active'));c.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});});
+let LANG=localStorage.getItem('ye_lang')||'cs';
+const CS_DEFAULTS={};
+function t(k){return (LANG==='en'&&I18N.en[k])||CS_DEFAULTS[k]||I18N.en[k]||k;}
+function applyLang(){
+ document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(!(k in CS_DEFAULTS))CS_DEFAULTS[k]=el.textContent;el.textContent=t(k);});
+ document.documentElement.lang=LANG;['btnLang','btnLang2'].forEach(id=>{const b=$(id);if(b)b.textContent=LANG==='cs'?'EN':'CZ';});
 }
-function populatePatternSelect(){
- $('pattern').innerHTML=crochetPatterns.map(p=>`<option value="${esc(p.pattern_id)}|${esc(p.version)}">${esc(p.name)} · ${esc(p.family_id||'crochet')}</option>`).join('');
+/* Czech fallbacks for message keys that are not in the DOM */
+Object.assign(CS_DEFAULTS,{"msg.calibrated":"Kalibrovaný odhad (naměřený vzorek)","msg.model":"Kalibrovaný odhad (schválený model)","msg.baseline":"Nekalibrovaný odhad – geometrie stehu","msg.loginFail":"Přihlášení se nezdařilo","msg.saved":"Uloženo.","msg.deleted":"Smazáno.","msg.confirmDel":"Smazat tohoto uživatele?","msg.projName":"Název projektu","msg.open":"Otevřít","msg.delete":"Smazat","msg.noProjects":"Zatím žádné uložené projekty.","msg.pwMismatch":"Hesla se neshodují.","msg.valid":"Kola jsou konzistentní.","msg.deact":"Deaktivovat","msg.act":"Aktivovat","msg.resetPw":"Reset hesla","msg.newPw":"Nové heslo pro","msg.yarnMissing":"Vyberte přízi nebo zadejte průměr příze."});
+
+/* ============================ helpers ============================ */
+const $=id=>document.getElementById(id);
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function status(el,msg,kind=''){el.textContent=msg;el.className='status '+kind;el.classList.remove('hidden');}
+function fmt(x,d=1){return (x==null||isNaN(x))?'–':Number(x).toFixed(d);}
+async function api(path,opts={}){
+ const r=await fetch(path,{headers:{'Content-Type':'application/json'},credentials:'same-origin',...opts,body:opts.body?JSON.stringify(opts.body):undefined});
+ let d=null;try{d=await r.json();}catch(e){}
+ if(r.status===401&&!path.startsWith('/api/auth/')){showLogin();throw new Error('login required');}
+ if(!r.ok){const m=d&&d.detail?(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail)):r.statusText;throw new Error(m);}
+ return d;
 }
-function setTemplate(name){if(name==='custom')return;const t=templates[name];$('initialStitches').value=t.initial_stitches;$('roundsJson').value=JSON.stringify(t.rounds,null,2);}
+
+/* ============================ crochet chart symbols ============================ */
+const OPS_INFO={CH:['Řetízkové oko','Chain'],SLST:['Pevné oko','Slip stitch'],SC:['Krátký sloupek','Single crochet'],HDC:['Polodlouhý sloupek','Half double crochet'],DC:['Dlouhý sloupek','Double crochet'],TR:['Dvakrát nahozený sloupek','Treble'],DTR:['Třikrát nahozený sloupek','Double treble'],
+ SC2TOG:['2 KS sháčkované','sc2tog'],SC3TOG:['3 KS sháčkované','sc3tog'],HDC2TOG:['2 PDS sháčkované','hdc2tog'],DC2TOG:['2 DS sháčkované','dc2tog'],DC3TOG:['3 DS sháčkované','dc3tog'],
+ SC_INC:['Přidání (2 KS do 1)','sc increase'],HDC_INC:['Přidání (2 PDS do 1)','hdc increase'],DC_INC:['Přidání (2 DS do 1)','dc increase'],
+ SC_BLO:['KS za zadní kličku','sc back loop only'],SC_FLO:['KS za přední kličku','sc front loop only'],HDC_BLO:['PDS za zadní kličku','hdc back loop only'],DC_BLO:['DS za zadní kličku','dc back loop only'],
+ FPDC:['Reliéfní DS zepředu','front post dc'],BPDC:['Reliéfní DS zezadu','back post dc'],PUFF3:['Puff (3 PDS)','puff stitch'],POPCORN5:['Popcorn (5 DS)','popcorn']};
+const CONSUMES={SC2TOG:2,SC3TOG:3,HDC2TOG:2,DC2TOG:2,DC3TOG:3};
+function opName(op){const i=OPS_INFO[op];return i?(LANG==='en'?i[1]:i[0]):op;}
+/* glyphs drawn in a 20x20 box, stroke-based */
+function glyph(op){
+ const S='stroke="var(--chart)" stroke-width="1.6" fill="none" stroke-linecap="round"';
+ const post=(n)=>{let s=`<line x1="10" y1="3" x2="10" y2="18" ${S}/><line x1="5" y1="3" x2="15" y2="3" ${S}/>`;for(let i=0;i<n;i++){const y=8+i*3.2;s+=`<line x1="7.5" y1="${y+1.6}" x2="12.5" y2="${y-1.6}" ${S}/>`;}return s;};
+ const x=`<line x1="5" y1="5" x2="15" y2="15" ${S}/><line x1="15" y1="5" x2="5" y2="15" ${S}/>`;
+ const T=`<line x1="10" y1="4" x2="10" y2="17" ${S}/><line x1="5" y1="4" x2="15" y2="4" ${S}/>`;
+ const arcB=`<path d="M6 17.5 Q10 20.5 14 17.5" ${S}/>`, arcF=`<path d="M6 2.5 Q10 -0.5 14 2.5" ${S}/>`;
+ const shrink=(inner,sx,tx,ty)=>`<g transform="translate(${tx} ${ty}) scale(${sx})">${inner}</g>`;
+ switch(op){
+  case 'CH':return `<ellipse cx="10" cy="10" rx="6" ry="3.5" ${S}/>`;
+  case 'SLST':return `<circle cx="10" cy="10" r="2.6" fill="var(--chart)"/>`;
+  case 'SC':return x;
+  case 'HDC':return T;
+  case 'DC':return post(1);
+  case 'TR':return post(2);
+  case 'DTR':return post(3);
+  case 'SC_BLO':return x+arcB; case 'SC_FLO':return x+arcF;
+  case 'HDC_BLO':return T+arcB; case 'DC_BLO':return post(1)+arcB;
+  case 'FPDC':return post(1)+`<path d="M10 18 Q6 18 6 15" ${S}/>`;
+  case 'BPDC':return post(1)+`<path d="M10 18 Q14 18 14 15" ${S}/>`;
+  case 'SC_INC':return `<line x1="10" y1="18" x2="4.5" y2="6" ${S}/><line x1="10" y1="18" x2="15.5" y2="6" ${S}/>`+shrink(x,.45,0,0)+shrink(x,.45,11,0);
+  case 'HDC_INC':return `<line x1="10" y1="18" x2="4.5" y2="7" ${S}/><line x1="10" y1="18" x2="15.5" y2="7" ${S}/>`+shrink(T,.5,-1,-1)+shrink(T,.5,10,-1);
+  case 'DC_INC':return `<line x1="10" y1="18" x2="4.5" y2="7" ${S}/><line x1="10" y1="18" x2="15.5" y2="7" ${S}/>`+shrink(post(1),.5,-1,-1)+shrink(post(1),.5,10,-1);
+  case 'SC2TOG':return `<line x1="10" y1="3" x2="4.5" y2="15" ${S}/><line x1="10" y1="3" x2="15.5" y2="15" ${S}/>`+shrink(x,.4,0.5,11)+shrink(x,.4,11.5,11);
+  case 'SC3TOG':return `<line x1="10" y1="3" x2="3" y2="15" ${S}/><line x1="10" y1="3" x2="10" y2="15" ${S}/><line x1="10" y1="3" x2="17" y2="15" ${S}/>`+shrink(x,.3,0,13)+shrink(x,.3,7,13)+shrink(x,.3,14,13);
+  case 'HDC2TOG':return `<line x1="10" y1="3" x2="4.5" y2="15" ${S}/><line x1="10" y1="3" x2="15.5" y2="15" ${S}/>`+shrink(T,.45,0,9)+shrink(T,.45,11,9);
+  case 'DC2TOG':return `<line x1="10" y1="3" x2="4.5" y2="15" ${S}/><line x1="10" y1="3" x2="15.5" y2="15" ${S}/>`+shrink(post(1),.45,0,9)+shrink(post(1),.45,11,9);
+  case 'DC3TOG':return `<line x1="10" y1="3" x2="3" y2="15" ${S}/><line x1="10" y1="3" x2="10" y2="15" ${S}/><line x1="10" y1="3" x2="17" y2="15" ${S}/>`+shrink(post(1),.35,-0.5,11)+shrink(post(1),.35,6.5,11)+shrink(post(1),.35,13.5,11);
+  case 'PUFF3':return `<ellipse cx="10" cy="10" rx="5" ry="7.5" ${S}/><line x1="8" y1="5" x2="8" y2="15" ${S}/><line x1="10" y1="4" x2="10" y2="16" ${S}/><line x1="12" y1="5" x2="12" y2="15" ${S}/>`;
+  case 'POPCORN5':return `<path d="M5 17 Q10 -2 15 17 Z" ${S}/><line x1="7" y1="14" x2="10" y2="6" ${S}/><line x1="13" y1="14" x2="10" y2="6" ${S}/><line x1="10" y1="14" x2="10" y2="6" ${S}/>`;
+  default:return `<text x="10" y="14" font-size="8" text-anchor="middle" fill="var(--chart)">${esc(op)}</text>`;
+ }
+}
+function expandRow(row){const cells=[];for(const s of row.sequence||[]){for(let i=0;i<(s.n||1);i++)cells.push(s.op);}return cells;}
+/* render chart: tilesX/tilesY repeat tiles; rows drawn bottom-up */
+function chartSVG(p,{tilesX=1,tilesY=1,cell=24,maxCells=Infinity,grid=true}={}){
+ const rows=p.rows||[];if(!rows.length)return '';
+ const rw=Math.max(1,p.repeat?.width_stitches||expandRow(rows[0]).length);
+ const cols=Math.min(rw*tilesX,maxCells),nrows=Math.min(rows.length*tilesY,maxCells);
+ const W=cols*cell+30,H=nrows*cell+8;let out=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+ for(let r=0;r<nrows;r++){
+  const row=rows[r%rows.length];const cells=expandRow(row);const y=H-4-(r+1)*cell;
+  const rs=(row.side||'RS')==='RS';
+  out+=`<text x="${rs?W-4:W-4}" y="${y+cell*0.65}" font-size="9" text-anchor="end" fill="#8a949a">${row.row||r+1}${rs?'→':'←'}</text>`;
+  let c=0,i=0;
+  while(c<cols){const op=cells[i%cells.length];const span=CONSUMES[op]||1;const x=c*cell;
+   if(grid)out+=`<rect x="${x}" y="${y}" width="${cell*span}" height="${cell}" fill="none" stroke="#e5e2db" stroke-width=".7"/>`;
+   out+=`<svg x="${x}" y="${y}" width="${cell*span}" height="${cell}" viewBox="${span>1?-(span-1)*10:0} 0 ${20*span} 20">${glyph(op)}</svg>`;
+   c+=span;i++;}
+ }
+ return out+'</svg>';
+}
+function legendHTML(ops){return ops.map(op=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} – ${esc(opName(op))}</span>`).join('');}
+function patternOps(p){const s=new Set();for(const r of p.rows||[])for(const q of r.sequence||[])s.add(q.op);return [...s];}
+
+/* ============================ state ============================ */
+let ME=null,PATTERNS=[],YARNS=[],currentProjectId=null,lastResult=null,calcMode='flat';
+const KEY=p=>`${p.pattern_id}|${p.version}`;
+
+/* ============================ auth ============================ */
+function showLogin(){$('viewLogin').classList.remove('hidden');$('viewApp').classList.add('hidden');}
+function showApp(){$('viewLogin').classList.add('hidden');$('viewApp').classList.remove('hidden');}
 async function boot(){
+ applyLang();
+ try{ME=await api('/api/auth/me');}catch(e){ME=null;}
+ if(!ME){showLogin();return;}
+ showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');
+ $('tabAdmin').classList.toggle('hidden',ME.role!=='admin');
+ await loadData();
+}
+$('btnLogin').onclick=async()=>{try{ME=await api('/api/auth/login',{method:'POST',body:{username:$('loginUser').value,password:$('loginPass').value}});location.reload();}catch(e){status($('loginStatus'),t('msg.loginFail')+': '+e.message,'bad');}};
+$('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnLogin').click();});
+$('btnShowRegister').onclick=()=>$('registerBox').classList.toggle('hidden');
+$('btnRegister').onclick=async()=>{if($('regPass').value!==$('regPass2').value){status($('loginStatus'),t('msg.pwMismatch'),'bad');return;}
+ try{await api('/api/auth/register',{method:'POST',body:{username:$('regUser').value,password:$('regPass').value}});location.reload();}catch(e){status($('loginStatus'),e.message,'bad');}};
+$('btnLogout').onclick=async()=>{await api('/api/auth/logout',{method:'POST'});location.reload();};
+[$('btnLang'),$('btnLang2')].forEach(b=>b.onclick=()=>{LANG=LANG==='cs'?'en':'cs';localStorage.setItem('ye_lang',LANG);applyLang();if(ME){renderPatternSelect();renderGallery();renderYarns();}});
+$('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accClose').onclick=()=>$('accountModal').classList.add('hidden');
+$('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
+
+/* ============================ tabs ============================ */
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin')loadUsers();if(b.dataset.tab==='patterns')renderGallery();});
+
+/* ============================ data ============================ */
+async function loadData(){
+ [PATTERNS,YARNS]=await Promise.all([api('/api/patterns/full'),api('/api/yarns')]);
+ PATTERNS=PATTERNS.filter(p=>(p.techniques||[]).map(x=>String(x).toLowerCase()).includes('crochet'));
+ renderPatternSelect();renderYarnSelect();renderYarns();buildFilters();setTemplate();
+ if(PATTERNS.length)selectPattern(KEY(PATTERNS.find(p=>p.pattern_id==='CROCHET_SOLID_SC_01')||PATTERNS[0]));
+}
+function renderPatternSelect(){const sel=$('pattern');const cur=sel.value;sel.innerHTML=PATTERNS.map(p=>`<option value="${esc(KEY(p))}">${esc(p.name)} · ${esc(p.family_id)}</option>`).join('');if(cur)sel.value=cur;}
+function renderYarnSelect(){$('yarn').innerHTML=`<option value="">— ${LANG==='en'?'custom (enter diameter)':'vlastní (zadejte průměr)'} —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
+function selectPattern(key){$('pattern').value=key;const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('patternPreview').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(12/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(8/(p.rows||[]).length)),cell:22,maxCells:16});}
+$('pattern').onchange=e=>selectPattern(e.target.value);
+$('btnPickPattern').onclick=()=>document.querySelector('nav.tabs button[data-tab=patterns]').click();
+
+/* ============================ gallery ============================ */
+function buildFilters(){const fams=[...new Set(PATTERNS.map(p=>p.family_id))].sort();$('patFamily').innerHTML='<option value="">—</option>'+fams.map(f=>`<option>${esc(f)}</option>`).join('');
+ const ops=[...new Set(PATTERNS.flatMap(patternOps))].sort();$('patStitch').innerHTML='<option value="">—</option>'+ops.map(o=>`<option value="${o}">${o} – ${esc(opName(o))}</option>`).join('');}
+let galleryObserver=null;
+function renderGallery(){
+ const q=$('patSearch').value.trim().toLowerCase(),fam=$('patFamily').value,st=$('patStitch').value;
+ const rows=PATTERNS.filter(p=>(!fam||p.family_id===fam)&&(!st||patternOps(p).includes(st))&&(!q||`${p.pattern_id} ${p.name} ${p.family_id} ${(p.tags||[]).join(' ')} ${patternOps(p).join(' ')}`.toLowerCase().includes(q)));
+ $('patCount').textContent=`${rows.length} / ${PATTERNS.length}`;
+ const cur=$('pattern').value;
+ $('gallery').innerHTML=rows.map(p=>`<div class="pcard ${KEY(p)===cur?'active':''}" data-k="${esc(KEY(p))}"><div class="thumb"></div><strong>${esc(p.name)}</strong><span class="small muted">${esc(p.family_id)} · ${p.repeat?.width_stitches||'?'}×${(p.rows||[]).length} · ${esc(p.difficulty)}</span></div>`).join('');
+ if(galleryObserver)galleryObserver.disconnect();
+ galleryObserver=new IntersectionObserver(es=>{for(const e of es){if(!e.isIntersecting)continue;const card=e.target;galleryObserver.unobserve(card);const p=PATTERNS.find(x=>KEY(x)===card.dataset.k);card.querySelector('.thumb').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(6/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(6/(p.rows||[]).length)),cell:20,maxCells:8,grid:false});}} ,{root:$('gallery'),rootMargin:'200px'});
+ document.querySelectorAll('.pcard').forEach(c=>{galleryObserver.observe(c);c.onclick=()=>openPattern(c.dataset.k);});
+}
+['patSearch','patFamily','patStitch'].forEach(id=>$(id).addEventListener('input',renderGallery));
+function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('pmFamily').textContent=p.family_id+' · '+p.pattern_id;$('pmName').textContent=p.name;
+ $('pmTags').innerHTML=(p.tags||[]).map(x=>`<span class="badge">${esc(x)}</span>`).join('');
+ $('pmChart').innerHTML=chartSVG(p,{tilesX:Math.max(2,Math.ceil(16/(p.repeat?.width_stitches||1))),tilesY:Math.max(2,Math.ceil(8/(p.rows||[]).length)),cell:26,maxCells:24});
+ $('pmLegend').innerHTML=legendHTML(patternOps(p));
+ $('pmRepeat').textContent=(LANG==='en'?'Repeat: ':'Opakování: ')+`${p.repeat?.width_stitches} × ${p.rows.length}`+(LANG==='en'?' (stitches × rows). Rows read bottom-up; arrows show working direction.':' (stehy × řady). Řady se čtou zdola nahoru; šipky ukazují směr práce.');
+ $('pmUse').onclick=()=>{selectPattern(key);calcSetMode('flat');$('patternModal').classList.add('hidden');document.querySelector('nav.tabs button[data-tab=calc]').click();};
+ $('patternModal').classList.remove('hidden');}
+$('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
+
+/* ============================ amigurumi rounds ============================ */
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');}
+$('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');
+function roundRow(i,ops){return `<div class="round"><span class="pill">${i+1}</span><input value="${esc(ops)}" placeholder="SC:6, SC_INC:6"><button class="alt" data-del="${i}">✕</button></div>`;}
+function readRounds(){return [...document.querySelectorAll('#rounds .round input')].map(inp=>{const operations={};inp.value.split(',').forEach(part=>{const [op,n]=part.split(':').map(s=>s.trim());if(op)operations[op.toUpperCase()]=Number(n||1);});return {operations};});}
+function writeRounds(list){$('rounds').innerHTML=list.map((r,i)=>roundRow(i,Object.entries(r.operations).map(([k,v])=>`${k}:${v}`).join(', '))).join('');document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});}
+function genTemplate(kind,maxSt,init){
+ const inc=[],rounds=[];let cur=init;const step=init;
+ rounds.push({operations:{SC_INC:init}});cur=init*2;
+ while(cur+step<=maxSt){rounds.push({operations:{SC:cur-step,SC_INC:step}});cur+=step;}
+ const straight=n=>{for(let i=0;i<n;i++)rounds.push({operations:{SC:cur}});};
+ if(kind==='sphere'){straight(Math.max(1,Math.round(cur/step)-1));while(cur-step>=init){rounds.push({operations:{SC:cur-2*step,SC2TOG:step}});cur-=step;}}
+ else if(kind==='cylinder'){straight(Math.max(2,Math.round(cur/step)*2));}
+ else if(kind==='cone'){straight(1);}
+ else if(kind==='limb'){rounds.length=0;cur=init;rounds.push({operations:{SC_INC:init}});cur=init*2;straight(Math.max(3,Math.round(maxSt/step)));}
+ return rounds;
+}
+function setTemplate(){const k=$('amiTemplate').value;if(k==='custom')return;const init=Number($('amiInitial').value)||6;writeRounds(genTemplate(k,Number($('amiSize').value)||36,init));}
+['amiTemplate','amiSize','amiInitial'].forEach(id=>$(id).addEventListener('change',setTemplate));
+$('btnAddRound').onclick=()=>{const l=readRounds();l.push({operations:{SC:6}});writeRounds(l);$('amiTemplate').value='custom';};
+$('btnAnalyse').onclick=async()=>{try{const d=await api('/api/crochet/amigurumi/analyse',{method:'POST',body:{initial_stitches:Number($('amiInitial').value),rounds:readRounds()}});
+ if(!d.valid){status($('amiStatus'),JSON.stringify(d.issues),'bad');return;}status($('amiStatus'),`${t('msg.valid')} ${d.initial_stitches} → ${d.final_stitches}. `+Object.entries(d.operation_counts).map(([k,v])=>`${k}×${v}`).join(', '),'good');}catch(e){status($('amiStatus'),e.message,'bad');}};
+
+/* ============================ calculation ============================ */
+function commonInputs(){return {yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
+function swatchInput(){const s=Number($('swSt').value),r=Number($('swRows').value),l=Number($('swLen').value);return (s>0&&r>0&&l>0)?{stitches:s,rows:r,yarn_length_m:l}:null;}
+$('btnCalc').onclick=async()=>{
+ $('calcStatus').classList.add('hidden');const c=commonInputs();if(!c.yarn_id&&!c.yarn_diameter_mm){status($('calcStatus'),t('msg.yarnMissing'),'bad');return;}
  try{
-  const [h,p,y,m]=await Promise.all([fetch('/api/health').then(r=>r.json()),fetch('/api/patterns').then(r=>r.json()),fetch('/api/yarns').then(r=>r.json()),fetch('/api/models/production/current').then(r=>r.json()).catch(()=>({active:false}))]);
-  patterns=p;crochetPatterns=p.filter(crochetLike);yarns=y;
-  populatePatternSelect();renderPatterns();
-  $('yarn').innerHTML='<option value="">Select yarn</option>'+y.map(x=>`<option value="${esc(x.yarn_id)}">${esc(x.brand)} · ${esc(x.product)}</option>`).join('');
-  status($('apiStatus'),`Engine ${h.version} online · ${crochetPatterns.length} crochet patterns loaded`,'good');
-  status($('modelStatus'),m.active?`Approved model: ${m.model?.name||m.model?.model_id||'production'}`:'No approved calibration model yet. Yarn estimates use the uncalibrated geometry baseline (rough range shown) until one is captured.',m.active?'good':'');
-  setTemplate('sphere');
- }catch(e){status($('apiStatus'),'Engine error: '+e.message,'bad');}
+  if(calcMode==='flat'){
+   const [pattern_id,pattern_version]=$('pattern').value.split('|');
+   const body={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
+   const d=await api('/api/calculate',{method:'POST',body});lastResult={kind:'flat',request:body,response:d};
+   showResult({len:d.consumption.recommended_length_m,lower:d.confidence.lower_m,upper:d.confidence.upper_m,mass:d.consumption.mass_g,packs:d.consumption.packages,st:d.project.stitches*d.project.rows,size:`${fmt(d.project.achieved_width_cm)} × ${fmt(d.project.achieved_height_cm)} cm`,ops:d.project.operation_counts,warnings:d.warnings,level:d.confidence.level,copies:1});
+  }else{
+   const copies=Math.max(1,Number($('amiCopies').value)||1);
+   const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn'};
+   const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
+   const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
+   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} ${LANG==='en'?'rounds':'kol'} × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
+  }
+ }catch(e){status($('calcStatus'),e.message,'bad');}
+};
+function yarnById(id){return YARNS.find(y=>y.yarn_id===id);}
+function showResult(r){
+ $('resultEmpty').classList.add('hidden');$('resultBody').classList.remove('hidden');
+ const lvl=r.level;const badge=lvl==='calibrated'?['good',t('msg.calibrated')]:lvl?.startsWith('production_model')?['good',t('msg.model')]:['warn',t('msg.baseline')];
+ $('resultBadge').innerHTML=`<span class="badge ${badge[0]}">${esc(badge[1])}</span>`;
+ $('rLen').textContent=fmt(r.len,1)+' m';$('rRange').textContent=(r.lower!=null&&r.upper!=null)?`${fmt(r.lower,0)}–${fmt(r.upper,0)} m`:'–';
+ $('rMass').textContent=r.mass!=null?fmt(r.mass,0)+' g':'–';
+ let packs=r.packs;if(packs==null&&r.packLen&&r.len)packs=Math.ceil(r.len/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
+ $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
+ $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} × ${n}</span>`).join('');
+ $('rWarn').innerHTML=(r.warnings||[]).map(w=>`<li>${esc(w)}</li>`).join('');
+ $('resultCard').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-async function analyse(){
- let rounds;try{rounds=JSON.parse($('roundsJson').value);}catch(e){status($('analysisStatus'),'Rounds must be valid JSON.','bad');$('analysisStatus').classList.remove('hidden');return null;}
- const payload={initial_stitches:Number($('initialStitches').value),rounds};
- const r=await fetch('/api/crochet/amigurumi/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();
- $('analysisStatus').classList.remove('hidden');if(!r.ok||!d.valid){status($('analysisStatus'),'Pattern invalid: '+JSON.stringify(d.detail||d.issues),'bad');return null;}
- lastAnalysis=d;status($('analysisStatus'),'Pattern structure valid.','good');$('resultsPanel').classList.remove('hidden');$('mInitial').textContent=d.initial_stitches;$('mFinal').textContent=d.final_stitches;$('mOps').textContent=Object.values(d.operation_counts||{}).reduce((a,b)=>a+Number(b),0);$('operationTotals').textContent=JSON.stringify(d.operation_counts,null,2);$('roundTrace').textContent=JSON.stringify(d.trace,null,2);return d;
-}
-async function calculateConsumption(){
- const d=lastAnalysis||await analyse();if(!d)return;
- const yarnId=$('yarn').value;if(!yarnId){status($('analysisStatus'),'Select a yarn first.','bad');return;}
- const payload={program_type:'amigurumi',program:{initial_stitches:Number($('initialStitches').value),rounds:JSON.parse($('roundsJson').value)},yarn_id:yarnId,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:5,domain_policy:'strict'};
- const r=await fetch('/api/complex-consumption/calculate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const x=await r.json();
- if(!r.ok){status($('analysisStatus'),'Yarn estimate unavailable: '+(typeof x.detail==='string'?x.detail:JSON.stringify(x.detail)),'bad');return;}
- const calibrated=x.model_id!=='uncalibrated_geometry_baseline_v1';
- const rec=x.calculation?.recommended_length_m;const recTxt=rec?.toFixed?.(2)||rec;
- const range=(!calibrated&&x.prediction)?` (rough range ${x.prediction.lower_95_m?.toFixed?.(2)}–${x.prediction.upper_95_m?.toFixed?.(2)} m)`:'';
- const badge=calibrated?'Calibrated estimate':'Uncalibrated estimate – no measured model for this yarn/hook/gauge yet';
- status($('analysisStatus'),`${badge}: ${recTxt} m${range} · ${x.model_id}`,calibrated?'good':'');
-}
-function newProject(){currentProjectId=null;lastAnalysis=null;$('projectName').textContent='Unsaved crochet project';$('resultsPanel').classList.add('hidden');$('analysisStatus').classList.add('hidden');$('patternSearch').value='';renderPatterns();setTemplate('sphere');}
-async function openProjects(){
- $('projectsModal').classList.remove('hidden');const box=$('projectsList');box.innerHTML='<div class="muted">Loading…</div>';
- try{const list=await fetch('/api/projects').then(r=>r.json());box.innerHTML=list.length?list.map(p=>`<div class="project-card" data-id="${p.project_id}"><strong>${esc(p.name)}</strong><span class="tag">${esc(p.status)}</span><div class="muted">${esc(p.pattern_id||'')} ${esc(p.pattern_version||'')}</div></div>`).join(''):'<div class="muted">No saved projects yet.</div>';box.querySelectorAll('[data-id]').forEach(c=>c.onclick=()=>loadProject(Number(c.dataset.id)));}catch(e){box.innerHTML='<div class="status bad">'+esc(e.message)+'</div>';}
-}
-async function loadProject(id){
- const r=await fetch('/api/projects/'+id);const p=await r.json();if(!r.ok)return;currentProjectId=p.project_id;$('projectName').textContent=p.name||'Crochet project';const c=p.request||p.calculation||{};if(c.pattern_id&&c.pattern_version)$('pattern').value=`${c.pattern_id}|${c.pattern_version}`;if(c.yarn_id)$('yarn').value=c.yarn_id;if(c.gauge_stitches_per_10cm)$('gaugeSt').value=c.gauge_stitches_per_10cm;if(c.gauge_rows_per_10cm)$('gaugeRows').value=c.gauge_rows_per_10cm;$('projectsModal').classList.add('hidden');
-}
-async function saveProject(){
- const [pattern_id,pattern_version]=($('pattern').value||'|').split('|');const name=currentProjectId?$('projectName').textContent:prompt('Project name','Crochet amigurumi project');if(!name)return;
- const calc={pattern_id,pattern_version,yarn_id:$('yarn').value||null,width_cm:10,height_cm:10,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:5,partial_repeat_mode:'crop',edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'swatch',swatch:{stitches:24,rows:26,yarn_length_m:1},yarn_diameter_mm:null};
- const payload={name,description:'Crochet / amigurumi project',calculation:calc,result:null,status:lastAnalysis?'calculated':'draft'};const url=currentProjectId?'/api/projects/'+currentProjectId:'/api/projects';const method=currentProjectId?'PUT':'POST';const r=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const d=await r.json();if(!r.ok){status($('apiStatus'),'Save failed: '+JSON.stringify(d.detail),'bad');return;}currentProjectId=d.project_id;$('projectName').textContent=d.name;status($('apiStatus'),'Project saved.','good');
-}
-async function openCalibration(){
- $('calibrationModal').classList.remove('hidden');try{const [s,recs]=await Promise.all([fetch('/api/crochet/calibration/status').then(r=>r.json()),fetch('/api/crochet/calibration/records').then(r=>r.json())]);status($('calibrationStatus'),s.ready?'Calibration evidence gate READY':'Not ready: '+(s.reasons||[]).join(' | '),s.ready?'good':'');$('calibrationRecords').innerHTML=(recs||[]).map(x=>`<div class="project-card"><strong>${esc(x.record_id)}</strong><div class="muted">${esc(x.yarn_id)} · ${esc(x.construction)} · ${x.yarn_length_m} m</div></div>`).join('')||'<div class="muted">No physical crochet measurements stored.</div>';}catch(e){status($('calibrationStatus'),e.message,'bad');}
-}
-$('newBtn').onclick=newProject;$('openBtn').onclick=openProjects;$('saveBtn').onclick=saveProject;$('closeProjects').onclick=()=> $('projectsModal').classList.add('hidden');$('calibrationBtn').onclick=openCalibration;$('closeCalibration').onclick=()=> $('calibrationModal').classList.add('hidden');$('analyseBtn').onclick=analyse;$('consumeBtn').onclick=calculateConsumption;$('template').onchange=e=>setTemplate(e.target.value);$('patternSearch').oninput=e=>renderPatterns(e.target.value);$('selectPatternBtn').onclick=()=>{$('patternSearch').focus();$('patternList').scrollIntoView({behavior:'smooth'});};
+
+/* ============================ projects ============================ */
+$('btnSaveProject').onclick=async()=>{
+ if(calcMode!=='flat'){status($('calcStatus'),LANG==='en'?'Projects currently save flat-piece calculations.':'Projekty zatím ukládají výpočty plošných dílů.','warn');return;}
+ const name=prompt(t('msg.projName'),$('pattern').selectedOptions[0]?.textContent||'Projekt');if(!name)return;
+ const [pattern_id,pattern_version]=$('pattern').value.split('|');const c=commonInputs();
+ const calculation={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
+ try{const d=await api(currentProjectId?'/api/projects/'+currentProjectId:'/api/projects',{method:currentProjectId?'PUT':'POST',body:{name,description:'',calculation,result:lastResult?.response||null,status:lastResult?'calculated':'draft'}});currentProjectId=d.project_id;status($('calcStatus'),t('msg.saved'),'good');}catch(e){status($('calcStatus'),e.message,'bad');}
+};
+async function loadProjects(){const box=$('projectList');try{const list=await api('/api/projects');box.innerHTML=list.length?`<table><thead><tr><th>#</th><th>${esc(t('msg.projName'))}</th><th>Status</th><th></th></tr></thead><tbody>`+list.map(p=>`<tr><td>${p.project_id}</td><td>${esc(p.name)}</td><td>${esc(p.status)}</td><td><button class="link" data-open="${p.project_id}">${esc(t('msg.open'))}</button> <button class="link" data-del="${p.project_id}">${esc(t('msg.delete'))}</button></td></tr>`).join('')+'</tbody></table>':`<div class="muted">${esc(t('msg.noProjects'))}</div>`;
+ box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openProject(Number(b.dataset.open)));box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await api('/api/projects/'+b.dataset.del,{method:'DELETE'});loadProjects();});}catch(e){box.innerHTML=`<div class="status bad">${esc(e.message)}</div>`;}}
+async function openProject(id){const p=await api('/api/projects/'+id);const c=p.request||p.calculation||{};currentProjectId=p.project_id;calcSetMode('flat');
+ if(c.pattern_id)selectPattern(`${c.pattern_id}|${c.pattern_version}`);if(c.yarn_id)$('yarn').value=c.yarn_id;if(c.width_cm)$('widthCm').value=c.width_cm;if(c.height_cm)$('heightCm').value=c.height_cm;if(c.gauge_stitches_per_10cm)$('gaugeSt').value=c.gauge_stitches_per_10cm;if(c.gauge_rows_per_10cm)$('gaugeRows').value=c.gauge_rows_per_10cm;if(c.allowance_percent!=null)$('allowance').value=c.allowance_percent;if(c.swatch){$('swSt').value=c.swatch.stitches;$('swRows').value=c.swatch.rows;$('swLen').value=c.swatch.yarn_length_m;}
+ document.querySelector('nav.tabs button[data-tab=calc]').click();}
+
+/* ============================ yarns ============================ */
+function renderYarns(){const tb=document.querySelector('#yarnTable tbody');tb.innerHTML=YARNS.map(y=>`<tr><td>${esc(y.brand)}</td><td>${esc(y.product)}${y.variant?' '+esc(y.variant):''}</td><td>${y.cyc_weight??''}</td><td>${y.package_mass_g} / ${y.package_length_m}</td><td class="small">${esc(Object.entries(y.fibre_composition||{}).map(([k,v])=>`${k} ${v}%`).join(', '))}</td><td>${y.nominal_diameter_mm??(y.wpi?fmt(25.4/y.wpi,1)+'*':'')}</td></tr>`).join('');}
+$('btnAddYarn').onclick=async()=>{const fibre={};$('yFibre').value.split(',').forEach(p=>{const m=p.trim().match(/^(.+?)\s+(\d+(?:\.\d+)?)$/);if(m)fibre[m[1].trim()]=Number(m[2]);});
+ const body={yarn_id:$('yId').value.trim().toUpperCase().replace(/\s+/g,'_'),brand:$('yBrand').value.trim(),product:$('yProduct').value.trim(),cyc_weight:$('yCyc').value?Number($('yCyc').value):null,package_mass_g:Number($('yMass').value),package_length_m:Number($('yLen').value),fibre_composition:fibre,nominal_diameter_mm:$('yDiam').value?Number($('yDiam').value):null,wpi:$('yWpi').value?Number($('yWpi').value):null};
+ body.tex=body.package_mass_g/body.package_length_m*1000;
+ try{await api('/api/yarns',{method:'POST',body});YARNS=await api('/api/yarns');renderYarnSelect();renderYarns();status($('yarnStatus'),t('msg.saved'),'good');}catch(e){status($('yarnStatus'),e.message,'bad');}};
+
+/* ============================ admin ============================ */
+async function loadUsers(){const tb=document.querySelector('#userTable tbody');try{const us=await api('/api/admin/users');tb.innerHTML=us.map(u=>`<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.role)}</td><td>${u.active?'✔':'✖'}</td><td class="small">${esc((u.last_login_at||'').replace('T',' ').slice(0,16))}</td><td>
+ <button class="link" data-act="${u.id}" data-to="${u.active?0:1}">${u.active?esc(t('msg.deact')):esc(t('msg.act'))}</button>
+ <button class="link" data-pw="${u.id}" data-name="${esc(u.username)}">${esc(t('msg.resetPw'))}</button>
+ <button class="link" data-role="${u.id}" data-to="${u.role==='admin'?'user':'admin'}">→ ${u.role==='admin'?'user':'admin'}</button>
+ <button class="link" data-del="${u.id}">${esc(t('msg.delete'))}</button></td></tr>`).join('');
+ tb.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>adminUpdate(b.dataset.act,{active:b.dataset.to==='1'}));
+ tb.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>adminUpdate(b.dataset.role,{role:b.dataset.to}));
+ tb.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>{const pw=prompt(`${t('msg.newPw')} ${b.dataset.name}:`);if(pw)adminUpdate(b.dataset.pw,{password:pw});});
+ tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm(t('msg.confirmDel')))return;try{await api('/api/admin/users/'+b.dataset.del,{method:'DELETE'});loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}});
+ }catch(e){tb.innerHTML=`<tr><td colspan="6">${esc(e.message)}</td></tr>`;}}
+async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
+$('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
+
 boot();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
 </script>

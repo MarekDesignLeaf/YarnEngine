@@ -12,6 +12,8 @@ from src.calibration.swatch import CoreSwatchCalibration
 from src.consumption.engine import calculate_from_swatch, calculate_plain_geometry
 from src.library.compatibility import assess_yarn_for_gauge
 from src.production_model.runtime import calculate_with_production_model
+from src.complex_consumption.bridge import calculate_uncalibrated_baseline
+from src.library.yarn_geometry import estimate_yarn_diameter_mm
 
 
 class WebService:
@@ -135,7 +137,37 @@ class WebService:
         package_length = yarn.get("package_length_m") if yarn else None
         warnings = []
 
-        if req.calculation_mode == "calibrated":
+        mode = req.calculation_mode
+        diameter, diameter_source, diameter_warnings = estimate_yarn_diameter_mm(yarn, req.yarn_diameter_mm)
+        if mode == "auto":
+            production = self.model_registry.production() if self.model_registry else None
+            if req.swatch is not None:
+                mode = "swatch"
+            elif production is not None and diameter is not None:
+                mode = "calibrated"
+            else:
+                mode = "crochet_baseline"
+
+        if mode == "crochet_baseline":
+            if diameter is None:
+                raise ValueError("crochet baseline needs a yarn with diameter/WPI/weight/tex or an explicit yarn_diameter_mm")
+            warnings.extend(diameter_warnings)
+            calc, pred, unsupported = calculate_uncalibrated_baseline(
+                operation_counts=plan.operation_counts, gauge=gauge, yarn_diameter_mm=diameter,
+                hook_mm=req.hook_mm, cyc_weight=(yarn.get("cyc_weight") if yarn else None),
+                allowance_percent=req.allowance_percent, tex=tex, package_length_m=package_length)
+            if unsupported:
+                warnings.append("operations without a crochet geometry baseline were excluded: " + ", ".join(unsupported))
+            confidence = {
+                "level": "uncalibrated_baseline",
+                "label": "Uncalibrated estimate",
+                "explanation": "Stitch geometry baseline (no measured swatch or approved calibration model yet). Add a measured swatch to replace it with a calibrated figure.",
+                "lower_m": pred.lower_95_m * (1 + req.allowance_percent / 100.0),
+                "upper_m": pred.upper_95_m * (1 + req.allowance_percent / 100.0),
+                "yarn_diameter_mm": diameter, "yarn_diameter_source": diameter_source,
+            }
+            warnings.extend(pred.warnings)
+        elif mode == "calibrated":
             if self.model_registry is None:
                 raise ValueError("production model registry unavailable")
             production=self.model_registry.production()
@@ -154,7 +186,7 @@ class WebService:
                 "explanation":"Uses an explicitly approved production calibration model. Domain checks are applied at runtime.",
             }
             warnings.extend(pred.warnings)
-        elif req.calculation_mode == "swatch":
+        elif mode == "swatch":
             calibration = CoreSwatchCalibration(
                 req.swatch.stitches,
                 req.swatch.rows,
@@ -224,9 +256,10 @@ class WebService:
             "compatibility": compatibility,
             "warnings": list(dict.fromkeys(warnings)),
             "audit": {
-                "calculation_mode": req.calculation_mode,
+                "calculation_mode": mode,
+                "requested_calculation_mode": req.calculation_mode,
                 "domain_policy": req.domain_policy,
-                "prediction_tier": ("A" if req.calculation_mode=="swatch" else "B" if req.calculation_mode=="calibrated" else "research_geometry"),
+                "prediction_tier": ("A" if mode=="swatch" else "B" if mode in ("calibrated","crochet_baseline") else "research_geometry"),
                 "gauge": {
                     "stitches_per_10cm": req.gauge_stitches_per_10cm,
                     "rows_per_10cm": req.gauge_rows_per_10cm,
@@ -242,7 +275,7 @@ class WebService:
                       "promoted_at": self.model_registry.production()["promoted_at"],
                      "model_schema_version": self.model_registry.production().get("model_schema_version"),
                      "feature_spec_version": self.model_registry.production().get("feature_spec_version")}
-                    if req.calculation_mode=="calibrated" and self.model_registry and self.model_registry.production()
+                    if mode=="calibrated" and self.model_registry and self.model_registry.production()
                     else None
                 ),
             },

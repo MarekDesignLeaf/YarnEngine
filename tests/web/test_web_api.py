@@ -7,7 +7,7 @@ client=TestClient(app)
 def test_health():
     r=client.get('/api/health')
     assert r.status_code==200
-    assert r.json()['version']=='M11.0'
+    assert r.json()['version']=='M12.1'
 
 
 def test_library_endpoints():
@@ -61,3 +61,24 @@ def test_geometry_stockinette():
     assert r.status_code==200, r.text
     assert r.json()['consumption']['tier']=='B'
     assert r.json()['confidence']['level']=='research'
+
+
+def test_auto_mode_returns_uncalibrated_baseline_for_crochet_pattern_without_swatch():
+    from fastapi.testclient import TestClient
+    from src.web.app import app
+    c=TestClient(app)
+    body={"pattern_id":"CROCHET_SOLID_SC_01","pattern_version":"1.0.0","yarn_id":"DROPS_SAFRAN_50G_160M",
+          "width_cm":20,"height_cm":20,"gauge_stitches_per_10cm":20,"gauge_rows_per_10cm":22,
+          "allowance_percent":10,"partial_repeat_mode":"center",
+          "edges":{"left_stitches":0,"right_stitches":0,"left_operation":"SC","right_operation":"SC"}}
+    r=c.post("/api/calculate",json=body)
+    assert r.status_code==200, r.text
+    d=r.json()
+    assert d["audit"]["calculation_mode"]=="crochet_baseline"
+    assert d["confidence"]["level"]=="uncalibrated_baseline"
+    assert d["consumption"]["recommended_length_m"]>0
+    assert d["confidence"]["lower_m"]<d["consumption"]["recommended_length_m"]/1.1<d["confidence"]["upper_m"]
+    # supplying a measured swatch switches auto mode to the calibrated swatch tier
+    body["swatch"]={"stitches":20,"rows":20,"yarn_length_m":8.0}
+    d2=c.post("/api/calculate",json=body).json()
+    assert d2["audit"]["calculation_mode"]=="swatch" and d2["confidence"]["level"]=="calibrated"

@@ -26,10 +26,13 @@ class CalculationRequest(BaseModel):
     allowance_percent: float = Field(0.0, ge=0, le=50)
     partial_repeat_mode: Literal["reject", "left", "right", "split", "center"] = "reject"
     edges: EdgeInput = EdgeInput()
-    calculation_mode: Literal["swatch", "geometry", "calibrated"] = "swatch"
+    # "auto": measured swatch if supplied, else approved calibration model if one exists,
+    # else the uncalibrated crochet geometry baseline. Calibration is a supplement, not a gate.
+    calculation_mode: Literal["auto", "swatch", "geometry", "calibrated", "crochet_baseline"] = "auto"
     domain_policy: Literal["strict","warn","research"] = "strict"
     swatch: SwatchInput | None = None
     yarn_diameter_mm: float | None = Field(None, gt=0)
+    hook_mm: float | None = Field(None, gt=0)
 
     @model_validator(mode="after")
     def validate_mode(self):

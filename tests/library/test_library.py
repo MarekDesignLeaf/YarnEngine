@@ -5,12 +5,12 @@ from src.library.compatibility import assess_yarn_for_gauge
 ROOT=Path(__file__).resolve().parents[2]
 def test_load_library():
     r=load_library(ROOT)
-    assert len(r.yarns)==2
+    assert len(r.yarns)>=2 and "TEST_Y1" in r.yarns
     assert len(r.patterns)>=7
 def test_search_yarn():
     r=load_library(ROOT)
     x=search_yarns(r,cyc_weight=4)
-    assert len(x)==1 and x[0].yarn_id=="TEST_Y1"
+    assert len(x)>=1 and any(y.yarn_id=="TEST_Y1" for y in x)
 def test_search_pattern():
     r=load_library(ROOT)
     x=search_patterns(r,family_id="CABLE",tags=("cable",))
