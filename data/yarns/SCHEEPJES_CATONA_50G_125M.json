@@ -1,0 +1,19 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "SCHEEPJES_CATONA_50G_125M",
+  "brand": "Scheepjes",
+  "product": "Catona",
+  "variant": "50g",
+  "cyc_weight": 1,
+  "package_mass_g": 50,
+  "package_length_m": 125,
+  "fibre_composition": {"Mercerised cotton": 100},
+  "tex": 400.0,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.scheepjes.com/en/catona-50g-322/page-15/",
+  "evidence_level": "manufacturer_declared"
+}
