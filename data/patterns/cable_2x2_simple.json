@@ -1,0 +1,89 @@
+{
+  "pattern_id": "CABLE_2X2_SIMPLE",
+  "version": "1.0.0",
+  "name": "Simple 2x2 Cable Repeat",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 8,
+    "height_rows": 4
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 2
+        },
+        {
+          "op": "K",
+          "n": 4
+        },
+        {
+          "op": "P",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 2
+        },
+        {
+          "op": "P",
+          "n": 4
+        },
+        {
+          "op": "K",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 2
+        },
+        {
+          "op": "C2_2R",
+          "n": 1
+        },
+        {
+          "op": "P",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 2
+        },
+        {
+          "op": "P",
+          "n": 4
+        },
+        {
+          "op": "K",
+          "n": 2
+        }
+      ]
+    }
+  ],
+  "source": {
+    "type": "internal",
+    "reference": "Canonical test construction",
+    "license": "Internal definition"
+  }
+}

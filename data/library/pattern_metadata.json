@@ -1,0 +1,3564 @@
+{
+  "patterns": [
+    {
+      "pattern_id": "STOCKINETTE",
+      "version": "1.0.0",
+      "name": "Stockinette",
+      "family_id": "PLAIN",
+      "tags": [
+        "basic",
+        "flat"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "GARTER",
+      "version": "1.0.0",
+      "name": "Garter Stitch",
+      "family_id": "PLAIN",
+      "tags": [
+        "basic",
+        "texture"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "RIB_1X1",
+      "version": "1.0.0",
+      "name": "1x1 Rib",
+      "family_id": "RIB",
+      "tags": [
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "RIB_2X2",
+      "version": "1.0.0",
+      "name": "2x2 Rib",
+      "family_id": "RIB",
+      "tags": [
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "SEED_1X1",
+      "version": "1.0.0",
+      "name": "Seed Stitch 1x1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "seed",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "CABLE_2X2_SIMPLE",
+      "version": "1.0.0",
+      "name": "Simple 2x2 Cable Repeat",
+      "family_id": "CABLE",
+      "tags": [
+        "cable",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "EYELET_BALANCED",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet Repeat",
+      "family_id": "LACE",
+      "tags": [
+        "lace",
+        "eyelet"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal"
+    },
+    {
+      "pattern_id": "KP_TEXTURE_3_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 3:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_3_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 3:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_4_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 4:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_4_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 4:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_4_3",
+      "version": "1.0.0",
+      "name": "K/P Texture 4:3",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_5_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 5:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_5_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 5:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_5_3",
+      "version": "1.0.0",
+      "name": "K/P Texture 5:3",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_5_4",
+      "version": "1.0.0",
+      "name": "K/P Texture 5:4",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_6_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 6:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_6_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 6:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_6_3",
+      "version": "1.0.0",
+      "name": "K/P Texture 6:3",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_6_4",
+      "version": "1.0.0",
+      "name": "K/P Texture 6:4",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_6_5",
+      "version": "1.0.0",
+      "name": "K/P Texture 6:5",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_3",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:3",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_4",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:4",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_5",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:5",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_7_6",
+      "version": "1.0.0",
+      "name": "K/P Texture 7:6",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_1",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:1",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_2",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:2",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_3",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:3",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_4",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:4",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_5",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:5",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_6",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:6",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "KP_TEXTURE_8_7",
+      "version": "1.0.0",
+      "name": "K/P Texture 8:7",
+      "family_id": "TEXTURE",
+      "tags": [
+        "internal-reference",
+        "texture",
+        "knit-purl"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_1X1_REF",
+      "version": "1.0.0",
+      "name": "1x1 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_1X2_REF",
+      "version": "1.0.0",
+      "name": "1x2 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_1X3_REF",
+      "version": "1.0.0",
+      "name": "1x3 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_1X4_REF",
+      "version": "1.0.0",
+      "name": "1x4 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_1X5_REF",
+      "version": "1.0.0",
+      "name": "1x5 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_2X1_REF",
+      "version": "1.0.0",
+      "name": "2x1 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_2X2_REF",
+      "version": "1.0.0",
+      "name": "2x2 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_2X3_REF",
+      "version": "1.0.0",
+      "name": "2x3 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_2X4_REF",
+      "version": "1.0.0",
+      "name": "2x4 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_2X5_REF",
+      "version": "1.0.0",
+      "name": "2x5 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_3X1_REF",
+      "version": "1.0.0",
+      "name": "3x1 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_3X2_REF",
+      "version": "1.0.0",
+      "name": "3x2 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_3X3_REF",
+      "version": "1.0.0",
+      "name": "3x3 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_3X4_REF",
+      "version": "1.0.0",
+      "name": "3x4 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_3X5_REF",
+      "version": "1.0.0",
+      "name": "3x5 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_4X1_REF",
+      "version": "1.0.0",
+      "name": "4x1 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_4X2_REF",
+      "version": "1.0.0",
+      "name": "4x2 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_4X3_REF",
+      "version": "1.0.0",
+      "name": "4x3 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_4X4_REF",
+      "version": "1.0.0",
+      "name": "4x4 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_4X5_REF",
+      "version": "1.0.0",
+      "name": "4x5 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_5X1_REF",
+      "version": "1.0.0",
+      "name": "5x1 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_5X2_REF",
+      "version": "1.0.0",
+      "name": "5x2 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_5X3_REF",
+      "version": "1.0.0",
+      "name": "5x3 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_5X4_REF",
+      "version": "1.0.0",
+      "name": "5x4 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "RIB_5X5_REF",
+      "version": "1.0.0",
+      "name": "5x5 Rib Reference",
+      "family_id": "RIB",
+      "tags": [
+        "internal-reference",
+        "rib",
+        "elastic"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "knit",
+        "purl"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_3_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 3-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_3_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 3-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_4_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 4-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_4_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 4-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_4_3",
+      "version": "1.0.0",
+      "name": "Slip Texture 4-3",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_5_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 5-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_5_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 5-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_5_3",
+      "version": "1.0.0",
+      "name": "Slip Texture 5-3",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_5_4",
+      "version": "1.0.0",
+      "name": "Slip Texture 5-4",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_6_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 6-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_6_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 6-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_6_3",
+      "version": "1.0.0",
+      "name": "Slip Texture 6-3",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_6_4",
+      "version": "1.0.0",
+      "name": "Slip Texture 6-4",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_7_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 7-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_7_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 7-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_7_3",
+      "version": "1.0.0",
+      "name": "Slip Texture 7-3",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_7_4",
+      "version": "1.0.0",
+      "name": "Slip Texture 7-4",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_8_1",
+      "version": "1.0.0",
+      "name": "Slip Texture 8-1",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_8_2",
+      "version": "1.0.0",
+      "name": "Slip Texture 8-2",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_8_3",
+      "version": "1.0.0",
+      "name": "Slip Texture 8-3",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "SLIP_TEXTURE_8_4",
+      "version": "1.0.0",
+      "name": "Slip Texture 8-4",
+      "family_id": "SLIP",
+      "tags": [
+        "internal-reference",
+        "slip",
+        "texture"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "slip"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_3_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 3",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_3_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 3",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_4_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 4",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_5_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 5",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_5_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 5",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_6_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 6",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_6_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 6",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_7_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 7",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_7_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 7",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_8_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 8",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_8_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 8",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_9_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 9",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_9_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 9",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_10_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 10",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_10_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 10",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_11_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 11",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_11_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 11",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_K2TOG_12_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet K2TOG 12",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "EYELET_SSK_12_REF",
+      "version": "1.0.0",
+      "name": "Balanced Eyelet SSK 12",
+      "family_id": "LACE",
+      "tags": [
+        "internal-reference",
+        "eyelet",
+        "balanced"
+      ],
+      "difficulty": "easy",
+      "techniques": [
+        "knit",
+        "purl",
+        "yarn-over",
+        "decrease"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_4_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 4",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_5_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 5",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_6_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 6",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_7_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 7",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_8_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 8",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_9_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 9",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2R_10_REF",
+      "version": "1.0.0",
+      "name": "C2_2R Reference 10",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_4_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 4",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_5_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 5",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_6_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 6",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_7_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 7",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_8_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 8",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_9_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 9",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2L_10_REF",
+      "version": "1.0.0",
+      "name": "C2_2L Reference 10",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_4_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 4",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_5_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 5",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_6_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 6",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_7_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 7",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_8_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 8",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_9_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 9",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2RP_10_REF",
+      "version": "1.0.0",
+      "name": "C2_2RP Reference 10",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_4_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 4",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_5_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 5",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_6_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 6",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_7_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 7",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_8_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 8",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_9_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 9",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "C2_2LP_10_REF",
+      "version": "1.0.0",
+      "name": "C2_2LP Reference 10",
+      "family_id": "CABLE",
+      "tags": [
+        "internal-reference",
+        "cable"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "knit",
+        "purl",
+        "cable"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal reference library M8.3",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_3",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 3",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_4",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 4",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_5",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 5",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_6",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 6",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_7",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 7",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_8",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 8",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_9",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 9",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_10",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 10",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_11",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 11",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_12",
+      "version": "1.0.0",
+      "name": "Amigurumi Single Crochet 12",
+      "family_id": "AMIGURUMI_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "dense-fabric"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_3",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 3",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_3",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 3",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_4",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 4",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_4",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 4",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_5",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 5",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_5",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 5",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_6",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 6",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_6",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 6",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_7",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 7",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_7",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 7",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_8",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 8",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_8",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 8",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_9",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 9",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_9",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 9",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_BLO_10",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Back Loop 10",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "back-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_SC_FLO_10",
+      "version": "1.0.0",
+      "name": "Amigurumi SC Front Loop 10",
+      "family_id": "AMIGURUMI_LOOP",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "single-crochet",
+        "front-loop"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_HDC_4",
+      "version": "1.0.0",
+      "name": "Toy Half Double Crochet 4",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "hdc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_HDC_6",
+      "version": "1.0.0",
+      "name": "Toy Half Double Crochet 6",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "hdc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_HDC_8",
+      "version": "1.0.0",
+      "name": "Toy Half Double Crochet 8",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "hdc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_HDC_10",
+      "version": "1.0.0",
+      "name": "Toy Half Double Crochet 10",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "hdc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_DC_4",
+      "version": "1.0.0",
+      "name": "Toy Double Crochet 4",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "dc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_DC_6",
+      "version": "1.0.0",
+      "name": "Toy Double Crochet 6",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "dc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_DC_8",
+      "version": "1.0.0",
+      "name": "Toy Double Crochet 8",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "dc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_DC_10",
+      "version": "1.0.0",
+      "name": "Toy Double Crochet 10",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "dc"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_TR_4",
+      "version": "1.0.0",
+      "name": "Toy Treble Crochet 4",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "tr"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_TR_6",
+      "version": "1.0.0",
+      "name": "Toy Treble Crochet 6",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "tr"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_TR_8",
+      "version": "1.0.0",
+      "name": "Toy Treble Crochet 8",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "tr"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_TR_10",
+      "version": "1.0.0",
+      "name": "Toy Treble Crochet 10",
+      "family_id": "CROCHET_BASIC",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "decorative",
+        "tr"
+      ],
+      "difficulty": "basic",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_PUFF_4",
+      "version": "1.0.0",
+      "name": "Toy Puff Texture 4",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "puff",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_POPCORN_4",
+      "version": "1.0.0",
+      "name": "Toy Popcorn Texture 4",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "popcorn",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_RIB_POST_4",
+      "version": "1.0.0",
+      "name": "Toy Post Rib 4",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "post-stitch",
+        "rib"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_PUFF_6",
+      "version": "1.0.0",
+      "name": "Toy Puff Texture 6",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "puff",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_POPCORN_6",
+      "version": "1.0.0",
+      "name": "Toy Popcorn Texture 6",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "popcorn",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_RIB_POST_6",
+      "version": "1.0.0",
+      "name": "Toy Post Rib 6",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "post-stitch",
+        "rib"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_PUFF_8",
+      "version": "1.0.0",
+      "name": "Toy Puff Texture 8",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "puff",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_POPCORN_8",
+      "version": "1.0.0",
+      "name": "Toy Popcorn Texture 8",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "popcorn",
+        "texture"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    },
+    {
+      "pattern_id": "AMIGURUMI_RIB_POST_8",
+      "version": "1.0.0",
+      "name": "Toy Post Rib 8",
+      "family_id": "CROCHET_TEXTURE",
+      "tags": [
+        "crochet",
+        "amigurumi",
+        "toy",
+        "post-stitch",
+        "rib"
+      ],
+      "difficulty": "intermediate",
+      "techniques": [
+        "crochet"
+      ],
+      "source_type": "internal",
+      "source_reference": "YarnEngine internal amigurumi reference library M9.1",
+      "license_id": "YCE_INTERNAL_REFERENCE_1",
+      "active": true
+    }
+  ]
+}

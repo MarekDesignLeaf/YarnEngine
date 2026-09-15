@@ -1,0 +1,40 @@
+{
+  "pattern_id": "EYELET_K2TOG_9_REF",
+  "version": "1.0.0",
+  "name": "Balanced Eyelet K2TOG 9",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 9,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "YO",
+          "n": 1
+        },
+        {
+          "op": "K2TOG",
+          "n": 1
+        },
+        {
+          "op": "K",
+          "n": 7
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 9
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_HDC_6",
+  "version": "1.0.0",
+  "name": "Toy Half Double Crochet 6",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 6,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC",
+          "n": 6
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "health": {
+    "status": "ok",
+    "version": "M11.0"
+  },
+  "home": 200,
+  "manifest": 200,
+  "service_worker": 200,
+  "patterns": 174
+}

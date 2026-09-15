@@ -1,0 +1,34 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M7.1"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "/api/acquisition/translate": {
+    "status": 200,
+    "valid": true,
+    "stage": "import_review",
+    "review_required": false
+  },
+  "ambiguous_translation": {
+    "status": 200,
+    "valid": false,
+    "stage": "translation_review",
+    "issue_codes": [
+      "REPEAT_PROSE"
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "/api/health": {
+    "status": 200,
+    "data": {
+      "status": "ok",
+      "version": "M9.0"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 127
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30
+  },
+  "branch": {
+    "status": 200,
+    "valid": true,
+    "live_stitches": 8,
+    "operation_counts": {
+      "K": 4,
+      "P": 4
+    }
+  }
+}

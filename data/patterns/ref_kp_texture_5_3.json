@@ -1,0 +1,40 @@
+{
+  "pattern_id": "KP_TEXTURE_5_3",
+  "version": "1.0.0",
+  "name": "K/P Texture 5:3",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 5,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 3
+        },
+        {
+          "op": "P",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 2
+        },
+        {
+          "op": "K",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

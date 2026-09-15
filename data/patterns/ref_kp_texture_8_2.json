@@ -1,0 +1,40 @@
+{
+  "pattern_id": "KP_TEXTURE_8_2",
+  "version": "1.0.0",
+  "name": "K/P Texture 8:2",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 8,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 2
+        },
+        {
+          "op": "P",
+          "n": 6
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 6
+        },
+        {
+          "op": "K",
+          "n": 2
+        }
+      ]
+    }
+  ]
+}

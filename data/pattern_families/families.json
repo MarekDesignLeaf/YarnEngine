@@ -1,0 +1,29 @@
+{
+  "families": [
+    {
+      "family_id": "PLAIN",
+      "name": "Plain fabrics",
+      "calibration_sharing": "high"
+    },
+    {
+      "family_id": "RIB",
+      "name": "Rib structures",
+      "calibration_sharing": "medium"
+    },
+    {
+      "family_id": "TEXTURE",
+      "name": "Textured knit/purl structures",
+      "calibration_sharing": "medium"
+    },
+    {
+      "family_id": "CABLE",
+      "name": "Cable structures",
+      "calibration_sharing": "operation-aware"
+    },
+    {
+      "family_id": "LACE",
+      "name": "Lace and eyelet structures",
+      "calibration_sharing": "operation-aware"
+    }
+  ]
+}

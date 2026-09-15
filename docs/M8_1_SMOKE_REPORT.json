@@ -1,0 +1,27 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M8.1"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "uncertainty": {
+    "status": 200,
+    "method": "held_out_absolute_error_quantile",
+    "n": 6,
+    "calibrated": false,
+    "warning": "Empirical interval is based on fewer than 20 held-out errors; coverage is descriptive and not production-validated."
+  }
+}

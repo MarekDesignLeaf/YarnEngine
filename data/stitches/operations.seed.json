@@ -1,0 +1,797 @@
+[
+  {
+    "operation_id": "K",
+    "name": "Knit",
+    "family": "basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "P",
+    "name": "Purl",
+    "family": "basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "YO",
+    "name": "Yarn over",
+    "family": "increase",
+    "consumes_stitches": 0,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "K2TOG",
+    "name": "Knit 2 together",
+    "family": "decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "P2TOG",
+    "name": "Purl 2 together",
+    "family": "decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SSK",
+    "name": "Slip slip knit",
+    "family": "decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SSP",
+    "name": "Slip slip purl",
+    "family": "decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "KFB",
+    "name": "Knit front and back",
+    "family": "increase",
+    "consumes_stitches": 1,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "M1L",
+    "name": "Make one left",
+    "family": "increase",
+    "consumes_stitches": 0,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "M1R",
+    "name": "Make one right",
+    "family": "increase",
+    "consumes_stitches": 0,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SL1_WYIB",
+    "name": "Slip 1, yarn in back",
+    "family": "slip",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": false,
+    "model": {
+      "kind": "zero_yarn"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SL1_WYIF",
+    "name": "Slip 1, yarn in front",
+    "family": "slip",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": false,
+    "model": {
+      "kind": "zero_yarn"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "K3TOG",
+    "name": "Knit 3 together",
+    "family": "decrease",
+    "consumes_stitches": 3,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "P3TOG",
+    "name": "Purl 3 together",
+    "family": "decrease",
+    "consumes_stitches": 3,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "S2KP2",
+    "name": "Centered double decrease",
+    "family": "decrease",
+    "consumes_stitches": 3,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "K_TBL",
+    "name": "Knit through back loop",
+    "family": "twist",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "P_TBL",
+    "name": "Purl through back loop",
+    "family": "twist",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "BO",
+    "name": "Bind off",
+    "family": "edge",
+    "consumes_stitches": 1,
+    "produces_stitches": 0,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "CO",
+    "name": "Cast on",
+    "family": "edge",
+    "consumes_stitches": 0,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C1_1R",
+    "name": "1/1 right cable",
+    "family": "cable",
+    "consumes_stitches": 2,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C1_1L",
+    "name": "1/1 left cable",
+    "family": "cable",
+    "consumes_stitches": 2,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C1_1RP",
+    "name": "1/1 right purl cable",
+    "family": "cable",
+    "consumes_stitches": 2,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C1_1LP",
+    "name": "1/1 left purl cable",
+    "family": "cable",
+    "consumes_stitches": 2,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_1R",
+    "name": "2/1 right cable",
+    "family": "cable",
+    "consumes_stitches": 3,
+    "produces_stitches": 3,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_1L",
+    "name": "2/1 left cable",
+    "family": "cable",
+    "consumes_stitches": 3,
+    "produces_stitches": 3,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_2R",
+    "name": "2/2 right cable",
+    "family": "cable",
+    "consumes_stitches": 4,
+    "produces_stitches": 4,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_2L",
+    "name": "2/2 left cable",
+    "family": "cable",
+    "consumes_stitches": 4,
+    "produces_stitches": 4,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_2RP",
+    "name": "2/2 right purl cable",
+    "family": "cable",
+    "consumes_stitches": 4,
+    "produces_stitches": 4,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "C2_2LP",
+    "name": "2/2 left purl cable",
+    "family": "cable",
+    "consumes_stitches": 4,
+    "produces_stitches": 4,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "BOBBLE",
+    "name": "Bobble",
+    "family": "texture",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "geometry"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_KNIT_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "CH",
+    "name": "Chain",
+    "family": "crochet_basic",
+    "consumes_stitches": 0,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SLST",
+    "name": "Slip stitch",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC",
+    "name": "Single crochet",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "HDC",
+    "name": "Half double crochet",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DC",
+    "name": "Double crochet",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "TR",
+    "name": "Treble crochet",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DTR",
+    "name": "Double treble crochet",
+    "family": "crochet_basic",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC2TOG",
+    "name": "Single crochet 2 together",
+    "family": "crochet_decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC3TOG",
+    "name": "Single crochet 3 together",
+    "family": "crochet_decrease",
+    "consumes_stitches": 3,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "HDC2TOG",
+    "name": "Half double crochet 2 together",
+    "family": "crochet_decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DC2TOG",
+    "name": "Double crochet 2 together",
+    "family": "crochet_decrease",
+    "consumes_stitches": 2,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DC3TOG",
+    "name": "Double crochet 3 together",
+    "family": "crochet_decrease",
+    "consumes_stitches": 3,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC_INC",
+    "name": "Single crochet increase",
+    "family": "crochet_increase",
+    "consumes_stitches": 1,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "HDC_INC",
+    "name": "Half double crochet increase",
+    "family": "crochet_increase",
+    "consumes_stitches": 1,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DC_INC",
+    "name": "Double crochet increase",
+    "family": "crochet_increase",
+    "consumes_stitches": 1,
+    "produces_stitches": 2,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC_BLO",
+    "name": "Single crochet back loop only",
+    "family": "crochet_loop",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "SC_FLO",
+    "name": "Single crochet front loop only",
+    "family": "crochet_loop",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "HDC_BLO",
+    "name": "Half double crochet back loop only",
+    "family": "crochet_loop",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "DC_BLO",
+    "name": "Double crochet back loop only",
+    "family": "crochet_loop",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "FPDC",
+    "name": "Front post double crochet",
+    "family": "crochet_post",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "BPDC",
+    "name": "Back post double crochet",
+    "family": "crochet_post",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "PUFF3",
+    "name": "3 half-double crochet puff/bobble",
+    "family": "crochet_texture",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  },
+  {
+    "operation_id": "POPCORN5",
+    "name": "5 double crochet popcorn",
+    "family": "crochet_texture",
+    "consumes_stitches": 1,
+    "produces_stitches": 1,
+    "working_yarn": true,
+    "model": {
+      "kind": "calibration_required"
+    },
+    "evidence_level": "definition_only",
+    "source_ids": [
+      "CYC_CROCHET_SYMBOLS"
+    ]
+  }
+]

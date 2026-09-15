@@ -1,0 +1,63 @@
+{
+  "model": {
+    "feature_names": [
+      "intercept",
+      "op:C2_2R/1000",
+      "op:K/1000",
+      "op:P/1000",
+      "wale_spacing_mm",
+      "course_spacing_mm",
+      "yarn_diameter_mm"
+    ],
+    "coefficients": [
+      -0.030999828844244792,
+      13.557408382147699,
+      5.98847569993239,
+      6.396000016952362,
+      0.29672793752239585,
+      0.4634906411150618,
+      0.9375429641203441
+    ],
+    "operation_ids": [
+      "C2_2R",
+      "K",
+      "P"
+    ],
+    "rmse_m": 0.007721197807406543,
+    "mae_m": 0.0069044691534418945,
+    "mean_error_m": -2.1316282072803005e-15,
+    "residual_std_m": 0.008138857112034261,
+    "n_samples": 10,
+    "ridge_lambda": 0.0001,
+    "domains": {
+      "wale_spacing_mm": [
+        4.5,
+        5.3
+      ],
+      "course_spacing_mm": [
+        3.6,
+        4.2
+      ],
+      "yarn_diameter_mm": [
+        0.9,
+        1.2
+      ],
+      "operation_ids": [
+        "C2_2R",
+        "K",
+        "P"
+      ]
+    }
+  },
+  "feature_spec": {
+    "operation_ids": [
+      "C2_2R",
+      "K",
+      "P"
+    ],
+    "include_intercept": true,
+    "include_wale": true,
+    "include_course": true,
+    "include_diameter": true
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StitchOperation",
+  "type": "object",
+  "required": [
+    "operation_id",
+    "name",
+    "family",
+    "consumes_stitches",
+    "produces_stitches",
+    "model"
+  ],
+  "properties": {
+    "operation_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "family": {
+      "type": "string"
+    },
+    "consumes_stitches": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "produces_stitches": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "working_yarn": {
+      "type": "boolean"
+    },
+    "model": {
+      "type": "object"
+    },
+    "evidence_level": {
+      "enum": [
+        "definition_only",
+        "theoretical",
+        "measured",
+        "fitted",
+        "validated"
+      ]
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

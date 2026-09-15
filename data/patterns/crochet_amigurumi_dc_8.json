@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_DC_8",
+  "version": "1.0.0",
+  "name": "Toy Double Crochet 8",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 8,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "DC",
+          "n": 8
+        }
+      ]
+    }
+  ]
+}

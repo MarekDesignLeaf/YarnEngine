@@ -1,0 +1,25 @@
+{
+  "/api/health": {
+    "status_code": 200,
+    "size": null,
+    "data": {
+      "status": "ok",
+      "version": "M5.3"
+    }
+  },
+  "/api/projects": {
+    "status_code": 200,
+    "size": 0,
+    "data": null
+  },
+  "/api/operations": {
+    "status_code": 200,
+    "size": 30,
+    "data": null
+  },
+  "/api/patterns": {
+    "status_code": 200,
+    "size": 7,
+    "data": null
+  }
+}

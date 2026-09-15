@@ -1,0 +1,41 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M7.5"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "/api/stitch-groups/analyse": {
+    "status": 200,
+    "valid": true,
+    "live_stitches": 12,
+    "final_body": {
+      "group_id": "BODY",
+      "stitches": 12,
+      "state": "active",
+      "parent_ids": [
+        "LEFT",
+        "RIGHT"
+      ]
+    },
+    "timeline_steps": [
+      "initial",
+      "split",
+      "hold",
+      "resume",
+      "join"
+    ]
+  }
+}

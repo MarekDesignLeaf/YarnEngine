@@ -1,0 +1,187 @@
+import sqlite3, json
+from pathlib import Path
+
+SCHEMA = """
+PRAGMA foreign_keys=ON;
+
+CREATE TABLE IF NOT EXISTS yarns(
+  yarn_id TEXT PRIMARY KEY,
+  brand TEXT NOT NULL,
+  product TEXT NOT NULL,
+  variant TEXT,
+  cyc_weight INTEGER,
+  package_mass_g REAL NOT NULL,
+  package_length_m REAL NOT NULL,
+  tex REAL,
+  nominal_diameter_mm REAL,
+  wpi REAL,
+  recommended_needle_min_mm REAL,
+  recommended_needle_max_mm REAL,
+  fibre_json TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  source_reference TEXT,
+  evidence_level TEXT NOT NULL,
+  checksum TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS patterns(
+  pattern_id TEXT NOT NULL,
+  version TEXT NOT NULL,
+  name TEXT NOT NULL,
+  family_id TEXT NOT NULL,
+  difficulty TEXT NOT NULL,
+  tags_json TEXT NOT NULL,
+  techniques_json TEXT NOT NULL,
+  pattern_json TEXT NOT NULL,
+  source_type TEXT NOT NULL,
+  source_reference TEXT,
+  license_id TEXT,
+  checksum TEXT NOT NULL,
+  active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY(pattern_id,version)
+);
+
+CREATE TABLE IF NOT EXISTS provenance_audit(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entity_type TEXT NOT NULL,
+  entity_id TEXT NOT NULL,
+  version TEXT,
+  source_type TEXT,
+  source_reference TEXT,
+  license_id TEXT,
+  evidence_level TEXT,
+  checksum TEXT NOT NULL,
+  imported_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS quarantine(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entity_type TEXT,
+  source_file TEXT,
+  raw_json TEXT,
+  error_code TEXT NOT NULL,
+  error_message TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_yarns_brand_product ON yarns(brand,product);
+CREATE INDEX IF NOT EXISTS idx_yarns_weight ON yarns(cyc_weight);
+CREATE INDEX IF NOT EXISTS idx_patterns_family ON patterns(family_id);
+CREATE INDEX IF NOT EXISTS idx_patterns_active ON patterns(active);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS pattern_fts USING fts5(
+  pattern_id UNINDEXED,
+  version UNINDEXED,
+  name,
+  family_id,
+  tags,
+  techniques
+);
+
+CREATE VIRTUAL TABLE IF NOT EXISTS yarn_fts USING fts5(
+  yarn_id UNINDEXED,
+  brand,
+  product,
+  variant
+);
+"""
+
+class SQLiteStore:
+    def __init__(self,path):
+        self.path=str(path)
+        Path(self.path).parent.mkdir(parents=True,exist_ok=True)
+        self.conn=sqlite3.connect(self.path)
+        self.conn.row_factory=sqlite3.Row
+        self.conn.executescript(SCHEMA)
+        self.conn.commit()
+
+    def close(self): self.conn.close()
+
+    def upsert_yarn(self,yarn_dict,checksum,now):
+        c=self.conn.cursor()
+        c.execute("""
+        INSERT INTO yarns(yarn_id,brand,product,variant,cyc_weight,package_mass_g,package_length_m,tex,
+        nominal_diameter_mm,wpi,recommended_needle_min_mm,recommended_needle_max_mm,fibre_json,
+        source_type,source_reference,evidence_level,checksum,created_at,updated_at)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        ON CONFLICT(yarn_id) DO UPDATE SET
+          brand=excluded.brand,product=excluded.product,variant=excluded.variant,cyc_weight=excluded.cyc_weight,
+          package_mass_g=excluded.package_mass_g,package_length_m=excluded.package_length_m,tex=excluded.tex,
+          nominal_diameter_mm=excluded.nominal_diameter_mm,wpi=excluded.wpi,
+          recommended_needle_min_mm=excluded.recommended_needle_min_mm,
+          recommended_needle_max_mm=excluded.recommended_needle_max_mm,
+          fibre_json=excluded.fibre_json,source_type=excluded.source_type,source_reference=excluded.source_reference,
+          evidence_level=excluded.evidence_level,checksum=excluded.checksum,updated_at=excluded.updated_at
+        """,(
+          yarn_dict["yarn_id"],yarn_dict["brand"],yarn_dict["product"],yarn_dict.get("variant"),
+          yarn_dict.get("cyc_weight"),yarn_dict["package_mass_g"],yarn_dict["package_length_m"],
+          yarn_dict.get("tex"),yarn_dict.get("nominal_diameter_mm"),yarn_dict.get("wpi"),
+          yarn_dict.get("recommended_needle_min_mm"),yarn_dict.get("recommended_needle_max_mm"),
+          json.dumps(yarn_dict["fibre_composition"],sort_keys=True),
+          yarn_dict.get("source_type","user"),yarn_dict.get("source_reference"),
+          yarn_dict.get("evidence_level","declared"),checksum,now,now
+        ))
+        c.execute("DELETE FROM yarn_fts WHERE yarn_id=?",(yarn_dict["yarn_id"],))
+        c.execute("INSERT INTO yarn_fts(yarn_id,brand,product,variant) VALUES(?,?,?,?)",
+                  (yarn_dict["yarn_id"],yarn_dict["brand"],yarn_dict["product"],yarn_dict.get("variant") or ""))
+        self.conn.commit()
+
+    def upsert_pattern(self,pattern_dict,meta,checksum,now):
+        c=self.conn.cursor()
+        key=(pattern_dict["pattern_id"],pattern_dict["version"])
+        c.execute("""
+        INSERT INTO patterns(pattern_id,version,name,family_id,difficulty,tags_json,techniques_json,pattern_json,
+        source_type,source_reference,license_id,checksum,active,created_at,updated_at)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        ON CONFLICT(pattern_id,version) DO UPDATE SET
+          name=excluded.name,family_id=excluded.family_id,difficulty=excluded.difficulty,
+          tags_json=excluded.tags_json,techniques_json=excluded.techniques_json,pattern_json=excluded.pattern_json,
+          source_type=excluded.source_type,source_reference=excluded.source_reference,license_id=excluded.license_id,
+          checksum=excluded.checksum,active=excluded.active,updated_at=excluded.updated_at
+        """,(
+          key[0],key[1],meta["name"],meta["family_id"],meta["difficulty"],
+          json.dumps(meta.get("tags",[])),json.dumps(meta.get("techniques",[])),
+          json.dumps(pattern_dict,sort_keys=True),meta.get("source_type","internal"),
+          meta.get("source_reference"),meta.get("license_id"),checksum,1 if meta.get("active",True) else 0,now,now
+        ))
+        c.execute("DELETE FROM pattern_fts WHERE pattern_id=? AND version=?",key)
+        c.execute("INSERT INTO pattern_fts(pattern_id,version,name,family_id,tags,techniques) VALUES(?,?,?,?,?,?)",
+                  (key[0],key[1],meta["name"],meta["family_id"],
+                   " ".join(meta.get("tags",[]))," ".join(meta.get("techniques",[]))))
+        self.conn.commit()
+
+    def audit(self,**kwargs):
+        self.conn.execute("""INSERT INTO provenance_audit(entity_type,entity_id,version,source_type,source_reference,
+        license_id,evidence_level,checksum,imported_at) VALUES(?,?,?,?,?,?,?,?,?)""",
+        (kwargs.get("entity_type"),kwargs.get("entity_id"),kwargs.get("version"),kwargs.get("source_type"),
+         kwargs.get("source_reference"),kwargs.get("license_id"),kwargs.get("evidence_level"),
+         kwargs["checksum"],kwargs["imported_at"]))
+        self.conn.commit()
+
+    def quarantine(self,entity_type,source_file,raw_json,error_code,error_message,created_at):
+        self.conn.execute("""INSERT INTO quarantine(entity_type,source_file,raw_json,error_code,error_message,created_at)
+        VALUES(?,?,?,?,?,?)""",(entity_type,source_file,raw_json,error_code,error_message,created_at))
+        self.conn.commit()
+
+    def search_patterns(self,query,limit=20):
+        return [dict(r) for r in self.conn.execute(
+          """SELECT p.pattern_id,p.version,p.name,p.family_id,p.difficulty,p.tags_json,p.techniques_json
+             FROM pattern_fts f JOIN patterns p ON p.pattern_id=f.pattern_id AND p.version=f.version
+             WHERE pattern_fts MATCH ? AND p.active=1 LIMIT ?""",(query,limit))]
+
+    def search_yarns(self,query,limit=20):
+        return [dict(r) for r in self.conn.execute(
+          """SELECT y.* FROM yarn_fts f JOIN yarns y ON y.yarn_id=f.yarn_id
+             WHERE yarn_fts MATCH ? LIMIT ?""",(query,limit))]
+
+    def counts(self):
+        return {
+          "yarns":self.conn.execute("SELECT COUNT(*) FROM yarns").fetchone()[0],
+          "patterns":self.conn.execute("SELECT COUNT(*) FROM patterns").fetchone()[0],
+          "quarantine":self.conn.execute("SELECT COUNT(*) FROM quarantine").fetchone()[0],
+          "audit":self.conn.execute("SELECT COUNT(*) FROM provenance_audit").fetchone()[0]
+        }

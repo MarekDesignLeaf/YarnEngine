@@ -1,0 +1,24 @@
+{
+  "stitches": 100,
+  "rows": 180,
+  "horizontal": {
+    "total_stitches": 100,
+    "edge_left": 2,
+    "repeat_width": 4,
+    "full_repeats": 24,
+    "partial_left": 0,
+    "partial_right": 0,
+    "edge_right": 2,
+    "mode": "reject"
+  },
+  "vertical": {
+    "total_rows": 180,
+    "repeat_height": 2,
+    "full_repeats": 90,
+    "partial_rows": 0
+  },
+  "operation_counts": {
+    "K": 9360,
+    "P": 8640
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_SC_FLO_3",
+  "version": "1.0.0",
+  "name": "Amigurumi SC Front Loop 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 3,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_FLO",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

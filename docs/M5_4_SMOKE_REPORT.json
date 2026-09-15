@@ -1,0 +1,35 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M5.4"
+    }
+  },
+  "/api/yarns": {
+    "status": 200,
+    "count": 3,
+    "data": null
+  },
+  "/api/swatches": {
+    "status": 200,
+    "count": 0,
+    "data": null
+  },
+  "/api/projects": {
+    "status": 200,
+    "count": 0,
+    "data": null
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "pattern_id": "RIB_4X3_REF",
+  "version": "1.0.0",
+  "name": "4x3 Rib Reference",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 7,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 4
+        },
+        {
+          "op": "P",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

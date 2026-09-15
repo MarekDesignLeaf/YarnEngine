@@ -1,0 +1,33 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M8.2"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "scale_gate": {
+    "status": 200,
+    "ready": false,
+    "target": 100,
+    "current": 0,
+    "issues": [
+      {
+        "code": "TARGET_NOT_REACHED",
+        "current": 0,
+        "target": 100
+      }
+    ]
+  }
+}

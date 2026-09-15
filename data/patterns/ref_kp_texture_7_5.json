@@ -1,0 +1,40 @@
+{
+  "pattern_id": "KP_TEXTURE_7_5",
+  "version": "1.0.0",
+  "name": "K/P Texture 7:5",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 7,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 5
+        },
+        {
+          "op": "P",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 2
+        },
+        {
+          "op": "K",
+          "n": 5
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M6"
+    }
+  },
+  "/api/calibration-lab/status": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "ready": false,
+      "reasons": [
+        "need at least 6 eligible swatches",
+        "need at least 2 distinct patterns",
+        "need at least 2 distinct yarns"
+      ],
+      "coverage": {
+        "records": 0,
+        "patterns": {},
+        "yarns": {},
+        "operation_record_counts": {}
+      },
+      "note": "Thresholds are project protocol gates, not published universal calibration standards.",
+      "eligible_records": [],
+      "excluded": []
+    }
+  },
+  "/api/swatches": {
+    "status": 200,
+    "count": 0,
+    "data": null
+  },
+  "/api/projects": {
+    "status": 200,
+    "count": 0,
+    "data": null
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  }
+}

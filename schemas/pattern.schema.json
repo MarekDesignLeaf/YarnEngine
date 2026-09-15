@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pattern",
+  "type": "object",
+  "required": [
+    "pattern_id",
+    "version",
+    "name",
+    "technique",
+    "repeat",
+    "rows",
+    "source"
+  ],
+  "properties": {
+    "pattern_id": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "technique": {
+      "const": "knitting"
+    },
+    "repeat": {
+      "type": "object",
+      "required": [
+        "width_stitches",
+        "height_rows"
+      ],
+      "properties": {
+        "width_stitches": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "height_rows": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "source": {
+      "type": "object"
+    }
+  }
+}

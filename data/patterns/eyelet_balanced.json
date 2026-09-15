@@ -1,0 +1,45 @@
+{
+  "pattern_id": "EYELET_BALANCED",
+  "version": "1.0.0",
+  "name": "Balanced eyelet repeat",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "YO",
+          "n": 1
+        },
+        {
+          "op": "K2TOG",
+          "n": 1
+        },
+        {
+          "op": "K",
+          "n": 2
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 4
+        }
+      ]
+    }
+  ],
+  "source": {
+    "type": "internal",
+    "reference": "Canonical test construction",
+    "license": "Internal definition"
+  }
+}

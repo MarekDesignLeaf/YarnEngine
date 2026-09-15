@@ -1,0 +1,73 @@
+{
+  "yarns": [
+    {
+      "status": "imported",
+      "entity": "yarn",
+      "id": "TEST_Y1",
+      "checksum": "c67e5d167a5197a1f9060a16bde8d83f8e5f856ebfe187c3848988b71adc5684"
+    },
+    {
+      "status": "imported",
+      "entity": "yarn",
+      "id": "TEST_Y2",
+      "checksum": "f540db015b09f6c87cbc597f250829bf9181e72544882448010b5d9b1b0db420"
+    }
+  ],
+  "patterns": [
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "CABLE_2X2_SIMPLE",
+      "version": "1.0.0",
+      "checksum": "50129d05a62e645be06712c680c084e78269c17f58f2f1b7364ba7db68d1b9f5"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "EYELET_BALANCED",
+      "version": "1.0.0",
+      "checksum": "2bdea607f6dde8d5fda4ff75e6c0bd8f74e5c3f42ad311c38b21283b091cd4c0"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "GARTER",
+      "version": "1.0.0",
+      "checksum": "8da8b88ccbbf1c3ef55034a60fa8e5cd7188707b4371d66b94250541b268c4de"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "RIB_1X1",
+      "version": "1.0.0",
+      "checksum": "a80d181d4e0fb31e91317bb180a9007876e54a7b4982f127fb1eb4d8c3959da1"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "RIB_2X2",
+      "version": "1.0.0",
+      "checksum": "74a317e89f401d6e1ecd1caef49f8512ef80172cd73be13b8fff57d2c2e34480"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "SEED_1X1",
+      "version": "1.0.0",
+      "checksum": "c66b91107c478659c78b7da648338d6ba8d7eec854fc239106b7c478ea6c6faf"
+    },
+    {
+      "status": "imported",
+      "entity": "pattern",
+      "id": "STOCKINETTE",
+      "version": "1.0.0",
+      "checksum": "c12349eab8c6d39e6d42d1591bd8afccbb536c491b62fe7e60301b3716d51c5b"
+    }
+  ],
+  "counts": {
+    "yarns": 2,
+    "patterns": 7,
+    "quarantine": 0,
+    "audit": 9
+  }
+}

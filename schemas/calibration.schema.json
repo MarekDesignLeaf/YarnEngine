@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CalibrationRecord",
+  "type": "object",
+  "required": [
+    "calibration_id",
+    "pattern_id",
+    "pattern_version",
+    "yarn_id",
+    "gauge_id",
+    "swatch",
+    "consumption",
+    "provenance"
+  ],
+  "properties": {
+    "calibration_id": {
+      "type": "string"
+    },
+    "pattern_id": {
+      "type": "string"
+    },
+    "pattern_version": {
+      "type": "string"
+    },
+    "yarn_id": {
+      "type": "string"
+    },
+    "gauge_id": {
+      "type": "string"
+    },
+    "swatch": {
+      "type": "object"
+    },
+    "consumption": {
+      "type": "object"
+    },
+    "condition": {
+      "type": "string"
+    },
+    "provenance": {
+      "type": "object"
+    }
+  }
+}

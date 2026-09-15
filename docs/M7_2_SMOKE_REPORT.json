@@ -1,0 +1,38 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M7.2"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "group_repeat": {
+    "status": 200,
+    "valid": true,
+    "stage": "import_review"
+  },
+  "repeat_to_end": {
+    "status": 200,
+    "valid": true,
+    "stage": "import_review"
+  },
+  "non_tiling": {
+    "status": 200,
+    "valid": false,
+    "stage": "translation_review",
+    "issues": [
+      "REPEAT_DOES_NOT_TILE_WIDTH"
+    ]
+  }
+}

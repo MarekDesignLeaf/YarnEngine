@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "YarnLibraryRecord",
+  "type": "object",
+  "required": [
+    "record_type",
+    "yarn_id",
+    "brand",
+    "product",
+    "package_mass_g",
+    "package_length_m",
+    "fibre_composition"
+  ],
+  "properties": {
+    "record_type": {
+      "const": "yarn"
+    },
+    "yarn_id": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "product": {
+      "type": "string"
+    },
+    "variant": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "cyc_weight": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 7
+    },
+    "package_mass_g": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "package_length_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "tex": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "nominal_diameter_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "wpi": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "recommended_needle_min_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "recommended_needle_max_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "fibre_composition": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0,
+        "maximum": 100
+      }
+    },
+    "source_type": {
+      "type": "string"
+    },
+    "source_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "evidence_level": {
+      "type": "string"
+    }
+  }
+}

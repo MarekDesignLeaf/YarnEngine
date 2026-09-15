@@ -1,0 +1,37 @@
+{
+  "fit": {
+    "n_samples": 10,
+    "rmse_m": 0.007721197807406543,
+    "mae_m": 0.0069044691534418945,
+    "mean_error_m": -2.1316282072803005e-15
+  },
+  "leave_one_out": {
+    "n_samples": 10,
+    "mae_m": 0.0470238319187267,
+    "rmse_m": 0.07867268456241232,
+    "mean_absolute_percent_error": 0.34457210660192417,
+    "errors": [
+      0.003926203845445286,
+      0.04455734489424934,
+      -0.0141375031961406,
+      0.006981085941557552,
+      0.02883574867595584,
+      0.04797391422047248,
+      -0.0068916099260736274,
+      -0.022671321197234917,
+      -0.22667589148518275,
+      -0.0675876958049546
+    ]
+  }
+}
+
+Spreadsheet runtime warmup failed during python startup
+Traceback (most recent call last):
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/patches/warm_spreadsheet_runtime_on_startup.py", line 26, in warm_spreadsheet_runtime_on_startup
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 785, in warm_spreadsheet_runtime
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 720, in _warm_feature_flows
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/spreadsheet_warmup.py", line 704, in _warm_collaboration_flows
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/generated/interface/models.py", line 32317, in hydrate_crdt_from_proto
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/remote.py", line 749, in __call__
+  File "/tmp/tmp.L2TH2Y5coc/artifact_tool_v2-2.8.22/artifact_tool/rpc/client.py", line 150, in call
+artifact_tool.rpc.client.RemoteError: hydrateCrdtFromProto requires an empty collaborative document.

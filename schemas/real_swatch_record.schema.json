@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "RealSwatchRecord",
+  "type": "object",
+  "required": [
+    "record_id",
+    "replicate_group_id",
+    "knitter_id",
+    "pattern_id",
+    "yarn_id",
+    "needle_mm",
+    "gauge",
+    "operation_counts",
+    "yarn_length_m",
+    "condition",
+    "evidence"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "replicate_group_id": {
+      "type": "string"
+    },
+    "knitter_id": {
+      "type": "string"
+    },
+    "pattern_id": {
+      "type": "string"
+    },
+    "yarn_id": {
+      "type": "string"
+    },
+    "needle_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "gauge": {
+      "type": "object",
+      "required": [
+        "stitches",
+        "rows",
+        "width_mm",
+        "height_mm"
+      ],
+      "properties": {
+        "stitches": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rows": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "operation_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "yarn_length_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "yarn_mass_g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "tex": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "yarn_diameter_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "condition": {
+      "enum": [
+        "unblocked",
+        "blocked",
+        "washed",
+        "relaxed",
+        "unknown"
+      ]
+    },
+    "evidence": {
+      "type": "object",
+      "required": [
+        "operator_id",
+        "date_iso",
+        "method"
+      ],
+      "properties": {
+        "operator_id": {
+          "type": "string"
+        },
+        "date_iso": {
+          "type": "string",
+          "format": "date"
+        },
+        "method": {
+          "type": "string"
+        },
+        "instrument_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "photo_reference": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

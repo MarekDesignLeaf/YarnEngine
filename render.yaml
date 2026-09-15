@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: yarnengine
+    runtime: docker
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12

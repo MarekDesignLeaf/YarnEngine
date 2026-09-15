@@ -1,0 +1,37 @@
+{
+  "note": "Synthetic demonstration inputs only; not a real yarn/pattern recommendation.",
+  "tier_A": {
+    "tier": "A",
+    "core_length_m": 648.0,
+    "allowance_percent": 8,
+    "recommended_length_m": 699.84,
+    "mass_g": 174.96,
+    "packages": 4,
+    "stitches": 216,
+    "rows": 432,
+    "achieved_width_mm": 1200.0,
+    "achieved_height_mm": 1800.0000000000002,
+    "model_status": "empirical_core_swatch",
+    "warnings": [
+      "Valid only when project pattern, yarn behaviour, gauge and knitting conditions are sufficiently equivalent to the calibrated swatch."
+    ]
+  },
+  "tier_B": {
+    "tier": "B",
+    "core_length_m": 1885.049109502245,
+    "allowance_percent": 8,
+    "recommended_length_m": 2035.853038262425,
+    "mass_g": 508.9632595656062,
+    "packages": 11,
+    "stitches": 216,
+    "rows": 432,
+    "achieved_width_mm": 1200.0,
+    "achieved_height_mm": 1800.0000000000002,
+    "model_status": "research_geometry_unvalidated_for_hand_knitting",
+    "warnings": [
+      "Tier B uses published weft-knit geometry studied on machine-knitted fabrics and must be calibrated before hand-knitting accuracy is claimed.",
+      "Yarn diameter is difficult to measure reproducibly for compressible or fuzzy yarn.",
+      "Edges, cast-on, bind-off, tails and seams are excluded from the core calculation."
+    ]
+  }
+}

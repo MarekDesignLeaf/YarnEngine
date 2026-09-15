@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_DC_6",
+  "version": "1.0.0",
+  "name": "Toy Double Crochet 6",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 6,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "DC",
+          "n": 6
+        }
+      ]
+    }
+  ]
+}

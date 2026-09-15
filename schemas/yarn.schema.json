@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Yarn",
+  "type": "object",
+  "required": [
+    "yarn_id",
+    "name",
+    "tex",
+    "source"
+  ],
+  "properties": {
+    "yarn_id": {
+      "type": "string"
+    },
+    "brand": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "cyc_weight": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 7
+    },
+    "tex": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "metres_per_100g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "nominal_diameter_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "fibre_composition": {
+      "type": "array"
+    },
+    "construction": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "package_mass_g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "package_length_m": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "source": {
+      "type": "object"
+    }
+  }
+}

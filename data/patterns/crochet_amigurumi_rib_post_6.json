@@ -1,0 +1,42 @@
+{
+  "pattern_id": "AMIGURUMI_RIB_POST_6",
+  "version": "1.0.0",
+  "name": "Toy Post Rib 6",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 6,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        },
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        },
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}

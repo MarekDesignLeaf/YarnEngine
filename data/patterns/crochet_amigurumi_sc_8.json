@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_SC_8",
+  "version": "1.0.0",
+  "name": "Amigurumi Single Crochet 8",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 8,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 8
+        }
+      ]
+    }
+  ]
+}

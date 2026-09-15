@@ -1,0 +1,135 @@
+{
+  "warning": "SYNTHETIC TEST DATA ONLY. These records do not represent measured knitting consumption and must never be shipped as production calibration evidence.",
+  "samples": [
+    {
+      "calibration_id": "S01",
+      "pattern_id": "STOCKINETTE",
+      "operation_counts": {
+        "K": 1000
+      },
+      "yarn_length_m": 10.23,
+      "wale_spacing_mm": 5.0,
+      "course_spacing_mm": 4.0,
+      "yarn_diameter_mm": 1.0,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S02",
+      "pattern_id": "STOCKINETTE",
+      "operation_counts": {
+        "K": 1200
+      },
+      "yarn_length_m": 11.622,
+      "wale_spacing_mm": 5.2,
+      "course_spacing_mm": 4.1,
+      "yarn_diameter_mm": 1.1,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S03",
+      "pattern_id": "GARTER",
+      "operation_counts": {
+        "K": 900
+      },
+      "yarn_length_m": 9.438,
+      "wale_spacing_mm": 4.8,
+      "course_spacing_mm": 3.9,
+      "yarn_diameter_mm": 0.9,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S04",
+      "pattern_id": "RIB_1X1",
+      "operation_counts": {
+        "K": 500,
+        "P": 500
+      },
+      "yarn_length_m": 10.007,
+      "wale_spacing_mm": 4.5,
+      "course_spacing_mm": 3.6,
+      "yarn_diameter_mm": 0.9,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S05",
+      "pattern_id": "RIB_1X1",
+      "operation_counts": {
+        "K": 600,
+        "P": 600
+      },
+      "yarn_length_m": 11.481,
+      "wale_spacing_mm": 4.7,
+      "course_spacing_mm": 3.8,
+      "yarn_diameter_mm": 1.0,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S06",
+      "pattern_id": "RIB_2X2",
+      "operation_counts": {
+        "K": 800,
+        "P": 800
+      },
+      "yarn_length_m": 14.265,
+      "wale_spacing_mm": 5.1,
+      "course_spacing_mm": 4.0,
+      "yarn_diameter_mm": 1.1,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S07",
+      "pattern_id": "CABLE",
+      "operation_counts": {
+        "K": 700,
+        "P": 300,
+        "C2_2R": 50
+      },
+      "yarn_length_m": 11.13,
+      "wale_spacing_mm": 5.0,
+      "course_spacing_mm": 4.0,
+      "yarn_diameter_mm": 1.1,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S08",
+      "pattern_id": "CABLE",
+      "operation_counts": {
+        "K": 900,
+        "P": 400,
+        "C2_2R": 70
+      },
+      "yarn_length_m": 13.519,
+      "wale_spacing_mm": 5.3,
+      "course_spacing_mm": 4.2,
+      "yarn_diameter_mm": 1.2,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S09",
+      "pattern_id": "RIB_2X2",
+      "operation_counts": {
+        "K": 1000,
+        "P": 1000
+      },
+      "yarn_length_m": 16.469,
+      "wale_spacing_mm": 4.9,
+      "course_spacing_mm": 3.7,
+      "yarn_diameter_mm": 1.0,
+      "tex": 250
+    },
+    {
+      "calibration_id": "S10",
+      "pattern_id": "CABLE",
+      "operation_counts": {
+        "K": 650,
+        "P": 350,
+        "C2_2R": 60
+      },
+      "yarn_length_m": 11.063,
+      "wale_spacing_mm": 4.7,
+      "course_spacing_mm": 3.9,
+      "yarn_diameter_mm": 1.0,
+      "tex": 250
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CalibrationSampleM3",
+  "type": "object",
+  "required": [
+    "calibration_id",
+    "pattern_id",
+    "operation_counts",
+    "yarn_length_m",
+    "wale_spacing_mm",
+    "course_spacing_mm"
+  ],
+  "properties": {
+    "calibration_id": {
+      "type": "string"
+    },
+    "pattern_id": {
+      "type": "string"
+    },
+    "operation_counts": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "yarn_length_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "wale_spacing_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "course_spacing_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "yarn_diameter_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "tex": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "evidence_type": {
+      "enum": [
+        "measured",
+        "synthetic_test",
+        "imported"
+      ]
+    }
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M7.3"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "/api/shaping/translate": {
+    "status": 200,
+    "valid": true,
+    "stage": "shaping_valid",
+    "initial_stitches": 4,
+    "final_stitches": 4,
+    "trace": [
+      {
+        "row": 1,
+        "expected_in": 4,
+        "consumed": 4,
+        "produced": 5,
+        "delta": 1
+      },
+      {
+        "row": 2,
+        "expected_in": 5,
+        "consumed": 5,
+        "produced": 4,
+        "delta": -1
+      }
+    ]
+  },
+  "continuity_failure": {
+    "status": 200,
+    "valid": false,
+    "stage": "structural_review",
+    "issues": [
+      "ROW_INPUT_MISMATCH",
+      "DECLARED_INPUT_MISMATCH"
+    ]
+  }
+}

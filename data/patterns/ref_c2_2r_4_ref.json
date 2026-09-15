@@ -1,0 +1,32 @@
+{
+  "pattern_id": "C2_2R_4_REF",
+  "version": "1.0.0",
+  "name": "C2_2R Reference 4",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "C2_2R",
+          "n": 1
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 4
+        }
+      ]
+    }
+  ]
+}

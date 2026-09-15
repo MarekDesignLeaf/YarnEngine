@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Crochet Calibration Record",
+  "type": "object",
+  "required": [
+    "record_id",
+    "replicate_group_id",
+    "crocheter_id",
+    "yarn_id",
+    "hook_mm",
+    "gauge_stitches",
+    "gauge_rows",
+    "gauge_width_mm",
+    "gauge_height_mm",
+    "operation_counts",
+    "yarn_length_m",
+    "construction"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "replicate_group_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "crocheter_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "yarn_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hook_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "gauge_stitches": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "gauge_rows": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "gauge_width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "gauge_height_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "operation_counts": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "yarn_length_m": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "yarn_mass_g": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "tex": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "yarn_diameter_mm": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "exclusiveMinimum": 0
+    },
+    "construction": {
+      "enum": [
+        "flat",
+        "round",
+        "spiral"
+      ]
+    },
+    "tension_condition": {
+      "type": "string"
+    },
+    "evidence_reference": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

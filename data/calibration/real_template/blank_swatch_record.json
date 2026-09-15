@@ -1,0 +1,28 @@
+{
+  "record_id": "REC_0001",
+  "replicate_group_id": "REP_PATTERN_YARN_NEEDLE_001",
+  "knitter_id": "KNITTER_001",
+  "pattern_id": "STOCKINETTE",
+  "yarn_id": "YARN_001",
+  "needle_mm": 4.0,
+  "gauge": {
+    "stitches": 0,
+    "rows": 0,
+    "width_mm": 100.0,
+    "height_mm": 100.0
+  },
+  "operation_counts": {},
+  "yarn_length_m": 0.0,
+  "yarn_mass_g": null,
+  "tex": null,
+  "yarn_diameter_mm": null,
+  "condition": "relaxed",
+  "evidence": {
+    "operator_id": "",
+    "date_iso": "",
+    "method": "measured_core_swatch",
+    "instrument_id": null,
+    "photo_reference": null,
+    "notes": null
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Gauge",
+  "type": "object",
+  "required": [
+    "gauge_id",
+    "stitches",
+    "rows",
+    "width_mm",
+    "height_mm",
+    "needle_mm",
+    "pattern_id",
+    "yarn_id"
+  ],
+  "properties": {
+    "gauge_id": {
+      "type": "string"
+    },
+    "stitches": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "rows": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "height_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "needle_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "pattern_id": {
+      "type": "string"
+    },
+    "yarn_id": {
+      "type": "string"
+    },
+    "state": {
+      "enum": [
+        "unblocked",
+        "blocked",
+        "washed",
+        "relaxed",
+        "unknown"
+      ]
+    },
+    "measurement_method": {
+      "enum": [
+        "manual",
+        "image_assisted",
+        "imported"
+      ]
+    }
+  }
+}

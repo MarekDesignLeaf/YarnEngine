@@ -1,0 +1,30 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M7"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 7,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 30,
+    "data": null
+  },
+  "/api/models/production/current": {
+    "status": 200,
+    "count": null,
+    "data": null
+  },
+  "/api/import-studio/inspect": {
+    "status": 200,
+    "valid": true,
+    "review_required": true
+  }
+}

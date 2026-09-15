@@ -1,0 +1,64 @@
+{
+  "replicates": [
+    {
+      "replicate_group_id": "G1",
+      "n": 3,
+      "mean_length_m": 12.033333333333333,
+      "sample_sd_m": 0.15275252316519414,
+      "cv_percent": 1.2694115498492589,
+      "min_m": 11.9,
+      "max_m": 12.2
+    },
+    {
+      "replicate_group_id": "G2",
+      "n": 3,
+      "mean_length_m": 19.033333333333335,
+      "sample_sd_m": 0.2516611478423584,
+      "cv_percent": 1.3222126856866463,
+      "min_m": 18.8,
+      "max_m": 19.3
+    },
+    {
+      "replicate_group_id": "G3",
+      "n": 3,
+      "mean_length_m": 17.566666666666666,
+      "sample_sd_m": 0.20816659994661424,
+      "cv_percent": 1.185009107855489,
+      "min_m": 17.4,
+      "max_m": 17.8
+    }
+  ],
+  "replicate_flags": [],
+  "coverage": {
+    "n_records": 9,
+    "distinct_patterns": 3,
+    "distinct_yarns": 2,
+    "distinct_knitters": 2,
+    "operation_record_counts": {
+      "K": 9,
+      "P": 6,
+      "C2_2R": 3
+    },
+    "operation_occurrence_counts": {
+      "K": 12084,
+      "P": 6000,
+      "C2_2R": 180
+    },
+    "undercovered_operations": [
+      "C2_2R"
+    ],
+    "pattern_counts": {
+      "STOCKINETTE": 3,
+      "RIB_1X1": 3,
+      "CABLE_2X2_SIMPLE": 3
+    },
+    "yarn_counts": {
+      "Y1": 6,
+      "Y2": 3
+    },
+    "knitter_counts": {
+      "K1": 6,
+      "K2": 3
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M9.3"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 174,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 53,
+    "data": null
+  },
+  "crochet_calibration": {
+    "status": 200,
+    "ready": false,
+    "reasons": [
+      "SC needs at least 3 measured records",
+      "SC_INC needs at least 3 measured records",
+      "SC2TOG needs at least 3 measured records"
+    ]
+  }
+}

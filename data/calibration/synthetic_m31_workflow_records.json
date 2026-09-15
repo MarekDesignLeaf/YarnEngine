@@ -1,0 +1,266 @@
+{
+  "warning": "SYNTHETIC TEST DATA ONLY",
+  "records": [
+    {
+      "record_id": "R1",
+      "replicate_group_id": "G1",
+      "knitter_id": "K1",
+      "pattern_id": "STOCKINETTE",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 18,
+      "gauge_rows": 24,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1728
+      },
+      "yarn_length_m": 12.0,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R2",
+      "replicate_group_id": "G1",
+      "knitter_id": "K1",
+      "pattern_id": "STOCKINETTE",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 18,
+      "gauge_rows": 24,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1728
+      },
+      "yarn_length_m": 12.2,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R3",
+      "replicate_group_id": "G1",
+      "knitter_id": "K1",
+      "pattern_id": "STOCKINETTE",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 18,
+      "gauge_rows": 24,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1728
+      },
+      "yarn_length_m": 11.9,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R4",
+      "replicate_group_id": "G2",
+      "knitter_id": "K2",
+      "pattern_id": "RIB_1X1",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 20,
+      "gauge_rows": 28,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1400,
+        "P": 1400
+      },
+      "yarn_length_m": 19.0,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R5",
+      "replicate_group_id": "G2",
+      "knitter_id": "K2",
+      "pattern_id": "RIB_1X1",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 20,
+      "gauge_rows": 28,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1400,
+        "P": 1400
+      },
+      "yarn_length_m": 19.3,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R6",
+      "replicate_group_id": "G2",
+      "knitter_id": "K2",
+      "pattern_id": "RIB_1X1",
+      "yarn_id": "Y1",
+      "needle_mm": 4.0,
+      "gauge_stitches": 20,
+      "gauge_rows": 28,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 1400,
+        "P": 1400
+      },
+      "yarn_length_m": 18.8,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R7",
+      "replicate_group_id": "G3",
+      "knitter_id": "K1",
+      "pattern_id": "CABLE_2X2_SIMPLE",
+      "yarn_id": "Y2",
+      "needle_mm": 5.0,
+      "gauge_stitches": 16,
+      "gauge_rows": 22,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 900,
+        "P": 600,
+        "C2_2R": 60
+      },
+      "yarn_length_m": 17.5,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R8",
+      "replicate_group_id": "G3",
+      "knitter_id": "K1",
+      "pattern_id": "CABLE_2X2_SIMPLE",
+      "yarn_id": "Y2",
+      "needle_mm": 5.0,
+      "gauge_stitches": 16,
+      "gauge_rows": 22,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 900,
+        "P": 600,
+        "C2_2R": 60
+      },
+      "yarn_length_m": 17.8,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    },
+    {
+      "record_id": "R9",
+      "replicate_group_id": "G3",
+      "knitter_id": "K1",
+      "pattern_id": "CABLE_2X2_SIMPLE",
+      "yarn_id": "Y2",
+      "needle_mm": 5.0,
+      "gauge_stitches": 16,
+      "gauge_rows": 22,
+      "gauge_width_mm": 100,
+      "gauge_height_mm": 100,
+      "operation_counts": {
+        "K": 900,
+        "P": 600,
+        "C2_2R": 60
+      },
+      "yarn_length_m": 17.4,
+      "yarn_mass_g": null,
+      "tex": 250.0,
+      "yarn_diameter_mm": 1.0,
+      "condition": "relaxed",
+      "evidence": {
+        "operator_id": "TEST",
+        "date_iso": "2026-08-28",
+        "method": "synthetic_workflow_fixture",
+        "instrument_id": null,
+        "photo_reference": null,
+        "notes": "SYNTHETIC TEST DATA ONLY"
+      }
+    }
+  ]
+}

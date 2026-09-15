@@ -1,0 +1,22 @@
+{
+  "pattern_id": "AMIGURUMI_PUFF_4",
+  "version": "1.0.0",
+  "name": "Toy Puff Texture 4",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "PUFF3",
+          "n": 4
+        }
+      ]
+    }
+  ]
+}

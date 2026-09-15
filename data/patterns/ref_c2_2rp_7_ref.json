@@ -1,0 +1,36 @@
+{
+  "pattern_id": "C2_2RP_7_REF",
+  "version": "1.0.0",
+  "name": "C2_2RP Reference 7",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 7,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "C2_2RP",
+          "n": 1
+        },
+        {
+          "op": "K",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 7
+        }
+      ]
+    }
+  ]
+}

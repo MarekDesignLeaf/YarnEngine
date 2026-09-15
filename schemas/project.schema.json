@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ProjectGeometry",
+  "type": "object",
+  "required": [
+    "project_id",
+    "pattern_id",
+    "width_mm",
+    "height_mm",
+    "edge_zones",
+    "partial_repeat_mode"
+  ],
+  "properties": {
+    "project_id": {
+      "type": "string"
+    },
+    "pattern_id": {
+      "type": "string"
+    },
+    "width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "height_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "edge_zones": {
+      "type": "object",
+      "properties": {
+        "left_stitches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "right_stitches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "left_operation": {
+          "type": "string"
+        },
+        "right_operation": {
+          "type": "string"
+        }
+      }
+    },
+    "partial_repeat_mode": {
+      "enum": [
+        "reject",
+        "left",
+        "right",
+        "split",
+        "center"
+      ]
+    }
+  }
+}

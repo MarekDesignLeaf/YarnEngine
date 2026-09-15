@@ -1,0 +1,40 @@
+{
+  "pattern_id": "SLIP_TEXTURE_6_1",
+  "version": "1.0.0",
+  "name": "Slip Texture 6-1",
+  "technique": "knitting",
+  "repeat": {
+    "width_stitches": 6,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "K",
+          "n": 1
+        },
+        {
+          "op": "SL1_WYIB",
+          "n": 1
+        },
+        {
+          "op": "K",
+          "n": 4
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "WS",
+      "sequence": [
+        {
+          "op": "P",
+          "n": 6
+        }
+      ]
+    }
+  ]
+}

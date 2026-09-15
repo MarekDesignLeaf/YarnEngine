@@ -1,0 +1,24 @@
+{
+  "/api/health": {
+    "status": 200,
+    "count": null,
+    "data": {
+      "status": "ok",
+      "version": "M9.2"
+    }
+  },
+  "/api/patterns": {
+    "status": 200,
+    "count": 174,
+    "data": null
+  },
+  "/api/operations": {
+    "status": 200,
+    "count": 53,
+    "data": null
+  },
+  "complex_without_model": {
+    "status": 422,
+    "detail": "no approved production calibration model"
+  }
+}

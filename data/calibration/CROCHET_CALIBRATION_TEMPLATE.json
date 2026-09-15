@@ -1,0 +1,21 @@
+{
+  "record_id": "REPLACE",
+  "replicate_group_id": "REPLACE",
+  "crocheter_id": "REPLACE",
+  "yarn_id": "REPLACE",
+  "hook_mm": null,
+  "gauge_stitches": null,
+  "gauge_rows": null,
+  "gauge_width_mm": null,
+  "gauge_height_mm": null,
+  "operation_counts": {
+    "SC": 0
+  },
+  "yarn_length_m": null,
+  "yarn_mass_g": null,
+  "tex": null,
+  "yarn_diameter_mm": null,
+  "construction": "spiral",
+  "tension_condition": "as_crocheted",
+  "evidence_reference": null
+}
