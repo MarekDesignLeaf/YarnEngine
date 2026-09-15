@@ -6,3 +6,4 @@ venv/
 .env
 .DS_Store
 data/db/*.sqlite
+data/db/.session_secret
