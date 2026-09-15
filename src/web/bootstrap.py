@@ -9,17 +9,16 @@ def ensure_demo_database(root: Path, db_path: Path) -> None:
     store = SQLiteStore(db_path)
     try:
         ensure_version(store.conn)
-        counts = store.counts()
         operations = load_operation_registry(root / "data/stitches/operations.seed.json")
-        # Always synchronize the bundled canonical pattern library.
-        # Imports are checksum/version aware and use upsert semantics.
+        # Always synchronize bundled canonical libraries. Imports are
+        # checksum/version aware and use upsert semantics, so verified yarns
+        # added to the repository become available without deleting user data.
         bulk_import_patterns(
             store,
             root / "data/patterns",
             root / "data/library/pattern_metadata.json",
             operations,
         )
-        if counts["yarns"] == 0:
-            bulk_import_yarns(store, root / "data/yarns")
+        bulk_import_yarns(store, root / "data/yarns")
     finally:
         store.close()
