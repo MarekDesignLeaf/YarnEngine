@@ -1,0 +1,22 @@
+{
+  "pattern_id": "CROCHET_SOLID_HDC_BLO_13",
+  "version": "1.0.0",
+  "name": "Half double crochet back loop only solid repeat 13",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 13,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC_BLO",
+          "n": 13
+        }
+      ]
+    }
+  ]
+}

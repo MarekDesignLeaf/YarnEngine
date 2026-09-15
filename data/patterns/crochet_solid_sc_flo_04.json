@@ -1,0 +1,22 @@
+{
+  "pattern_id": "CROCHET_SOLID_SC_FLO_04",
+  "version": "1.0.0",
+  "name": "Single crochet front loop only solid repeat 4",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_FLO",
+          "n": 4
+        }
+      ]
+    }
+  ]
+}

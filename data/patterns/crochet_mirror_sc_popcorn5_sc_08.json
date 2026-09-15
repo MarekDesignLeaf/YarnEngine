@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_MIRROR_SC_POPCORN5_SC_08",
+  "version": "1.0.0",
+  "name": "Mirrored SC POPCORN5 SC 8",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 17,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 8
+        },
+        {
+          "op": "POPCORN5",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 8
+        }
+      ]
+    }
+  ]
+}

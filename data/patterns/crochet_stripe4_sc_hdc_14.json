@@ -1,0 +1,52 @@
+{
+  "pattern_id": "CROCHET_STRIPE4_SC_HDC_14",
+  "version": "1.0.0",
+  "name": "Four row SC/HDC texture 14",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 14,
+    "height_rows": 4
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 14
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 14
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC",
+          "n": 14
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC",
+          "n": 14
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_SPOT_FPDC_03",
+  "version": "1.0.0",
+  "name": "FPDC centred spot gap 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 7,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 3
+        },
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

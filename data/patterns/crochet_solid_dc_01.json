@@ -1,0 +1,22 @@
+{
+  "pattern_id": "CROCHET_SOLID_DC_01",
+  "version": "1.0.0",
+  "name": "Double crochet solid repeat 1",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 1,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "DC",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}

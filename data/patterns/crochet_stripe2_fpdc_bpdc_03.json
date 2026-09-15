@@ -1,0 +1,32 @@
+{
+  "pattern_id": "CROCHET_STRIPE2_FPDC_BPDC_03",
+  "version": "1.0.0",
+  "name": "Two row FPDC/BPDC texture 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 3,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "FPDC",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "BPDC",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

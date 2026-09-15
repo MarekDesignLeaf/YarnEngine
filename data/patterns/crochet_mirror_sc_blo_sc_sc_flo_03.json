@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_MIRROR_SC_BLO_SC_SC_FLO_03",
+  "version": "1.0.0",
+  "name": "Mirrored SC_BLO SC SC_FLO 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 7,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 3
+        },
+        {
+          "op": "SC",
+          "n": 1
+        },
+        {
+          "op": "SC_FLO",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

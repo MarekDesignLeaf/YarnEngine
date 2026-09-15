@@ -1,0 +1,32 @@
+{
+  "pattern_id": "CROCHET_STRIPE2_SC_POPCORN5_11",
+  "version": "1.0.0",
+  "name": "Two row SC/POPCORN5 texture 11",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 11,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 11
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "POPCORN5",
+          "n": 11
+        }
+      ]
+    }
+  ]
+}

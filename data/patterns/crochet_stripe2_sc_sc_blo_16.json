@@ -1,0 +1,32 @@
+{
+  "pattern_id": "CROCHET_STRIPE2_SC_SC_BLO_16",
+  "version": "1.0.0",
+  "name": "Two row SC/SC_BLO texture 16",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 16,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 16
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 16
+        }
+      ]
+    }
+  ]
+}

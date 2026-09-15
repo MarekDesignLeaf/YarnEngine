@@ -1,0 +1,34 @@
+{
+  "pattern_id": "CROCHET_ALT_FPDC_BPDC_02",
+  "version": "1.0.0",
+  "name": "Alternating FPDC and BPDC x2",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        },
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}

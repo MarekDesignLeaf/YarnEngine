@@ -1,0 +1,22 @@
+{
+  "pattern_id": "CROCHET_SOLID_DTR_09",
+  "version": "1.0.0",
+  "name": "Double treble crochet solid repeat 9",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 9,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "DTR",
+          "n": 9
+        }
+      ]
+    }
+  ]
+}

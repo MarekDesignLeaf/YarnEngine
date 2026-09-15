@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_MIRROR_FPDC_SC_BPDC_01",
+  "version": "1.0.0",
+  "name": "Mirrored FPDC SC BPDC 1",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 3,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "FPDC",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 1
+        },
+        {
+          "op": "BPDC",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}

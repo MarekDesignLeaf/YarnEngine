@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_MIRROR_SC_DC_SC_02",
+  "version": "1.0.0",
+  "name": "Mirrored SC DC SC 2",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 5,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 2
+        },
+        {
+          "op": "DC",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 2
+        }
+      ]
+    }
+  ]
+}

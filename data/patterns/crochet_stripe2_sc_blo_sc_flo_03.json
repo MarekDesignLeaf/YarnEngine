@@ -1,0 +1,32 @@
+{
+  "pattern_id": "CROCHET_STRIPE2_SC_BLO_SC_FLO_03",
+  "version": "1.0.0",
+  "name": "Two row SC_BLO/SC_FLO texture 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 3,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_FLO",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_SPOT_SC_BLO_02",
+  "version": "1.0.0",
+  "name": "SC_BLO centred spot gap 2",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 5,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 2
+        },
+        {
+          "op": "SC_BLO",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 2
+        }
+      ]
+    }
+  ]
+}

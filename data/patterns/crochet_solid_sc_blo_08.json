@@ -1,0 +1,22 @@
+{
+  "pattern_id": "CROCHET_SOLID_SC_BLO_08",
+  "version": "1.0.0",
+  "name": "Single crochet back loop only solid repeat 8",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 8,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 8
+        }
+      ]
+    }
+  ]
+}

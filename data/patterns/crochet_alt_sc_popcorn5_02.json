@@ -1,0 +1,34 @@
+{
+  "pattern_id": "CROCHET_ALT_SC_POPCORN5_02",
+  "version": "1.0.0",
+  "name": "Alternating SC and POPCORN5 x2",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 4,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 1
+        },
+        {
+          "op": "POPCORN5",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 1
+        },
+        {
+          "op": "POPCORN5",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}

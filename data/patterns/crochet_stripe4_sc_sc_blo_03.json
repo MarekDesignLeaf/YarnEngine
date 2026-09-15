@@ -1,0 +1,52 @@
+{
+  "pattern_id": "CROCHET_STRIPE4_SC_SC_BLO_03",
+  "version": "1.0.0",
+  "name": "Four row SC/SC_BLO texture 3",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 3,
+    "height_rows": 4
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 3,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 3
+        }
+      ]
+    },
+    {
+      "row": 4,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC_BLO",
+          "n": 3
+        }
+      ]
+    }
+  ]
+}

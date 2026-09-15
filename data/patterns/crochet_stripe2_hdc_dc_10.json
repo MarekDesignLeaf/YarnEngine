@@ -1,0 +1,32 @@
+{
+  "pattern_id": "CROCHET_STRIPE2_HDC_DC_10",
+  "version": "1.0.0",
+  "name": "Two row HDC/DC texture 10",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 10,
+    "height_rows": 2
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC",
+          "n": 10
+        }
+      ]
+    },
+    {
+      "row": 2,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "DC",
+          "n": 10
+        }
+      ]
+    }
+  ]
+}

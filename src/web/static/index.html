@@ -70,7 +70,7 @@
 </section>
 <section class="panel">
 <h2>Evidence status</h2>
-<div class="muted">Production yarn estimates require an approved calibration model based on physical measurements. Pattern structure can be analysed without one.</div>
+<div class="muted">Yarn estimates work from the start using an uncalibrated geometry baseline. An approved calibration model, once available for this yarn/hook/gauge, replaces the baseline with a measured, narrower estimate.</div>
 <div id="modelStatus" class="status">Checking production model…</div>
 </section>
 </div>
@@ -110,7 +110,7 @@ async function boot(){
   populatePatternSelect();renderPatterns();
   $('yarn').innerHTML='<option value="">Select yarn</option>'+y.map(x=>`<option value="${esc(x.yarn_id)}">${esc(x.brand)} · ${esc(x.product)}</option>`).join('');
   status($('apiStatus'),`Engine ${h.version} online · ${crochetPatterns.length} crochet patterns loaded`,'good');
-  status($('modelStatus'),m.active?`Approved model: ${m.model?.name||m.model?.model_id||'production'}`:'No approved production crochet model. Structural analysis is available; production yarn estimates remain gated.',m.active?'good':'');
+  status($('modelStatus'),m.active?`Approved model: ${m.model?.name||m.model?.model_id||'production'}`:'No approved calibration model yet. Yarn estimates use the uncalibrated geometry baseline (rough range shown) until one is captured.',m.active?'good':'');
   setTemplate('sphere');
  }catch(e){status($('apiStatus'),'Engine error: '+e.message,'bad');}
 }
@@ -127,7 +127,11 @@ async function calculateConsumption(){
  const payload={program_type:'amigurumi',program:{initial_stitches:Number($('initialStitches').value),rounds:JSON.parse($('roundsJson').value)},yarn_id:yarnId,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:5,domain_policy:'strict'};
  const r=await fetch('/api/complex-consumption/calculate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const x=await r.json();
  if(!r.ok){status($('analysisStatus'),'Yarn estimate unavailable: '+(typeof x.detail==='string'?x.detail:JSON.stringify(x.detail)),'bad');return;}
- status($('analysisStatus'),`Recommended yarn: ${x.calculation?.recommended_length_m?.toFixed?.(2)||x.calculation?.recommended_length_m} m · model ${x.model_id}`,'good');
+ const calibrated=x.model_id!=='uncalibrated_geometry_baseline_v1';
+ const rec=x.calculation?.recommended_length_m;const recTxt=rec?.toFixed?.(2)||rec;
+ const range=(!calibrated&&x.prediction)?` (rough range ${x.prediction.lower_95_m?.toFixed?.(2)}–${x.prediction.upper_95_m?.toFixed?.(2)} m)`:'';
+ const badge=calibrated?'Calibrated estimate':'Uncalibrated estimate – no measured model for this yarn/hook/gauge yet';
+ status($('analysisStatus'),`${badge}: ${recTxt} m${range} · ${x.model_id}`,calibrated?'good':'');
 }
 function newProject(){currentProjectId=null;lastAnalysis=null;$('projectName').textContent='Unsaved crochet project';$('resultsPanel').classList.add('hidden');$('analysisStatus').classList.add('hidden');$('patternSearch').value='';renderPatterns();setTemplate('sphere');}
 async function openProjects(){

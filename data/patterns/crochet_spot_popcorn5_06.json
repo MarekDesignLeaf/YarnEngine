@@ -1,0 +1,30 @@
+{
+  "pattern_id": "CROCHET_SPOT_POPCORN5_06",
+  "version": "1.0.0",
+  "name": "POPCORN5 centred spot gap 6",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 13,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "SC",
+          "n": 6
+        },
+        {
+          "op": "POPCORN5",
+          "n": 1
+        },
+        {
+          "op": "SC",
+          "n": 6
+        }
+      ]
+    }
+  ]
+}

@@ -33,7 +33,7 @@ from src.library_scaling.batch import inspect_scaling_batch
 from src.library_scaling.pipeline import scale_gate
 from src.branch_knitting.engine import execute_branch_program
 from src.crochet.amigurumi import analyse_rounds
-from src.complex_consumption.bridge import calculate_operation_program
+from src.complex_consumption.bridge import calculate_operation_program, UNCALIBRATED_BASELINE_MODEL_ID
 from src.gauge_engine.gauge import Gauge
 from src.crochet_calibration.record import CrochetCalibrationRecord
 from src.crochet_calibration.protocol import readiness as crochet_calibration_readiness
@@ -215,8 +215,6 @@ def complex_consumption_calculate(payload:dict):
     if not analysed.get("valid"):
         raise HTTPException(status_code=422,detail={"program_issues":analysed.get("issues",[])})
     production=model_registry.production()
-    if production is None:
-        raise HTTPException(status_code=422,detail="no approved production calibration model")
     yarn=service._yarn(payload.get("yarn_id")) if payload.get("yarn_id") else None
     diameter=(yarn.get("nominal_diameter_mm") if yarn else None) or payload.get("yarn_diameter_mm")
     if diameter is None:
@@ -232,7 +230,7 @@ def complex_consumption_calculate(payload:dict):
         raise HTTPException(status_code=422,detail=str(e))
     return {"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
             "prediction":{"estimate_m":pred.estimate_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
-            "audit":audit,"model_id":production["model_id"]}
+            "audit":audit,"model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
 
 @app.post("/api/crochet/amigurumi/analyse")
 def crochet_amigurumi_analyse(payload:dict):
@@ -337,6 +335,22 @@ def patterns():
                   "source_type":m.get("source_type","user_created")
                 }
     return sorted(base.values(),key=lambda x:(x["name"],x["version"]))
+
+
+@app.get("/api/amigurumi/constructions")
+def amigurumi_constructions(category: str | None = None, text: str | None = None, limit: int = 500):
+    if limit < 1 or limit > 5000:
+        raise HTTPException(status_code=422, detail="limit must be between 1 and 5000")
+    path = ROOT / "data/library/amigurumi_construction_catalog.json"
+    if not path.exists():
+        return {"count": 0, "items": []}
+    records = json.loads(path.read_text(encoding="utf-8"))["records"]
+    if category:
+        records = [x for x in records if x.get("category", "").lower() == category.lower()]
+    if text:
+        q = text.lower()
+        records = [x for x in records if q in " ".join([x.get("canonical_name", ""), x.get("category", ""), *x.get("aliases", []), *x.get("typical_use", [])]).lower()]
+    return {"count": len(records), "items": records[:limit]}
 
 
 @app.get("/api/patterns/{pattern_id}/{version}/chart")

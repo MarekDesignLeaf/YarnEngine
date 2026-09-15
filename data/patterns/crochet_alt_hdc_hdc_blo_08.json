@@ -1,0 +1,82 @@
+{
+  "pattern_id": "CROCHET_ALT_HDC_HDC_BLO_08",
+  "version": "1.0.0",
+  "name": "Alternating HDC and HDC_BLO x8",
+  "technique": "crochet",
+  "repeat": {
+    "width_stitches": 16,
+    "height_rows": 1
+  },
+  "rows": [
+    {
+      "row": 1,
+      "side": "RS",
+      "sequence": [
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        },
+        {
+          "op": "HDC",
+          "n": 1
+        },
+        {
+          "op": "HDC_BLO",
+          "n": 1
+        }
+      ]
+    }
+  ]
+}
