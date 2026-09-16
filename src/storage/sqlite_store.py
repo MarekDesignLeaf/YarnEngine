@@ -1,4 +1,4 @@
-import sqlite3, json
+import sqlite3, json, math
 from pathlib import Path
 
 SCHEMA = """
@@ -97,9 +97,31 @@ CREATE TABLE IF NOT EXISTS stash(
   UNIQUE(user_id,yarn_id)
 );
 
+CREATE TABLE IF NOT EXISTS product_lines(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT,
+  photo_url TEXT,
+  product_url TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS product_line_materials(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  product_line_id INTEGER NOT NULL,
+  yarn_id TEXT NOT NULL,
+  length_m REAL,
+  quantity_g REAL,
+  notes TEXT,
+  created_at TEXT NOT NULL
+);
+
 CREATE INDEX IF NOT EXISTS idx_yarns_brand_product ON yarns(brand,product);
 CREATE INDEX IF NOT EXISTS idx_yarns_weight ON yarns(cyc_weight);
 CREATE INDEX IF NOT EXISTS idx_yarn_suppliers_yarn ON yarn_suppliers(yarn_id);
+CREATE INDEX IF NOT EXISTS idx_product_lines_name ON product_lines(name);
+CREATE INDEX IF NOT EXISTS idx_product_line_materials_line ON product_line_materials(product_line_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_family ON patterns(family_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_active ON patterns(active);
 
@@ -314,6 +336,95 @@ class SQLiteStore:
         return [dict(r) for r in self.conn.execute(
           """SELECT y.* FROM yarn_fts f JOIN yarns y ON y.yarn_id=f.yarn_id
              WHERE yarn_fts MATCH ? LIMIT ?""",(query,limit))]
+
+    def create_product_line(self,name,description,photo_url,product_url,now):
+        c=self.conn.cursor()
+        try:
+            c.execute("""INSERT INTO product_lines(name,description,photo_url,product_url,created_at,updated_at)
+                         VALUES(?,?,?,?,?,?)""",(name,description,photo_url,product_url,now,now))
+        except sqlite3.IntegrityError:
+            self.conn.rollback()
+            raise
+        self.conn.commit()
+        return self.get_product_line(c.lastrowid)
+
+    def list_product_lines(self):
+        rows=self.conn.execute("SELECT * FROM product_lines ORDER BY name").fetchall()
+        return [self._with_materials(dict(r)) for r in rows]
+
+    def get_product_line(self,line_id):
+        r=self.conn.execute("SELECT * FROM product_lines WHERE id=?",(line_id,)).fetchone()
+        return self._with_materials(dict(r)) if r is not None else None
+
+    def _with_materials(self,line):
+        mats=self.list_materials(line["id"])
+        costs=[m["cost"] for m in mats if m.get("cost") is not None]
+        currencies={m["price_currency"] for m in mats if m.get("price_currency")}
+        line["materials"]=mats
+        if mats and len(costs)==len(mats) and len(currencies)<=1:
+            line["total_cost"]=round(sum(costs),2)
+            line["total_cost_currency"]=next(iter(currencies),None)
+        else:
+            line["total_cost"]=None
+            line["total_cost_currency"]=None
+        return line
+
+    def update_product_line(self,line_id,now,**fields):
+        allowed={k:v for k,v in fields.items() if k in ("name","description","photo_url","product_url") and v is not None}
+        if not allowed:
+            return self.get_product_line(line_id)
+        sets=",".join(f"{k}=?" for k in allowed)+",updated_at=?"
+        vals=list(allowed.values())+[now,line_id]
+        c=self.conn.cursor()
+        try:
+            c.execute(f"UPDATE product_lines SET {sets} WHERE id=?",vals)
+        except sqlite3.IntegrityError:
+            self.conn.rollback()
+            raise
+        self.conn.commit()
+        return self.get_product_line(line_id) if c.rowcount>0 else None
+
+    def delete_product_line(self,line_id):
+        c=self.conn.cursor()
+        c.execute("DELETE FROM product_lines WHERE id=?",(line_id,))
+        deleted=c.rowcount>0
+        c.execute("DELETE FROM product_line_materials WHERE product_line_id=?",(line_id,))
+        self.conn.commit()
+        return deleted
+
+    def add_material(self,product_line_id,yarn_id,length_m,quantity_g,notes,now):
+        c=self.conn.cursor()
+        c.execute("""INSERT INTO product_line_materials(product_line_id,yarn_id,length_m,quantity_g,notes,created_at)
+                     VALUES(?,?,?,?,?,?)""",(product_line_id,yarn_id,length_m,quantity_g,notes,now))
+        self.conn.commit()
+        r=self.conn.execute("SELECT * FROM product_line_materials WHERE id=?",(c.lastrowid,)).fetchone()
+        return dict(r)
+
+    def list_materials(self,product_line_id):
+        rows=self.conn.execute(
+            """SELECT m.*, y.brand as yarn_brand, y.product as yarn_product,
+                      y.package_length_m, y.package_mass_g, y.price_amount, y.price_currency
+               FROM product_line_materials m LEFT JOIN yarns y ON y.yarn_id=m.yarn_id
+               WHERE m.product_line_id=? ORDER BY m.id""",(product_line_id,)).fetchall()
+        out=[]
+        for r in rows:
+            d=dict(r)
+            packages=None
+            if d.get("length_m") and d.get("package_length_m"):
+                packages=math.ceil(d["length_m"]/d["package_length_m"])
+            elif d.get("quantity_g") and d.get("package_mass_g"):
+                packages=math.ceil(d["quantity_g"]/d["package_mass_g"])
+            d["packages"]=packages
+            d["cost"]=round(packages*d["price_amount"],2) if (packages and d.get("price_amount")) else None
+            out.append(d)
+        return out
+
+    def delete_material(self,product_line_id,material_id):
+        c=self.conn.cursor()
+        c.execute("DELETE FROM product_line_materials WHERE id=? AND product_line_id=?",
+                   (material_id,product_line_id))
+        self.conn.commit()
+        return c.rowcount>0
 
     def counts(self):
         return {

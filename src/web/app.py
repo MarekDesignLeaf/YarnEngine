@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest, YarnExtraUpdateRequest, SupplierCreateRequest, StashUpsertRequest, CompanySettingsRequest
+from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest, YarnExtraUpdateRequest, SupplierCreateRequest, StashUpsertRequest, CompanySettingsRequest, ProductLineCreateRequest, ProductLineUpdateRequest, ProductMaterialCreateRequest
 from .bootstrap import ensure_demo_database
 from .service import WebService
 from .pattern_chart import build_pattern_chart, load_operation_map
@@ -45,7 +45,7 @@ from src.crochet_calibration.quality import replicate_quality as crochet_replica
 from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
-import datetime, os
+import datetime, os, sqlite3
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
 from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS
@@ -756,6 +756,72 @@ def delete_yarn_supplier(yarn_id:str, supplier_id:int):
             raise HTTPException(status_code=404,detail="supplier not found")
     finally: store.close()
     return {"status":"deleted","supplier_id":supplier_id}
+
+
+# ------------------------------------------------------------- product lines (catalogue) ---
+@app.get("/api/product-lines")
+def list_product_lines():
+    store=service._store()
+    try: return store.list_product_lines()
+    finally: store.close()
+
+@app.post("/api/admin/product-lines")
+def create_product_line(request:ProductLineCreateRequest):
+    store=service._store()
+    try:
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        try:
+            return store.create_product_line(request.name,request.description,request.photo_url,
+                                               request.product_url,now)
+        except sqlite3.IntegrityError:
+            raise HTTPException(status_code=409,detail="a product line with this name already exists")
+    finally: store.close()
+
+@app.patch("/api/admin/product-lines/{line_id}")
+def update_product_line(line_id:int, request:ProductLineUpdateRequest):
+    store=service._store()
+    try:
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        data=request.model_dump(exclude_unset=True)
+        try:
+            updated=store.update_product_line(line_id,now,**data)
+        except sqlite3.IntegrityError:
+            raise HTTPException(status_code=409,detail="a product line with this name already exists")
+        if updated is None:
+            raise HTTPException(status_code=404,detail="product line not found")
+        return updated
+    finally: store.close()
+
+@app.delete("/api/admin/product-lines/{line_id}")
+def delete_product_line(line_id:int):
+    store=service._store()
+    try:
+        if not store.delete_product_line(line_id):
+            raise HTTPException(status_code=404,detail="product line not found")
+    finally: store.close()
+    return {"status":"deleted","id":line_id}
+
+@app.post("/api/admin/product-lines/{line_id}/materials")
+def add_product_material(line_id:int, request:ProductMaterialCreateRequest):
+    store=service._store()
+    try:
+        if store.get_product_line(line_id) is None:
+            raise HTTPException(status_code=404,detail="product line not found")
+        if store.get_yarn(request.yarn_id) is None:
+            raise HTTPException(status_code=422,detail="yarn not found")
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        store.add_material(line_id,request.yarn_id,request.length_m,request.quantity_g,request.notes,now)
+        return store.get_product_line(line_id)
+    finally: store.close()
+
+@app.delete("/api/admin/product-lines/{line_id}/materials/{material_id}")
+def delete_product_material(line_id:int, material_id:int):
+    store=service._store()
+    try:
+        if not store.delete_material(line_id,material_id):
+            raise HTTPException(status_code=404,detail="material not found")
+        return store.get_product_line(line_id)
+    finally: store.close()
 
 
 def _eligible_lab_records():

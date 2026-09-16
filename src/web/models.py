@@ -139,6 +139,33 @@ class StashUpsertRequest(BaseModel):
         return self
 
 
+class ProductLineCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    description: str | None = Field(None, max_length=4000)
+    photo_url: str | None = Field(None, max_length=1000)
+    product_url: str | None = Field(None, max_length=1000)
+
+
+class ProductLineUpdateRequest(BaseModel):
+    name: str | None = Field(None, min_length=1, max_length=200)
+    description: str | None = Field(None, max_length=4000)
+    photo_url: str | None = Field(None, max_length=1000)
+    product_url: str | None = Field(None, max_length=1000)
+
+
+class ProductMaterialCreateRequest(BaseModel):
+    yarn_id: str = Field(..., min_length=1, max_length=100)
+    length_m: float | None = Field(None, gt=0)
+    quantity_g: float | None = Field(None, gt=0)
+    notes: str | None = Field(None, max_length=500)
+
+    @model_validator(mode="after")
+    def quantity_present(self):
+        if self.length_m is None and self.quantity_g is None:
+            raise ValueError("length_m or quantity_g is required")
+        return self
+
+
 class CompanySettingsRequest(BaseModel):
     company_name: str | None = Field(None, max_length=200)
     address: str | None = Field(None, max_length=1000)

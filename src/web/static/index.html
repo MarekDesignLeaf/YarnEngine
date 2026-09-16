@@ -36,6 +36,13 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;max-height:70vh;overflow:auto;padding:2px}
 .pcard{border:1px solid var(--line);border-radius:10px;padding:8px;background:#faf9f6;cursor:pointer;display:grid;gap:6px}.pcard:hover{border-color:var(--accent2)}.pcard.active{outline:2px solid var(--accent)}
 .pcard .thumb{aspect-ratio:1;background:#fff;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;overflow:hidden}.pcard .thumb > svg{width:100%;height:100%}
+.lineGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.lineCard{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.lineCard .thumb{aspect-ratio:4/3;background:#f3f1ec;display:grid;place-items:center;overflow:hidden}
+.lineCard .thumb img{width:100%;height:100%;object-fit:cover}
+.lineCard .body{padding:10px 12px;display:grid;gap:6px;flex:1}
+.lineCard .mats{font-size:12.5px;color:var(--muted)}
+.lineCard .mats li{margin:2px 0}
 .pcard strong{font-size:13px;line-height:1.25}.pcard .small{font-size:11.5px}
 .chartbox{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px}.chartbox > svg{display:block;max-width:100%}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
@@ -92,6 +99,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   <button data-tab="patterns">Pattern library</button>
   <button data-tab="yarns">Yarns</button>
   <button data-tab="stash">My stash</button>
+  <button data-tab="lines">Products</button>
   <button data-tab="projects">Projects</button>
   <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
 </nav>
@@ -264,6 +272,17 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   </div>
 </section>
 
+<!-- ---------- PRODUCT LINES (PiLoop toys) ---------- -->
+<section id="tab-lines" class="hidden">
+  <div class="card">
+    <div class="topbar" style="margin-bottom:8px"><h2 style="margin:0">Product lines</h2><button id="btnNewLine" class="alt hidden">+ Add product</button></div>
+    <p class="small muted">Every PiLoop product with what it's made from — the yarns, lengths/quantities used, and the estimated material cost.</p>
+    <div class="toolbar"><input id="lineSearch" placeholder="Search products…" style="flex:1;min-width:160px"></div>
+    <div id="lineGrid" class="lineGrid"></div>
+    <div id="lineEmpty" class="muted hidden">No products in the catalogue yet.</div>
+  </div>
+</section>
+
 <!-- ---------- PROJECTS ---------- -->
 <section id="tab-projects" class="hidden">
   <div class="card"><h2>Saved projects</h2><div id="projectList"></div></div>
@@ -329,6 +348,28 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
     <label><span>Link</span><input id="ymSupUrl" placeholder="https://…"></label>
   </div>
   <div class="toolbar"><button id="ymAddSupplier" class="alt">+ Add supplier</button></div>
+</div></div>
+
+<div id="lineModal" class="modal hidden"><div class="modal-card" style="max-width:620px">
+  <div class="modal-head"><h2 id="lmTitle" style="margin:0">Add product</h2><button id="lmClose" class="alt">✕</button></div>
+  <div class="fields">
+    <label style="grid-column:1/-1"><span>Name</span><input id="lmName"></label>
+    <label style="grid-column:1/-1"><span>Description</span><input id="lmDesc"></label>
+    <label><span>Photo URL</span><input id="lmPhoto" placeholder="https://…"></label>
+    <label><span>Product / website URL</span><input id="lmUrl" placeholder="https://…"></label>
+  </div>
+  <div class="toolbar"><button id="lmSave">Save product</button><button id="lmDelete" class="danger hidden">Delete product</button></div>
+  <div id="lineModalStatus" class="status hidden"></div>
+  <h3>What it's made from</h3>
+  <table id="lmMaterials" class="small" style="width:100%"><thead><tr><th>Yarn</th><th>Length / qty</th><th>Cost</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table>
+  <div id="lmMatEmpty" class="muted small hidden">No materials listed yet.</div>
+  <div class="fields three" style="margin-top:8px">
+    <label style="grid-column:1/-1"><span>Yarn</span><select id="lmMatYarn"></select></label>
+    <label><span>Length (m)</span><input id="lmMatLen" type="number" step="1" min="0"></label>
+    <label><span>Or grams</span><input id="lmMatGrams" type="number" step="1" min="0"></label>
+    <label><span>Notes</span><input id="lmMatNotes"></label>
+  </div>
+  <div class="toolbar"><button id="lmAddMaterial" class="alt">+ Add material</button></div>
 </div></div>
 
 </main>
@@ -426,6 +467,7 @@ async function boot(){
  if(!ME){showLogin();return;}
  showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');
  $('tabAdmin').classList.toggle('hidden',ME.role!=='admin');
+ $('btnNewLine').classList.toggle('hidden',ME.role!=='admin');
  await loadData();
 }
 $('btnLogin').onclick=async()=>{try{ME=await api('/api/auth/login',{method:'POST',body:{username:$('loginUser').value,password:$('loginPass').value}});location.reload();}catch(e){status($('loginStatus'),t('msg.loginFail')+': '+e.message,'bad');}};
@@ -438,7 +480,7 @@ $('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accC
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -637,6 +679,96 @@ $('ymAddSupplier').onclick=async()=>{
    $('ymSupName').value='';$('ymSupPrice').value='';$('ymSupUrl').value='';
    refreshYarnSuppliers(ymCurrent);
  }catch(e){alert(e.message);}
+};
+
+/* ============================ product lines (PiLoop catalogue) ============================ */
+let LINES=[];
+async function loadProductLines(){
+ LINES=await api('/api/product-lines');
+ renderProductLines();
+}
+function matText(m){
+ const bits=[];
+ if(m.length_m)bits.push(fmt(m.length_m,0)+' m');
+ if(m.quantity_g)bits.push(fmt(m.quantity_g,0)+' g');
+ if(m.packages)bits.push(fmt(m.packages,0)+' ball'+(m.packages===1?'':'s'));
+ if(m.cost!=null)bits.push(fmt(m.cost,2)+' '+esc(m.price_currency||''));
+ return `${esc(m.yarn_brand||'')} ${esc(m.yarn_product||m.yarn_id)}`.trim()+(bits.length?' — '+bits.join(' · '):'');
+}
+function renderProductLines(){
+ const q=($('lineSearch').value||'').trim().toLowerCase();
+ const filtered=q?LINES.filter(l=>l.name.toLowerCase().includes(q)||(l.description||'').toLowerCase().includes(q)):LINES;
+ $('lineEmpty').classList.toggle('hidden',filtered.length>0);
+ $('lineGrid').innerHTML=filtered.map(l=>`
+  <div class="lineCard">
+   <div class="thumb">${l.photo_url?`<img src="${esc(l.photo_url)}" alt="${esc(l.name)}">`:'<span class="muted small">No photo</span>'}</div>
+   <div class="body">
+    <strong>${esc(l.name)}</strong>
+    ${l.description?`<span class="small muted">${esc(l.description)}</span>`:''}
+    ${l.materials&&l.materials.length?`<ul class="mats">${l.materials.map(m=>`<li>${matText(m)}</li>`).join('')}</ul>`:'<span class="small muted">No materials listed yet.</span>'}
+    ${l.total_cost!=null?`<strong class="small">Total material cost: ${fmt(l.total_cost,2)} ${esc(l.total_cost_currency||'')}</strong>`:''}
+    <div class="toolbar">
+     ${l.product_url?`<a href="${esc(l.product_url)}" target="_blank" rel="noopener" class="small">link ↗</a>`:''}
+     ${(ME&&ME.role==='admin')?`<button class="link" data-edit-line="${l.id}">edit</button>`:''}
+    </div>
+   </div>
+  </div>`).join('');
+ $('lineGrid').querySelectorAll('[data-edit-line]').forEach(b=>b.onclick=()=>openLineModal(Number(b.dataset.editLine)));
+}
+$('lineSearch').oninput=renderProductLines;
+let LM_CURRENT=null;
+function openLineModal(id){
+ LM_CURRENT=id;
+ const l=id?LINES.find(x=>x.id===id):null;
+ $('lmTitle').textContent=l?'Edit product':'Add product';
+ $('lmName').value=l?.name||'';$('lmDesc').value=l?.description||'';$('lmPhoto').value=l?.photo_url||'';$('lmUrl').value=l?.product_url||'';
+ $('lmDelete').classList.toggle('hidden',!l);
+ $('lmMatYarn').innerHTML=YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''}</option>`).join('');
+ renderLineMaterials(l);
+ $('lineModalStatus').classList.add('hidden');
+ $('lineModal').classList.remove('hidden');
+}
+$('btnNewLine').onclick=()=>openLineModal(null);
+$('lmClose').onclick=()=>$('lineModal').classList.add('hidden');
+function renderLineMaterials(l){
+ const mats=l?.materials||[];
+ const tb=document.querySelector('#lmMaterials tbody');
+ $('lmMatEmpty').classList.toggle('hidden',mats.length>0);
+ tb.innerHTML=mats.map(m=>`<tr><td>${esc(m.yarn_brand||'')} ${esc(m.yarn_product||m.yarn_id)}</td><td>${m.length_m?fmt(m.length_m,0)+' m':''}${m.quantity_g?' '+fmt(m.quantity_g,0)+' g':''}${m.packages?' ('+fmt(m.packages,0)+' ball'+(m.packages===1?'':'s')+')':''}</td><td class="small">${m.cost!=null?fmt(m.cost,2)+' '+esc(m.price_currency||''):''}</td><td class="small">${esc(m.notes||'')}</td><td><button class="link" data-delmat="${m.id}">remove</button></td></tr>`).join('');
+ tb.querySelectorAll('[data-delmat]').forEach(b=>b.onclick=async()=>{
+   const updated=await api(`/api/admin/product-lines/${LM_CURRENT}/materials/${b.dataset.delmat}`,{method:'DELETE'});
+   Object.assign(LINES.find(x=>x.id===LM_CURRENT),updated);renderLineMaterials(updated);renderProductLines();
+ });
+}
+$('lmSave').onclick=async()=>{
+ const body={name:$('lmName').value.trim(),description:$('lmDesc').value.trim()||null,photo_url:$('lmPhoto').value.trim()||null,product_url:$('lmUrl').value.trim()||null};
+ if(!body.name){status($('lineModalStatus'),'Name is required.','bad');return;}
+ try{
+   let saved;
+   if(LM_CURRENT){saved=await api(`/api/admin/product-lines/${LM_CURRENT}`,{method:'PATCH',body});}
+   else{saved=await api('/api/admin/product-lines',{method:'POST',body});LM_CURRENT=saved.id;$('lmDelete').classList.remove('hidden');}
+   const i=LINES.findIndex(x=>x.id===saved.id);if(i>=0)LINES[i]=saved;else LINES.push(saved);
+   renderProductLines();status($('lineModalStatus'),t('msg.saved'),'good');
+ }catch(e){status($('lineModalStatus'),e.message,'bad');}
+};
+$('lmDelete').onclick=async()=>{
+ if(!LM_CURRENT||!confirm(t('msg.confirmDel')))return;
+ try{
+   await api(`/api/admin/product-lines/${LM_CURRENT}`,{method:'DELETE'});
+   LINES=LINES.filter(x=>x.id!==LM_CURRENT);renderProductLines();$('lineModal').classList.add('hidden');
+ }catch(e){status($('lineModalStatus'),e.message,'bad');}
+};
+$('lmAddMaterial').onclick=async()=>{
+ const yarn_id=$('lmMatYarn').value;
+ const length_m=$('lmMatLen').value?Number($('lmMatLen').value):null;
+ const quantity_g=$('lmMatGrams').value?Number($('lmMatGrams').value):null;
+ if(!yarn_id||(!length_m&&!quantity_g)){status($('lineModalStatus'),'Pick a yarn and a length or weight.','bad');return;}
+ try{
+   const updated=await api(`/api/admin/product-lines/${LM_CURRENT}/materials`,{method:'POST',body:{yarn_id,length_m,quantity_g,notes:$('lmMatNotes').value.trim()||null}});
+   const i=LINES.findIndex(x=>x.id===updated.id);if(i>=0)LINES[i]=updated;
+   renderLineMaterials(updated);renderProductLines();
+   $('lmMatLen').value='';$('lmMatGrams').value='';$('lmMatNotes').value='';
+ }catch(e){status($('lineModalStatus'),e.message,'bad');}
 };
 
 /* ============================ admin ============================ */
