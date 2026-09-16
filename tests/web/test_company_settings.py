@@ -23,7 +23,7 @@ def test_company_settings_round_trip_shape(auth_client):
     user/project stores), so this clears every field via the API itself first
     rather than assuming a pristine starting state left by other tests."""
     admin, _ = auth_client
-    empty = {"company_name": "", "address": "", "ico": "", "dic": "", "email": "", "phone": "", "website": ""}
+    empty = {"company_name": "", "address": "", "company_number": "", "vat_number": "", "email": "", "phone": "", "website": ""}
     cleared = admin.put("/api/admin/settings/company", json=empty).json()
     assert cleared == empty
     assert admin.get("/api/settings/company").json() == empty

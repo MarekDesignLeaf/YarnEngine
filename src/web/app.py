@@ -904,7 +904,7 @@ def delete_stash(yarn_id:str, http_request:Request):
 
 
 # --------------------------------------------------------- company/branding ---
-_COMPANY_FIELDS=("company_name","address","ico","dic","email","phone","website")
+_COMPANY_FIELDS=("company_name","address","company_number","vat_number","email","phone","website")
 
 @app.get("/api/settings/company")
 def get_company_settings():

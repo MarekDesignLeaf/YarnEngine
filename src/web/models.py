@@ -142,8 +142,8 @@ class StashUpsertRequest(BaseModel):
 class CompanySettingsRequest(BaseModel):
     company_name: str | None = Field(None, max_length=200)
     address: str | None = Field(None, max_length=1000)
-    ico: str | None = Field(None, max_length=100)
-    dic: str | None = Field(None, max_length=100)
+    company_number: str | None = Field(None, max_length=100)
+    vat_number: str | None = Field(None, max_length=100)
     email: str | None = Field(None, max_length=200)
     phone: str | None = Field(None, max_length=100)
     website: str | None = Field(None, max_length=300)
