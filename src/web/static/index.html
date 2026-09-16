@@ -5,8 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>YarnEngine – Crochet Yarn Calculator</title>
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/static/favicon.png">
 <meta name="theme-color" content="#202a2f">
 <style>
+@media print{body *{visibility:hidden}#resultCard,#resultCard *{visibility:visible}#resultCard{position:absolute;left:0;top:0;width:100%}#resultCard button{display:none}}
+footer.appfoot{display:flex;align-items:center;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;flex-wrap:wrap}
+footer.appfoot img{height:34px;width:auto}
+.thumb-sm{width:44px;height:44px;border-radius:8px;object-fit:cover;border:1px solid var(--line);background:#fff}
+#projectList{overflow-x:auto}
+@media(max-width:600px){nav.tabs button{flex:1 1 auto;font-size:12.5px;padding:9px 8px}.topbar h1{font-size:20px}.topbar img{height:30px!important}}
 :root{--bg:#f5f3ee;--card:#fff;--ink:#202a2f;--muted:#667078;--line:#d9d6cf;--accent:#d9795e;--accent2:#567b8c;--good:#376d4c;--warn:#8a6414;--bad:#9b4038;--chart:#1d2a33}
 *{box-sizing:border-box}html{color-scheme:light}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 .shell{max-width:1240px;margin:auto;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px))}
@@ -73,7 +80,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ===================== APP ===================== -->
 <div id="viewApp" class="hidden">
 <div class="topbar">
-  <div><div class="eyebrow">YARNENGINE · <span>CROCHET & AMIGURUMI</span></div><h1>Yarn consumption calculator</h1></div>
+  <div style="display:flex;align-items:center;gap:12px"><img src="/static/piloop_logo.png" alt="PiLoop" style="height:40px;width:auto"><div><div class="eyebrow">YARNENGINE · <span>CROCHET & AMIGURUMI</span></div><h1>Yarn consumption calculator</h1></div></div>
   <div class="toolbar" style="margin:0">
     <span class="pill" id="whoami"></span>
     <button id="btnAccount" class="alt">Account</button>
@@ -84,6 +91,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   <button data-tab="calc" class="active">Calculator</button>
   <button data-tab="patterns">Pattern library</button>
   <button data-tab="yarns">Yarns</button>
+  <button data-tab="stash">My stash</button>
   <button data-tab="projects">Projects</button>
   <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
 </nav>
@@ -102,6 +110,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
       <div class="fields">
         <label><span>Pattern</span><select id="pattern"></select></label>
         <label><span>Partial repeat</span><select id="partial"><option value="center">Centre</option><option value="left">Fill left</option><option value="right">Fill right</option><option value="split">Split both sides</option><option value="reject">Reject (exact multiples)</option></select></label>
+        <label><span>Size preset</span><select id="sizePreset"><option value="">— custom —</option><option value="20,20">Dishcloth (20×20 cm)</option><option value="18,150">Scarf (18×150 cm)</option><option value="90,70">Baby blanket (90×70 cm)</option><option value="150,200">Adult blanket (150×200 cm)</option><option value="56,20">Hat band (56×20 cm)</option><option value="45,55">Sweater panel (45×55 cm)</option></select></label>
         <label><span>Piece width (cm)</span><input id="widthCm" type="number" step="0.5" min="0.5" value="30"></label>
         <label><span>Piece height (cm)</span><input id="heightCm" type="number" step="0.5" min="0.5" value="40"></label>
       </div>
@@ -148,7 +157,13 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 
 <div>
   <div class="card" id="resultCard">
-    <h2>Result</h2>
+    <div class="toolbar" style="margin-top:0;justify-content:space-between">
+      <h2 style="margin:0">Result</h2>
+      <div class="toolbar" style="margin:0">
+        <select id="unitToggle" style="width:auto"><option value="metric">g / m</option><option value="imperial">oz / yd</option></select>
+        <button id="btnPrintResult" class="alt">Print / export PDF</button>
+      </div>
+    </div>
     <div id="resultEmpty" class="muted">Nothing calculated yet.</div>
     <div id="resultBody" class="hidden">
       <div id="resultBadge"></div>
@@ -159,9 +174,12 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
         <div class="metric"><span>Balls / skeins</span><strong id="rPacks">–</strong></div>
         <div class="metric"><span>Total stitches</span><strong id="rSt">–</strong></div>
         <div class="metric"><span>Achieved size</span><strong id="rSize" style="font-size:16px">–</strong></div>
+        <div class="metric hidden" id="rCostBox"><span>Estimated cost</span><strong id="rCost">–</strong></div>
+        <div class="metric hidden" id="rStashBox"><span>From your stash</span><strong id="rStash">–</strong></div>
       </div>
       <h3>Operations used</h3><div id="rOps" class="legend"></div>
       <h3>Accuracy notes</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
+      <p class="small"><a href="/static/calibration_print.html" target="_blank" rel="noopener">Open a printable gauge-swatch calibration sheet ↗</a></p>
     </div>
   </div>
   <div class="card">
@@ -205,21 +223,43 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
         </select>
         <span id="yarnCount" class="small"></span>
       </div>
-      <div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th><th>Source</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      <div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th><th>Price</th><th>Source</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="card"><h2>Add yarn</h2>
       <div class="fields">
         <label>ID<input id="yId" placeholder="BRAND_PRODUCT_50G_120M"></label>
         <label><span>Brand</span><input id="yBrand"></label>
         <label><span>Product</span><input id="yProduct"></label>
+        <label><span>Product line (optional)</span><input id="yLine" placeholder="e.g. PiLoop amigurumi range"></label>
         <label><span>CYC weight (0–7)</span><input id="yCyc" type="number" min="0" max="7" value="3"></label>
         <label><span>Ball weight (g)</span><input id="yMass" type="number" step="1" min="1" value="50"></label>
         <label><span>Ball length (m)</span><input id="yLen" type="number" step="1" min="1" value="120"></label>
         <label><span>Diameter (mm, optional)</span><input id="yDiam" type="number" step="0.1" min="0.1"></label>
         <label><span>WPI (optional)</span><input id="yWpi" type="number" step="0.5" min="1"></label>
+        <label><span>Indicative price (optional)</span><input id="yPrice" type="number" step="0.01" min="0"></label>
+        <label><span>Currency</span><input id="yCurrency" value="GBP" maxlength="3"></label>
         <label style="grid-column:1/-1"><span>Fibre (e.g. Cotton 100 or Wool 70, Acrylic 30)</span><input id="yFibre" value="Cotton 100"></label>
+        <label style="grid-column:1/-1"><span>Photo URL (optional)</span><input id="yPhoto" placeholder="https://…"></label>
+        <label style="grid-column:1/-1"><span>Description (optional)</span><input id="yDesc"></label>
       </div>
       <div class="toolbar"><button id="btnAddYarn">Save yarn</button></div>
       <div id="yarnStatus" class="status hidden"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ---------- STASH ---------- -->
+<section id="tab-stash" class="hidden">
+  <div class="grid2">
+    <div class="card"><h2>My yarn stash</h2><div style="overflow:auto"><table id="stashTable"><thead><tr><th>Yarn</th><th>Grams</th><th>Skeins</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table></div><div id="stashEmpty" class="muted hidden">Nothing in your stash yet.</div></div>
+    <div class="card"><h2>Add / update stash</h2>
+      <div class="fields">
+        <label style="grid-column:1/-1"><span>Yarn</span><select id="stYarn"></select></label>
+        <label><span>Grams on hand</span><input id="stGrams" type="number" step="1" min="0"></label>
+        <label><span>Skeins on hand</span><input id="stSkeins" type="number" step="0.25" min="0"></label>
+        <label style="grid-column:1/-1"><span>Notes (optional)</span><input id="stNotes"></label>
+      </div>
+      <div class="toolbar"><button id="btnStashSave">Save</button></div>
+      <div id="stashStatus" class="status hidden"></div>
     </div>
   </div>
 </section>
@@ -239,7 +279,21 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
       <div id="adminStatus" class="status hidden"></div>
     </div>
   </div>
+  <div class="card"><h2>Company info (shown in the app footer)</h2>
+    <div class="fields">
+      <label><span>Company name</span><input id="coName"></label>
+      <label><span>Website</span><input id="coWeb"></label>
+      <label><span>Email</span><input id="coEmail"></label>
+      <label><span>Phone</span><input id="coPhone"></label>
+      <label><span>IČO</span><input id="coIco"></label>
+      <label><span>DIČ</span><input id="coDic"></label>
+      <label style="grid-column:1/-1"><span>Address</span><input id="coAddress"></label>
+    </div>
+    <div class="toolbar"><button id="btnSaveCompany">Save</button></div>
+    <div id="companyStatus" class="status hidden"></div>
+  </div>
 </section>
+<footer class="appfoot" id="viewAppFooter"><img src="/static/piloop_logo.png" alt=""><div id="footCompany"></div></footer>
 </div>
 
 <!-- ---------- MODALS ---------- -->
@@ -256,6 +310,25 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   <div class="modal-head"><h2 style="margin:0">Change password</h2><button id="accClose" class="alt">✕</button></div>
   <div class="fields" style="grid-template-columns:1fr"><label><span>Current password</span><input id="accCur" type="password"></label><label><span>New password</span><input id="accNew" type="password"></label></div>
   <div class="toolbar"><button id="accSave">Change</button></div><div id="accStatus" class="status hidden"></div>
+</div></div>
+
+<div id="yarnModal" class="modal hidden"><div class="modal-card" style="max-width:560px">
+  <div class="modal-head"><h2 id="ymName" style="margin:0"></h2><button id="ymClose" class="alt">✕</button></div>
+  <img id="ymPhoto" class="hidden" style="max-width:100%;max-height:220px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px">
+  <p id="ymDesc" class="small muted"></p>
+  <div class="fields three">
+    <label><span>Indicative price</span><input id="ymPrice" type="number" step="0.01" min="0"></label>
+    <label><span>Currency</span><input id="ymCurrency" maxlength="3"></label>
+    <label><span>Product line</span><input id="ymLine"></label>
+  </div>
+  <div class="toolbar"><button id="ymSavePrice" class="alt">Update indicative price</button></div>
+  <h3>Suppliers</h3><div id="ymSuppliers" class="small"></div>
+  <div class="fields three" style="margin-top:8px">
+    <label><span>Name</span><input id="ymSupName"></label>
+    <label><span>Price</span><input id="ymSupPrice" type="number" step="0.01" min="0"></label>
+    <label><span>Link</span><input id="ymSupUrl" placeholder="https://…"></label>
+  </div>
+  <div class="toolbar"><button id="ymAddSupplier" class="alt">+ Add supplier</button></div>
 </div></div>
 
 </main>
@@ -365,7 +438,7 @@ $('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accC
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin')loadUsers();if(b.dataset.tab==='patterns')renderGallery();});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -373,7 +446,9 @@ async function loadData(){
  PATTERNS=PATTERNS.filter(p=>(p.techniques||[]).map(x=>String(x).toLowerCase()).includes('crochet'));
  renderPatternSelect();renderYarnSelect();renderYarns();buildFilters();setTemplate();
  if(PATTERNS.length)selectPattern(KEY(PATTERNS.find(p=>p.pattern_id==='CROCHET_SOLID_SC_01')||PATTERNS[0]));
+ loadCompanyFooter();
 }
+$('sizePreset').onchange=e=>{if(!e.target.value)return;const [w,h]=e.target.value.split(',');$('widthCm').value=w;$('heightCm').value=h;};
 function renderPatternSelect(){const sel=$('pattern');const cur=sel.value;sel.innerHTML=PATTERNS.map(p=>`<option value="${esc(KEY(p))}">${esc(p.name)} · ${esc(p.family_id)}</option>`).join('');if(cur)sel.value=cur;}
 function renderYarnSelect(){$('yarn').innerHTML=`<option value="">— custom (enter diameter) —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
 function selectPattern(key){$('pattern').value=key;const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('patternPreview').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(12/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(8/(p.rows||[]).length)),cell:22,maxCells:16});}
@@ -437,7 +512,7 @@ $('btnCalc').onclick=async()=>{
    const [pattern_id,pattern_version]=$('pattern').value.split('|');
    const body={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
    const d=await api('/api/calculate',{method:'POST',body});lastResult={kind:'flat',request:body,response:d};
-   showResult({len:d.consumption.recommended_length_m,lower:d.confidence.lower_m,upper:d.confidence.upper_m,mass:d.consumption.mass_g,packs:d.consumption.packages,st:d.project.stitches*d.project.rows,size:`${fmt(d.project.achieved_width_cm)} × ${fmt(d.project.achieved_height_cm)} cm`,ops:d.project.operation_counts,warnings:d.warnings,level:d.confidence.level,copies:1});
+   showResult({len:d.consumption.recommended_length_m,lower:d.confidence.lower_m,upper:d.confidence.upper_m,mass:d.consumption.mass_g,packs:d.consumption.packages,st:d.project.stitches*d.project.rows,size:`${fmt(d.project.achieved_width_cm)} × ${fmt(d.project.achieved_height_cm)} cm`,ops:d.project.operation_counts,warnings:d.warnings,level:d.confidence.level,copies:1,cost:d.cost_estimate,stash:d.stash_status});
   }else{
    const copies=Math.max(1,Number($('amiCopies').value)||1);
    const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn'};
@@ -448,16 +523,31 @@ $('btnCalc').onclick=async()=>{
  }catch(e){status($('calcStatus'),e.message,'bad');}
 };
 function yarnById(id){return YARNS.find(y=>y.yarn_id===id);}
+/* ============================ units ============================ */
+let UNIT='metric',lastShownResult=null;
+function unitLenLabel(){return UNIT==='imperial'?'yd':'m';}
+function unitMassLabel(){return UNIT==='imperial'?'oz':'g';}
+function toLen(m){return m==null?null:(UNIT==='imperial'?m*1.09361:m);}
+function toMass(g){return g==null?null:(UNIT==='imperial'?g*0.035274:g);}
+$('unitToggle').onchange=e=>{UNIT=e.target.value;if(lastShownResult)showResult(lastShownResult);};
+$('btnPrintResult').onclick=()=>window.print();
 function showResult(r){
+ lastShownResult=r;
  $('resultEmpty').classList.add('hidden');$('resultBody').classList.remove('hidden');
  const lvl=r.level;const badge=lvl==='calibrated'?['good',t('msg.calibrated')]:lvl?.startsWith('production_model')?['good',t('msg.model')]:['warn',t('msg.baseline')];
  $('resultBadge').innerHTML=`<span class="badge ${badge[0]}">${esc(badge[1])}</span>`;
- $('rLen').textContent=fmt(r.len,1)+' m';$('rRange').textContent=(r.lower!=null&&r.upper!=null)?`${fmt(r.lower,0)}–${fmt(r.upper,0)} m`:'–';
- $('rMass').textContent=r.mass!=null?fmt(r.mass,0)+' g':'–';
+ $('rLen').textContent=r.len!=null?fmt(toLen(r.len),1)+' '+unitLenLabel():'–';
+ $('rRange').textContent=(r.lower!=null&&r.upper!=null)?`${fmt(toLen(r.lower),0)}–${fmt(toLen(r.upper),0)} ${unitLenLabel()}`:'–';
+ $('rMass').textContent=r.mass!=null?fmt(toMass(r.mass),UNIT==='imperial'?1:0)+' '+unitMassLabel():'–';
  let packs=r.packs;if(packs==null&&r.packLen&&r.len)packs=Math.ceil(r.len/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
  $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
  $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} × ${n}</span>`).join('');
  $('rWarn').innerHTML=(r.warnings||[]).map(w=>`<li>${esc(w)}</li>`).join('');
+ if(r.cost){$('rCostBox').classList.remove('hidden');$('rCost').textContent=`${fmt(r.cost.amount,2)} ${esc(r.cost.currency)} (${r.cost.packages}×)`;}
+ else $('rCostBox').classList.add('hidden');
+ const massD=UNIT==='imperial'?1:0;
+ if(r.stash){$('rStashBox').classList.remove('hidden');$('rStash').textContent=r.stash.sufficient?`Enough (${fmt(toMass(r.stash.have_g),massD)} ${unitMassLabel()} on hand)`:`Short ${fmt(toMass(r.stash.shortfall_g),massD)} ${unitMassLabel()} (have ${fmt(toMass(r.stash.have_g),massD)} ${unitMassLabel()})`;}
+ else $('rStashBox').classList.add('hidden');
  $('resultCard').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -469,8 +559,25 @@ $('btnSaveProject').onclick=async()=>{
  const calculation={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
  try{const d=await api(currentProjectId?'/api/projects/'+currentProjectId:'/api/projects',{method:currentProjectId?'PUT':'POST',body:{name,description:'',calculation,result:lastResult?.response||null,status:lastResult?'calculated':'draft'}});currentProjectId=d.project_id;status($('calcStatus'),t('msg.saved'),'good');}catch(e){status($('calcStatus'),e.message,'bad');}
 };
-async function loadProjects(){const box=$('projectList');try{const list=await api('/api/projects');box.innerHTML=list.length?`<table><thead><tr><th>#</th><th>${esc(t('msg.projName'))}</th><th>Status</th><th></th></tr></thead><tbody>`+list.map(p=>`<tr><td>${p.project_id}</td><td>${esc(p.name)}</td><td>${esc(p.status)}</td><td><button class="link" data-open="${p.project_id}">${esc(t('msg.open'))}</button> <button class="link" data-del="${p.project_id}">${esc(t('msg.delete'))}</button></td></tr>`).join('')+'</tbody></table>':`<div class="muted">${esc(t('msg.noProjects'))}</div>`;
- box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openProject(Number(b.dataset.open)));box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await api('/api/projects/'+b.dataset.del,{method:'DELETE'});loadProjects();});}catch(e){box.innerHTML=`<div class="status bad">${esc(e.message)}</div>`;}}
+async function loadProjects(){const box=$('projectList');try{const list=await api('/api/projects');box.innerHTML=list.length?`<table><thead><tr><th>#</th><th>${esc(t('msg.projName'))}</th><th>Status</th><th></th></tr></thead><tbody>`+list.map(p=>`<tr><td>${p.project_id}</td><td>${esc(p.name)}</td><td>${esc(p.status)}</td><td>
+  <button class="link" data-open="${p.project_id}">${esc(t('msg.open'))}</button>
+  <button class="link" data-share="${p.project_id}">${p.share_token?'copy link':'share'}</button>
+  ${p.share_token?`<button class="link" data-unshare="${p.project_id}">unshare</button>`:''}
+  <button class="link" data-del="${p.project_id}">${esc(t('msg.delete'))}</button></td></tr>`).join('')+'</tbody></table>':`<div class="muted">${esc(t('msg.noProjects'))}</div>`;
+ box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openProject(Number(b.dataset.open)));
+ box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{await api('/api/projects/'+b.dataset.del,{method:'DELETE'});loadProjects();});
+ box.querySelectorAll('[data-share]').forEach(b=>b.onclick=async()=>{
+   const id=b.dataset.share;
+   try{
+     const d=await api(`/api/projects/${id}/share`,{method:'POST'});
+     const url=`${location.origin}/static/share.html?t=${encodeURIComponent(d.share_token)}`;
+     if(navigator.clipboard)navigator.clipboard.writeText(url).catch(()=>{});
+     alert('Share link (copied if your browser allows it):\n'+url);
+     loadProjects();
+   }catch(e){alert(e.message);}
+ });
+ box.querySelectorAll('[data-unshare]').forEach(b=>b.onclick=async()=>{await api(`/api/projects/${b.dataset.unshare}/share`,{method:'DELETE'});loadProjects();});
+ }catch(e){box.innerHTML=`<div class="status bad">${esc(e.message)}</div>`;}}
 async function openProject(id){const p=await api('/api/projects/'+id);const c=p.request||p.calculation||{};currentProjectId=p.project_id;calcSetMode('flat');
  if(c.pattern_id)selectPattern(`${c.pattern_id}|${c.pattern_version}`);if(c.yarn_id)$('yarn').value=c.yarn_id;if(c.width_cm)$('widthCm').value=c.width_cm;if(c.height_cm)$('heightCm').value=c.height_cm;if(c.gauge_stitches_per_10cm)$('gaugeSt').value=c.gauge_stitches_per_10cm;if(c.gauge_rows_per_10cm)$('gaugeRows').value=c.gauge_rows_per_10cm;if(c.allowance_percent!=null)$('allowance').value=c.allowance_percent;if(c.swatch){$('swSt').value=c.swatch.stitches;$('swRows').value=c.swatch.rows;$('swLen').value=c.swatch.yarn_length_m;}
  document.querySelector('nav.tabs button[data-tab=calc]').click();}
@@ -486,18 +593,51 @@ function renderYarns(){
  });
  $('yarnCount').textContent=`${rows.length} / ${YARNS.length} yarns`;
  const tb=document.querySelector('#yarnTable tbody');
- tb.innerHTML=rows.map(y=>`<tr><td>${esc(y.brand)}</td><td>${esc(y.product)}${y.variant?' '+esc(y.variant):''}</td><td>${y.cyc_weight??''}</td><td>${y.package_mass_g} / ${y.package_length_m}</td><td class="small">${esc(Object.entries(y.fibre_composition||{}).map(([k,v])=>`${k} ${v}%`).join(', '))}</td><td>${y.nominal_diameter_mm??(y.wpi?fmt(25.4/y.wpi,1)+'*':'')}</td><td class="small">${y.source_reference?`<a href="${esc(y.source_reference)}" target="_blank" rel="noopener">${esc(y.evidence_level||'source')}</a>`:esc(y.evidence_level||'')}</td><td>${(ME&&ME.role==='admin'&&y.source_type==='user_created')?`<button class="link" data-del="${esc(y.yarn_id)}">delete</button>`:''}</td></tr>`).join('');
+ tb.innerHTML=rows.map(y=>`<tr><td>${esc(y.brand)}</td><td>${esc(y.product)}${y.variant?' '+esc(y.variant):''}</td><td>${y.cyc_weight??''}</td><td>${y.package_mass_g} / ${y.package_length_m}</td><td class="small">${esc(Object.entries(y.fibre_composition||{}).map(([k,v])=>`${k} ${v}%`).join(', '))}</td><td>${y.nominal_diameter_mm??(y.wpi?fmt(25.4/y.wpi,1)+'*':'')}</td><td class="small">${y.price_amount?fmt(y.price_amount,2)+' '+esc(y.price_currency||''):'–'}</td><td class="small">${y.source_reference?`<a href="${esc(y.source_reference)}" target="_blank" rel="noopener">${esc(y.evidence_level||'source')}</a>`:esc(y.evidence_level||'')}</td><td><button class="link" data-detail="${esc(y.yarn_id)}">details</button> ${(ME&&ME.role==='admin'&&y.source_type==='user_created')?`<button class="link" data-del="${esc(y.yarn_id)}">delete</button>`:''}</td></tr>`).join('');
  tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
    if(!confirm(`Delete yarn "${b.dataset.del}"?`))return;
    try{await api(`/api/admin/yarns/${encodeURIComponent(b.dataset.del)}`,{method:'DELETE'});YARNS=await api('/api/yarns');renderYarnSelect();renderYarns();}catch(e){alert(e.message);}
  });
+ tb.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>openYarnModal(b.dataset.detail));
 }
 $('yarnSearch').oninput=renderYarns;
 $('yarnWeightFilter').onchange=renderYarns;
 $('btnAddYarn').onclick=async()=>{const fibre={};$('yFibre').value.split(',').forEach(p=>{const m=p.trim().match(/^(.+?)\s+(\d+(?:\.\d+)?)$/);if(m)fibre[m[1].trim()]=Number(m[2]);});
- const body={yarn_id:$('yId').value.trim().toUpperCase().replace(/\s+/g,'_'),brand:$('yBrand').value.trim(),product:$('yProduct').value.trim(),cyc_weight:$('yCyc').value?Number($('yCyc').value):null,package_mass_g:Number($('yMass').value),package_length_m:Number($('yLen').value),fibre_composition:fibre,nominal_diameter_mm:$('yDiam').value?Number($('yDiam').value):null,wpi:$('yWpi').value?Number($('yWpi').value):null};
+ const body={yarn_id:$('yId').value.trim().toUpperCase().replace(/\s+/g,'_'),brand:$('yBrand').value.trim(),product:$('yProduct').value.trim(),cyc_weight:$('yCyc').value?Number($('yCyc').value):null,package_mass_g:Number($('yMass').value),package_length_m:Number($('yLen').value),fibre_composition:fibre,nominal_diameter_mm:$('yDiam').value?Number($('yDiam').value):null,wpi:$('yWpi').value?Number($('yWpi').value):null,product_line:$('yLine').value.trim()||null,photo_url:$('yPhoto').value.trim()||null,description:$('yDesc').value.trim()||null,price_amount:$('yPrice').value?Number($('yPrice').value):null,price_currency:$('yPrice').value?($('yCurrency').value.trim().toUpperCase()||'GBP'):null};
  body.tex=body.package_mass_g/body.package_length_m*1000;
  try{await api('/api/yarns',{method:'POST',body});YARNS=await api('/api/yarns');renderYarnSelect();renderYarns();status($('yarnStatus'),t('msg.saved'),'good');}catch(e){status($('yarnStatus'),e.message,'bad');}};
+
+/* ============================ yarn detail modal ============================ */
+let ymCurrent=null;
+async function openYarnModal(yarnId){
+ const y=yarnById(yarnId);if(!y)return;ymCurrent=yarnId;
+ $('ymName').textContent=`${y.brand} ${y.product}${y.variant?' '+y.variant:''}`;
+ if(y.photo_url){$('ymPhoto').src=y.photo_url;$('ymPhoto').classList.remove('hidden');}else{$('ymPhoto').classList.add('hidden');}
+ $('ymDesc').textContent=y.description||'';
+ $('ymPrice').value=y.price_amount??'';$('ymCurrency').value=y.price_currency||'GBP';$('ymLine').value=y.product_line||'';
+ await refreshYarnSuppliers(yarnId);
+ $('yarnModal').classList.remove('hidden');
+}
+$('ymClose').onclick=()=>$('yarnModal').classList.add('hidden');
+async function refreshYarnSuppliers(yarnId){
+ const list=await api(`/api/yarns/${encodeURIComponent(yarnId)}/suppliers`);
+ $('ymSuppliers').innerHTML=list.length?list.map(s=>`<div class="toolbar" style="margin-top:4px"><span>${esc(s.name)}${s.price_amount?' · '+fmt(s.price_amount,2)+' '+esc(s.price_currency||''):''}</span>${s.product_url?`<a href="${esc(s.product_url)}" target="_blank" rel="noopener">link ↗</a>`:''}${(ME&&ME.role==='admin')?`<button class="link" data-supdel="${s.id}">remove</button>`:''}</div>`).join(''):'<span class="muted">No suppliers listed yet.</span>';
+ $('ymSuppliers').querySelectorAll('[data-supdel]').forEach(b=>b.onclick=async()=>{await api(`/api/admin/yarns/${encodeURIComponent(yarnId)}/suppliers/${b.dataset.supdel}`,{method:'DELETE'});refreshYarnSuppliers(yarnId);});
+}
+$('ymSavePrice').onclick=async()=>{
+ try{
+   const updated=await api(`/api/yarns/${encodeURIComponent(ymCurrent)}`,{method:'PATCH',body:{price_amount:$('ymPrice').value?Number($('ymPrice').value):null,price_currency:$('ymCurrency').value.trim()||null,product_line:$('ymLine').value.trim()||null}});
+   Object.assign(yarnById(ymCurrent),updated);renderYarns();
+ }catch(e){alert(e.message);}
+};
+$('ymAddSupplier').onclick=async()=>{
+ if(!$('ymSupName').value.trim())return;
+ try{
+   await api(`/api/yarns/${encodeURIComponent(ymCurrent)}/suppliers`,{method:'POST',body:{name:$('ymSupName').value.trim(),price_amount:$('ymSupPrice').value?Number($('ymSupPrice').value):null,price_currency:$('ymCurrency').value.trim()||null,product_url:$('ymSupUrl').value.trim()||null}});
+   $('ymSupName').value='';$('ymSupPrice').value='';$('ymSupUrl').value='';
+   refreshYarnSuppliers(ymCurrent);
+ }catch(e){alert(e.message);}
+};
 
 /* ============================ admin ============================ */
 async function loadUsers(){const tb=document.querySelector('#userTable tbody');try{const us=await api('/api/admin/users');tb.innerHTML=us.map(u=>`<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.role)}</td><td>${u.active?'✔':'✖'}</td><td class="small">${esc((u.last_login_at||'').replace('T',' ').slice(0,16))}</td><td>
@@ -512,6 +652,43 @@ async function loadUsers(){const tb=document.querySelector('#userTable tbody');t
  }catch(e){tb.innerHTML=`<tr><td colspan="6">${esc(e.message)}</td></tr>`;}}
 async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
 $('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
+
+/* ============================ stash ============================ */
+function renderStashYarnSelect(){$('stYarn').innerHTML=YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''}</option>`).join('');}
+async function loadStash(){
+ renderStashYarnSelect();
+ const list=await api('/api/stash');
+ const tb=document.querySelector('#stashTable tbody');
+ $('stashEmpty').classList.toggle('hidden',list.length>0);
+ tb.innerHTML=list.map(s=>{const y=yarnById(s.yarn_id);return `<tr><td>${y?esc(y.brand)+' '+esc(y.product):esc(s.yarn_id)}</td><td>${s.quantity_g??'–'}</td><td>${s.quantity_skeins??'–'}</td><td class="small">${esc(s.notes||'')}</td><td><button class="link" data-stdel="${esc(s.yarn_id)}">${esc(t('msg.delete'))}</button></td></tr>`;}).join('');
+ tb.querySelectorAll('[data-stdel]').forEach(b=>b.onclick=async()=>{await api('/api/stash/'+encodeURIComponent(b.dataset.stdel),{method:'DELETE'});loadStash();});
+}
+$('btnStashSave').onclick=async()=>{
+ const body={yarn_id:$('stYarn').value,quantity_g:$('stGrams').value?Number($('stGrams').value):null,quantity_skeins:$('stSkeins').value?Number($('stSkeins').value):null,notes:$('stNotes').value.trim()||null};
+ if(body.quantity_g==null&&body.quantity_skeins==null){status($('stashStatus'),'Enter grams or skeins on hand.','bad');return;}
+ try{await api('/api/stash',{method:'POST',body});status($('stashStatus'),t('msg.saved'),'good');loadStash();}catch(e){status($('stashStatus'),e.message,'bad');}
+};
+
+/* ============================ company / branding ============================ */
+async function loadCompanyFooter(){
+ try{
+   const c=await api('/api/settings/company');
+   const parts=[c.company_name,c.address,c.ico?('IČO '+c.ico):'',c.dic?('DIČ '+c.dic):'',c.email,c.phone,c.website].filter(Boolean);
+   $('footCompany').textContent=parts.join(' · ')||'PiLoop · More Than a Toy';
+ }catch(e){$('footCompany').textContent='PiLoop · More Than a Toy';}
+}
+async function loadCompanyForm(){
+ if(!ME||ME.role!=='admin')return;
+ try{
+   const c=await api('/api/settings/company');
+   $('coName').value=c.company_name||'';$('coWeb').value=c.website||'';$('coEmail').value=c.email||'';
+   $('coPhone').value=c.phone||'';$('coIco').value=c.ico||'';$('coDic').value=c.dic||'';$('coAddress').value=c.address||'';
+ }catch(e){}
+}
+$('btnSaveCompany').onclick=async()=>{
+ const body={company_name:$('coName').value.trim()||null,website:$('coWeb').value.trim()||null,email:$('coEmail').value.trim()||null,phone:$('coPhone').value.trim()||null,ico:$('coIco').value.trim()||null,dic:$('coDic').value.trim()||null,address:$('coAddress').value.trim()||null};
+ try{await api('/api/admin/settings/company',{method:'PUT',body});status($('companyStatus'),t('msg.saved'),'good');loadCompanyFooter();}catch(e){status($('companyStatus'),e.message,'bad');}
+};
 
 boot();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));

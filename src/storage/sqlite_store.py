@@ -68,8 +68,38 @@ CREATE TABLE IF NOT EXISTS quarantine(
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS yarn_suppliers(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  yarn_id TEXT NOT NULL,
+  name TEXT NOT NULL,
+  price_amount REAL,
+  price_currency TEXT,
+  product_url TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS app_settings(
+  key TEXT PRIMARY KEY,
+  value TEXT
+);
+
+CREATE TABLE IF NOT EXISTS stash(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  yarn_id TEXT NOT NULL,
+  quantity_g REAL,
+  quantity_skeins REAL,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(user_id,yarn_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_yarns_brand_product ON yarns(brand,product);
 CREATE INDEX IF NOT EXISTS idx_yarns_weight ON yarns(cyc_weight);
+CREATE INDEX IF NOT EXISTS idx_yarn_suppliers_yarn ON yarn_suppliers(yarn_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_family ON patterns(family_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_active ON patterns(active);
 
@@ -90,6 +120,15 @@ CREATE VIRTUAL TABLE IF NOT EXISTS yarn_fts USING fts5(
 );
 """
 
+YARN_EXTRA_COLUMNS = {
+    "description": "TEXT",
+    "photo_url": "TEXT",
+    "product_line": "TEXT",
+    "price_amount": "REAL",
+    "price_currency": "TEXT",
+}
+
+
 class SQLiteStore:
     def __init__(self,path):
         self.path=str(path)
@@ -97,6 +136,10 @@ class SQLiteStore:
         self.conn=sqlite3.connect(self.path)
         self.conn.row_factory=sqlite3.Row
         self.conn.executescript(SCHEMA)
+        cols={r["name"] for r in self.conn.execute("PRAGMA table_info(yarns)")}
+        for name,coltype in YARN_EXTRA_COLUMNS.items():
+            if name not in cols:
+                self.conn.execute(f"ALTER TABLE yarns ADD COLUMN {name} {coltype}")
         self.conn.commit()
 
     def close(self): self.conn.close()
@@ -106,8 +149,9 @@ class SQLiteStore:
         c.execute("""
         INSERT INTO yarns(yarn_id,brand,product,variant,cyc_weight,package_mass_g,package_length_m,tex,
         nominal_diameter_mm,wpi,recommended_needle_min_mm,recommended_needle_max_mm,fibre_json,
-        source_type,source_reference,evidence_level,checksum,created_at,updated_at)
-        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+        source_type,source_reference,evidence_level,checksum,created_at,updated_at,
+        description,photo_url,product_line,price_amount,price_currency)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         ON CONFLICT(yarn_id) DO UPDATE SET
           brand=excluded.brand,product=excluded.product,variant=excluded.variant,cyc_weight=excluded.cyc_weight,
           package_mass_g=excluded.package_mass_g,package_length_m=excluded.package_length_m,tex=excluded.tex,
@@ -115,7 +159,12 @@ class SQLiteStore:
           recommended_needle_min_mm=excluded.recommended_needle_min_mm,
           recommended_needle_max_mm=excluded.recommended_needle_max_mm,
           fibre_json=excluded.fibre_json,source_type=excluded.source_type,source_reference=excluded.source_reference,
-          evidence_level=excluded.evidence_level,checksum=excluded.checksum,updated_at=excluded.updated_at
+          evidence_level=excluded.evidence_level,checksum=excluded.checksum,updated_at=excluded.updated_at,
+          description=COALESCE(description,excluded.description),
+          photo_url=COALESCE(photo_url,excluded.photo_url),
+          product_line=COALESCE(product_line,excluded.product_line),
+          price_amount=COALESCE(price_amount,excluded.price_amount),
+          price_currency=COALESCE(price_currency,excluded.price_currency)
         """,(
           yarn_dict["yarn_id"],yarn_dict["brand"],yarn_dict["product"],yarn_dict.get("variant"),
           yarn_dict.get("cyc_weight"),yarn_dict["package_mass_g"],yarn_dict["package_length_m"],
@@ -123,20 +172,100 @@ class SQLiteStore:
           yarn_dict.get("recommended_needle_min_mm"),yarn_dict.get("recommended_needle_max_mm"),
           json.dumps(yarn_dict["fibre_composition"],sort_keys=True),
           yarn_dict.get("source_type","user"),yarn_dict.get("source_reference"),
-          yarn_dict.get("evidence_level","declared"),checksum,now,now
+          yarn_dict.get("evidence_level","declared"),checksum,now,now,
+          yarn_dict.get("description"),yarn_dict.get("photo_url"),yarn_dict.get("product_line"),
+          yarn_dict.get("price_amount"),yarn_dict.get("price_currency"),
         ))
         c.execute("DELETE FROM yarn_fts WHERE yarn_id=?",(yarn_dict["yarn_id"],))
         c.execute("INSERT INTO yarn_fts(yarn_id,brand,product,variant) VALUES(?,?,?,?)",
                   (yarn_dict["yarn_id"],yarn_dict["brand"],yarn_dict["product"],yarn_dict.get("variant") or ""))
         self.conn.commit()
 
+    def update_yarn_extra(self,yarn_id,**fields):
+        """Update only the collaborative/editorial yarn fields (description, photo, product
+        line, indicative price) without touching the structural/technical fields that came
+        from a sourced import."""
+        allowed={k:v for k,v in fields.items() if k in YARN_EXTRA_COLUMNS}
+        if not allowed:
+            return self.get_yarn(yarn_id)
+        sets=",".join(f"{k}=?" for k in allowed)
+        vals=list(allowed.values())+[yarn_id]
+        c=self.conn.cursor()
+        c.execute(f"UPDATE yarns SET {sets} WHERE yarn_id=?",vals)
+        self.conn.commit()
+        return self.get_yarn(yarn_id) if c.rowcount>0 else None
+
+    def get_yarn(self,yarn_id):
+        r=self.conn.execute("SELECT * FROM yarns WHERE yarn_id=?",(yarn_id,)).fetchone()
+        return dict(r) if r is not None else None
+
     def delete_yarn(self,yarn_id):
         c=self.conn.cursor()
         c.execute("DELETE FROM yarn_fts WHERE yarn_id=?",(yarn_id,))
         c.execute("DELETE FROM yarns WHERE yarn_id=?",(yarn_id,))
         deleted=c.rowcount>0
+        c.execute("DELETE FROM yarn_suppliers WHERE yarn_id=?",(yarn_id,))
         self.conn.commit()
         return deleted
+
+    def add_supplier(self,yarn_id,name,price_amount,price_currency,product_url,notes,now):
+        c=self.conn.cursor()
+        c.execute("""INSERT INTO yarn_suppliers(yarn_id,name,price_amount,price_currency,product_url,notes,
+                     created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)""",
+                  (yarn_id,name,price_amount,price_currency,product_url,notes,now,now))
+        self.conn.commit()
+        r=self.conn.execute("SELECT * FROM yarn_suppliers WHERE id=?",(c.lastrowid,)).fetchone()
+        return dict(r)
+
+    def list_suppliers(self,yarn_id):
+        rows=self.conn.execute("SELECT * FROM yarn_suppliers WHERE yarn_id=? ORDER BY price_amount IS NULL,price_amount,id",
+                                (yarn_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def delete_supplier(self,yarn_id,supplier_id):
+        c=self.conn.cursor()
+        c.execute("DELETE FROM yarn_suppliers WHERE id=? AND yarn_id=?",(supplier_id,yarn_id))
+        self.conn.commit()
+        return c.rowcount>0
+
+    def get_setting(self,key,default=None):
+        r=self.conn.execute("SELECT value FROM app_settings WHERE key=?",(key,)).fetchone()
+        return r["value"] if r is not None else default
+
+    def set_setting(self,key,value):
+        self.conn.execute("INSERT INTO app_settings(key,value) VALUES(?,?) "
+                           "ON CONFLICT(key) DO UPDATE SET value=excluded.value",(key,value))
+        self.conn.commit()
+
+    def all_settings(self):
+        return {r["key"]:r["value"] for r in self.conn.execute("SELECT key,value FROM app_settings")}
+
+    def upsert_stash(self,user_id,yarn_id,quantity_g,quantity_skeins,notes,now):
+        existing=self.get_stash_entry(user_id,yarn_id)
+        c=self.conn.cursor()
+        if existing is None:
+            c.execute("""INSERT INTO stash(user_id,yarn_id,quantity_g,quantity_skeins,notes,created_at,updated_at)
+                         VALUES(?,?,?,?,?,?,?)""",
+                      (user_id,yarn_id,quantity_g,quantity_skeins,notes,now,now))
+        else:
+            c.execute("""UPDATE stash SET quantity_g=?,quantity_skeins=?,notes=?,updated_at=? WHERE id=?""",
+                      (quantity_g,quantity_skeins,notes,now,existing["id"]))
+        self.conn.commit()
+        return self.get_stash_entry(user_id,yarn_id)
+
+    def list_stash(self,user_id):
+        rows=self.conn.execute("SELECT * FROM stash WHERE user_id IS ? ORDER BY updated_at DESC",(user_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_stash_entry(self,user_id,yarn_id):
+        r=self.conn.execute("SELECT * FROM stash WHERE user_id IS ? AND yarn_id=?",(user_id,yarn_id)).fetchone()
+        return dict(r) if r is not None else None
+
+    def delete_stash(self,user_id,yarn_id):
+        c=self.conn.cursor()
+        c.execute("DELETE FROM stash WHERE user_id IS ? AND yarn_id=?",(user_id,yarn_id))
+        self.conn.commit()
+        return c.rowcount>0
 
     def upsert_pattern(self,pattern_dict,meta,checksum,now):
         c=self.conn.cursor()

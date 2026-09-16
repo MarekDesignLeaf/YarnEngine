@@ -19,6 +19,11 @@ class YarnRecord:
     source_type:str="user"
     source_reference:str|None=None
     evidence_level:str="declared"
+    description:str|None=None
+    photo_url:str|None=None
+    product_line:str|None=None
+    price_amount:float|None=None
+    price_currency:str|None=None
 
     def __post_init__(self):
         if not self.yarn_id or not self.brand or not self.product:
@@ -30,6 +35,8 @@ class YarnRecord:
         if self.tex is not None and self.tex<=0: raise ValueError("tex must be > 0")
         if self.nominal_diameter_mm is not None and self.nominal_diameter_mm<=0:
             raise ValueError("diameter must be > 0")
+        if self.price_amount is not None and self.price_amount<=0:
+            raise ValueError("price_amount must be > 0")
         total=sum(self.fibre_composition.values())
         if abs(total-100.0)>0.05:
             raise ValueError("fibre composition must total 100%")

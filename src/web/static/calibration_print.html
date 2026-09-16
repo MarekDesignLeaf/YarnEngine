@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gauge swatch calibration sheet – YarnEngine</title>
+<style>
+body{font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif;color:#202a2f;max-width:760px;margin:24px auto;padding:0 16px}
+h1{font-size:20px;margin:0 0 4px}.muted{color:#667078;font-size:12.5px;margin:0 0 18px}
+.row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 18px;margin-bottom:18px}
+.field{border-bottom:1px solid #202a2f;padding:6px 2px;min-height:22px}
+.field span{display:block;font-size:11px;color:#667078;text-transform:uppercase;letter-spacing:.06em}
+.swatch{width:10cm;height:10cm;border:2px solid #202a2f;position:relative;margin:14px 0}
+.swatch::before,.swatch::after{content:"";position:absolute;border-color:#202a2f;border-style:dashed}
+.swatch::before{left:50%;top:0;bottom:0;border-left-width:1px}
+.swatch::after{top:50%;left:0;right:0;border-top-width:1px}
+.cmlabel{position:absolute;bottom:-20px;left:0;font-size:11px;color:#667078}
+.toolbar{margin:16px 0}
+button{border:0;border-radius:9px;background:#202a2f;color:#fff;padding:9px 14px;font-weight:650;cursor:pointer}
+@media print{.toolbar{display:none}}
+</style>
+</head>
+<body>
+<h1>Gauge swatch calibration &amp; record sheet</h1>
+<p class="muted">Print at 100% scale (no "fit to page"). Crochet a swatch inside the 10 × 10 cm square below, then record your counts and yarn used so the result can be reproduced later.</p>
+<div class="toolbar"><button onclick="window.print()">Print this sheet</button></div>
+<div class="row">
+  <div class="field"><span>Date</span></div>
+  <div class="field"><span>Pattern</span></div>
+  <div class="field"><span>Yarn (brand / product)</span></div>
+  <div class="field"><span>Hook size (mm)</span></div>
+  <div class="field"><span>Stitches counted</span></div>
+  <div class="field"><span>Rows counted</span></div>
+  <div class="field"><span>Yarn used (m or g)</span></div>
+  <div class="field"><span>Notes</span></div>
+</div>
+<div class="swatch"><span class="cmlabel">10 cm × 10 cm — place your swatch here and mark the stitches/rows you counted</span></div>
+<p class="muted">Once measured, enter the swatch stitches/rows/yarn length back into YarnEngine's calculator to replace the estimate with a calibrated figure.</p>
+</body>
+</html>

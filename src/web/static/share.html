@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shared project – YarnEngine</title>
+<link rel="icon" href="/static/favicon.png">
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--ink:#202a2f;--muted:#667078;--line:#d9d6cf;--accent2:#567b8c}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+.shell{max-width:640px;margin:auto;padding:20px 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px}
+.metric{border:1px solid var(--line);border-radius:10px;padding:10px}.metric strong{display:block;font-size:20px}.metric span{font-size:12px;color:var(--muted)}
+.eyebrow{font-size:11px;letter-spacing:.12em;font-weight:750;color:var(--accent2)}
+img.logo{height:36px;margin-bottom:8px}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<main class="shell">
+<img class="logo" src="/static/piloop_logo.png" alt="PiLoop">
+<div class="card">
+  <div class="eyebrow">SHARED YARNENGINE PROJECT · READ-ONLY</div>
+  <h1 id="pName" style="margin:6px 0">Loading…</h1>
+  <p id="pDesc" class="muted"></p>
+  <div id="pBody" class="hidden">
+    <div class="metrics">
+      <div class="metric"><span>Recommended length</span><strong id="rLen">–</strong></div>
+      <div class="metric"><span>Weight</span><strong id="rMass">–</strong></div>
+      <div class="metric"><span>Balls / skeins</span><strong id="rPacks">–</strong></div>
+      <div class="metric"><span>Estimated cost</span><strong id="rCost">–</strong></div>
+    </div>
+  </div>
+  <p id="pError" class="muted hidden">This shared link is no longer available.</p>
+</div>
+</main>
+<script>
+function fmt(x,d=1){return (x==null||isNaN(x))?'–':Number(x).toFixed(d);}
+async function boot(){
+  const token=new URLSearchParams(location.search).get('t');
+  if(!token){document.getElementById('pError').classList.remove('hidden');document.getElementById('pName').textContent='No link';return;}
+  try{
+    const r=await fetch('/api/share/'+encodeURIComponent(token));
+    if(!r.ok)throw new Error('not found');
+    const p=await r.json();
+    document.getElementById('pName').textContent=p.name||'Shared project';
+    document.getElementById('pDesc').textContent=p.description||'';
+    const d=p.result;
+    if(d){
+      document.getElementById('pBody').classList.remove('hidden');
+      document.getElementById('rLen').textContent=d.consumption?fmt(d.consumption.recommended_length_m,1)+' m':'–';
+      document.getElementById('rMass').textContent=d.consumption?.mass_g!=null?fmt(d.consumption.mass_g,0)+' g':'–';
+      document.getElementById('rPacks').textContent=d.consumption?.packages!=null?String(d.consumption.packages):'–';
+      document.getElementById('rCost').textContent=d.cost_estimate?fmt(d.cost_estimate.amount,2)+' '+d.cost_estimate.currency:'–';
+    }
+  }catch(e){document.getElementById('pError').classList.remove('hidden');document.getElementById('pName').textContent='Not found';}
+}
+boot();
+</script>
+</body>
+</html>

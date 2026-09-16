@@ -54,7 +54,8 @@ class WebService:
             rows = store.conn.execute(
                 "SELECT yarn_id,brand,product,variant,cyc_weight,package_mass_g,package_length_m,tex,"
                 "nominal_diameter_mm,wpi,recommended_needle_min_mm,recommended_needle_max_mm,"
-                "fibre_json,source_type,source_reference,evidence_level FROM yarns "
+                "fibre_json,source_type,source_reference,evidence_level,"
+                "description,photo_url,product_line,price_amount,price_currency FROM yarns "
                 "WHERE evidence_level!='synthetic' ORDER BY brand,product"
             ).fetchall()
             return [
@@ -75,6 +76,11 @@ class WebService:
                     "source_type": r["source_type"],
                     "source_reference": r["source_reference"],
                     "evidence_level": r["evidence_level"],
+                    "description": r["description"],
+                    "photo_url": r["photo_url"],
+                    "product_line": r["product_line"],
+                    "price_amount": r["price_amount"],
+                    "price_currency": r["price_currency"],
                 }
                 for r in rows
             ]
@@ -104,7 +110,7 @@ class WebService:
         finally:
             store.close()
 
-    def calculate(self, req):
+    def calculate(self, req, user_id=None):
         pattern, pattern_name, family_id = self._pattern(req.pattern_id, req.pattern_version)
         yarn = self._yarn(req.yarn_id)
         if req.yarn_id and yarn is None:
@@ -235,13 +241,44 @@ class WebService:
             compatibility = asdict(comp)
             warnings.extend(comp.warnings)
 
+        consumption = calc.to_dict()
+        cost_estimate = None
+        if yarn and yarn.get("price_amount") and consumption.get("packages"):
+            cost_estimate = {
+                "amount": round(yarn["price_amount"] * consumption["packages"], 2),
+                "currency": yarn.get("price_currency") or "GBP",
+                "packages": consumption["packages"],
+                "price_per_package": yarn["price_amount"],
+                "basis": "indicative",
+            }
+        stash_status = None
+        if yarn and user_id is not None:
+            store = self._store()
+            try:
+                entry = store.get_stash_entry(user_id, yarn["yarn_id"])
+            finally:
+                store.close()
+            if entry is not None:
+                have_g = entry.get("quantity_g") or 0.0
+                need_g = consumption.get("mass_g")
+                stash_status = {
+                    "have_g": have_g,
+                    "need_g": need_g,
+                    "shortfall_g": (max(0.0, need_g - have_g) if need_g is not None else None),
+                    "sufficient": (need_g is not None and have_g >= need_g),
+                }
+
         return {
             "pattern": {"id": req.pattern_id, "version": req.pattern_version, "name": pattern_name, "family": family_id},
             "yarn": None if yarn is None else {
                 "id": yarn["yarn_id"], "brand": yarn["brand"], "product": yarn["product"],
                 "package_length_m": yarn["package_length_m"], "package_mass_g": yarn["package_mass_g"],
                 "tex": yarn["tex"], "evidence_level": yarn["evidence_level"], "source_type": yarn["source_type"],
+                "photo_url": yarn.get("photo_url"), "description": yarn.get("description"),
+                "product_line": yarn.get("product_line"),
             },
+            "cost_estimate": cost_estimate,
+            "stash_status": stash_status,
             "project": {
                 "requested_width_cm": req.width_cm,
                 "requested_height_cm": req.height_cm,
@@ -253,7 +290,7 @@ class WebService:
                 "vertical_layout": asdict(plan.vertical_layout),
                 "operation_counts": plan.operation_counts,
             },
-            "consumption": calc.to_dict(),
+            "consumption": consumption,
             "confidence": confidence,
             "compatibility": compatibility,
             "warnings": list(dict.fromkeys(warnings)),

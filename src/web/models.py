@@ -94,12 +94,59 @@ class YarnCreateRequest(BaseModel):
     wpi: float | None = Field(None, gt=0)
     recommended_needle_min_mm: float | None = Field(None, gt=0)
     recommended_needle_max_mm: float | None = Field(None, gt=0)
+    description: str | None = Field(None, max_length=4000)
+    photo_url: str | None = Field(None, max_length=1000)
+    product_line: str | None = Field(None, max_length=200)
+    price_amount: float | None = Field(None, gt=0)
+    price_currency: str | None = Field(None, min_length=3, max_length=3)
 
     @model_validator(mode="after")
     def fibre_total(self):
         if abs(sum(self.fibre_composition.values())-100.0)>0.05:
             raise ValueError("fibre composition must total 100%")
         return self
+
+
+class YarnExtraUpdateRequest(BaseModel):
+    """Collaborative/editorial fields any signed-in user may update on a yarn:
+    an indicative price is explicitly approximate ("orientacni") and can be
+    kept current by the community, unlike the sourced technical fields."""
+    description: str | None = Field(None, max_length=4000)
+    photo_url: str | None = Field(None, max_length=1000)
+    product_line: str | None = Field(None, max_length=200)
+    price_amount: float | None = Field(None, gt=0)
+    price_currency: str | None = Field(None, min_length=3, max_length=3)
+
+
+class SupplierCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=200)
+    price_amount: float | None = Field(None, gt=0)
+    price_currency: str | None = Field(None, min_length=3, max_length=3)
+    product_url: str | None = Field(None, max_length=1000)
+    notes: str | None = Field(None, max_length=1000)
+
+
+class StashUpsertRequest(BaseModel):
+    yarn_id: str = Field(..., min_length=1, max_length=100)
+    quantity_g: float | None = Field(None, ge=0)
+    quantity_skeins: float | None = Field(None, ge=0)
+    notes: str | None = Field(None, max_length=1000)
+
+    @model_validator(mode="after")
+    def quantity_present(self):
+        if self.quantity_g is None and self.quantity_skeins is None:
+            raise ValueError("quantity_g or quantity_skeins is required")
+        return self
+
+
+class CompanySettingsRequest(BaseModel):
+    company_name: str | None = Field(None, max_length=200)
+    address: str | None = Field(None, max_length=1000)
+    ico: str | None = Field(None, max_length=100)
+    dic: str | None = Field(None, max_length=100)
+    email: str | None = Field(None, max_length=200)
+    phone: str | None = Field(None, max_length=100)
+    website: str | None = Field(None, max_length=300)
 
 class SwatchCreateRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=200)

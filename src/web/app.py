@@ -3,7 +3,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest
+from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest, YarnExtraUpdateRequest, SupplierCreateRequest, StashUpsertRequest, CompanySettingsRequest
 from .bootstrap import ensure_demo_database
 from .service import WebService
 from .pattern_chart import build_pattern_chart, load_operation_map
@@ -95,10 +95,17 @@ def _current_user(request: Request):
         return None
     return UserStore.public(u)
 
+def _current_user_id(request: Request):
+    """The signed-in user's id, or None (including whenever auth is disabled,
+    e.g. in most tests) -- used to scope per-user data like projects and stash."""
+    u = getattr(request.state, "user", None)
+    return u["id"] if u else None
+
 @app.middleware("http")
 async def require_login(request: Request, call_next):
     path = request.url.path
-    if _auth_disabled() or path in PUBLIC_PATHS or path.startswith("/static/") or path.startswith("/docs") or path.startswith("/openapi"):
+    if (_auth_disabled() or path in PUBLIC_PATHS or path.startswith("/static/")
+            or path.startswith("/docs") or path.startswith("/openapi") or path.startswith("/api/share/")):
         return await call_next(request)
     user = _current_user(request)
     if user is None:
@@ -540,19 +547,22 @@ def _editor_domain(x: EditorPatternInput):
     )
 
 
-@app.get("/api/projects")
-def list_projects():
-    return project_store.list()
-
-@app.get("/api/projects/{project_id}")
-def get_project(project_id:int):
+def _owned_project_or_404(project_id:int, http_request:Request):
     p=project_store.get(project_id)
-    if p is None:
+    if p is None or p.get("user_id")!=_current_user_id(http_request):
         raise HTTPException(status_code=404,detail="project not found")
     return p
 
+@app.get("/api/projects")
+def list_projects(http_request:Request):
+    return project_store.list(user_id=_current_user_id(http_request))
+
+@app.get("/api/projects/{project_id}")
+def get_project(project_id:int, http_request:Request):
+    return _owned_project_or_404(project_id, http_request)
+
 @app.post("/api/projects")
-def create_project(request: ProjectCreateRequest):
+def create_project(request: ProjectCreateRequest, http_request:Request):
     calc=request.calculation.model_dump()
     return project_store.create(
       name=request.name,
@@ -562,11 +572,13 @@ def create_project(request: ProjectCreateRequest):
       yarn_id=calc.get("yarn_id"),
       request=calc,
       result=request.result,
-      status=request.status
+      status=request.status,
+      user_id=_current_user_id(http_request),
     )
 
 @app.put("/api/projects/{project_id}")
-def update_project(project_id:int, request:ProjectUpdateRequest):
+def update_project(project_id:int, request:ProjectUpdateRequest, http_request:Request):
+    _owned_project_or_404(project_id, http_request)
     changes={}
     if request.name is not None: changes["name"]=request.name
     if request.description is not None: changes["description"]=request.description
@@ -582,21 +594,41 @@ def update_project(project_id:int, request:ProjectUpdateRequest):
     return p
 
 @app.post("/api/projects/{project_id}/calculate")
-def calculate_project(project_id:int):
-    p=project_store.get(project_id)
-    if p is None:raise HTTPException(status_code=404,detail="project not found")
+def calculate_project(project_id:int, http_request:Request):
+    p=_owned_project_or_404(project_id, http_request)
     try:
         req=CalculationRequest(**p["request"])
-        result=service.calculate(req)
+        result=service.calculate(req, user_id=_current_user_id(http_request))
     except (ValueError,KeyError) as e:
         raise HTTPException(status_code=422,detail=str(e))
     return project_store.update(project_id,result=result,status="calculated")
 
 @app.delete("/api/projects/{project_id}")
-def delete_project(project_id:int):
-    if not project_store.delete(project_id):
-        raise HTTPException(status_code=404,detail="project not found")
+def delete_project(project_id:int, http_request:Request):
+    _owned_project_or_404(project_id, http_request)
+    project_store.delete(project_id)
     return {"status":"deleted","project_id":project_id}
+
+@app.post("/api/projects/{project_id}/share")
+def share_project(project_id:int, http_request:Request):
+    _owned_project_or_404(project_id, http_request)
+    p=project_store.set_share_token(project_id)
+    return {"share_token":p["share_token"]}
+
+@app.delete("/api/projects/{project_id}/share")
+def unshare_project(project_id:int, http_request:Request):
+    _owned_project_or_404(project_id, http_request)
+    p=project_store.set_share_token(project_id, token=False)
+    return {"status":"unshared"}
+
+@app.get("/api/share/{token}")
+def get_shared_project(token:str):
+    """Public, read-only view of a project someone chose to share -- no login required."""
+    p=project_store.get_by_share_token(token)
+    if p is None:
+        raise HTTPException(status_code=404,detail="shared project not found")
+    return {"name":p["name"],"description":p["description"],"request":p["request"],
+            "result":p["result"],"status":p["status"],"updated_at":p["updated_at"]}
 
 @app.get("/api/operations")
 def operations():
@@ -678,6 +710,52 @@ def create_yarn(request:YarnCreateRequest):
                     checksum=checksum,imported_at=now)
     finally: store.close()
     return {"status":"created","yarn":d}
+
+
+@app.patch("/api/yarns/{yarn_id}")
+def update_yarn_extra(yarn_id:str, request:YarnExtraUpdateRequest):
+    """Collaborative fields (description, photo, product line, indicative price) any
+    signed-in user may keep current -- unlike the sourced technical fields, which stay
+    fixed once imported. Admin-only deletion still protects the yarn record itself."""
+    fields={k:v for k,v in request.model_dump().items() if v is not None}
+    if not fields:
+        raise HTTPException(status_code=422,detail="no fields to update")
+    store=service._store()
+    try:
+        updated=store.update_yarn_extra(yarn_id,**fields)
+    finally: store.close()
+    if updated is None:
+        raise HTTPException(status_code=404,detail="yarn not found")
+    return updated
+
+@app.get("/api/yarns/{yarn_id}/suppliers")
+def list_yarn_suppliers(yarn_id:str):
+    store=service._store()
+    try:
+        if store.get_yarn(yarn_id) is None:
+            raise HTTPException(status_code=404,detail="yarn not found")
+        return store.list_suppliers(yarn_id)
+    finally: store.close()
+
+@app.post("/api/yarns/{yarn_id}/suppliers")
+def add_yarn_supplier(yarn_id:str, request:SupplierCreateRequest):
+    store=service._store()
+    try:
+        if store.get_yarn(yarn_id) is None:
+            raise HTTPException(status_code=404,detail="yarn not found")
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        return store.add_supplier(yarn_id,request.name,request.price_amount,request.price_currency,
+                                   request.product_url,request.notes,now)
+    finally: store.close()
+
+@app.delete("/api/admin/yarns/{yarn_id}/suppliers/{supplier_id}")
+def delete_yarn_supplier(yarn_id:str, supplier_id:int):
+    store=service._store()
+    try:
+        if not store.delete_supplier(yarn_id,supplier_id):
+            raise HTTPException(status_code=404,detail="supplier not found")
+    finally: store.close()
+    return {"status":"deleted","supplier_id":supplier_id}
 
 
 def _eligible_lab_records():
@@ -796,10 +874,63 @@ def admin_delete_yarn(yarn_id: str):
     return {"status": "deleted", "yarn_id": yarn_id}
 
 
-@app.post("/api/calculate")
-def calculate(request: CalculationRequest):
+# ------------------------------------------------------------- yarn stash ---
+@app.get("/api/stash")
+def list_stash(http_request:Request):
+    store=service._store()
     try:
-        return service.calculate(request)
+        return store.list_stash(_current_user_id(http_request))
+    finally: store.close()
+
+@app.post("/api/stash")
+def upsert_stash(request:StashUpsertRequest, http_request:Request):
+    store=service._store()
+    try:
+        if store.get_yarn(request.yarn_id) is None:
+            raise HTTPException(status_code=404,detail="yarn not found")
+        now=datetime.datetime.now(datetime.timezone.utc).isoformat()
+        return store.upsert_stash(_current_user_id(http_request),request.yarn_id,
+                                   request.quantity_g,request.quantity_skeins,request.notes,now)
+    finally: store.close()
+
+@app.delete("/api/stash/{yarn_id}")
+def delete_stash(yarn_id:str, http_request:Request):
+    store=service._store()
+    try:
+        if not store.delete_stash(_current_user_id(http_request),yarn_id):
+            raise HTTPException(status_code=404,detail="stash entry not found")
+    finally: store.close()
+    return {"status":"deleted","yarn_id":yarn_id}
+
+
+# --------------------------------------------------------- company/branding ---
+_COMPANY_FIELDS=("company_name","address","ico","dic","email","phone","website")
+
+@app.get("/api/settings/company")
+def get_company_settings():
+    store=service._store()
+    try:
+        settings=store.all_settings()
+    finally: store.close()
+    return {f:settings.get(f"company.{f}","") for f in _COMPANY_FIELDS}
+
+@app.put("/api/admin/settings/company")
+def update_company_settings(request:CompanySettingsRequest):
+    store=service._store()
+    try:
+        data=request.model_dump()
+        for f in _COMPANY_FIELDS:
+            if data.get(f) is not None:
+                store.set_setting(f"company.{f}",data[f])
+        settings=store.all_settings()
+    finally: store.close()
+    return {f:settings.get(f"company.{f}","") for f in _COMPANY_FIELDS}
+
+
+@app.post("/api/calculate")
+def calculate(request: CalculationRequest, http_request: Request):
+    try:
+        return service.calculate(request, user_id=_current_user_id(http_request))
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except ValueError as e:
