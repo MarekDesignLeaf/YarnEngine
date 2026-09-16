@@ -1,0 +1,21 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "CASCADE_220_SPORT_50G_150M",
+  "brand": "Cascade Yarns",
+  "product": "220 Sport",
+  "variant": null,
+  "cyc_weight": 2,
+  "package_mass_g": 50,
+  "package_length_m": 150,
+  "fibre_composition": {
+    "Wool": 100
+  },
+  "tex": 333.333,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.cascadeyarns.com/product/cascade-220-sport",
+  "evidence_level": "manufacturer_declared"
+}

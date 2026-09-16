@@ -1,0 +1,21 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "RED_HEART_SUPER_SAVER_198G_333M",
+  "brand": "Red Heart",
+  "product": "Super Saver",
+  "variant": "Solid",
+  "cyc_weight": 4,
+  "package_mass_g": 198,
+  "package_length_m": 333,
+  "fibre_composition": {
+    "Acrylic": 100
+  },
+  "tex": 594.595,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.yarnspirations.com/products/red-heart-super-saver-yarn",
+  "evidence_level": "manufacturer_declared"
+}

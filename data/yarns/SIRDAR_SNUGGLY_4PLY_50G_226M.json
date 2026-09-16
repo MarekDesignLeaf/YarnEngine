@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "SIRDAR_SNUGGLY_4PLY_50G_226M",
+  "brand": "Sirdar",
+  "product": "Snuggly 4 Ply",
+  "variant": null,
+  "cyc_weight": 1,
+  "package_mass_g": 50,
+  "package_length_m": 226,
+  "fibre_composition": {
+    "Nylon": 55,
+    "Acrylic": 45
+  },
+  "tex": 221.239,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://sirdar.com/en/products/sirdar-snuggly-4-ply-50g",
+  "evidence_level": "manufacturer_declared"
+}

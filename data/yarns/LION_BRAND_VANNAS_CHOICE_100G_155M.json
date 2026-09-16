@@ -1,0 +1,21 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "LION_BRAND_VANNAS_CHOICE_100G_155M",
+  "brand": "Lion Brand",
+  "product": "Vanna's Choice",
+  "variant": "Solid",
+  "cyc_weight": 4,
+  "package_mass_g": 100,
+  "package_length_m": 155,
+  "fibre_composition": {
+    "Acrylic": 100
+  },
+  "tex": 645.161,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.lionbrand.com/products/vannas-choice-yarn",
+  "evidence_level": "manufacturer_declared"
+}

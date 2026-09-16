@@ -49,6 +49,27 @@ def test_admin_cannot_lock_self_out(auth_client):
     assert c.put(f"/api/admin/users/{me['id']}", json={"active": False}).status_code == 422
     assert c.delete(f"/api/admin/users/{me['id']}").status_code == 422
 
+def test_yarn_delete_is_admin_only(auth_client):
+    c, store = auth_client
+    store.create("marek", "correct-horse-1", role="admin")
+    store.create("eva", "another-pass-2", role="user")
+    admin = TestClient(appmod.app)
+    admin.post("/api/auth/login", json={"username": "marek", "password": "correct-horse-1"})
+    user = TestClient(appmod.app)
+    user.post("/api/auth/login", json={"username": "eva", "password": "another-pass-2"})
+
+    created = admin.post("/api/yarns", json={
+        "yarn_id": "DELETE_ME_TEST_YARN", "brand": "Test", "product": "Deletable",
+        "package_mass_g": 50, "package_length_m": 100, "fibre_composition": {"Acrylic": 100},
+    })
+    assert created.status_code == 200
+
+    assert user.delete("/api/admin/yarns/DELETE_ME_TEST_YARN").status_code == 403
+    assert admin.delete("/api/admin/yarns/DELETE_ME_TEST_YARN").status_code == 200
+    assert admin.delete("/api/admin/yarns/DELETE_ME_TEST_YARN").status_code == 404
+    assert not any(y["yarn_id"] == "DELETE_ME_TEST_YARN" for y in admin.get("/api/yarns").json())
+
+
 def test_seed_admin_from_env(tmp_path, monkeypatch):
     from src.web.auth import UserStore
     monkeypatch.setenv("ADMIN_USERNAME", "marek")

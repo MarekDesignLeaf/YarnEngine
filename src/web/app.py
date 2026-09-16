@@ -785,6 +785,17 @@ def yarns():
     return service.yarns()
 
 
+@app.delete("/api/admin/yarns/{yarn_id}")
+def admin_delete_yarn(yarn_id: str):
+    store = service._store()
+    try:
+        if not store.delete_yarn(yarn_id):
+            raise HTTPException(status_code=404, detail="yarn not found")
+    finally:
+        store.close()
+    return {"status": "deleted", "yarn_id": yarn_id}
+
+
 @app.post("/api/calculate")
 def calculate(request: CalculationRequest):
     try:

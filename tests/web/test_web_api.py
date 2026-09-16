@@ -17,6 +17,18 @@ def test_library_endpoints():
     assert y.status_code==200 and len(y.json())>=2
 
 
+def test_yarn_database_covers_all_cyc_weights_and_hides_synthetic_fixtures():
+    yarns=client.get('/api/yarns').json()
+    assert len(yarns)>=40
+    weights={y['cyc_weight'] for y in yarns}
+    assert weights >= {0,1,2,3,4,5,6,7}
+    ids={y['yarn_id'] for y in yarns}
+    assert 'TEST_Y1' not in ids and 'TEST_Y2' not in ids
+    # every bundled yarn must carry a source reference so its numbers are checkable
+    unsourced=[y['yarn_id'] for y in yarns if not y.get('source_reference')]
+    assert unsourced==[]
+
+
 def test_swatch_calculation():
     payload={
       'pattern_id':'RIB_2X2','pattern_version':'1.0.0','yarn_id':'TEST_Y1',

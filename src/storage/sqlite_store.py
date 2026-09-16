@@ -130,6 +130,14 @@ class SQLiteStore:
                   (yarn_dict["yarn_id"],yarn_dict["brand"],yarn_dict["product"],yarn_dict.get("variant") or ""))
         self.conn.commit()
 
+    def delete_yarn(self,yarn_id):
+        c=self.conn.cursor()
+        c.execute("DELETE FROM yarn_fts WHERE yarn_id=?",(yarn_id,))
+        c.execute("DELETE FROM yarns WHERE yarn_id=?",(yarn_id,))
+        deleted=c.rowcount>0
+        self.conn.commit()
+        return deleted
+
     def upsert_pattern(self,pattern_dict,meta,checksum,now):
         c=self.conn.cursor()
         key=(pattern_dict["pattern_id"],pattern_dict["version"])

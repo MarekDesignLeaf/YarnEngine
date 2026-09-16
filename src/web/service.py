@@ -54,7 +54,8 @@ class WebService:
             rows = store.conn.execute(
                 "SELECT yarn_id,brand,product,variant,cyc_weight,package_mass_g,package_length_m,tex,"
                 "nominal_diameter_mm,wpi,recommended_needle_min_mm,recommended_needle_max_mm,"
-                "fibre_json,source_type,evidence_level FROM yarns ORDER BY brand,product"
+                "fibre_json,source_type,source_reference,evidence_level FROM yarns "
+                "WHERE evidence_level!='synthetic' ORDER BY brand,product"
             ).fetchall()
             return [
                 {
@@ -72,6 +73,7 @@ class WebService:
                     "recommended_needle_max_mm": r["recommended_needle_max_mm"],
                     "fibre_composition": json.loads(r["fibre_json"]),
                     "source_type": r["source_type"],
+                    "source_reference": r["source_reference"],
                     "evidence_level": r["evidence_level"],
                 }
                 for r in rows

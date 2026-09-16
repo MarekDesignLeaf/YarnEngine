@@ -189,7 +189,23 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ---------- YARNS ---------- -->
 <section id="tab-yarns" class="hidden">
   <div class="grid2">
-    <div class="card"><h2>Yarn database</h2><div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2>Yarn database</h2>
+      <div class="toolbar">
+        <input id="yarnSearch" placeholder="Search brand or product…" style="flex:1;min-width:160px">
+        <select id="yarnWeightFilter">
+          <option value="">All weights</option>
+          <option value="0">0 · Lace</option>
+          <option value="1">1 · Super Fine (Sock/Fingering)</option>
+          <option value="2">2 · Fine (Sport)</option>
+          <option value="3">3 · Light (DK)</option>
+          <option value="4">4 · Medium (Worsted/Aran)</option>
+          <option value="5">5 · Bulky (Chunky)</option>
+          <option value="6">6 · Super Bulky</option>
+          <option value="7">7 · Jumbo</option>
+        </select>
+        <span id="yarnCount" class="small"></span>
+      </div>
+      <div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th><th>Source</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="card"><h2>Add yarn</h2>
       <div class="fields">
         <label>ID<input id="yId" placeholder="BRAND_PRODUCT_50G_120M"></label>
@@ -460,7 +476,24 @@ async function openProject(id){const p=await api('/api/projects/'+id);const c=p.
  document.querySelector('nav.tabs button[data-tab=calc]').click();}
 
 /* ============================ yarns ============================ */
-function renderYarns(){const tb=document.querySelector('#yarnTable tbody');tb.innerHTML=YARNS.map(y=>`<tr><td>${esc(y.brand)}</td><td>${esc(y.product)}${y.variant?' '+esc(y.variant):''}</td><td>${y.cyc_weight??''}</td><td>${y.package_mass_g} / ${y.package_length_m}</td><td class="small">${esc(Object.entries(y.fibre_composition||{}).map(([k,v])=>`${k} ${v}%`).join(', '))}</td><td>${y.nominal_diameter_mm??(y.wpi?fmt(25.4/y.wpi,1)+'*':'')}</td></tr>`).join('');}
+function renderYarns(){
+ const q=($('yarnSearch').value||'').trim().toLowerCase();
+ const wf=$('yarnWeightFilter').value;
+ const rows=YARNS.filter(y=>{
+   if(wf!==''&&String(y.cyc_weight??'')!==wf)return false;
+   if(!q)return true;
+   return `${y.brand} ${y.product} ${y.variant||''}`.toLowerCase().includes(q);
+ });
+ $('yarnCount').textContent=`${rows.length} / ${YARNS.length} yarns`;
+ const tb=document.querySelector('#yarnTable tbody');
+ tb.innerHTML=rows.map(y=>`<tr><td>${esc(y.brand)}</td><td>${esc(y.product)}${y.variant?' '+esc(y.variant):''}</td><td>${y.cyc_weight??''}</td><td>${y.package_mass_g} / ${y.package_length_m}</td><td class="small">${esc(Object.entries(y.fibre_composition||{}).map(([k,v])=>`${k} ${v}%`).join(', '))}</td><td>${y.nominal_diameter_mm??(y.wpi?fmt(25.4/y.wpi,1)+'*':'')}</td><td class="small">${y.source_reference?`<a href="${esc(y.source_reference)}" target="_blank" rel="noopener">${esc(y.evidence_level||'source')}</a>`:esc(y.evidence_level||'')}</td><td>${(ME&&ME.role==='admin'&&y.source_type==='user_created')?`<button class="link" data-del="${esc(y.yarn_id)}">delete</button>`:''}</td></tr>`).join('');
+ tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+   if(!confirm(`Delete yarn "${b.dataset.del}"?`))return;
+   try{await api(`/api/admin/yarns/${encodeURIComponent(b.dataset.del)}`,{method:'DELETE'});YARNS=await api('/api/yarns');renderYarnSelect();renderYarns();}catch(e){alert(e.message);}
+ });
+}
+$('yarnSearch').oninput=renderYarns;
+$('yarnWeightFilter').onchange=renderYarns;
 $('btnAddYarn').onclick=async()=>{const fibre={};$('yFibre').value.split(',').forEach(p=>{const m=p.trim().match(/^(.+?)\s+(\d+(?:\.\d+)?)$/);if(m)fibre[m[1].trim()]=Number(m[2]);});
  const body={yarn_id:$('yId').value.trim().toUpperCase().replace(/\s+/g,'_'),brand:$('yBrand').value.trim(),product:$('yProduct').value.trim(),cyc_weight:$('yCyc').value?Number($('yCyc').value):null,package_mass_g:Number($('yMass').value),package_length_m:Number($('yLen').value),fibre_composition:fibre,nominal_diameter_mm:$('yDiam').value?Number($('yDiam').value):null,wpi:$('yWpi').value?Number($('yWpi').value):null};
  body.tex=body.package_mass_g/body.package_length_m*1000;

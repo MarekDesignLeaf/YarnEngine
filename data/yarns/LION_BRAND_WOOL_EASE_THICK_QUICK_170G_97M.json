@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "LION_BRAND_WOOL_EASE_THICK_QUICK_170G_97M",
+  "brand": "Lion Brand",
+  "product": "Wool-Ease Thick & Quick",
+  "variant": "Solid",
+  "cyc_weight": 6,
+  "package_mass_g": 170,
+  "package_length_m": 97,
+  "fibre_composition": {
+    "Acrylic": 80,
+    "Wool": 20
+  },
+  "tex": 1752.577,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.lionbrand.com/products/wool-ease-thick-and-quick-yarn",
+  "evidence_level": "manufacturer_declared"
+}
