@@ -96,6 +96,9 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 .lineCard .mats li{margin:2px 0}
 .pcard strong{font-size:13px;line-height:1.25;font-family:var(--font-display)}.pcard .small{font-size:11.5px}
 .chartbox{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.chartbox > svg{display:block;max-width:100%}
+#ami3dCanvas{background:radial-gradient(circle at 50% 30%,var(--accent2-pale),var(--bg-tint));cursor:grab;touch-action:none}
+#ami3dCanvas:active{cursor:grabbing}
+#ami3dCanvas canvas{display:block;width:100%;height:100%}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
 .modal{position:fixed;inset:0;background:rgba(38,49,58,.55);display:grid;place-items:center;padding:14px;z-index:20}.modal-card{background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:18px;box-shadow:var(--shadow-pop)}
 .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
@@ -191,6 +194,14 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
+      <div style="margin-top:14px">
+        <div class="toolbar" style="margin-top:0;justify-content:space-between">
+          <h3 style="margin:0">3D shape preview</h3>
+          <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px"><input type="checkbox" id="ami3dSpin" checked style="width:auto">Spin</label>
+        </div>
+        <div id="ami3dCanvas" class="chartbox" style="height:340px;padding:0;position:relative"></div>
+        <div id="ami3dInfo" class="small muted" style="margin-top:6px">Add rounds to see the shape.</div>
+      </div>
     </div>
   </div>
 
@@ -534,7 +545,7 @@ $('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accC
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -576,11 +587,29 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');}
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
 $('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');
+let ami3dTimer=null;
+function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
+async function refreshAmi3D(){
+  if(!window.YE3D)return;
+  const rounds=readRounds().filter(r=>Object.keys(r.operations).length);
+  const initial=Number($('amiInitial').value)||0;
+  const gaugeSt=Number($('gaugeSt').value)||20,gaugeRows=Number($('gaugeRows').value)||22;
+  if(!rounds.length){window.YE3D.renderAmiShape([],{gaugeSt,gaugeRows,initialStitches:initial});return;}
+  try{
+    const d=await api('/api/crochet/amigurumi/analyse',{method:'POST',body:{initial_stitches:initial,rounds}});
+    if(!d.valid){window.YE3D.renderAmiShape([],{gaugeSt,gaugeRows,initialStitches:initial},'Fix the round errors above to preview the shape.');return;}
+    window.YE3D.renderAmiShape(d.trace,{gaugeSt,gaugeRows,initialStitches:initial});
+  }catch(e){window.YE3D.renderAmiShape([],{gaugeSt,gaugeRows,initialStitches:initial});}
+}
+$('rounds').addEventListener('input',scheduleAmi3D);
+$('amiInitial').addEventListener('input',scheduleAmi3D);
+['gaugeSt','gaugeRows'].forEach(id=>$(id).addEventListener('input',scheduleAmi3D));
+$('ami3dSpin').addEventListener('change',()=>{window.YE3D&&window.YE3D.setSpin&&window.YE3D.setSpin($('ami3dSpin').checked);});
 function roundRow(i,ops){return `<div class="round"><span class="pill">${i+1}</span><input value="${esc(ops)}" placeholder="SC:6, SC_INC:6"><button class="alt" data-del="${i}">✕</button></div>`;}
 function readRounds(){return [...document.querySelectorAll('#rounds .round input')].map(inp=>{const operations={};inp.value.split(',').forEach(part=>{const [op,n]=part.split(':').map(s=>s.trim());if(op)operations[op.toUpperCase()]=Number(n||1);});return {operations};});}
-function writeRounds(list){$('rounds').innerHTML=list.map((r,i)=>roundRow(i,Object.entries(r.operations).map(([k,v])=>`${k}:${v}`).join(', '))).join('');document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});}
+function writeRounds(list){$('rounds').innerHTML=list.map((r,i)=>roundRow(i,Object.entries(r.operations).map(([k,v])=>`${k}:${v}`).join(', '))).join('');document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});scheduleAmi3D();}
 function genTemplate(kind,maxSt,init){
  const inc=[],rounds=[];let cur=init;const step=init;
  rounds.push({operations:{SC_INC:init}});cur=init*2;
@@ -596,7 +625,7 @@ function setTemplate(){const k=$('amiTemplate').value;if(k==='custom')return;con
 ['amiTemplate','amiSize','amiInitial'].forEach(id=>$(id).addEventListener('change',setTemplate));
 $('btnAddRound').onclick=()=>{const l=readRounds();l.push({operations:{SC:6}});writeRounds(l);$('amiTemplate').value='custom';};
 $('btnAnalyse').onclick=async()=>{try{const d=await api('/api/crochet/amigurumi/analyse',{method:'POST',body:{initial_stitches:Number($('amiInitial').value),rounds:readRounds()}});
- if(!d.valid){status($('amiStatus'),JSON.stringify(d.issues),'bad');return;}status($('amiStatus'),`${t('msg.valid')} ${d.initial_stitches} → ${d.final_stitches}. `+Object.entries(d.operation_counts).map(([k,v])=>`${k}×${v}`).join(', '),'good');}catch(e){status($('amiStatus'),e.message,'bad');}};
+ if(!d.valid){status($('amiStatus'),JSON.stringify(d.issues),'bad');return;}status($('amiStatus'),`${t('msg.valid')} ${d.initial_stitches} → ${d.final_stitches}. `+Object.entries(d.operation_counts).map(([k,v])=>`${k}×${v}`).join(', '),'good');}catch(e){status($('amiStatus'),e.message,'bad');}scheduleAmi3D();};
 
 /* ============================ calculation ============================ */
 function commonInputs(){return {yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
@@ -878,5 +907,106 @@ $('btnSaveCompany').onclick=async()=>{
 
 boot();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+</script>
+
+<!-- ============================ 3D amigurumi shape preview ============================ -->
+<script type="importmap">
+{"imports":{
+  "three":"/static/vendor/three/three.module.min.js"
+}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from '/static/vendor/three/OrbitControls.js';
+
+let scene, camera, renderer, controls, mesh, container, spinning = true, ready = false;
+
+function initAmi3D() {
+  container = document.getElementById('ami3dCanvas');
+  if (!container || renderer) return;
+  scene = new THREE.Scene();
+  const w = container.clientWidth || 300, h = container.clientHeight || 340;
+  camera = new THREE.PerspectiveCamera(40, w / h, 0.05, 500);
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setSize(w, h);
+  container.appendChild(renderer.domElement);
+  scene.add(new THREE.HemisphereLight(0xfff3ea, 0x2f3a40, 1.15));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.85); dir.position.set(3, 6, 4); scene.add(dir);
+  const dir2 = new THREE.DirectionalLight(0xbfe3ea, 0.35); dir2.position.set(-4, -2, -3); scene.add(dir2);
+  controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.minDistance = 1; controls.maxDistance = 80;
+  window.addEventListener('resize', resize);
+  ready = true;
+  animate();
+}
+
+function resize() {
+  if (!container || !renderer || !camera) return;
+  const w = container.clientWidth || 300, h = container.clientHeight || 340;
+  if (!w || !h) return;
+  renderer.setSize(w, h);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  if (mesh && spinning) mesh.rotation.y += 0.006;
+  if (controls) controls.update();
+  if (renderer && scene && camera) renderer.render(scene, camera);
+}
+
+function updateInfo(stats, message) {
+  const el = document.getElementById('ami3dInfo');
+  if (!el) return;
+  if (message) { el.textContent = message; return; }
+  if (!stats) { el.textContent = 'Add rounds to see the shape.'; return; }
+  el.textContent = `Height ≈ ${stats.height.toFixed(1)} cm · Max diameter ≈ ${stats.maxDiameter.toFixed(1)} cm · ${stats.rounds} round${stats.rounds === 1 ? '' : 's'}`;
+}
+
+// Builds a bottom-to-top (radius_cm, height_cm) profile from the round trace
+// (as returned by /api/crochet/amigurumi/analyse) and the current gauge, then
+// revolves it into a solid to approximate the finished amigurumi shape.
+function renderAmiShape(trace, opts, message) {
+  initAmi3D();
+  if (!renderer) return;
+  if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
+  if (message || !trace || !trace.length) { updateInfo(null, message); return; }
+
+  const stitchWidthCm = 10 / (opts.gaugeSt || 20);
+  const rowHeightCm = 10 / (opts.gaugeRows || 22);
+  const pts = [new THREE.Vector2(0.12, 0)];
+  trace.forEach((r, i) => {
+    const circumference = (r.output_stitches || 0) * stitchWidthCm;
+    const radius = Math.max(0.08, circumference / (2 * Math.PI));
+    pts.push(new THREE.Vector2(radius, (i + 1) * rowHeightCm));
+  });
+
+  const geo = new THREE.LatheGeometry(pts, 48);
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ color: 0xef8a6c, roughness: 0.95, metalness: 0.02, side: THREE.DoubleSide });
+  mesh = new THREE.Mesh(geo, mat);
+
+  geo.computeBoundingBox();
+  const bb = geo.boundingBox;
+  const height = bb.max.y - bb.min.y;
+  const maxR = Math.max(bb.max.x, 0.3);
+  mesh.position.y = -(bb.max.y + bb.min.y) / 2;
+  scene.add(mesh);
+
+  const dist = Math.max(height, maxR * 2) * 1.7 + 1.5;
+  camera.position.set(dist * 0.6, dist * 0.32, dist * 0.65);
+  camera.lookAt(0, 0, 0);
+  controls.target.set(0, 0, 0); controls.update();
+
+  updateInfo({ height, maxDiameter: maxR * 2, rounds: trace.length });
+}
+
+window.YE3D = {
+  renderAmiShape,
+  resize,
+  setSpin: (on) => { spinning = !!on; },
+};
 </script>
 </body></html>
