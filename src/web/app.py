@@ -1,7 +1,9 @@
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+import io as _io
+from src.storage.backup import build_backup_zip
 
 from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest, YarnExtraUpdateRequest, SupplierCreateRequest, StashUpsertRequest, CompanySettingsRequest, ProductLineCreateRequest, ProductLineUpdateRequest, ProductMaterialCreateRequest
 from .bootstrap import ensure_demo_database
@@ -45,7 +47,8 @@ from src.crochet_calibration.quality import replicate_quality as crochet_replica
 from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
-import datetime, os, sqlite3
+import datetime, os, sqlite3, time
+from collections import defaultdict
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
 from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS
@@ -101,6 +104,13 @@ def _current_user_id(request: Request):
     u = getattr(request.state, "user", None)
     return u["id"] if u else None
 
+def _require_admin(request: Request):
+    """Raise 403 unless the signed-in user is an admin. A no-op when auth is
+    disabled (e.g. in tests), matching how the rest of the app treats that mode."""
+    u = getattr(request.state, "user", None)
+    if u is not None and u["role"] != "admin":
+        raise HTTPException(status_code=403, detail="admin only")
+
 @app.middleware("http")
 async def require_login(request: Request, call_next):
     path = request.url.path
@@ -138,11 +148,49 @@ def auth_register(payload: dict, response: Response):
     _set_session(response, u["id"])
     return u
 
+# ---------------------------------------------------------- login rate limit ---
+# In-memory throttle on failed logins, keyed by (client IP, username). Simple by
+# design: it slows down sustained automated guessing on a single instance and
+# resets on deploy. It does not need to be perfect or shared across instances.
+LOGIN_MAX_ATTEMPTS = 8
+LOGIN_WINDOW_SECONDS = 300  # 5 minutes
+_login_attempts: dict[str, list[float]] = defaultdict(list)
+
+def _login_rate_limit_key(request: Request, username: str) -> str:
+    ip = request.client.host if request.client else "unknown"
+    return f"{ip}:{(username or '').strip().lower()}"
+
+def _check_login_rate_limit(request: Request, username: str):
+    key = _login_rate_limit_key(request, username)
+    now = time.monotonic()
+    attempts = _login_attempts[key]
+    cutoff = now - LOGIN_WINDOW_SECONDS
+    while attempts and attempts[0] < cutoff:
+        attempts.pop(0)
+    if not attempts:
+        _login_attempts.pop(key, None)
+    if len(attempts) >= LOGIN_MAX_ATTEMPTS:
+        retry_after = max(1, int(LOGIN_WINDOW_SECONDS - (now - attempts[0])))
+        raise HTTPException(status_code=429, detail="too many login attempts, try again later",
+                            headers={"Retry-After": str(retry_after)})
+    # Opportunistically cap unbounded growth from an attacker spraying many
+    # distinct usernames -- drop the oldest tracked keys once this gets large.
+    if len(_login_attempts) > 5000:
+        for stale_key in list(_login_attempts.keys())[:1000]:
+            _login_attempts.pop(stale_key, None)
+
+def _record_failed_login(request: Request, username: str):
+    _login_attempts[_login_rate_limit_key(request, username)].append(time.monotonic())
+
 @app.post("/api/auth/login")
-def auth_login(payload: dict, response: Response):
-    u = user_store.authenticate(payload.get("username", ""), payload.get("password", ""))
+def auth_login(payload: dict, request: Request, response: Response):
+    username = payload.get("username", "")
+    _check_login_rate_limit(request, username)
+    u = user_store.authenticate(username, payload.get("password", ""))
     if u is None:
+        _record_failed_login(request, username)
         raise HTTPException(status_code=401, detail="invalid username or password")
+    _login_attempts.pop(_login_rate_limit_key(request, username), None)
     _set_session(response, u["id"])
     return u
 
@@ -209,6 +257,18 @@ def admin_delete_user(user_id: int, request: Request):
     if not user_store.delete(user_id):
         raise HTTPException(status_code=404, detail="user not found")
     return {"status": "deleted", "user_id": user_id}
+
+@app.get("/api/admin/backup")
+def admin_backup():
+    """Download a consistent zip snapshot of every database file (users, yarns,
+    product lines, projects, swatches, calibration data) for offline safekeeping.
+    The persistent volume is still the primary store; this is a manual, on-demand
+    second copy against volume loss or corruption."""
+    data = build_backup_zip(DATA_DIR)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
+    filename = f"yarnengine-backup-{stamp}.zip"
+    return StreamingResponse(_io.BytesIO(data), media_type="application/zip",
+                             headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
 
 @app.get("/")
@@ -302,7 +362,8 @@ def crochet_calibration_add(payload:dict):
         raise
 
 @app.delete("/api/crochet/calibration/records/{record_id}")
-def crochet_calibration_delete(record_id:str):
+def crochet_calibration_delete(record_id:str, request:Request):
+    _require_admin(request)
     if not crochet_cal_store.delete(record_id):raise HTTPException(status_code=404,detail="record not found")
     return {"deleted":True,"record_id":record_id}
 
@@ -919,7 +980,8 @@ def create_swatch(request:SwatchCreateRequest):
     return swatch_store.create(request.model_dump())
 
 @app.delete("/api/swatches/{swatch_id}")
-def delete_swatch(swatch_id:int):
+def delete_swatch(swatch_id:int, request:Request):
+    _require_admin(request)
     if not swatch_store.delete(swatch_id):
         raise HTTPException(status_code=404,detail="swatch not found")
     return {"status":"deleted","swatch_id":swatch_id}

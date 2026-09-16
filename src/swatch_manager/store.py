@@ -27,6 +27,7 @@ class SwatchStore:
  def __init__(self,path):
   Path(path).parent.mkdir(parents=True,exist_ok=True)
   self.conn=sqlite3.connect(str(path),check_same_thread=False);self.conn.row_factory=sqlite3.Row
+  self.conn.execute("PRAGMA journal_mode=WAL");self.conn.execute("PRAGMA busy_timeout=5000")
   self.conn.executescript(SCHEMA)
   cols={r[1] for r in self.conn.execute("PRAGMA table_info(swatches)")}
   for name,sql in [

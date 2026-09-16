@@ -156,6 +156,8 @@ class SQLiteStore:
         self.path=str(path)
         Path(self.path).parent.mkdir(parents=True,exist_ok=True)
         self.conn=sqlite3.connect(self.path)
+        self.conn.execute("PRAGMA journal_mode=WAL")
+        self.conn.execute("PRAGMA busy_timeout=5000")
         self.conn.row_factory=sqlite3.Row
         self.conn.executescript(SCHEMA)
         cols={r["name"] for r in self.conn.execute("PRAGMA table_info(yarns)")}

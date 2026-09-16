@@ -15,6 +15,7 @@ CREATE INDEX IF NOT EXISTS idx_crochet_cal_yarn ON crochet_calibration(yarn_id);
 class CrochetCalibrationStore:
  def __init__(self,path):
   Path(path).parent.mkdir(parents=True,exist_ok=True);self.conn=sqlite3.connect(str(path),check_same_thread=False)
+  self.conn.execute("PRAGMA journal_mode=WAL");self.conn.execute("PRAGMA busy_timeout=5000")
   self.conn.row_factory=sqlite3.Row;self.conn.executescript(SCHEMA);self.conn.commit()
  def close(self):self.conn.close()
  def add(self,r):

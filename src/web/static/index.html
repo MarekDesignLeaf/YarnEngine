@@ -363,6 +363,10 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
       <div id="adminStatus" class="status hidden"></div>
     </div>
   </div>
+  <div class="card"><h2>Backup</h2>
+    <p class="small muted">Download a snapshot of the whole database (users, yarns, product lines, projects, swatches, calibration data) as a zip file, in case something ever happens to the server's storage.</p>
+    <div class="toolbar"><button id="btnBackup" class="alt">Download backup</button></div>
+  </div>
   <div class="card"><h2>Company info (shown in the app footer)</h2>
     <div class="fields">
       <label><span>Company name</span><input id="coName"></label>
@@ -867,6 +871,7 @@ async function loadUsers(){const tb=document.querySelector('#userTable tbody');t
  }catch(e){tb.innerHTML=`<tr><td colspan="6">${esc(e.message)}</td></tr>`;}}
 async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
 $('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
+$('btnBackup').onclick=()=>{location.href='/api/admin/backup';};
 
 /* ============================ stash ============================ */
 function renderStashYarnSelect(){$('stYarn').innerHTML=YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''}</option>`).join('');}
