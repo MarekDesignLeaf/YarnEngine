@@ -149,16 +149,23 @@ def auth_register(payload: dict, response: Response):
     return u
 
 # ---------------------------------------------------------- login rate limit ---
-# In-memory throttle on failed logins, keyed by (client IP, username). Simple by
-# design: it slows down sustained automated guessing on a single instance and
-# resets on deploy. It does not need to be perfect or shared across instances.
+# In-memory throttle on failed logins, keyed by username. Simple by design: it
+# slows down sustained automated guessing against a known account on a single
+# instance and resets on deploy. It does not need to be perfect or shared
+# across instances.
+#
+# Deliberately NOT keyed by client IP: behind Railway's edge proxy,
+# request.client.host was observed to vary between requests from the very
+# same short curl/PowerShell loop, which would silently defeat an IP-based (or
+# IP+username) key -- each attempt would land in its own near-empty bucket and
+# never accumulate. Username alone is stable and still meets the audit's own
+# "per-IP or per-username throttle" bar.
 LOGIN_MAX_ATTEMPTS = 8
 LOGIN_WINDOW_SECONDS = 300  # 5 minutes
 _login_attempts: dict[str, list[float]] = defaultdict(list)
 
 def _login_rate_limit_key(request: Request, username: str) -> str:
-    ip = request.client.host if request.client else "unknown"
-    return f"{ip}:{(username or '').strip().lower()}"
+    return (username or "").strip().lower()
 
 def _check_login_rate_limit(request: Request, username: str):
     key = _login_rate_limit_key(request, username)
