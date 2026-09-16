@@ -106,10 +106,20 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .login{max-width:440px;margin:7vh auto;text-align:center;padding:28px 26px}
 .login .fields{text-align:left}
 .login img.brand{height:96px;width:auto;margin-bottom:10px;filter:drop-shadow(0 4px 10px rgba(38,49,58,.15))}
-.rounds{display:grid;gap:6px}.round{display:grid;grid-template-columns:52px 1fr 36px;gap:6px;align-items:center}.round input{padding:6px}
+.rounds{display:grid;gap:10px}.round{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:start}.round input{padding:6px}
+.round-ops{display:flex;flex-direction:column;gap:6px}
+.op-seg{display:flex;gap:6px;align-items:center}
+.op-seg select{flex:1 1 auto;min-width:0;padding:6px}
+.op-seg input.opCount{width:60px;flex:0 0 auto;padding:6px}
+.op-seg .opx{color:var(--muted);font-weight:700}
+.op-seg .segDel{min-height:32px;padding:4px 10px}
+.addSeg{min-height:32px;padding:4px 12px;align-self:flex-start}
+.round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
 @media(max-width:860px){.grid2{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.fields,.fields.three{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}}
+@media(max-width:520px){.fields,.fields.three{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
+.round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
+.op-seg{flex-wrap:wrap}.op-seg select{flex-basis:100%}}
 </style>
 </head>
 <body>
@@ -212,7 +222,8 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
         <label><span>Starting stitches (magic ring)</span><input id="amiInitial" type="number" min="0" value="6"></label>
         <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
-      <h3>Rounds (operations: SC, SC_INC, SC2TOG, HDC, DC …)</h3>
+      <h3>Rounds</h3>
+      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked. Add another stitch to mix, e.g. 36 sc + 6 increases.</p>
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
@@ -492,11 +503,18 @@ async function api(path,opts={}){
 }
 
 /* ============================ crochet chart symbols ============================ */
-const OPS_INFO={CH:['Chain','Chain'],SLST:['Slip stitch','Slip stitch'],SC:['Single crochet','Single crochet'],HDC:['Half double crochet','Half double crochet'],DC:['Double crochet','Double crochet'],TR:['Treble','Treble'],DTR:['Double treble','Double treble'],
- SC2TOG:['sc2tog','sc2tog'],SC3TOG:['sc3tog','sc3tog'],HDC2TOG:['hdc2tog','hdc2tog'],DC2TOG:['dc2tog','dc2tog'],DC3TOG:['dc3tog','dc3tog'],
- SC_INC:['sc increase','sc increase'],HDC_INC:['hdc increase','hdc increase'],DC_INC:['dc increase','dc increase'],
- SC_BLO:['sc back loop only','sc back loop only'],SC_FLO:['sc front loop only','sc front loop only'],HDC_BLO:['hdc back loop only','hdc back loop only'],DC_BLO:['dc back loop only','dc back loop only'],
- FPDC:['front post dc','front post dc'],BPDC:['back post dc','back post dc'],PUFF3:['puff stitch','puff stitch'],POPCORN5:['popcorn','popcorn']};
+const OPS_INFO={CH:['Chain','Chain'],SLST:['Slip stitch','Slip stitch'],SC:['Single crochet','Single crochet'],HDC:['Half double crochet','Half double crochet'],DC:['Double crochet','Double crochet'],TR:['Treble crochet','Treble crochet'],DTR:['Double treble crochet','Double treble crochet'],
+ SC2TOG:['Decrease – 2 sc together','Decrease – 2 sc together'],SC3TOG:['Decrease – 3 sc together','Decrease – 3 sc together'],HDC2TOG:['Decrease – 2 hdc together','Decrease – 2 hdc together'],DC2TOG:['Decrease – 2 dc together','Decrease – 2 dc together'],DC3TOG:['Decrease – 3 dc together','Decrease – 3 dc together'],
+ SC_INC:['Increase – 2 sc in one stitch','Increase – 2 sc in one stitch'],HDC_INC:['Increase – 2 hdc in one stitch','Increase – 2 hdc in one stitch'],DC_INC:['Increase – 2 dc in one stitch','Increase – 2 dc in one stitch'],
+ SC_BLO:['sc, back loop only','sc, back loop only'],SC_FLO:['sc, front loop only','sc, front loop only'],HDC_BLO:['hdc, back loop only','hdc, back loop only'],DC_BLO:['dc, back loop only','dc, back loop only'],
+ FPDC:['Front post dc','Front post dc'],BPDC:['Back post dc','Back post dc'],PUFF3:['Puff stitch (3 dc)','Puff stitch (3 dc)'],POPCORN5:['Popcorn stitch (5 dc)','Popcorn stitch (5 dc)']};
+const OP_GROUPS=[
+ {label:'Basic stitches',ops:['CH','SLST','SC','HDC','DC','TR','DTR']},
+ {label:'Increases (more stitches)',ops:['SC_INC','HDC_INC','DC_INC']},
+ {label:'Decreases (fewer stitches)',ops:['SC2TOG','SC3TOG','HDC2TOG','DC2TOG','DC3TOG']},
+ {label:'Special stitches',ops:['SC_BLO','SC_FLO','HDC_BLO','DC_BLO','FPDC','BPDC','PUFF3','POPCORN5']},
+];
+const ALL_OPS=OP_GROUPS.flatMap(g=>g.ops);
 const CONSUMES={SC2TOG:2,SC3TOG:3,HDC2TOG:2,DC2TOG:2,DC3TOG:3};
 function opName(op){const i=OPS_INFO[op];return i?i[1]:op;}
 /* glyphs drawn in a 20x20 box, stroke-based */
@@ -658,12 +676,22 @@ async function refreshAmi3D(){
   }catch(e){window.YE3D.renderAmiShape([],{gaugeSt,gaugeRows,initialStitches:initial});}
 }
 $('rounds').addEventListener('input',scheduleAmi3D);
+$('rounds').addEventListener('change',scheduleAmi3D);
 $('amiInitial').addEventListener('input',scheduleAmi3D);
 ['gaugeSt','gaugeRows'].forEach(id=>$(id).addEventListener('input',scheduleAmi3D));
 $('ami3dSpin').addEventListener('change',()=>{window.YE3D&&window.YE3D.setSpin&&window.YE3D.setSpin($('ami3dSpin').checked);});
-function roundRow(i,ops){return `<div class="round"><span class="pill">${i+1}</span><input value="${esc(ops)}" placeholder="SC:6, SC_INC:6"><button class="alt" data-del="${i}">✕</button></div>`;}
-function readRounds(){return [...document.querySelectorAll('#rounds .round input')].map(inp=>{const operations={};inp.value.split(',').forEach(part=>{const [op,n]=part.split(':').map(s=>s.trim());if(op)operations[op.toUpperCase()]=Number(n||1);});return {operations};});}
-function writeRounds(list){$('rounds').innerHTML=list.map((r,i)=>roundRow(i,Object.entries(r.operations).map(([k,v])=>`${k}:${v}`).join(', '))).join('');document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});scheduleAmi3D();}
+function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
+function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><input type="number" class="opCount" min="1" value="${n}"><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+function roundRow(i,ops){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
+ return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+function readRounds(){return [...document.querySelectorAll('#rounds .round')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
+function writeRounds(list){
+ $('rounds').innerHTML=list.map((r,i)=>roundRow(i,r.operations)).join('');
+ document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});
+ document.querySelectorAll('#rounds .addSeg').forEach(b=>b.onclick=()=>{const l=readRounds();const idx=Number(b.dataset.round);const used=new Set(Object.keys(l[idx].operations));const next=ALL_OPS.find(op=>!used.has(op))||'SC';l[idx].operations[next]=(l[idx].operations[next]||0)+1;writeRounds(l);});
+ document.querySelectorAll('#rounds .segDel').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);entries.splice(si,1);l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
+ scheduleAmi3D();
+}
 function genTemplate(kind,maxSt,init){
  const inc=[],rounds=[];let cur=init;const step=init;
  rounds.push({operations:{SC_INC:init}});cur=init*2;
