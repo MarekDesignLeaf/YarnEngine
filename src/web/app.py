@@ -4,6 +4,10 @@ from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import io as _io
 from src.storage.backup import build_backup_zip
+from src.storage.sqlite_store import SQLiteStore
+from src.yarn_ingestion.store import IngestionStore
+from src.yarn_ingestion.registry import load_registry
+from src.yarn_ingestion.seed import import_seed_jsonl
 
 from .models import CalculationRequest, EditorPatternInput, SavePatternRequest, ProjectCreateRequest, ProjectUpdateRequest, YarnCreateRequest, SwatchCreateRequest, YarnExtraUpdateRequest, SupplierCreateRequest, StashUpsertRequest, CompanySettingsRequest, ProductLineCreateRequest, ProductLineUpdateRequest, ProductMaterialCreateRequest
 from .bootstrap import ensure_demo_database
@@ -63,6 +67,34 @@ DB_PATH = DATA_DIR / "web_app.sqlite"
 STATIC = Path(__file__).resolve().parent / "static"
 
 ensure_demo_database(ROOT, DB_PATH)
+
+
+def _sync_ingestion_registry():
+    """Register the M9 manufacturer-source list in the ingestion tables on every
+    startup, the same idempotent upsert pattern ensure_demo_database uses for
+    patterns/yarns -- adding a source to sources.json makes it show up without
+    any manual step."""
+    registry_path = ROOT / "data/ingestion/sources.json"
+    seed_path = ROOT / "data/ingestion/seed_current_products_v0_5.jsonl"
+    if not registry_path.exists():
+        return
+    core = SQLiteStore(DB_PATH)
+    try:
+        ingestion = IngestionStore(core)
+        for source in load_registry(registry_path):
+            ingestion.upsert_source(source)
+        # The 296-row v0.5 reference set: the ~101 complete rows are also
+        # shipped as data/yarns/*.json (so they go through the same validated
+        # bulk_import_yarns path as every other library yarn); re-running this
+        # here is what keeps the reference/review table itself in sync, and is
+        # a harmless idempotent upsert for the yarn rows it touches too.
+        if seed_path.exists():
+            import_seed_jsonl(ingestion, seed_path)
+    finally:
+        core.close()
+
+
+_sync_ingestion_registry()
 model_registry = ModelRegistry(DATA_DIR / 'model_registry.sqlite')
 service = WebService(ROOT, DB_PATH, model_registry=model_registry)
 project_store = ProjectStore(DATA_DIR / 'projects.sqlite')
@@ -366,6 +398,46 @@ def admin_backup():
     filename = f"yarnengine-backup-{stamp}.zip"
     return StreamingResponse(_io.BytesIO(data), media_type="application/zip",
                              headers={"Content-Disposition": f'attachment; filename="{filename}"'})
+
+
+@app.get("/api/admin/ingestion/stats")
+def admin_ingestion_stats():
+    """Read-only status of the M9 automated yarn-catalogue ingestion pipeline:
+    how many manufacturer sources are registered/verified, how many reference
+    products are on file, and how many yarns currently in the live catalogue
+    came from this pipeline (vs. the original hand-curated library)."""
+    store = service._store()
+    try:
+        ingestion = IngestionStore(store)
+        stats = ingestion.stats()
+        registry_path = ROOT / "data/ingestion/sources.json"
+        sources = load_registry(registry_path) if registry_path.exists() else []
+        web_ingested = store.conn.execute(
+            "SELECT COUNT(*) FROM yarns WHERE source_type IN ('official_web_seed','official_web')"
+        ).fetchone()[0]
+        return {
+            **stats,
+            "sources_verified": sum(1 for s in sources if s.domain_status == "verified"),
+            "sources_needing_verification": sum(1 for s in sources if s.domain_status != "verified"),
+            "web_ingested_yarns": web_ingested,
+        }
+    finally:
+        store.close()
+
+
+@app.get("/api/admin/ingestion/review")
+def admin_ingestion_review(limit: int = 100):
+    store = service._store()
+    try:
+        ingestion = IngestionStore(store)
+        rows = ingestion.conn.execute("""
+          SELECT q.id,q.status,q.reason,q.created_at,c.source_id,c.brand,c.product_name,c.source_url,c.confidence
+          FROM manual_review_queue q JOIN product_candidates c ON c.candidate_id=q.candidate_id
+          WHERE q.status='open' ORDER BY q.created_at LIMIT ?
+        """, (limit,)).fetchall()
+        return [dict(r) for r in rows]
+    finally:
+        store.close()
 
 
 @app.get("/")

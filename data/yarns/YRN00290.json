@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00290",
+  "brand": "Malabrigo",
+  "product": "Ultimate Sock Minis",
+  "variant": null,
+  "cyc_weight": 1,
+  "package_mass_g": 20.0,
+  "package_length_m": 77.0,
+  "fibre_composition": {
+    "Superwash Merino Wool": 75.0,
+    "Nylon": 25.0
+  },
+  "tex": 259.7402597402597,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 2.75,
+  "recommended_needle_max_mm": 2.75,
+  "source_type": "official_web_seed",
+  "source_reference": "https://malabrigoyarn.com/yarns/usminis",
+  "evidence_level": "manufacturer_official_page"
+}

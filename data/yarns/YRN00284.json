@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00284",
+  "brand": "Malabrigo",
+  "product": "Silky Merino",
+  "variant": null,
+  "cyc_weight": 3,
+  "package_mass_g": 50.0,
+  "package_length_m": 137.0,
+  "fibre_composition": {
+    "Silk": 51.0,
+    "Merino Wool": 49.0
+  },
+  "tex": 364.963503649635,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 3.75,
+  "recommended_needle_max_mm": 3.75,
+  "source_type": "official_web_seed",
+  "source_reference": "https://malabrigoyarn.com/yarns/silky-merino",
+  "evidence_level": "manufacturer_official_page"
+}

@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00014",
+  "brand": "DROPS",
+  "product": "DROPS Fabel",
+  "variant": null,
+  "cyc_weight": null,
+  "package_mass_g": 50.0,
+  "package_length_m": 205.0,
+  "fibre_composition": {
+    "Wool": 75.0,
+    "Nylon": 25.0
+  },
+  "tex": 243.90243902439025,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "official_web_seed",
+  "source_reference": "https://www.garnstudio.com/pricelist.php?action=yarns&cid=19",
+  "evidence_level": "catalogue_listing"
+}

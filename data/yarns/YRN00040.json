@@ -1,0 +1,21 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00040",
+  "brand": "Scheepjes",
+  "product": "Cotton Whirl",
+  "variant": null,
+  "cyc_weight": 1,
+  "package_mass_g": 226.0,
+  "package_length_m": 1000.0,
+  "fibre_composition": {
+    "Organic Cotton": 100.0
+  },
+  "tex": 226.0,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 2.5,
+  "recommended_needle_max_mm": 2.5,
+  "source_type": "official_web_seed",
+  "source_reference": "https://www.scheepjes.com/en/cotton-whirl-13421/",
+  "evidence_level": "manufacturer_official_page"
+}

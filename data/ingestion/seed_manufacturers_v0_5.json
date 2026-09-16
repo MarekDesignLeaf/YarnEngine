@@ -1,0 +1,62 @@
+[
+  {
+    "manufacturer_id": "MFR0001",
+    "manufacturer_name": "DROPS Design A/S",
+    "brand_name": "DROPS",
+    "entity_type": "brand / yarn company",
+    "country": "Norway",
+    "active_verified": true,
+    "official_website": "https://www.garnstudio.com",
+    "verification_date": "2026-09-16",
+    "source_url": "https://www.garnstudio.com/pricelist.php?action=yarns&cid=19",
+    "notes": "Official current catalogue verified. Only products actively listed in the current yarn catalogue are included."
+  },
+  {
+    "manufacturer_id": "MFR0002",
+    "manufacturer_name": "Scheepjes",
+    "brand_name": "Scheepjes",
+    "entity_type": "brand / yarn company",
+    "country": "Netherlands",
+    "active_verified": true,
+    "official_website": "https://www.scheepjes.com",
+    "verification_date": "2026-09-16",
+    "source_url": "https://www.scheepjes.com/en/yarn/",
+    "notes": "109 yarn product entries are currently listed across the official Yarn overview pages 1 and 2."
+  },
+  {
+    "manufacturer_id": "MFR0003",
+    "manufacturer_name": "Sirdar Holdings Ltd",
+    "brand_name": "Sirdar / Snuggly / Hayfield / Happy",
+    "entity_type": "manufacturer / brand group",
+    "country": "United Kingdom",
+    "active_verified": true,
+    "official_website": "https://sirdar.com",
+    "verification_date": "2026-09-16",
+    "source_url": "https://sirdar.com/en/yarns",
+    "notes": "Current ranges verified from the official Sirdar yarn catalogue and individual product pages."
+  },
+  {
+    "manufacturer_id": "MFR0004",
+    "manufacturer_name": "King Cole Ltd",
+    "brand_name": "King Cole",
+    "entity_type": "brand / yarn company",
+    "country": "United Kingdom",
+    "active_verified": true,
+    "official_website": "https://www.kingcole.com",
+    "verification_date": "2026-09-16",
+    "source_url": "https://www.kingcole.com/product-category/yarn/",
+    "notes": "Current official yarn catalogue lists 126 products. This database version includes only product lines individually confirmed as current through the main yarn catalogue and active yarn-weight category pages."
+  },
+  {
+    "manufacturer_id": "MFR0005",
+    "manufacturer_name": "Malabrigo Yarn",
+    "brand_name": "Malabrigo",
+    "entity_type": "manufacturer / brand",
+    "country": "Uruguay",
+    "active_verified": true,
+    "official_website": "https://malabrigoyarn.com",
+    "verification_date": "2026-09-16",
+    "source_url": "https://malabrigoyarn.com/yarns",
+    "notes": "27 current yarn / fibre bases are listed on the live official yarn catalogue. Only those live catalogue entries are included."
+  }
+]

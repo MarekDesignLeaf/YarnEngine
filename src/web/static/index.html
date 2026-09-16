@@ -389,6 +389,10 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
     <p class="small muted">Download a snapshot of the whole database (users, yarns, product lines, projects, swatches, calibration data) as a zip file, in case something ever happens to the server's storage.</p>
     <div class="toolbar"><button id="btnBackup" class="alt">Download backup</button></div>
   </div>
+  <div class="card"><h2>Yarn data ingestion</h2>
+    <p class="small muted">Status of the automated manufacturer-catalogue ingestion pipeline (M9). Source list and crawling run from the command line on the server; this is a read-only status view.</p>
+    <div id="ingestStats" class="small"></div>
+  </div>
   <div class="card"><h2>Company info (shown in the app footer)</h2>
     <div class="fields">
       <label><span>Company name</span><input id="coName"></label>
@@ -595,7 +599,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -920,6 +924,14 @@ async function loadUsers(){const tb=document.querySelector('#userTable tbody');t
 async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
 $('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value,email:$('auEmail').value||null}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';$('auEmail').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
 $('btnBackup').onclick=()=>{location.href='/api/admin/backup';};
+async function loadIngestionStats(){const box=$('ingestStats');try{const s=await api('/api/admin/ingestion/stats');box.innerHTML=`<table style="width:100%"><tbody>
+  <tr><td>Manufacturer sources on file</td><td><b>${s.sources}</b></td></tr>
+  <tr><td>— with a verified official domain</td><td><b>${s.sources_verified}</b></td></tr>
+  <tr><td>— awaiting verification</td><td><b>${s.sources_needing_verification}</b></td></tr>
+  <tr><td>Reference products on file</td><td><b>${s.seed_reference_products}</b></td></tr>
+  <tr><td>Yarns in the live catalogue from this pipeline</td><td><b>${s.web_ingested_yarns}</b></td></tr>
+  <tr><td>Open review items</td><td><b>${s.open_reviews}</b></td></tr>
+  </tbody></table>`;}catch(e){box.innerHTML=`<div class="status bad">${esc(e.message)}</div>`;}}
 
 /* ============================ stash ============================ */
 function renderStashYarnSelect(){$('stYarn').innerHTML=YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''}</option>`).join('');}

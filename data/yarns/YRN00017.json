@@ -1,0 +1,22 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00017",
+  "brand": "DROPS",
+  "product": "DROPS Glitter",
+  "variant": null,
+  "cyc_weight": null,
+  "package_mass_g": 10.0,
+  "package_length_m": 700.0,
+  "fibre_composition": {
+    "Cupro": 60.0,
+    "Metal": 40.0
+  },
+  "tex": 14.285714285714286,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": null,
+  "recommended_needle_max_mm": null,
+  "source_type": "official_web_seed",
+  "source_reference": "https://www.garnstudio.com/pricelist.php?action=yarns&cid=19",
+  "evidence_level": "catalogue_listing"
+}

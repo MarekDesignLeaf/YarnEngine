@@ -1,0 +1,21 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YRN00280",
+  "brand": "Malabrigo",
+  "product": "Washted",
+  "variant": null,
+  "cyc_weight": 4,
+  "package_mass_g": 100.0,
+  "package_length_m": 192.0,
+  "fibre_composition": {
+    "Superwash Merino Wool": 100.0
+  },
+  "tex": 520.8333333333334,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 5.0,
+  "recommended_needle_max_mm": 5.0,
+  "source_type": "official_web_seed",
+  "source_reference": "https://malabrigoyarn.com/yarns/washted",
+  "evidence_level": "manufacturer_official_page"
+}
