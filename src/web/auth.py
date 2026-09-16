@@ -10,6 +10,7 @@ import datetime
 import hashlib
 import hmac
 import os
+import re
 import secrets
 import sqlite3
 from pathlib import Path
@@ -17,6 +18,7 @@ from pathlib import Path
 SESSION_COOKIE = "ye_session"
 SESSION_DAYS = 30
 PBKDF2_ITERATIONS = 200_000
+RESET_TOKEN_TTL_MINUTES = 30
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users(
@@ -27,13 +29,37 @@ CREATE TABLE IF NOT EXISTS users(
   role TEXT NOT NULL DEFAULT 'user',
   active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL,
-  last_login_at TEXT
+  last_login_at TEXT,
+  email TEXT
+);
+CREATE TABLE IF NOT EXISTS password_resets(
+  token_hash TEXT PRIMARY KEY,
+  user_id INTEGER NOT NULL,
+  expires_at TEXT NOT NULL,
+  used INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL
 );
 """
 
 
 def _now():
     return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat()
+
+
+def _in_minutes(minutes: int):
+    return (datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(minutes=minutes)).replace(microsecond=0).isoformat()
+
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+def validate_email(email: str) -> str:
+    e = (email or "").strip().lower()
+    if not e:
+        raise ValueError("email is required")
+    if len(e) > 254 or not _EMAIL_RE.match(e):
+        raise ValueError("invalid email address")
+    return e
 
 
 def hash_password(password: str, salt: bytes | None = None) -> tuple[str, str]:
@@ -71,6 +97,9 @@ class UserStore:
         self.conn.execute("PRAGMA busy_timeout=5000")
         self.conn.row_factory = sqlite3.Row
         self.conn.executescript(SCHEMA)
+        cols = {r["name"] for r in self.conn.execute("PRAGMA table_info(users)")}
+        if "email" not in cols:
+            self.conn.execute("ALTER TABLE users ADD COLUMN email TEXT")
         self.conn.commit()
 
     def count(self) -> int:
@@ -84,17 +113,18 @@ class UserStore:
         r = self.conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
         return dict(r) if r else None
 
-    def create(self, username: str, password: str, role: str = "user", active: bool = True):
+    def create(self, username: str, password: str, role: str = "user", active: bool = True, email: str | None = None):
         username = validate_username(username)
         password = validate_password(password)
         if role not in {"user", "admin"}:
             raise ValueError("invalid role")
         if self.get_by_username(username):
             raise ValueError("username already taken")
+        email_value = validate_email(email) if email else None
         h, s = hash_password(password)
         cur = self.conn.execute(
-            "INSERT INTO users(username,password_hash,salt,role,active,created_at) VALUES(?,?,?,?,?,?)",
-            (username, h, s, role, 1 if active else 0, _now()))
+            "INSERT INTO users(username,password_hash,salt,role,active,created_at,email) VALUES(?,?,?,?,?,?,?)",
+            (username, h, s, role, 1 if active else 0, _now(), email_value))
         self.conn.commit()
         return self.public(self.get(cur.lastrowid))
 
@@ -124,6 +154,51 @@ class UserStore:
         self.conn.execute("UPDATE users SET role=? WHERE id=?", (role, user_id))
         self.conn.commit()
 
+    def set_email(self, user_id: int, email: str | None):
+        value = validate_email(email) if email else None
+        self.conn.execute("UPDATE users SET email=? WHERE id=?", (value, user_id))
+        self.conn.commit()
+        return value
+
+    def get_by_email(self, email: str):
+        e = (email or "").strip().lower()
+        if not e:
+            return None
+        r = self.conn.execute("SELECT * FROM users WHERE email=?", (e,)).fetchone()
+        return dict(r) if r else None
+
+    def create_password_reset(self, user_id: int) -> str:
+        """Issue a one-time password-reset token for user_id, invalidating any
+        previous unused token for that user. Only the SHA-256 hash of the
+        token is stored, so a database leak alone can't be used to reset
+        anyone's password."""
+        token = secrets.token_urlsafe(32)
+        token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+        self.conn.execute("DELETE FROM password_resets WHERE user_id=? AND used=0", (user_id,))
+        self.conn.execute(
+            "INSERT INTO password_resets(token_hash,user_id,expires_at,used,created_at) VALUES(?,?,?,0,?)",
+            (token_hash, user_id, _in_minutes(RESET_TOKEN_TTL_MINUTES), _now()))
+        self.conn.commit()
+        return token
+
+    def consume_password_reset(self, token: str, new_password: str):
+        """Validate a reset token and, if valid and unused and unexpired, set
+        the account's new password and mark the token used. Returns the
+        public user dict on success, or None if the token is invalid, already
+        used, or expired."""
+        token_hash = hashlib.sha256((token or "").encode("utf-8")).hexdigest()
+        r = self.conn.execute("SELECT * FROM password_resets WHERE token_hash=?", (token_hash,)).fetchone()
+        if not r or r["used"]:
+            return None
+        if datetime.datetime.fromisoformat(r["expires_at"]) < datetime.datetime.now(datetime.timezone.utc):
+            return None
+        password = validate_password(new_password)
+        h, s = hash_password(password)
+        self.conn.execute("UPDATE users SET password_hash=?,salt=? WHERE id=?", (h, s, r["user_id"]))
+        self.conn.execute("UPDATE password_resets SET used=1 WHERE token_hash=?", (token_hash,))
+        self.conn.commit()
+        return self.public(self.get(r["user_id"]))
+
     def delete(self, user_id: int) -> bool:
         cur = self.conn.execute("DELETE FROM users WHERE id=?", (user_id,))
         self.conn.commit()
@@ -141,7 +216,7 @@ class UserStore:
         if u is None:
             return None
         return {"id": u["id"], "username": u["username"], "role": u["role"], "active": bool(u["active"]),
-                "created_at": u["created_at"], "last_login_at": u.get("last_login_at")}
+                "created_at": u["created_at"], "last_login_at": u.get("last_login_at"), "email": u.get("email")}
 
     def seed_admin_from_env(self):
         """Create the first administrator from ADMIN_USERNAME/ADMIN_PASSWORD if no users exist."""
@@ -151,7 +226,8 @@ class UserStore:
         password = os.environ.get("ADMIN_PASSWORD", "")
         if not username or not password:
             return None
-        return self.create(username, password, role="admin", active=True)
+        email = os.environ.get("ADMIN_EMAIL", "").strip() or None
+        return self.create(username, password, role="admin", active=True, email=email)
 
 
 class SessionSigner:

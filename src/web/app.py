@@ -51,7 +51,8 @@ import datetime, os, sqlite3, time
 from collections import defaultdict
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
-from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS
+from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS, RESET_TOKEN_TTL_MINUTES
+from .mailer import send_email
 
 ROOT = Path(__file__).resolve().parents[2]
 # All mutable state (sqlite files, session secret) lives under DATA_DIR so a
@@ -81,7 +82,8 @@ app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
-                "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status"}
+                "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status",
+                "/api/auth/forgot-password", "/api/auth/reset-password"}
 
 def _auth_disabled() -> bool:
     return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
@@ -224,6 +226,91 @@ def auth_change_password(payload: dict, request: Request):
         raise HTTPException(status_code=422, detail=str(e))
     return {"status": "ok"}
 
+@app.put("/api/auth/email")
+def auth_update_email(payload: dict, request: Request):
+    u = request.state.user
+    try:
+        user_store.set_email(u["id"], payload.get("email", ""))
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    return UserStore.public(user_store.get(u["id"]))
+
+# ---------------------------------------------------------- password reset ---
+# In-memory throttle on reset requests, keyed the same way as the login
+# limiter above (by identifier, not client IP -- see that comment for why).
+RESET_MAX_ATTEMPTS = 4
+RESET_WINDOW_SECONDS = 600  # 10 minutes
+_reset_attempts: dict[str, list[float]] = defaultdict(list)
+
+def _reset_rate_limit_key(identifier: str) -> str:
+    return (identifier or "").strip().lower()
+
+def _check_reset_rate_limit(identifier: str):
+    key = _reset_rate_limit_key(identifier)
+    now = time.monotonic()
+    attempts = _reset_attempts[key]
+    cutoff = now - RESET_WINDOW_SECONDS
+    while attempts and attempts[0] < cutoff:
+        attempts.pop(0)
+    if not attempts:
+        _reset_attempts.pop(key, None)
+    if len(attempts) >= RESET_MAX_ATTEMPTS:
+        retry_after = max(1, int(RESET_WINDOW_SECONDS - (now - attempts[0])))
+        raise HTTPException(status_code=429, detail="too many requests, try again later",
+                            headers={"Retry-After": str(retry_after)})
+    if len(_reset_attempts) > 5000:
+        for stale_key in list(_reset_attempts.keys())[:1000]:
+            _reset_attempts.pop(stale_key, None)
+
+def _record_reset_attempt(identifier: str):
+    _reset_attempts[_reset_rate_limit_key(identifier)].append(time.monotonic())
+
+@app.post("/api/auth/forgot-password")
+def auth_forgot_password(payload: dict, request: Request):
+    identifier = (payload.get("username_or_email") or payload.get("username") or payload.get("email") or "").strip()
+    _check_reset_rate_limit(identifier)
+    _record_reset_attempt(identifier)
+    user = None
+    if identifier:
+        user = user_store.get_by_username(identifier)
+        if user is None and "@" in identifier:
+            user = user_store.get_by_email(identifier)
+    if user and user.get("active") and user.get("email"):
+        token = user_store.create_password_reset(user["id"])
+        reset_link = f"{str(request.base_url).rstrip('/')}/?reset_token={token}"
+        try:
+            send_email(
+                to=user["email"],
+                subject="Reset your YarnEngine password",
+                html=(f"<p>Someone asked to reset the password for the YarnEngine account "
+                      f"<b>{user['username']}</b>.</p>"
+                      f"<p><a href=\"{reset_link}\">Click here to set a new password</a>. "
+                      f"This link expires in {RESET_TOKEN_TTL_MINUTES} minutes.</p>"
+                      f"<p>If you didn't request this, you can safely ignore this email.</p>"),
+                text=(f"Reset your YarnEngine password: {reset_link} "
+                      f"(expires in {RESET_TOKEN_TTL_MINUTES} minutes). "
+                      f"If you didn't request this, ignore this email."),
+            )
+        except Exception:
+            pass  # best-effort; never let a send failure leak through to the caller
+    # Always the same response whether or not an account/email was found or
+    # the send actually succeeded, so this endpoint can't be used to probe
+    # which usernames/emails exist.
+    return {"status": "ok"}
+
+@app.post("/api/auth/reset-password")
+def auth_reset_password(payload: dict, response: Response):
+    token = payload.get("token") or ""
+    new_password = payload.get("new_password") or ""
+    try:
+        user = user_store.consume_password_reset(token, new_password)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    if user is None:
+        raise HTTPException(status_code=400, detail="invalid or expired reset link")
+    _set_session(response, user["id"])
+    return user
+
 @app.get("/api/admin/users")
 def admin_users():
     return user_store.list()
@@ -232,7 +319,8 @@ def admin_users():
 def admin_create_user(payload: dict):
     try:
         return user_store.create(payload.get("username", ""), payload.get("password", ""),
-                                 role=payload.get("role", "user"), active=bool(payload.get("active", True)))
+                                 role=payload.get("role", "user"), active=bool(payload.get("active", True)),
+                                 email=payload.get("email") or None)
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
 
@@ -253,6 +341,8 @@ def admin_update_user(user_id: int, payload: dict, request: Request):
             user_store.set_role(user_id, payload["role"])
         if payload.get("password"):
             user_store.set_password(user_id, payload["password"])
+        if "email" in payload:
+            user_store.set_email(user_id, payload["email"])
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
     return UserStore.public(user_store.get(user_id))

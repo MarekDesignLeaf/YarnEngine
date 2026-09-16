@@ -121,23 +121,45 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
   <div class="eyebrow">YARNENGINE</div>
   <h1>Sign in</h1>
   <p class="muted small">Crochet & amigurumi yarn calculator with a graphical pattern library. Registered users only.</p>
-  <div class="fields" style="grid-template-columns:1fr">
-    <label><span>Username</span><input id="loginUser" autocomplete="username"></label>
-    <label><span>Password</span><input id="loginPass" type="password" autocomplete="current-password"></label>
-  </div>
-  <div class="toolbar">
-    <button id="btnLogin" class="accent">Sign in</button>
-    <button id="btnShowRegister" class="alt">Register a new account</button>
-  </div>
-  <div id="registerBox" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
-    <h3>Registration</h3>
+
+  <div id="loginNormal">
     <div class="fields" style="grid-template-columns:1fr">
-      <label><span>Username</span><input id="regUser" autocomplete="username"></label>
-      <label><span>Password (min. 8 characters)</span><input id="regPass" type="password" autocomplete="new-password"></label>
-      <label><span>Repeat password</span><input id="regPass2" type="password" autocomplete="new-password"></label>
+      <label><span>Username</span><input id="loginUser" autocomplete="username"></label>
+      <label><span>Password</span><input id="loginPass" type="password" autocomplete="current-password"></label>
     </div>
-    <div class="toolbar"><button id="btnRegister">Create account</button></div>
+    <div class="toolbar">
+      <button id="btnLogin" class="accent">Sign in</button>
+      <button id="btnShowRegister" class="alt">Register a new account</button>
+    </div>
+    <div class="toolbar" style="margin-top:4px"><button id="btnShowForgot" class="link">Forgot your password?</button></div>
+    <div id="registerBox" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <h3>Registration</h3>
+      <div class="fields" style="grid-template-columns:1fr">
+        <label><span>Username</span><input id="regUser" autocomplete="username"></label>
+        <label><span>Password (min. 8 characters)</span><input id="regPass" type="password" autocomplete="new-password"></label>
+        <label><span>Repeat password</span><input id="regPass2" type="password" autocomplete="new-password"></label>
+      </div>
+      <div class="toolbar"><button id="btnRegister">Create account</button></div>
+    </div>
+    <div id="forgotBox" class="hidden" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <h3>Reset password</h3>
+      <p class="small muted">Enter your username or email. If we have an email on file for that account, we'll send a reset link.</p>
+      <div class="fields" style="grid-template-columns:1fr">
+        <label><span>Username or email</span><input id="forgotId" autocomplete="username"></label>
+      </div>
+      <div class="toolbar"><button id="btnForgotSend">Send reset link</button></div>
+    </div>
   </div>
+
+  <div id="resetBox" class="hidden">
+    <h3>Set a new password</h3>
+    <div class="fields" style="grid-template-columns:1fr">
+      <label><span>New password (min. 8 characters)</span><input id="resetPass" type="password" autocomplete="new-password"></label>
+      <label><span>Repeat password</span><input id="resetPass2" type="password" autocomplete="new-password"></label>
+    </div>
+    <div class="toolbar"><button id="btnResetSave">Set new password</button></div>
+  </div>
+
   <div id="loginStatus" class="status hidden"></div>
 </section>
 
@@ -356,9 +378,9 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 <!-- ---------- ADMIN ---------- -->
 <section id="tab-admin" class="hidden">
   <div class="grid2">
-    <div class="card"><h2>Users</h2><div style="overflow:auto"><table id="userTable"><thead><tr><th>ID</th><th>Username</th><th>Role</th><th>Active</th><th>Last login</th><th></th></tr></thead><tbody></tbody></table></div></div>
+    <div class="card"><h2>Users</h2><div style="overflow:auto"><table id="userTable"><thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Active</th><th>Last login</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="card"><h2>Create user</h2>
-      <div class="fields"><label><span>Username</span><input id="auUser"></label><label><span>Password</span><input id="auPass" type="password"></label><label><span>Role</span><select id="auRole"><option value="user">user</option><option value="admin">admin</option></select></label></div>
+      <div class="fields"><label><span>Username</span><input id="auUser"></label><label><span>Password</span><input id="auPass" type="password"></label><label><span>Email (optional)</span><input id="auEmail" type="email"></label><label><span>Role</span><select id="auRole"><option value="user">user</option><option value="admin">admin</option></select></label></div>
       <div class="toolbar"><button id="btnCreateUser">Create</button></div>
       <div id="adminStatus" class="status hidden"></div>
     </div>
@@ -395,9 +417,14 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 </div></div>
 
 <div id="accountModal" class="modal hidden"><div class="modal-card" style="max-width:460px">
-  <div class="modal-head"><h2 style="margin:0">Change password</h2><button id="accClose" class="alt">✕</button></div>
-  <div class="fields" style="grid-template-columns:1fr"><label><span>Current password</span><input id="accCur" type="password"></label><label><span>New password</span><input id="accNew" type="password"></label></div>
-  <div class="toolbar"><button id="accSave">Change</button></div><div id="accStatus" class="status hidden"></div>
+  <div class="modal-head"><h2 style="margin:0">Account</h2><button id="accClose" class="alt">✕</button></div>
+  <div class="fields" style="grid-template-columns:1fr"><label><span>Email (used for password reset)</span><input id="accEmail" type="email"></label></div>
+  <div class="toolbar"><button id="accEmailSave" class="alt">Save email</button></div>
+  <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+    <div class="fields" style="grid-template-columns:1fr"><label><span>Current password</span><input id="accCur" type="password"></label><label><span>New password</span><input id="accNew" type="password"></label></div>
+    <div class="toolbar"><button id="accSave">Change password</button></div>
+  </div>
+  <div id="accStatus" class="status hidden"></div>
 </div></div>
 
 <div id="yarnModal" class="modal hidden"><div class="modal-card" style="max-width:560px">
@@ -444,7 +471,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 </main>
 <script>
 /* ============================ strings ============================ */
-const MSG={"msg.calibrated": "Calibrated estimate (measured swatch)", "msg.model": "Calibrated estimate (approved model)", "msg.baseline": "Uncalibrated estimate – stitch geometry baseline", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter."};
+const MSG={"msg.calibrated": "Calibrated estimate (measured swatch)", "msg.model": "Calibrated estimate (approved model)", "msg.baseline": "Uncalibrated estimate – stitch geometry baseline", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter.", "msg.resetSent": "If that account exists and has an email on file, we've sent a reset link."};
 function t(k){return MSG[k]||k;}
 function applyLang(){}
 /* ============================ helpers ============================ */
@@ -530,10 +557,17 @@ const KEY=p=>`${p.pattern_id}|${p.version}`;
 /* ============================ auth ============================ */
 function showLogin(){$('viewLogin').classList.remove('hidden');$('viewApp').classList.add('hidden');}
 function showApp(){$('viewLogin').classList.add('hidden');$('viewApp').classList.remove('hidden');}
+function showResetForm(token){$('loginNormal').classList.add('hidden');$('resetBox').classList.remove('hidden');$('resetBox').dataset.token=token;showLogin();}
 async function boot(){
  applyLang();
+ const resetToken=new URLSearchParams(location.search).get('reset_token');
+ if(resetToken){showResetForm(resetToken);return;}
  try{ME=await api('/api/auth/me');}catch(e){ME=null;}
- if(!ME){showLogin();return;}
+ if(!ME){
+  showLogin();
+  try{const st=await api('/api/auth/status');$('btnShowRegister').classList.toggle('hidden',!st.registration_open);}catch(e){}
+  return;
+ }
  showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');
  $('tabAdmin').classList.toggle('hidden',ME.role!=='admin');
  $('btnNewLine').classList.toggle('hidden',ME.role!=='admin');
@@ -544,8 +578,20 @@ $('loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnLogin').c
 $('btnShowRegister').onclick=()=>$('registerBox').classList.toggle('hidden');
 $('btnRegister').onclick=async()=>{if($('regPass').value!==$('regPass2').value){status($('loginStatus'),t('msg.pwMismatch'),'bad');return;}
  try{await api('/api/auth/register',{method:'POST',body:{username:$('regUser').value,password:$('regPass').value}});location.reload();}catch(e){status($('loginStatus'),e.message,'bad');}};
+$('btnShowForgot').onclick=()=>$('forgotBox').classList.toggle('hidden');
+$('btnForgotSend').onclick=async()=>{
+ try{await api('/api/auth/forgot-password',{method:'POST',body:{username_or_email:$('forgotId').value}});status($('loginStatus'),t('msg.resetSent'),'good');}
+ catch(e){status($('loginStatus'),e.message,'bad');}};
+$('btnResetSave').onclick=async()=>{
+ if($('resetPass').value!==$('resetPass2').value){status($('loginStatus'),t('msg.pwMismatch'),'bad');return;}
+ try{
+  await api('/api/auth/reset-password',{method:'POST',body:{token:$('resetBox').dataset.token,new_password:$('resetPass').value}});
+  history.replaceState(null,'',location.pathname);
+  location.reload();
+ }catch(e){status($('loginStatus'),e.message,'bad');}};
 $('btnLogout').onclick=async()=>{await api('/api/auth/logout',{method:'POST'});location.reload();};
-$('btnAccount').onclick=()=>$('accountModal').classList.remove('hidden');$('accClose').onclick=()=>$('accountModal').classList.add('hidden');
+$('btnAccount').onclick=()=>{$('accEmail').value=(ME&&ME.email)||'';$('accountModal').classList.remove('hidden');};$('accClose').onclick=()=>$('accountModal').classList.add('hidden');
+$('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'PUT',body:{email:$('accEmail').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
@@ -859,18 +905,20 @@ $('lmAddMaterial').onclick=async()=>{
 };
 
 /* ============================ admin ============================ */
-async function loadUsers(){const tb=document.querySelector('#userTable tbody');try{const us=await api('/api/admin/users');tb.innerHTML=us.map(u=>`<tr><td>${u.id}</td><td>${esc(u.username)}</td><td>${esc(u.role)}</td><td>${u.active?'✔':'✖'}</td><td class="small">${esc((u.last_login_at||'').replace('T',' ').slice(0,16))}</td><td>
+async function loadUsers(){const tb=document.querySelector('#userTable tbody');try{const us=await api('/api/admin/users');tb.innerHTML=us.map(u=>`<tr><td>${u.id}</td><td>${esc(u.username)}</td><td class="small">${esc(u.email||'—')}</td><td>${esc(u.role)}</td><td>${u.active?'✔':'✖'}</td><td class="small">${esc((u.last_login_at||'').replace('T',' ').slice(0,16))}</td><td>
+ <button class="link" data-email="${u.id}" data-cur="${esc(u.email||'')}">Email</button>
  <button class="link" data-act="${u.id}" data-to="${u.active?0:1}">${u.active?esc(t('msg.deact')):esc(t('msg.act'))}</button>
  <button class="link" data-pw="${u.id}" data-name="${esc(u.username)}">${esc(t('msg.resetPw'))}</button>
  <button class="link" data-role="${u.id}" data-to="${u.role==='admin'?'user':'admin'}">→ ${u.role==='admin'?'user':'admin'}</button>
  <button class="link" data-del="${u.id}">${esc(t('msg.delete'))}</button></td></tr>`).join('');
+ tb.querySelectorAll('[data-email]').forEach(b=>b.onclick=()=>{const em=prompt('Email (used for password reset):',b.dataset.cur);if(em!==null)adminUpdate(b.dataset.email,{email:em});});
  tb.querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>adminUpdate(b.dataset.act,{active:b.dataset.to==='1'}));
  tb.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>adminUpdate(b.dataset.role,{role:b.dataset.to}));
  tb.querySelectorAll('[data-pw]').forEach(b=>b.onclick=()=>{const pw=prompt(`${t('msg.newPw')} ${b.dataset.name}:`);if(pw)adminUpdate(b.dataset.pw,{password:pw});});
  tb.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{if(!confirm(t('msg.confirmDel')))return;try{await api('/api/admin/users/'+b.dataset.del,{method:'DELETE'});loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}});
- }catch(e){tb.innerHTML=`<tr><td colspan="6">${esc(e.message)}</td></tr>`;}}
+ }catch(e){tb.innerHTML=`<tr><td colspan="7">${esc(e.message)}</td></tr>`;}}
 async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
-$('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
+$('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value,email:$('auEmail').value||null}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';$('auEmail').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
 $('btnBackup').onclick=()=>{location.href='/api/admin/backup';};
 
 /* ============================ stash ============================ */
