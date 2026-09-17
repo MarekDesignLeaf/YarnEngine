@@ -14,3 +14,11 @@ def test_app_shell_forces_revalidation_so_deploys_are_picked_up():
   r=c.get(path)
   assert r.status_code==200,path
   assert r.headers.get("cache-control")=="no-cache",path
+
+def test_head_root_serves_etag_for_the_in_page_version_check():
+ # The page polls HEAD / and compares ETags to offer "Update now" when a
+ # newer deploy is live, so HEAD must work and carry an ETag.
+ r=c.head("/")
+ assert r.status_code==200
+ assert r.headers.get("etag")
+ assert r.headers.get("cache-control")=="no-cache"

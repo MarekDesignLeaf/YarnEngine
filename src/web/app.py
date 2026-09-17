@@ -452,8 +452,10 @@ def admin_ingestion_review(limit: int = 100):
         store.close()
 
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 def index():
+    # HEAD is used by the in-page version check (ETag comparison) so an open
+    # tab can offer "Update now" when a newer deploy is live.
     return FileResponse(STATIC / "index.html")
 
 @app.get("/sw.js")

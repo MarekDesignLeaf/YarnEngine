@@ -118,6 +118,8 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .addSeg,.subSeg{min-height:32px;padding:4px 12px}
 button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 button:disabled:hover{background:var(--bg-tint);color:var(--ink)}
+#updateBar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:12px;align-items:center;justify-content:center;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--accent2-dark);color:#fff;font-weight:650;box-shadow:0 -6px 18px rgba(38,49,58,.25)}
+#updateBar button{background:#fff;color:var(--accent2-dark)}
 .round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
 #shapeSvg{width:100%;max-width:320px;display:block;margin:0 auto;touch-action:none}
@@ -1288,6 +1290,32 @@ $('btnSaveCompany').onclick=async()=>{
 
 boot();
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+
+/* ---- self-updating app shell: compare the served page's ETag with the one
+   this page was loaded with, on focus and every 2 minutes. When a newer
+   deploy is live, offer a one-tap reload instead of silently running stale
+   code (nothing in the editor should ever be an outdated version). */
+let appEtag=null;
+async function checkAppVersion(){
+ try{
+  const r=await fetch('/',{method:'HEAD',cache:'no-store'});
+  const e=r.headers.get('etag');
+  if(!e)return;
+  if(appEtag===null){appEtag=e;return;}
+  if(e!==appEtag)showUpdateBar();
+ }catch(_){/* offline — try again later */}
+}
+function showUpdateBar(){
+ if(document.getElementById('updateBar'))return;
+ const d=document.createElement('div');
+ d.id='updateBar';
+ d.innerHTML='<span>A new version of the app is ready.</span><button id="updateReload" type="button">Update now</button>';
+ document.body.appendChild(d);
+ document.getElementById('updateReload').onclick=()=>location.reload();
+}
+checkAppVersion();
+setInterval(checkAppVersion,120000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAppVersion();});
 </script>
 
 <!-- ============================ 3D amigurumi shape preview ============================ -->
