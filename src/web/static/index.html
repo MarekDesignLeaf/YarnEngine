@@ -113,6 +113,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .op-seg input.opCount{width:60px;flex:0 0 auto;padding:6px}
 .op-seg .opx{color:var(--muted);font-weight:700}
 .op-seg .segDel{min-height:32px;padding:4px 10px}
+.op-seg .step{min-width:34px;min-height:32px;padding:4px 6px;font-size:16px;line-height:1;font-weight:800;flex:0 0 auto}
 .addSeg{min-height:32px;padding:4px 12px;align-self:flex-start}
 .round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
@@ -704,7 +705,7 @@ $('amiInitial').addEventListener('input',scheduleAmi3D);
 ['gaugeSt','gaugeRows'].forEach(id=>$(id).addEventListener('input',scheduleAmi3D));
 $('ami3dSpin').addEventListener('change',()=>{window.YE3D&&window.YE3D.setSpin&&window.YE3D.setSpin($('ami3dSpin').checked);});
 function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
-function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><input type="number" class="opCount" min="1" value="${n}"><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="1" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
 function roundRow(i,ops){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
  return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
 function readRounds(){return [...document.querySelectorAll('#rounds .round')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
@@ -713,6 +714,8 @@ function writeRounds(list){
  document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});
  document.querySelectorAll('#rounds .addSeg').forEach(b=>b.onclick=()=>{const l=readRounds();const idx=Number(b.dataset.round);const used=new Set(Object.keys(l[idx].operations));const next=ALL_OPS.find(op=>!used.has(op))||'SC';l[idx].operations[next]=(l[idx].operations[next]||0)+1;writeRounds(l);});
  document.querySelectorAll('#rounds .segDel').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);entries.splice(si,1);l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
+ document.querySelectorAll('#rounds .stepDown').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);const [op,n]=entries[si];entries[si]=[op,Math.max(1,n-1)];l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
+ document.querySelectorAll('#rounds .stepUp').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);const [op,n]=entries[si];entries[si]=[op,n+1];l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
  scheduleAmi3D();
 }
 function genTemplate(kind,maxSt,init){
