@@ -114,7 +114,10 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .op-seg .opx{color:var(--muted);font-weight:700}
 .op-seg .segDel{min-height:32px;padding:4px 10px}
 .op-seg .step{min-width:34px;min-height:32px;padding:4px 6px;font-size:16px;line-height:1;font-weight:800;flex:0 0 auto}
-.addSeg{min-height:32px;padding:4px 12px;align-self:flex-start}
+.segBtns{display:flex;gap:6px;align-self:flex-start}
+.addSeg,.subSeg{min-height:32px;padding:4px 12px}
+button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+button:disabled:hover{background:var(--bg-tint);color:var(--ink)}
 .round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
 #shapeSvg{width:100%;max-width:320px;display:block;margin:0 auto;touch-action:none}
@@ -247,7 +250,7 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
         <div id="shapeStatus" class="small muted" style="margin-top:6px"></div>
       </details>
       <h3>Rounds</h3>
-      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked. Add another stitch to mix, e.g. 36 sc + 6 increases.</p>
+      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked. Every change is balanced automatically (plain sc in this and following rounds adjust themselves) so the rounds always stay consistent — anything that can't be balanced is greyed out.</p>
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
@@ -540,6 +543,11 @@ const OP_GROUPS=[
 ];
 const ALL_OPS=OP_GROUPS.flatMap(g=>g.ops);
 const CONSUMES={SC2TOG:2,SC3TOG:3,HDC2TOG:2,DC2TOG:2,DC3TOG:3};
+/* consumed/produced stitches per operation — mirrors data/stitches/operations.seed.json */
+const OP_IO={CH:[0,1],SLST:[1,1],SC:[1,1],HDC:[1,1],DC:[1,1],TR:[1,1],DTR:[1,1],
+ SC2TOG:[2,1],SC3TOG:[3,1],HDC2TOG:[2,1],DC2TOG:[2,1],DC3TOG:[3,1],
+ SC_INC:[1,2],HDC_INC:[1,2],DC_INC:[1,2],
+ SC_BLO:[1,1],SC_FLO:[1,1],HDC_BLO:[1,1],DC_BLO:[1,1],FPDC:[1,1],BPDC:[1,1],PUFF3:[1,1],POPCORN5:[1,1]};
 function opName(op){const i=OPS_INFO[op];return i?i[1]:op;}
 /* glyphs drawn in a 20x20 box, stroke-based */
 function glyph(op){
@@ -699,23 +707,142 @@ async function refreshAmi3D(){
     window.YE3D.renderAmiShape(d.trace,{gaugeSt,gaugeRows,initialStitches:initial});
   }catch(e){window.YE3D.renderAmiShape([],{gaugeSt,gaugeRows,initialStitches:initial});}
 }
-$('rounds').addEventListener('input',scheduleAmi3D);
 $('rounds').addEventListener('change',scheduleAmi3D);
-$('amiInitial').addEventListener('input',scheduleAmi3D);
 ['gaugeSt','gaugeRows'].forEach(id=>$(id).addEventListener('input',scheduleAmi3D));
 $('ami3dSpin').addEventListener('change',()=>{window.YE3D&&window.YE3D.setSpin&&window.YE3D.setSpin($('ami3dSpin').checked);});
+
+/* ---- consistency engine: every edit keeps consumed==input for every round ----
+   Any change to a round is absorbed by that round's plain filler stitches, and
+   the resulting change in the round's output is cascaded into the fillers of
+   every following round. An edit that cannot be absorbed is not possible, and
+   the matching button is disabled — the rounds can never become inconsistent. */
+function opsC(o){return Object.entries(o).reduce((a,[k,n])=>a+(OP_IO[k]?OP_IO[k][0]:1)*n,0);}
+function opsP(o){return Object.entries(o).reduce((a,[k,n])=>a+(OP_IO[k]?OP_IO[k][1]:1)*n,0);}
+function chainValid(list,initial){let cur=initial;for(const r of list){if(opsC(r.operations)!==cur)return false;cur=opsP(r.operations);}return true;}
+function cloneRounds(list){return list.map(r=>({operations:{...r.operations}}));}
+function fillerOp(ops){if('SC' in ops)return 'SC';for(const k of Object.keys(ops)){const io=OP_IO[k];if(io&&io[0]===1&&io[1]===1)return k;}return 'SC';}
+function absorb(ops,d){const f=fillerOp(ops);const nf=(ops[f]||0)+d;if(nf<0)return false;if(nf===0)delete ops[f];else ops[f]=nf;return Object.keys(ops).length>0;}
+function applyDelta(list,initial,ri,changes){
+ const l=cloneRounds(list);const ops=l[ri].operations;let dC=0,dP=0;
+ for(const [op,d] of Object.entries(changes)){
+  const io=OP_IO[op]||[1,1];const cur=ops[op]||0;
+  if(cur+d<0)return null;
+  if(cur+d===0)delete ops[op];else ops[op]=cur+d;
+  dC+=io[0]*d;dP+=io[1]*d;
+ }
+ if(dC!==0){if(!absorb(ops,-dC))return null;dP-=dC;}
+ if(!Object.keys(ops).length)return null;
+ if(dP!==0)for(let j=ri+1;j<l.length;j++){if(!absorb(l[j].operations,dP))return null;}
+ return l;
+}
+function tryRemoveRound(list,initial,ri){
+ const l=cloneRounds(list);
+ const D=(ri>0?opsP(l[ri-1].operations):initial)-opsP(l[ri].operations);
+ l.splice(ri,1);
+ if(D!==0)for(let j=ri;j<l.length;j++){if(!absorb(l[j].operations,D))return null;}
+ return l;
+}
+function tryShiftAll(list,d){
+ const l=cloneRounds(list);
+ for(let j=0;j<l.length;j++){if(!absorb(l[j].operations,d))return null;}
+ return l;
+}
+/* + / − on the plain-sc row means "one more/fewer stitch in this round":
+   it undoes an existing decrease/increase first, otherwise adds one. */
+function stepChanges(ops,op,dir){
+ if(op==='SC'){
+  if(dir>0)return (ops.SC2TOG||0)>0?{SC2TOG:-1}:{SC_INC:1};
+  return (ops.SC_INC||0)>0?{SC_INC:-1}:{SC2TOG:1};
+ }
+ return {[op]:dir};
+}
+const DIS_TITLE='Not possible here — it would break the stitch counts of the following rounds';
+
 function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
-function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="1" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="0" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
 function roundRow(i,ops){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
- return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+ return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
 function readRounds(){return [...document.querySelectorAll('#rounds .round')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
+function curInitial(){return Math.max(0,Number($('amiInitial').value)||0);}
+const ADD_PREF=['HDC','DC','SC_INC','SC2TOG','TR','SLST','SC_BLO','SC_FLO','HDC_BLO','DC_BLO','FPDC','BPDC','PUFF3','POPCORN5','HDC_INC','DC_INC','HDC2TOG','DC2TOG','SC3TOG','DC3TOG','DTR','CH','SC'];
+function feasibleAddOp(list,initial,ri){
+ const used=new Set(Object.keys(list[ri].operations));
+ for(const op of ADD_PREF){if(used.has(op))continue;const res=applyDelta(list,initial,ri,{[op]:1});if(res)return {op,res};}
+ return null;
+}
 function writeRounds(list){
+ const initial=curInitial();
+ const strict=chainValid(list,initial);
  $('rounds').innerHTML=list.map((r,i)=>roundRow(i,r.operations)).join('');
- document.querySelectorAll('#rounds [data-del]').forEach(b=>b.onclick=()=>{const l=readRounds();l.splice(Number(b.dataset.del),1);writeRounds(l);});
- document.querySelectorAll('#rounds .addSeg').forEach(b=>b.onclick=()=>{const l=readRounds();const idx=Number(b.dataset.round);const used=new Set(Object.keys(l[idx].operations));const next=ALL_OPS.find(op=>!used.has(op))||'SC';l[idx].operations[next]=(l[idx].operations[next]||0)+1;writeRounds(l);});
- document.querySelectorAll('#rounds .segDel').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);entries.splice(si,1);l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
- document.querySelectorAll('#rounds .stepDown').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);const [op,n]=entries[si];entries[si]=[op,Math.max(1,n-1)];l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
- document.querySelectorAll('#rounds .stepUp').forEach(b=>b.onclick=()=>{const l=readRounds();const ri=Number(b.dataset.round),si=Number(b.dataset.seg);const entries=Object.entries(l[ri].operations);const [op,n]=entries[si];entries[si]=[op,n+1];l[ri].operations=Object.fromEntries(entries);writeRounds(l);});
+ const ent=i=>Object.entries(list[i].operations);
+ const setDis=(b,ok)=>{if(strict&&!ok){b.disabled=true;b.title=DIS_TITLE;}};
+ document.querySelectorAll('#rounds [data-del]').forEach(b=>{
+  const ri=Number(b.dataset.del);
+  setDis(b,!!tryRemoveRound(list,initial,ri));
+  b.onclick=()=>{const l=readRounds(),ini=curInitial();
+   if(chainValid(l,ini)){const res=tryRemoveRound(l,ini,ri);if(res)writeRounds(res);}
+   else{l.splice(ri,1);writeRounds(l);}};
+ });
+ document.querySelectorAll('#rounds .addSeg').forEach(b=>{
+  const ri=Number(b.dataset.round);
+  setDis(b,!!feasibleAddOp(list,initial,ri));
+  b.onclick=()=>{const l=readRounds(),ini=curInitial();
+   if(chainValid(l,ini)){const f=feasibleAddOp(l,ini,ri);if(f)writeRounds(f.res);}
+   else{const used=new Set(Object.keys(l[ri].operations));const next=ALL_OPS.find(op=>!used.has(op))||'SC';l[ri].operations[next]=(l[ri].operations[next]||0)+1;writeRounds(l);}};
+ });
+ document.querySelectorAll('#rounds .subSeg').forEach(b=>{
+  const ri=Number(b.dataset.round);
+  const e=ent(ri);const last=e[e.length-1];
+  setDis(b,!!(last&&applyDelta(list,initial,ri,{[last[0]]:-last[1]})));
+  b.onclick=()=>{const l=readRounds(),ini=curInitial();
+   const entries=Object.entries(l[ri].operations);const lp=entries[entries.length-1];if(!lp)return;
+   if(chainValid(l,ini)){const res=applyDelta(l,ini,ri,{[lp[0]]:-lp[1]});if(res)writeRounds(res);}
+   else{entries.pop();l[ri].operations=Object.fromEntries(entries);writeRounds(l);}};
+ });
+ document.querySelectorAll('#rounds .segDel').forEach(b=>{
+  const ri=Number(b.dataset.round),si=Number(b.dataset.seg);
+  const pair=ent(ri)[si];
+  setDis(b,!!(pair&&applyDelta(list,initial,ri,{[pair[0]]:-pair[1]})));
+  b.onclick=()=>{const l=readRounds(),ini=curInitial();
+   const entries=Object.entries(l[ri].operations);const p=entries[si];if(!p)return;
+   if(chainValid(l,ini)){const res=applyDelta(l,ini,ri,{[p[0]]:-p[1]});if(res)writeRounds(res);}
+   else{entries.splice(si,1);l[ri].operations=Object.fromEntries(entries);writeRounds(l);}};
+ });
+ const bindStep=(cls,dir)=>document.querySelectorAll('#rounds .'+cls).forEach(b=>{
+  const ri=Number(b.dataset.round),si=Number(b.dataset.seg);
+  const pair=ent(ri)[si];
+  setDis(b,!!(pair&&applyDelta(list,initial,ri,stepChanges(list[ri].operations,pair[0],dir))));
+  b.onclick=()=>{const l=readRounds(),ini=curInitial();
+   const entries=Object.entries(l[ri].operations);const p=entries[si];if(!p)return;
+   if(chainValid(l,ini)){const res=applyDelta(l,ini,ri,stepChanges(l[ri].operations,p[0],dir));if(res)writeRounds(res);}
+   else{entries[si]=[p[0],Math.max(1,p[1]+dir)];l[ri].operations=Object.fromEntries(entries);writeRounds(l);}};
+ });
+ bindStep('stepUp',1);bindStep('stepDown',-1);
+ document.querySelectorAll('#rounds .opCount').forEach(inp=>{
+  inp.onchange=()=>{
+   const seg=inp.closest('.op-seg');const ri=Number(seg.dataset.round),si=Number(seg.dataset.seg);
+   const pair=ent(ri)[si];if(!pair)return;
+   const [op,oldN]=pair;const v=Math.max(0,Math.floor(Number(inp.value)||0));
+   const ini=curInitial();
+   if(!chainValid(list,ini)){scheduleAmi3D();return;}
+   if(v===oldN){writeRounds(list);return;}
+   let res=null;
+   for(let d=v-oldN;d!==0;d+=(v>oldN?-1:1)){res=applyDelta(list,ini,ri,{[op]:d});if(res)break;}
+   writeRounds(res||list);
+  };
+ });
+ document.querySelectorAll('#rounds .opSel').forEach(sel=>{
+  sel.onchange=()=>{
+   const seg=sel.closest('.op-seg');const ri=Number(seg.dataset.round),si=Number(seg.dataset.seg);
+   const pair=ent(ri)[si];if(!pair)return;
+   const [oldOp,n]=pair;const newOp=sel.value;
+   if(newOp===oldOp)return;
+   const ini=curInitial();
+   if(!chainValid(list,ini)){scheduleAmi3D();return;}
+   const res=(newOp in OP_IO)?applyDelta(list,ini,ri,{[oldOp]:-n,[newOp]:n}):null;
+   writeRounds(res||list);
+  };
+ });
  scheduleAmi3D();
 }
 function genTemplate(kind,maxSt,init){
@@ -731,7 +858,24 @@ function genTemplate(kind,maxSt,init){
 }
 function setTemplate(){const k=$('amiTemplate').value;if(k==='custom')return;const init=Number($('amiInitial').value)||6;writeRounds(genTemplate(k,Number($('amiSize').value)||36,init));}
 ['amiTemplate','amiSize','amiInitial'].forEach(id=>$(id).addEventListener('change',setTemplate));
-$('btnAddRound').onclick=()=>{const l=readRounds();l.push({operations:{SC:6}});writeRounds(l);$('amiTemplate').value='custom';};
+let lastInitial=curInitial()||6;
+$('amiInitial').addEventListener('change',()=>{
+ if($('amiTemplate').value!=='custom'){lastInitial=curInitial();return;}
+ const v=curInitial();const d0=v-lastInitial;
+ if(d0===0)return;
+ const l=readRounds();
+ if(!chainValid(l,lastInitial)){lastInitial=v;scheduleAmi3D();return;}
+ let res=null,d=d0;
+ for(;d!==0;d+=(d0>0?-1:1)){res=tryShiftAll(l,d);if(res)break;}
+ if(res){lastInitial+=d;$('amiInitial').value=lastInitial;writeRounds(res);}
+ else{$('amiInitial').value=lastInitial;scheduleAmi3D();}
+});
+$('btnAddRound').onclick=()=>{
+ const l=readRounds();const ini=curInitial();
+ const out=l.length?opsP(l[l.length-1].operations):(ini||6);
+ l.push({operations: out>0?{SC:out}:{CH:6}});
+ writeRounds(l);$('amiTemplate').value='custom';
+};
 $('btnAnalyse').onclick=async()=>{try{const d=await api('/api/crochet/amigurumi/analyse',{method:'POST',body:{initial_stitches:Number($('amiInitial').value),rounds:readRounds()}});
  if(!d.valid){status($('amiStatus'),JSON.stringify(d.issues),'bad');return;}status($('amiStatus'),`${t('msg.valid')} ${d.initial_stitches} → ${d.final_stitches}. `+Object.entries(d.operation_counts).map(([k,v])=>`${k}×${v}`).join(', '),'good');}catch(e){status($('amiStatus'),e.message,'bad');}scheduleAmi3D();};
 
@@ -845,6 +989,7 @@ function generateRoundsFromShape(){
 $('btnGenRounds').onclick=()=>{
  const {rounds,finalStitches}=generateRoundsFromShape();
  if(!rounds.length){status($('shapeStatus'),'Shape is too small for the current gauge — widen it or add more height.','bad');return;}
+ $('amiInitial').value=Math.max(3,Number($('amiInitial').value)||6);lastInitial=curInitial();
  writeRounds(rounds);$('amiTemplate').value='custom';
  status($('shapeStatus'),`Generated ${rounds.length} round(s), ending at ${finalStitches} stitch(es). Close the last stitches by hand and fasten off.`,'good');
  scheduleAmi3D();
