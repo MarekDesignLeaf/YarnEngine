@@ -123,6 +123,8 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .op-seg .segDel{min-height:32px;padding:4px 10px}
 .op-seg .step{min-width:34px;min-height:32px;padding:4px 6px;font-size:16px;line-height:1;font-weight:800;flex:0 0 auto}
 .segBtns{display:flex;gap:6px;align-self:flex-start}
+.rsum{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.rsum input.roundOut{width:68px;padding:4px 6px;font-weight:700;color:var(--accent2-dark)}
 .addSeg,.subSeg{min-height:32px;padding:4px 12px}
 button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 button:disabled:hover{background:var(--bg-tint);color:var(--ink)}
@@ -278,7 +280,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <div id="shapeStatus" class="small muted" style="margin-top:6px"></div>
       </details>
       <h3>Rounds</h3>
-      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked. Every change is balanced automatically (plain sc in this and following rounds adjust themselves) so the rounds always stay consistent — anything that can't be balanced is greyed out.</p>
+      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked — or just type how many stitches the round should end with (the number in brackets in a written pattern) and the increases or decreases are worked out for you. Everything stays balanced automatically, so the rounds are always consistent.</p>
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
@@ -862,8 +864,21 @@ function cantClick(b){if(!b.classList.contains('cant'))return false;roundsNote(D
 
 function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
 function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="0" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
-function roundRow(i,ops){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
- return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+function roundRow(i,ops,inSt,outSt){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
+ return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+/* Set what a round ends with, the way patterns are written ("R2: inc around
+   (12)"). Each step is a validated edit, so it moves as far towards the target
+   as the stitches available in that round allow and stops there. */
+function setRoundOutput(list,initial,ri,target){
+ let cur=cloneRounds(list),guard=0;
+ while(opsP(cur[ri].operations)!==target&&guard++<400){
+  const dir=opsP(cur[ri].operations)<target?1:-1;
+  const next=applyDelta(cur,initial,ri,stepChanges(cur[ri].operations,'SC',dir));
+  if(!next)break;
+  cur=next;
+ }
+ return cur;
+}
 function domRounds(){return [...document.querySelectorAll('#rounds .round')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
 /* The rounds the editor has actually accepted. A number typed into a count
    field is not committed until it is confirmed, so reading raw DOM values
@@ -882,7 +897,8 @@ function writeRounds(list){
  const initial=curInitial();
  const strict=chainValid(list,initial);
  roundsState=cloneRounds(list);
- $('rounds').innerHTML=list.map((r,i)=>roundRow(i,r.operations)).join('');
+ let run=initial;
+ $('rounds').innerHTML=list.map((r,i)=>{const inSt=run,outSt=opsP(r.operations);run=outSt;return roundRow(i,r.operations,inSt,outSt);}).join('');
  const ent=i=>Object.entries(list[i].operations);
  const setDis=(b,ok)=>markCant(b,ok,strict);
  document.querySelectorAll('#rounds [data-del]').forEach(b=>{
@@ -947,6 +963,28 @@ function writeRounds(list){
   // Commit while typing too: a number left uncommitted in the field must never
   // be picked up by the next click as if the editor had accepted it.
   inp.oninput=()=>{clearTimeout(countTimer);countTimer=setTimeout(()=>{if(inp.isConnected&&inp.onchange)inp.onchange();},700);};
+ });
+ let outTimer=null;
+ document.querySelectorAll('#rounds .roundOut').forEach(inp=>{
+  inp.onchange=()=>{
+   clearTimeout(outTimer);
+   if(!inp.isConnected)return;
+   const ri=Number(inp.dataset.round);
+   const ini=curInitial();
+   if(!chainValid(list,ini)){scheduleAmi3D();return;}
+   const want=Math.max(1,Math.floor(Number(inp.value)||0));
+   const had=opsP(list[ri].operations);
+   if(want===had){writeRounds(list);return;}
+   const res=setRoundOutput(list,ini,ri,want);
+   const got=opsP(res[ri].operations);
+   writeRounds(res);
+   if(got===want)roundsNote('');
+   else{
+    const inSt=ri>0?opsP(res[ri-1].operations):ini;
+    roundsNote(`Round ${ri+1} works into ${inSt} stitches, so it can end with ${got}, not ${want}. Increases can at most double a round and decreases at most halve it — add a round to get there gradually.`);
+   }
+  };
+  inp.oninput=()=>{clearTimeout(outTimer);outTimer=setTimeout(()=>{if(inp.isConnected&&inp.onchange)inp.onchange();},700);};
  });
  document.querySelectorAll('#rounds .opSel').forEach(sel=>{
   sel.onchange=()=>{
