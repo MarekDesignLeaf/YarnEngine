@@ -6,3 +6,11 @@ def test_pwa_assets():
  m=c.get("/manifest.webmanifest");assert m.status_code==200 and m.json()["display"]=="standalone"
  s=c.get("/sw.js");assert s.status_code==200 and "Service-Worker-Allowed" in s.headers
  assert 'name="viewport"' in c.get("/").text
+
+def test_app_shell_forces_revalidation_so_deploys_are_picked_up():
+ # Browsers were keeping an old copy of the app after deploys (heuristic
+ # caching, since no Cache-Control was sent). The shell must revalidate.
+ for path in ("/","/sw.js","/manifest.webmanifest","/static/index.html"):
+  r=c.get(path)
+  assert r.status_code==200,path
+  assert r.headers.get("cache-control")=="no-cache",path

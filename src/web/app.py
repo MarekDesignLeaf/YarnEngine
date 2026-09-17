@@ -159,6 +159,18 @@ async def require_login(request: Request, call_next):
         return JSONResponse(status_code=403, content={"detail": "admin only"})
     return await call_next(request)
 
+@app.middleware("http")
+async def no_stale_app_shell(request: Request, call_next):
+    """Browsers were keeping old copies of the app after deploys (no Cache-Control
+    was sent, so heuristic caching applied). no-cache still allows caching but
+    forces revalidation against the ETag on every load, so a reload always picks
+    up the newly deployed version."""
+    response = await call_next(request)
+    path = request.url.path
+    if path in ("/", "/sw.js", "/manifest.webmanifest") or path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-cache"
+    return response
+
 def _set_session(response: Response, user_id: int):
     secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
     response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id), max_age=SESSION_DAYS*86400,
