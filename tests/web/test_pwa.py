@@ -15,6 +15,25 @@ def test_app_shell_forces_revalidation_so_deploys_are_picked_up():
   assert r.status_code==200,path
   assert r.headers.get("cache-control")=="no-cache",path
 
+def test_ios_install_assets_are_served():
+ # iOS ignores the manifest's icons and never prompts to install, so it needs a
+ # PNG apple-touch-icon plus the apple-mobile-web-app tags for Add to Home Screen.
+ page=c.get("/").text
+ assert 'rel="apple-touch-icon"' in page
+ assert 'name="apple-mobile-web-app-capable"' in page
+ assert 'name="apple-mobile-web-app-title"' in page
+ icon=c.get("/static/apple-touch-icon.png")
+ assert icon.status_code==200 and icon.headers["content-type"]=="image/png"
+ assert icon.content[:8]==b"\x89PNG\r\n\x1a\n"
+
+def test_manifest_icons_are_png_for_launcher_support():
+ icons=c.get("/manifest.webmanifest").json()["icons"]
+ pngs=[i for i in icons if i["type"]=="image/png"]
+ assert {i["sizes"] for i in pngs} >= {"192x192","512x512"}
+ assert any(i["purpose"]=="maskable" for i in pngs)
+ for i in icons:
+  r=c.get(i["src"]); assert r.status_code==200, i["src"]
+
 def test_head_root_serves_etag_for_the_in_page_version_check():
  # The page polls HEAD / and compares ETags to offer "Update now" when a
  # newer deploy is live, so HEAD must work and carry an ETag.

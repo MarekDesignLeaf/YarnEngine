@@ -7,6 +7,14 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/static/favicon.png">
 <meta name="theme-color" content="#ef6a4c">
+<!-- iOS ignores the web manifest's icons and never prompts to install, so it
+     needs its own PNG touch icon and these tags for "Add to Home Screen" to
+     produce a proper standalone app rather than a screenshot in a browser. -->
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="YarnEngine">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -96,7 +104,7 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 .lineCard .mats li{margin:2px 0}
 .pcard strong{font-size:13px;line-height:1.25;font-family:var(--font-display)}.pcard .small{font-size:11.5px}
 .chartbox{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.chartbox > svg{display:block;max-width:100%}
-#ami3dCanvas{background:radial-gradient(circle at 50% 30%,var(--accent2-pale),var(--bg-tint));cursor:grab;touch-action:none}
+#ami3dCanvas{height:340px;background:radial-gradient(circle at 50% 30%,var(--accent2-pale),var(--bg-tint));cursor:grab;touch-action:none}
 #ami3dCanvas:active{cursor:grabbing}
 #ami3dCanvas canvas{display:block;width:100%;height:100%}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
@@ -120,6 +128,23 @@ button:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 button:disabled:hover{background:var(--bg-tint);color:var(--ink)}
 #updateBar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;gap:12px;align-items:center;justify-content:center;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));background:var(--accent2-dark);color:#fff;font-weight:650;box-shadow:0 -6px 18px rgba(38,49,58,.25)}
 #updateBar button{background:#fff;color:var(--accent2-dark)}
+#iosInstall{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:58;display:flex;gap:10px;align-items:center;
+ padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);font-size:13.5px}
+#iosInstall img{width:34px;height:34px;border-radius:8px;flex:0 0 auto}
+#iosInstall span{flex:1 1 auto}
+#iosInstall button{flex:0 0 auto;padding:6px 12px;font-size:12.5px}
+/* 3D preview docked to the bottom of the screen, so the shape stays in view
+   while scrolling a long list of rounds */
+#ami3dBlock.pinned{position:fixed;left:0;right:0;bottom:0;z-index:45;margin:0;
+ background:var(--card);border-top:1px solid var(--line);border-radius:16px 16px 0 0;
+ padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px -12px rgba(38,49,58,.4)}
+#ami3dBlock.pinned #ami3dCanvas{height:32vh;min-height:170px}
+#ami3dBlock.pinned #ami3dInfo{margin-top:4px}
+#ami3dBlock.pinned.collapsed #ami3dCanvas,#ami3dBlock.pinned.collapsed #ami3dInfo{display:none}
+#ami3dBlock.pinned .ami3dBar{padding-bottom:4px}
+body.has-update-bar #ami3dBlock.pinned{bottom:62px}
+@media(max-width:520px){#ami3dBlock.pinned #ami3dCanvas{height:28vh}
+#ami3dBlock.pinned .ami3dBar h3{font-size:13px}}
 .round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
 #shapeSvg{width:100%;max-width:320px;display:block;margin:0 auto;touch-action:none}
@@ -256,12 +281,16 @@ button:disabled:hover{background:var(--bg-tint);color:var(--ink)}
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
-      <div style="margin-top:14px">
-        <div class="toolbar" style="margin-top:0;justify-content:space-between">
+      <div id="ami3dBlock" style="margin-top:14px">
+        <div class="toolbar ami3dBar" style="margin-top:0;justify-content:space-between">
           <h3 style="margin:0">3D shape preview</h3>
-          <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px"><input type="checkbox" id="ami3dSpin" checked style="width:auto">Spin</label>
+          <div class="toolbar" style="margin:0;gap:10px">
+            <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px"><input type="checkbox" id="ami3dSpin" checked style="width:auto">Spin</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px" title="Keep the 3D preview fixed at the bottom of the screen while you scroll through the rounds"><input type="checkbox" id="ami3dPin" checked style="width:auto">Keep visible</label>
+            <button type="button" id="ami3dCollapse" class="alt" style="min-height:30px;padding:3px 10px;font-size:12.5px">Hide</button>
+          </div>
         </div>
-        <div id="ami3dCanvas" class="chartbox" style="height:340px;padding:0;position:relative"></div>
+        <div id="ami3dCanvas" class="chartbox" style="padding:0;position:relative"></div>
         <div id="ami3dInfo" class="small muted" style="margin-top:6px">Add rounds to see the shape.</div>
       </div>
     </div>
@@ -693,7 +722,7 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
 $('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');
 let ami3dTimer=null;
 function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
@@ -712,6 +741,32 @@ async function refreshAmi3D(){
 $('rounds').addEventListener('change',scheduleAmi3D);
 ['gaugeSt','gaugeRows'].forEach(id=>$(id).addEventListener('input',scheduleAmi3D));
 $('ami3dSpin').addEventListener('change',()=>{window.YE3D&&window.YE3D.setSpin&&window.YE3D.setSpin($('ami3dSpin').checked);});
+
+/* ---- dock the 3D preview to the bottom of the screen ----
+   A pattern is a long list of rounds; without this the shape scrolls away as
+   soon as you start editing. Pinned by default, remembered per device, and
+   only while the amigurumi calculator is the visible tab. */
+let pin3d=true,collapsed3d=false;
+try{const v=localStorage.getItem('ye_pin3d');if(v!==null)pin3d=v==='1';}catch(_){}
+function ami3dVisible(){return calcMode==='ami'&&!$('tab-calc').classList.contains('hidden');}
+function applyPin3d(){
+ const b=$('ami3dBlock');if(!b)return;
+ const on=pin3d&&ami3dVisible();
+ b.classList.toggle('pinned',on);
+ b.classList.toggle('collapsed',on&&collapsed3d);
+ $('ami3dCollapse').textContent=(on&&collapsed3d)?'Show':'Hide';
+ $('ami3dCollapse').classList.toggle('hidden',!on);
+ document.body.style.paddingBottom=on?(b.offsetHeight+14)+'px':'';
+ setTimeout(()=>{
+  if(window.YE3D&&window.YE3D.resize)window.YE3D.resize();
+  if(b.classList.contains('pinned'))document.body.style.paddingBottom=(b.offsetHeight+14)+'px';
+ },60);
+}
+$('ami3dPin').checked=pin3d;
+$('ami3dPin').addEventListener('change',()=>{pin3d=$('ami3dPin').checked;try{localStorage.setItem('ye_pin3d',pin3d?'1':'0');}catch(_){}applyPin3d();});
+$('ami3dCollapse').onclick=()=>{collapsed3d=!collapsed3d;applyPin3d();};
+window.addEventListener('resize',applyPin3d);
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(applyPin3d,60)));
 
 /* ---- consistency engine: every edit keeps consumed==input for every round ----
    Any change to a round is absorbed by that round's plain filler stitches, and
@@ -1289,7 +1344,16 @@ $('btnSaveCompany').onclick=async()=>{
 };
 
 boot();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'));
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
+  // An installed PWA is resumed rather than reloaded, so poll for a newer
+  // worker as well; the worker reloads backgrounded windows itself and pings
+  // visible ones so they can offer the update instead of losing edits.
+  setInterval(()=>reg.update().catch(()=>{}),120000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)reg.update().catch(()=>{});});
+ }).catch(()=>{}));
+ navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='ye-update')showUpdateBar();});
+}
 
 /* ---- self-updating app shell: compare the served page's ETag with the one
    this page was loaded with, on focus and every 2 minutes. When a newer
@@ -1311,11 +1375,28 @@ function showUpdateBar(){
  d.id='updateBar';
  d.innerHTML='<span>A new version of the app is ready.</span><button id="updateReload" type="button">Update now</button>';
  document.body.appendChild(d);
+ document.body.classList.add('has-update-bar');
  document.getElementById('updateReload').onclick=()=>location.reload();
+ if(typeof applyPin3d==='function')applyPin3d();
 }
 checkAppVersion();
 setInterval(checkAppVersion,120000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkAppVersion();});
+
+/* ---- iOS install hint ----
+   Safari has no install prompt and never fires beforeinstallprompt, so on
+   iPhone/iPad the only way in is Share -> Add to Home Screen. Say so once. */
+function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+function isStandalone(){return (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;}
+function maybeShowIosInstall(){
+ if(!isIOS()||isStandalone()||document.getElementById('iosInstall'))return;
+ try{if(localStorage.getItem('ye_ios_hint')==='1')return;}catch(_){}
+ const d=document.createElement('div');d.id='iosInstall';
+ d.innerHTML='<img src="/static/apple-touch-icon.png" alt=""><span>Install this app: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span><button id="iosInstallOk" class="alt" type="button">Got it</button>';
+ document.body.appendChild(d);
+ document.getElementById('iosInstallOk').onclick=()=>{try{localStorage.setItem('ye_ios_hint','1');}catch(_){}d.remove();};
+}
+setTimeout(maybeShowIosInstall,1500);
 </script>
 
 <!-- ============================ 3D amigurumi shape preview ============================ -->
