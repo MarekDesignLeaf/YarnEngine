@@ -116,10 +116,16 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
 .addSeg{min-height:32px;padding:4px 12px;align-self:flex-start}
 .round>.alt{white-space:nowrap}
 .pill{display:inline-block;padding:3px 10px;border-radius:14px;background:var(--accent2-pale);color:var(--accent2-dark);font-size:12px;font-weight:600}
+#shapeSvg{width:100%;max-width:320px;display:block;margin:0 auto;touch-action:none}
+#shapeSvg .shapePt{cursor:grab}#shapeSvg .shapePt:active{cursor:grabbing}
+.shape-pt-row{display:grid;grid-template-columns:24px 1fr 1fr 32px;gap:6px;align-items:end}
+.shape-pt-row label{gap:2px}.shape-pt-row input{padding:6px}
+.shape-pt-row .idx{align-self:center;color:var(--muted);font-size:12.5px;font-weight:700}
 @media(max-width:860px){.grid2{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.fields,.fields.three{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
 .round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
-.op-seg{flex-wrap:wrap}.op-seg select{flex-basis:100%}}
+.op-seg{flex-wrap:wrap}.op-seg select{flex-basis:100%}
+.shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
 </style>
 </head>
 <body>
@@ -222,6 +228,23 @@ table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left
         <label><span>Starting stitches (magic ring)</span><input id="amiInitial" type="number" min="0" value="6"></label>
         <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
+      <details id="shapeEditorDetails" style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:650">Shape editor — draw the profile, generate rounds</summary>
+        <p class="small muted">Drag the dots to shape the side profile — it's revolved around the centre line, just like the 3D preview below. Then generate the stitch rounds that approximate it.</p>
+        <div class="toolbar" style="margin-top:4px">
+          <button type="button" class="alt" data-shape-preset="sphere">Sphere</button>
+          <button type="button" class="alt" data-shape-preset="egg">Egg</button>
+          <button type="button" class="alt" data-shape-preset="cone">Cone</button>
+          <button type="button" class="alt" data-shape-preset="cylinder">Cylinder</button>
+          <button type="button" id="btnShapeAddPoint" class="alt">+ point</button>
+        </div>
+        <div class="chartbox" style="padding:6px;margin-top:8px">
+          <svg id="shapeSvg" viewBox="0 0 260 300"></svg>
+        </div>
+        <div id="shapePoints" style="margin-top:8px;display:grid;gap:6px"></div>
+        <div class="toolbar"><button type="button" id="btnGenRounds" class="accent">Generate rounds from shape ▸</button></div>
+        <div id="shapeStatus" class="small muted" style="margin-top:6px"></div>
+      </details>
       <h3>Rounds</h3>
       <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked. Add another stitch to mix, e.g. 36 sc + 6 increases.</p>
       <div id="rounds" class="rounds"></div>
@@ -709,6 +732,123 @@ $('btnAddRound').onclick=()=>{const l=readRounds();l.push({operations:{SC:6}});w
 $('btnAnalyse').onclick=async()=>{try{const d=await api('/api/crochet/amigurumi/analyse',{method:'POST',body:{initial_stitches:Number($('amiInitial').value),rounds:readRounds()}});
  if(!d.valid){status($('amiStatus'),JSON.stringify(d.issues),'bad');return;}status($('amiStatus'),`${t('msg.valid')} ${d.initial_stitches} → ${d.final_stitches}. `+Object.entries(d.operation_counts).map(([k,v])=>`${k}×${v}`).join(', '),'good');}catch(e){status($('amiStatus'),e.message,'bad');}scheduleAmi3D();};
 
+/* ============================ amigurumi shape editor ============================
+   The side profile (radius per height) is revolved into a solid, exactly like the
+   3D preview above already does from stitch counts. Editing the profile freely and
+   then converting it to rounds is the inverse of that: sample the target radius at
+   each round's height, work out how many stitches that needs, and derive the
+   increases/decreases that get from the previous round's stitch count to it. */
+const SHAPE_R_MAX=8,SHAPE_H_MAX=22,SHAPE_MIN_GAP=0.3;
+let shapePoints=[{h:0,r:1.2},{h:2,r:2.6},{h:4,r:2.6},{h:6,r:1.2}];
+let shapeDrag=null,shape3dTimer=null;
+
+function shapeXY(p){
+ const W=260,H=300,marginTop=15,marginBottom=15,cx=W/2,plotH=H-marginTop-marginBottom,halfW=W/2-20;
+ const y=marginTop+plotH*(1-Math.min(p.h,SHAPE_H_MAX)/SHAPE_H_MAX);
+ const xr=cx+Math.min(p.r,SHAPE_R_MAX)/SHAPE_R_MAX*halfW,xl=cx-Math.min(p.r,SHAPE_R_MAX)/SHAPE_R_MAX*halfW;
+ return {xr,xl,y};
+}
+function xyToShape(x,y){
+ const W=260,H=300,marginTop=15,marginBottom=15,cx=W/2,plotH=H-marginTop-marginBottom,halfW=W/2-20;
+ return {h:SHAPE_H_MAX*(1-(y-marginTop)/plotH),r:Math.abs(x-cx)/halfW*SHAPE_R_MAX};
+}
+function svgPointFromEvent(svg,evt){const pt=svg.createSVGPoint();pt.x=evt.clientX;pt.y=evt.clientY;return pt.matrixTransform(svg.getScreenCTM().inverse());}
+
+function updateShapeSvgPositions(){
+ const svg=$('shapeSvg');if(!svg)return;
+ svg.querySelectorAll('.shapePt').forEach(el=>{const p=shapePoints[Number(el.dataset.i)];if(!p)return;const c=shapeXY(p);el.setAttribute('cx',c.xr);el.setAttribute('cy',c.y);});
+ const right=shapePoints.map(p=>{const c=shapeXY(p);return `${c.xr},${c.y}`;}).join(' ');
+ const left=shapePoints.map(p=>{const c=shapeXY(p);return `${c.xl},${c.y}`;}).join(' ');
+ const rEl=svg.querySelector('#shapeRight'),lEl=svg.querySelector('#shapeLeft');
+ if(rEl)rEl.setAttribute('points',right);if(lEl)lEl.setAttribute('points',left);
+}
+function renderShapeEditor(){
+ const svg=$('shapeSvg');if(!svg)return;
+ let h=`<line x1="0" y1="285" x2="260" y2="285" stroke="var(--line)" stroke-width="1"/>`;
+ h+=`<line x1="130" y1="15" x2="130" y2="285" stroke="var(--line)" stroke-width="1" stroke-dasharray="3,3"/>`;
+ h+=`<polyline id="shapeRight" points="" fill="none" stroke="var(--accent2)" stroke-width="2"/>`;
+ h+=`<polyline id="shapeLeft" points="" fill="none" stroke="var(--accent2)" stroke-width="2" opacity="0.45"/>`;
+ shapePoints.forEach((p,i)=>{h+=`<circle class="shapePt" data-i="${i}" r="7" fill="var(--accent)" stroke="#fff" stroke-width="2"/>`;});
+ svg.innerHTML=h;
+ svg.querySelectorAll('.shapePt').forEach(el=>{el.addEventListener('pointerdown',ev=>{ev.preventDefault();shapeDrag=Number(el.dataset.i);el.setPointerCapture(ev.pointerId);});});
+ svg.onpointermove=ev=>{
+  if(shapeDrag==null)return;
+  const svgPt=svgPointFromEvent(svg,ev),{h:hh,r:rr}=xyToShape(svgPt.x,svgPt.y),i=shapeDrag,p=shapePoints[i];
+  p.r=Math.max(0,Math.min(SHAPE_R_MAX,rr));
+  if(i>0){const prevH=shapePoints[i-1].h+SHAPE_MIN_GAP,nextH=(i<shapePoints.length-1)?shapePoints[i+1].h-SHAPE_MIN_GAP:SHAPE_H_MAX;p.h=Math.max(prevH,Math.min(nextH,hh));}
+  updateShapeSvgPositions();renderShapeFields();scheduleShapePreview();
+ };
+ svg.onpointerup=()=>{shapeDrag=null;};svg.onpointerleave=()=>{shapeDrag=null;};
+ updateShapeSvgPositions();
+}
+function renderShapeFields(){
+ const el=$('shapePoints');if(!el)return;
+ el.innerHTML=shapePoints.map((p,i)=>`<div class="shape-pt-row"><span class="idx">P${i+1}</span>
+  <label><span class="small muted">Height (cm)</span><input type="number" step="0.1" min="0" value="${p.h.toFixed(1)}" data-i="${i}" data-f="h" ${i===0?'disabled':''}></label>
+  <label><span class="small muted">Radius (cm)</span><input type="number" step="0.1" min="0" value="${p.r.toFixed(1)}" data-i="${i}" data-f="r"></label>
+  <button type="button" class="alt shapePtDel" data-i="${i}" ${shapePoints.length<=2?'disabled':''} title="Remove point">✕</button></div>`).join('');
+ el.querySelectorAll('input').forEach(inp=>{inp.onchange=()=>{
+  const i=Number(inp.dataset.i),f=inp.dataset.f,v=Number(inp.value)||0;
+  if(f==='h'){const prevH=i>0?shapePoints[i-1].h+SHAPE_MIN_GAP:0,nextH=i<shapePoints.length-1?shapePoints[i+1].h-SHAPE_MIN_GAP:SHAPE_H_MAX;shapePoints[i].h=Math.max(prevH,Math.min(nextH,v));}
+  else shapePoints[i].r=Math.max(0,Math.min(SHAPE_R_MAX,v));
+  updateShapeSvgPositions();renderShapeFields();scheduleShapePreview();
+ };});
+ el.querySelectorAll('.shapePtDel').forEach(btn=>{btn.onclick=()=>{if(shapePoints.length<=2)return;shapePoints.splice(Number(btn.dataset.i),1);renderShapeEditor();renderShapeFields();scheduleShapePreview();};});
+}
+function shapePreset(kind){
+ const H=Math.max(4,shapePoints[shapePoints.length-1].h||8),R=Math.max(1.5,Math.max(...shapePoints.map(p=>p.r))||3),N=7,pts=[];
+ for(let i=0;i<N;i++){
+  const t=i/(N-1);let r;
+  if(kind==='sphere')r=R*Math.sin(t*Math.PI);
+  else if(kind==='egg')r=R*Math.sin(Math.PI*t)*(1-0.22*Math.cos(Math.PI*t));
+  else if(kind==='cone')r=Math.max(0.2,R*(1-t))+(t<0.12?R*0.15:0);
+  else if(kind==='cylinder')r=(t<0.1||t>0.9)?R*0.65:R;
+  else r=R*0.5;
+  pts.push({h:+(t*H).toFixed(2),r:+Math.max(0.15,r).toFixed(2)});
+ }
+ pts[0].h=0;shapePoints=pts;renderShapeEditor();renderShapeFields();scheduleShapePreview();
+}
+document.querySelectorAll('[data-shape-preset]').forEach(b=>b.onclick=()=>shapePreset(b.dataset.shapePreset));
+$('btnShapeAddPoint').onclick=()=>{
+ const last=shapePoints[shapePoints.length-1],prev=shapePoints[shapePoints.length-2]||{h:0};
+ const newH=(last.h+(last.h-prev.h)/2)||last.h+1;
+ shapePoints.splice(shapePoints.length-1,0,{h:+Math.min(SHAPE_H_MAX,newH).toFixed(2),r:last.r});
+ renderShapeEditor();renderShapeFields();scheduleShapePreview();
+};
+function scheduleShapePreview(){clearTimeout(shape3dTimer);shape3dTimer=setTimeout(()=>{window.YE3D&&window.YE3D.previewProfile&&window.YE3D.previewProfile(shapePoints);},120);}
+function profileRadiusAt(points,h){
+ if(h<=points[0].h)return points[0].r;
+ for(let i=1;i<points.length;i++){if(h<=points[i].h){const p0=points[i-1],p1=points[i],t=(h-p0.h)/((p1.h-p0.h)||1);return p0.r+(p1.r-p0.r)*t;}}
+ return points[points.length-1].r;
+}
+function generateRoundsFromShape(){
+ const gaugeSt=Number($('gaugeSt').value)||20,gaugeRows=Number($('gaugeRows').value)||22;
+ const stitchWidthCm=10/gaugeSt,rowHeightCm=10/gaugeRows,initial=Math.max(3,Number($('amiInitial').value)||6);
+ const topH=shapePoints[shapePoints.length-1].h,nRounds=Math.max(1,Math.min(300,Math.round(topH/rowHeightCm)));
+ const rounds=[];let prev=initial;
+ for(let i=1;i<=nRounds;i++){
+  const h=i*rowHeightCm,r=profileRadiusAt(shapePoints,h);
+  let target=Math.max(3,Math.round((2*Math.PI*r)/stitchWidthCm));
+  target=Math.min(target,prev*2);target=Math.max(target,Math.ceil(prev/2));
+  if(target<2)break;
+  const ops={};
+  if(target>prev){const inc=target-prev,sc=prev-inc;if(sc>0)ops.SC=sc;ops.SC_INC=inc;}
+  else if(target<prev){const dec=prev-target,sc=prev-2*dec;if(sc>0)ops.SC=sc;ops.SC2TOG=dec;}
+  else ops.SC=prev;
+  rounds.push({operations:ops});prev=target;if(prev<2)break;
+ }
+ return {rounds,finalStitches:prev};
+}
+$('btnGenRounds').onclick=()=>{
+ const {rounds,finalStitches}=generateRoundsFromShape();
+ if(!rounds.length){status($('shapeStatus'),'Shape is too small for the current gauge — widen it or add more height.','bad');return;}
+ writeRounds(rounds);$('amiTemplate').value='custom';
+ status($('shapeStatus'),`Generated ${rounds.length} round(s), ending at ${finalStitches} stitch(es). Close the last stitches by hand and fasten off.`,'good');
+ scheduleAmi3D();
+};
+$('shapeEditorDetails').addEventListener('toggle',()=>{if($('shapeEditorDetails').open){window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleShapePreview();}});
+renderShapeEditor();renderShapeFields();
+
 /* ============================ calculation ============================ */
 function commonInputs(){return {yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
 function swatchInput(){const s=Number($('swSt').value),r=Number($('swRows').value),l=Number($('swLen').value);return (s>0&&r>0&&l>0)?{stitches:s,rows:r,yarn_length_m:l}:null;}
@@ -1055,27 +1195,14 @@ function updateInfo(stats, message) {
   if (!el) return;
   if (message) { el.textContent = message; return; }
   if (!stats) { el.textContent = 'Add rounds to see the shape.'; return; }
-  el.textContent = `Height ≈ ${stats.height.toFixed(1)} cm · Max diameter ≈ ${stats.maxDiameter.toFixed(1)} cm · ${stats.rounds} round${stats.rounds === 1 ? '' : 's'}`;
+  const dims = `Height ≈ ${stats.height.toFixed(1)} cm · Max diameter ≈ ${stats.maxDiameter.toFixed(1)} cm`;
+  el.textContent = (stats.rounds == null) ? `${dims} (draft shape — not yet stitches)` : `${dims} · ${stats.rounds} round${stats.rounds === 1 ? '' : 's'}`;
 }
 
-// Builds a bottom-to-top (radius_cm, height_cm) profile from the round trace
-// (as returned by /api/crochet/amigurumi/analyse) and the current gauge, then
-// revolves it into a solid to approximate the finished amigurumi shape.
-function renderAmiShape(trace, opts, message) {
-  initAmi3D();
-  if (!renderer) return;
+// Revolves a bottom-to-top array of THREE.Vector2(radius_cm, height_cm) into a
+// solid, frames the camera on it and returns its height/max-diameter.
+function buildLatheMesh(pts) {
   if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
-  if (message || !trace || !trace.length) { updateInfo(null, message); return; }
-
-  const stitchWidthCm = 10 / (opts.gaugeSt || 20);
-  const rowHeightCm = 10 / (opts.gaugeRows || 22);
-  const pts = [new THREE.Vector2(0.12, 0)];
-  trace.forEach((r, i) => {
-    const circumference = (r.output_stitches || 0) * stitchWidthCm;
-    const radius = Math.max(0.08, circumference / (2 * Math.PI));
-    pts.push(new THREE.Vector2(radius, (i + 1) * rowHeightCm));
-  });
-
   const geo = new THREE.LatheGeometry(pts, 48);
   geo.computeVertexNormals();
   const mat = new THREE.MeshStandardMaterial({ color: 0xef8a6c, roughness: 0.95, metalness: 0.02, side: THREE.DoubleSide });
@@ -1093,11 +1220,51 @@ function renderAmiShape(trace, opts, message) {
   camera.lookAt(0, 0, 0);
   controls.target.set(0, 0, 0); controls.update();
 
-  updateInfo({ height, maxDiameter: maxR * 2, rounds: trace.length });
+  return { height, maxDiameter: maxR * 2 };
+}
+
+function clearMesh(message) {
+  if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
+  updateInfo(null, message);
+}
+
+// Builds a bottom-to-top (radius_cm, height_cm) profile from the round trace
+// (as returned by /api/crochet/amigurumi/analyse) and the current gauge, then
+// revolves it into a solid to approximate the finished amigurumi shape.
+function renderAmiShape(trace, opts, message) {
+  initAmi3D();
+  if (!renderer) return;
+  if (message || !trace || !trace.length) { clearMesh(message); return; }
+
+  const stitchWidthCm = 10 / (opts.gaugeSt || 20);
+  const rowHeightCm = 10 / (opts.gaugeRows || 22);
+  const pts = [new THREE.Vector2(0.12, 0)];
+  trace.forEach((r, i) => {
+    const circumference = (r.output_stitches || 0) * stitchWidthCm;
+    const radius = Math.max(0.08, circumference / (2 * Math.PI));
+    pts.push(new THREE.Vector2(radius, (i + 1) * rowHeightCm));
+  });
+
+  const stats = buildLatheMesh(pts);
+  updateInfo({ ...stats, rounds: trace.length });
+}
+
+// Live preview of the freeform shape-editor profile (before it's converted to
+// rounds): points are {h, r} in cm, bottom point first. Same revolve, no gauge
+// involved yet — this is the drafted target shape, not the stitch approximation.
+function previewProfile(points, message) {
+  initAmi3D();
+  if (!renderer) return;
+  if (message || !points || points.length < 2) { clearMesh(message || 'Add at least two points.'); return; }
+  const sorted = points.slice().sort((a, b) => a.h - b.h);
+  const pts = sorted.map(p => new THREE.Vector2(Math.max(0.05, p.r), p.h));
+  const stats = buildLatheMesh(pts);
+  updateInfo({ ...stats, rounds: null });
 }
 
 window.YE3D = {
   renderAmiShape,
+  previewProfile,
   resize,
   setSpin: (on) => { spinning = !!on; },
 };
