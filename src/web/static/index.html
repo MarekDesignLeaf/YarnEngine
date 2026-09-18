@@ -390,6 +390,24 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <label><span>Starting stitches (magic ring)</span><input id="amiInitial" type="number" min="0" value="6"></label>
         <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
+      <details id="importDetails" style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:650">Import a pattern someone else wrote</summary>
+        <p class="small muted" style="margin-top:6px">Paste it, open a file, or photograph the page. What the stitches mean is worked out here, not guessed — any line that cannot be read is listed rather than filled in.</p>
+        <div class="fields">
+          <label><span>Written in</span><select id="impDialect"><option value="us">US terms (sc, hdc, dc)</option><option value="uk">UK terms (dc, htr, tr)</option></select></label>
+          <label><span>A file (.txt, .md, .pdf)</span><input id="impFile" type="file" accept=".txt,.md,.pdf,text/plain,application/pdf"></label>
+          <label><span>A photo of the page</span><input id="impPhoto" type="file" accept="image/*" multiple></label>
+        </div>
+        <label style="display:block;margin-top:8px"><span>Or paste the rounds</span>
+          <textarea id="impText" rows="6" placeholder="Round 1: 6 sc in magic ring (6)&#10;Round 2: inc in each st around (12)&#10;R3: [sc, inc] x 6 (18)" style="width:100%;font-family:ui-monospace,Menlo,monospace;font-size:12.5px"></textarea></label>
+        <div class="toolbar"><button type="button" id="btnImport" class="accent">Read it</button>
+          <button type="button" id="btnImportUse" class="alt hidden">Use these rounds</button>
+          <button type="button" id="btnImportSources" class="link">Where can patterns come from?</button></div>
+        <div id="impStatus" class="status hidden"></div>
+        <div id="impSources" class="small muted hidden" style="margin-top:6px"></div>
+        <pre id="impPreview" class="chartbox hidden" style="white-space:pre-wrap;font-size:12.5px;max-height:260px;overflow:auto"></pre>
+        <ul id="impIssues" class="small hidden" style="color:var(--bad,#b3261e);margin:6px 0 0;padding-left:18px"></ul>
+      </details>
       <details id="shapeEditorDetails" style="margin-top:12px">
         <summary style="cursor:pointer;font-weight:650">Shape editor — draw the profile, generate rounds</summary>
         <p class="small muted">Drag the dots to shape the side profile — it's revolved around the centre line, just like the 3D preview below. Then generate the stitch rounds that approximate it.</p>
@@ -2344,6 +2362,74 @@ $('mkDone').onclick=async()=>{
  MK.running=false;MK.startedAt=null;$('mkRun').textContent='Start';
  $('mkDone').textContent=finishing?'Finished ✓':'Finished';
  $('mkStatus').textContent=finishing?`Done in ${mkFormat(mkElapsed())}.`:'Reopened.';
+};
+
+/* ========================= importing a pattern =========================
+   Somebody else's pattern, read into rounds this app can cost, preview and
+   work through. The reading is done on the server by a parser that reports
+   what defeated it; nothing here fills in a gap. */
+let IMP=null;
+async function runImport(kind){
+ const dialect=$('impDialect').value;
+ status($('impStatus'),'Reading…','');
+ $('btnImportUse').classList.add('hidden');
+ try{
+  let d;
+  if(kind==='file'){
+   const f=$('impFile').files[0];
+   if(!f){status($('impStatus'),'Choose a file first.','bad');return;}
+   const data=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.readAsDataURL(f);});
+   d=await api('/api/import/file',{method:'POST',body:{filename:f.name,data,dialect}});
+  }else if(kind==='photo'){
+   const files=[...$('impPhoto').files].slice(0,4);
+   if(!files.length){status($('impStatus'),'Choose at least one photo first.','bad');return;}
+   const images=[];
+   for(const f of files){
+    const data=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(String(r.result));r.readAsDataURL(f);});
+    images.push({media_type:f.type||'image/jpeg',data});
+   }
+   d=await api('/api/import/photo',{method:'POST',body:{images,dialect}});
+   if(d.text)$('impText').value=d.text;
+  }else{
+   d=await api('/api/import/rounds',{method:'POST',body:{text:$('impText').value,dialect}});
+  }
+  IMP=d;showImport(d);
+ }catch(e){status($('impStatus'),e.message,'bad');}
+}
+function showImport(d){
+ const ok=d.valid&&d.rounds.length;
+ $('impPreview').classList.toggle('hidden',!ok);
+ if(ok)$('impPreview').textContent=d.written.join('\n');
+ $('impIssues').classList.toggle('hidden',!(d.issues||[]).length);
+ $('impIssues').innerHTML=(d.issues||[]).map(i=>`<li>Line ${i.line}: ${esc(i.reason)}<br><span class="muted">${esc(i.text)}</span></li>`).join('');
+ $('btnImportUse').classList.toggle('hidden',!ok);
+ const bits=[];
+ if(ok)bits.push(`${d.rounds.length+1} rounds read, starting from ${d.initial_stitches} stitches.`);
+ if((d.issues||[]).length)bits.push(`${d.issues.length} line${d.issues.length===1?'':'s'} could not be read — they are listed below and were left out.`);
+ if(!ok&&!(d.issues||[]).length)bits.push('Nothing in that text looked like rounds.');
+ (d.notes||[]).forEach(n=>bits.push(n));
+ status($('impStatus'),bits.join(' '),ok?((d.issues||[]).length?'warn':'good'):'bad');
+}
+$('btnImport').onclick=()=>runImport('text');
+$('impFile').addEventListener('change',()=>runImport('file'));
+$('impPhoto').addEventListener('change',()=>runImport('photo'));
+$('btnImportUse').onclick=()=>{
+ if(!IMP)return;
+ $('amiInitial').value=IMP.initial_stitches;lastInitial=IMP.initial_stitches;
+ $('amiTemplate').value='custom';
+ writeRounds(IMP.rounds);
+ status($('amiStatus'),`Imported ${IMP.rounds.length+1} rounds. Check them against the original, then calculate the yarn.`,'good');
+ $('importDetails').open=false;
+};
+$('btnImportSources').onclick=async()=>{
+ const box=$('impSources');
+ if(!box.classList.contains('hidden')){box.classList.add('hidden');return;}
+ try{
+  const d=await api('/api/import/sources');
+  box.innerHTML='<ul style="margin:0;padding-left:18px">'+d.sources.map(s=>
+   `<li><strong>${esc(s.name)}</strong> — ${s.available?'available':'not offered'}. ${esc(s.note)}</li>`).join('')+'</ul>';
+  box.classList.remove('hidden');
+ }catch(e){status($('impStatus'),e.message,'bad');}
 };
 
 $('wlRefresh').onclick=loadWorkLog;

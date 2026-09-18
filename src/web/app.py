@@ -35,7 +35,8 @@ from src.stitch_groups.service import analyse_stitch_groups
 import base64
 from src.design.parts import build_design, written_pattern, round_text, OP_WORDS
 from src.design.shapes import ARCHETYPES as DESIGN_ARCHETYPES
-from src.design.vision import (describe_photo, configured as vision_configured,
+from src.pattern_import.crochet_rounds import parse_pattern as parse_crochet_rounds
+from src.design.vision import (describe_photo, transcribe_pattern, configured as vision_configured,
                                model_name as vision_model_name, env_key as vision_env_key,
                                mask_key as vision_mask_key, DEFAULT_MODEL as VISION_DEFAULT_MODEL,
                                VisionUnavailable, CATEGORIES as VISION_CATEGORIES)
@@ -896,6 +897,140 @@ def _log_design(http_request, design: dict, payload: dict) -> None:
         length_m=yarn.get("length_m"), mass_g=yarn.get("mass_g"),
         packages=yarn.get("packages"), stitches=design.get("total_stitches"),
         pieces=design.get("piece_count"))
+
+
+# ------------------------------------------------------- importing a pattern --
+IMPORT_MAX_BYTES = 4 * 1024 * 1024
+
+
+def _import_result(text: str, dialect: str, source: str) -> dict:
+    """Read a written pattern into rounds, and say plainly what it could not read."""
+    parsed = parse_crochet_rounds(text or "", dialect=("uk" if dialect == "uk" else "us"))
+    out = parsed.as_dict()
+    out["source"] = source
+    out["text"] = text[:20000]
+    if out["rounds"]:
+        analysed = analyse_rounds({"initial_stitches": out["initial_stitches"] or 6,
+                                   "rounds": out["rounds"]}, service.operations)
+        out["valid"] = bool(analysed.get("valid"))
+        out["program_issues"] = analysed.get("issues", [])
+        # written out with the same writer the rest of the app uses, so what is
+        # previewed here is what the make-mode will read out
+        out["written"] = ([f"R1: {out['initial_stitches']} sc in magic ring "
+                           f"({out['initial_stitches']})"] +
+                          [f"R{i}: " + round_text(r["operations"], t["output_stitches"])
+                           for i, (r, t) in enumerate(zip(out["rounds"],
+                                                          analysed.get("trace") or []), start=2)]
+                          ) if analysed.get("valid") else []
+    else:
+        out["valid"] = False
+        out["program_issues"] = []
+        out["written"] = []
+    return out
+
+
+@app.post("/api/import/rounds")
+def import_rounds(payload: dict):
+    """Pasted or typed pattern text -> rounds."""
+    text = str(payload.get("text") or "")
+    if not text.strip():
+        raise HTTPException(status_code=422, detail="paste the pattern text first")
+    if len(text) > 200_000:
+        raise HTTPException(status_code=422, detail="that is a very large pattern; import one part at a time")
+    return _import_result(text, str(payload.get("dialect") or "us"), "text")
+
+
+@app.post("/api/import/file")
+def import_file(payload: dict):
+    """A pattern file: plain text, markdown, or a PDF whose text can be read.
+
+    A PDF of a scan is images, not text; when nothing comes out, the answer says
+    so and points at the photo route rather than returning an empty pattern.
+    """
+    name = str(payload.get("filename") or "pattern")
+    try:
+        blob = base64.b64decode(str(payload.get("data") or ""), validate=True)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=422, detail="the file could not be read")
+    if len(blob) > IMPORT_MAX_BYTES:
+        raise HTTPException(status_code=422, detail="the file is too large (maximum 4 MB)")
+    if name.lower().endswith(".pdf") or blob[:5] == b"%PDF-":
+        try:
+            import pdfplumber, io as _io
+            with pdfplumber.open(_io.BytesIO(blob)) as pdf:
+                text = "\n".join((page.extract_text() or "") for page in pdf.pages[:40])
+        except Exception as e:                       # noqa: BLE001 - any broken PDF
+            raise HTTPException(status_code=422, detail=f"the PDF could not be read: {e}")
+        if not text.strip():
+            raise HTTPException(status_code=422, detail=(
+                "this PDF holds pictures of the pages rather than text, so there is "
+                "nothing to read out of it — photograph or screenshot the pattern and "
+                "use “From a photo” instead"))
+    else:
+        try:
+            text = blob.decode("utf-8")
+        except UnicodeDecodeError:
+            text = blob.decode("latin-1", "replace")
+    return _import_result(text, str(payload.get("dialect") or "us"), name)
+
+
+@app.post("/api/import/photo")
+def import_photo(payload: dict, http_request: Request):
+    """A photographed or scanned pattern: transcribed, then read as rounds.
+
+    The model only transcribes; what the stitches mean is worked out afterwards
+    by the same deterministic reader the pasted text goes through, so a
+    misreading shows up as an unreadable line rather than as invented rounds.
+    """
+    _check_photo_rate_limit(http_request)
+    images = []
+    for item in (payload.get("images") or [])[:4]:
+        try:
+            media = str(item.get("media_type") or "image/jpeg")
+            data = str(item.get("data") or "")
+            if "," in data and data.strip().startswith("data:"):
+                media = data.split(";")[0][5:] or media
+                data = data.split(",", 1)[1]
+            images.append((media, base64.b64decode(data, validate=True)))
+        except (AttributeError, ValueError, TypeError):
+            raise HTTPException(status_code=422, detail="an image could not be read")
+    if not images:
+        raise HTTPException(status_code=422, detail="at least one photo is required")
+    key, model = _vision_settings()
+    try:
+        text = transcribe_pattern(images, api_key=key, model=model)
+    except VisionUnavailable as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    out = _import_result(text, str(payload.get("dialect") or "us"), "photo")
+    out["notes"] = list(out.get("notes") or []) + [
+        "Read from a photo, so check the stitch counts against the page before making it."]
+    return out
+
+
+@app.get("/api/import/sources")
+def import_sources():
+    """Where a pattern can come from, and where it honestly cannot."""
+    key, _ = _vision_settings()
+    return {"sources": [
+        {"id": "text", "name": "Paste the text", "available": True,
+         "note": "Works with anything you can copy: an email, a page, a message."},
+        {"id": "file", "name": "A file", "available": True,
+         "note": "Plain text, markdown, or a PDF that holds real text."},
+        {"id": "photo", "name": "From a photo", "available": vision_configured(key),
+         "note": ("A photograph or screenshot of a printed pattern, transcribed and then read."
+                  if vision_configured(key) else
+                  "Needs the vision key on the admin page.")},
+        {"id": "link", "name": "A web address", "available": False,
+         "note": ("Not offered: fetching someone's pattern page and keeping it here is "
+                  "their copyright, not ours. Open the page and paste the rounds instead.")},
+        {"id": "ravelry", "name": "Ravelry", "available": False,
+         "note": ("Not offered: a Ravelry pattern is licensed to you, not to this app, "
+                  "and there is no route that legitimately hands it over. Download your "
+                  "copy and import the file or paste the text.")},
+        {"id": "youtube", "name": "YouTube", "available": False,
+         "note": ("Not offered: a video has no pattern text to read. Written notes from "
+                  "the description can be pasted in.")},
+    ]}
 
 
 @app.post("/api/design/generate")

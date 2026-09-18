@@ -213,3 +213,64 @@ def describe_photo(images: list[tuple[str, bytes]], hint: str | None = None,
     described = validate_parts(_extract_json(raw_text))
     described["model"] = chosen_model
     return described
+
+
+TRANSCRIBE_PROMPT = """Transcribe the crochet pattern in these images as plain text.
+
+Rules:
+- Copy the round and row instructions exactly as written, one per line, keeping
+  the round numbers, the abbreviations, the brackets and the stitch counts.
+- Keep the part headings (HEAD, BODY, ARM) on their own lines.
+- Do not translate abbreviations, do not convert between UK and US terms, do
+  not tidy up the wording and do not fill in anything that is unclear.
+- If a line is unreadable in the image, write it as [unreadable] rather than
+  guessing what it said.
+- Output the text only. No commentary, no summary, no code fences."""
+
+
+def transcribe_pattern(images: list[tuple[str, bytes]], timeout: int = 60,
+                       api_key: str | None = None, model: str | None = None,
+                       _transport=None) -> str:
+    """Read a photographed or scanned pattern back as text, verbatim.
+
+    Deliberately a transcription and nothing more: the reading of what the
+    stitches mean is done afterwards by src/pattern_import/crochet_rounds.py,
+    which is deterministic and reports what it cannot read. A model that is
+    asked to transcribe can be checked against the page; one asked to interpret
+    cannot.
+    """
+    api_key = (api_key or "").strip() or env_key()
+    if not api_key and _transport is None:
+        raise VisionUnavailable(
+            "reading a photographed pattern is not set up yet — an administrator "
+            "can add an API key on the admin page")
+    if not images:
+        raise VisionUnavailable("no photo was supplied")
+    content = []
+    for media_type, blob in images[:4]:
+        if media_type not in ALLOWED_MEDIA:
+            raise VisionUnavailable(f"unsupported image type: {media_type}")
+        if len(blob) > MAX_IMAGE_BYTES:
+            raise VisionUnavailable("photo is too large (maximum 5 MB each)")
+        content.append({"type": "image", "source": {
+            "type": "base64", "media_type": media_type,
+            "data": base64.b64encode(blob).decode("ascii")}})
+    content.append({"type": "text", "text": TRANSCRIBE_PROMPT})
+    body = {"model": model_name(model), "max_tokens": 4000,
+            "messages": [{"role": "user", "content": content}]}
+    if _transport is not None:
+        return str(_transport(body) or "").strip()
+    req = urllib.request.Request(
+        API_URL, data=json.dumps(body).encode("utf-8"),
+        headers={"x-api-key": api_key, "anthropic-version": API_VERSION,
+                 "content-type": "application/json"}, method="POST")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        detail = e.read().decode("utf-8", "replace")[:300]
+        raise VisionUnavailable(f"the vision service refused the request ({e.code}): {detail}") from e
+    except (urllib.error.URLError, OSError, ValueError) as e:
+        raise VisionUnavailable(f"could not reach the vision service: {e}") from e
+    return "".join(b.get("text", "") for b in payload.get("content", [])
+                   if b.get("type") == "text").strip()
