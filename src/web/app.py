@@ -19,7 +19,7 @@ from src.pattern_editor.validation import validate_editor_grid
 from src.pattern_editor.convert import editor_to_canonical_dict
 from src.pattern_engine.loader import load_pattern_dict
 from src.pattern_engine.validation import validate_pattern
-import json, re
+import json, re, math
 from src.projects.store import ProjectStore
 from src.swatch_manager.store import SwatchStore
 from src.calibration_lab.analysis import build_lab_record,readiness
@@ -472,6 +472,82 @@ def _vision_settings() -> tuple[str, str]:
         store.close()
 
 
+def _cost_design_in_yarn(design: dict, payload: dict) -> None:
+    """Work out yarn length and weight for every part, and for the whole thing.
+
+    Uses exactly the same engine as the single-piece calculator, once per part,
+    multiplied by how many of that part are needed -- so the totals and the
+    per-part figures can never drift apart from what the calculator would say
+    for the same piece.
+    """
+    yarn = service._yarn(payload.get("yarn_id")) if payload.get("yarn_id") else None
+    diameter, diameter_source, diameter_warnings = estimate_yarn_diameter_mm(
+        yarn, payload.get("yarn_diameter_mm"))
+    if diameter is None:
+        design["yarn"] = {"available": False,
+                          "reason": "choose a yarn (or enter a yarn diameter) to get length and weight",
+                          "warnings": list(diameter_warnings)}
+        return
+    gauge = Gauge(float(design["gauge_stitches_per_10cm"]),
+                  float(design["gauge_rows_per_10cm"]), 100.0, 100.0)
+    production = model_registry.production()
+    package_length = yarn.get("package_length_m") if yarn else None
+    total_len = total_mass = 0.0
+    warnings: list[str] = list(diameter_warnings)
+    mass_known = True
+    for part in design["parts"]:
+        analysed = analyse_rounds({"initial_stitches": part["initial_stitches"],
+                                   "rounds": part["rounds"]}, service.operations)
+        if not analysed.get("valid"):
+            raise HTTPException(status_code=500,
+                                detail={"part": part["name"], "program_issues": analysed["issues"]})
+        try:
+            calc, pred, _audit = calculate_operation_program(
+                record=production, operation_counts=analysed["operation_counts"], gauge=gauge,
+                yarn_diameter_mm=float(diameter),
+                allowance_percent=float(payload.get("allowance_percent", 10) or 0),
+                tex=(yarn.get("tex") if yarn else None), package_length_m=package_length,
+                domain_policy="warn", source="amigurumi",
+                hook_mm=(float(payload["hook_mm"]) if payload.get("hook_mm") else None),
+                cyc_weight=(yarn.get("cyc_weight") if yarn else None))
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
+        each_len = float(calc.recommended_length_m)
+        each_mass = float(calc.mass_g) if calc.mass_g is not None else None
+        if each_mass is None:
+            mass_known = False
+        part["yarn"] = {
+            "length_m_each": round(each_len, 2),
+            "length_m_total": round(each_len * part["copies"], 2),
+            "mass_g_each": round(each_mass, 1) if each_mass is not None else None,
+            "mass_g_total": round(each_mass * part["copies"], 1) if each_mass is not None else None,
+            "lower_95_m_each": round(float(pred.lower_95_m), 2),
+            "upper_95_m_each": round(float(pred.upper_95_m), 2),
+        }
+        total_len += each_len * part["copies"]
+        if each_mass is not None:
+            total_mass += each_mass * part["copies"]
+        for w in (pred.warnings or []):
+            if w not in warnings:
+                warnings.append(w)
+    packages = math.ceil(total_len / package_length) if package_length else None
+    design["yarn"] = {
+        "available": True,
+        "yarn_id": (yarn.get("yarn_id") if yarn else None),
+        "yarn_name": (" ".join(x for x in [yarn.get("brand"), yarn.get("product")] if x)
+                      if yarn else None),
+        "length_m": round(total_len, 2),
+        "mass_g": round(total_mass, 1) if mass_known and total_mass else None,
+        "packages": packages,
+        "package_length_m": package_length,
+        "allowance_percent": float(payload.get("allowance_percent", 10) or 0),
+        "yarn_diameter_mm": diameter,
+        "yarn_diameter_source": diameter_source,
+        "model_id": production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID,
+        "warnings": warnings,
+    }
+
+
 @app.get("/api/design/status")
 def design_status():
     """Whether photo analysis is available on this server."""
@@ -560,6 +636,7 @@ def design_generate(payload: dict):
         design = build_design(payload)
     except (KeyError, TypeError, ValueError) as e:
         raise HTTPException(status_code=422, detail=str(e))
+    _cost_design_in_yarn(design, payload)
     design["written"] = written_pattern(design)
     return design
 
@@ -623,6 +700,7 @@ def design_from_photo(payload: dict, http_request: Request):
         design = build_design(spec)
     except (KeyError, TypeError, ValueError) as e:
         raise HTTPException(status_code=422, detail=str(e))
+    _cost_design_in_yarn(design, payload)
     design["written"] = written_pattern(design)
     design["photo_reading"] = {
         "confidence": described["confidence"],

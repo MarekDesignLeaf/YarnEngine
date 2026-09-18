@@ -269,6 +269,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
           <div class="toolbar" style="margin:0"><button id="btnDsgCopy" class="alt">Copy</button><button id="btnDsgPrint" class="alt">Print</button></div>
         </div>
         <div id="dsgSummary" class="metrics"></div>
+        <div id="dsgYarnNote" class="hidden" style="margin-top:6px"></div>
         <div id="dsgPartList" style="display:grid;gap:8px;margin-top:10px"></div>
         <pre id="dsgWritten" class="chartbox" style="white-space:pre-wrap;font-size:12.5px;margin-top:10px;max-height:340px;overflow:auto"></pre>
       </div>
@@ -1235,7 +1236,13 @@ $('dsgPhotos').addEventListener('change',async()=>{
  }
 });
 
-function dsgGauge(){return {gauge_stitches_per_10cm:Number($('gaugeSt').value)||20,gauge_rows_per_10cm:Number($('gaugeRows').value)||22,initial_stitches:Math.max(3,Number($('dsgInitial').value)||6)};}
+/* The designer costs the yarn with the same yarn, hook and allowance chosen in
+   the "Yarn, hook and gauge" card below, so the figures match what the
+   calculator would say for the same piece. */
+function dsgGauge(){return {gauge_stitches_per_10cm:Number($('gaugeSt').value)||20,gauge_rows_per_10cm:Number($('gaugeRows').value)||22,initial_stitches:Math.max(3,Number($('dsgInitial').value)||6),
+ yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,
+ yarn_diameter_mm:$('diam').value?Number($('diam').value):null,
+ allowance_percent:Number($('allowance').value)||0};}
 
 $('btnDesignPhoto').onclick=async()=>{
  if(!dsgPhotos.length){status($('dsgStatus'),'Choose at least one photo first.','bad');return;}
@@ -1291,16 +1298,35 @@ function showDesign(d){
   if(r.dropped&&r.dropped.length)bits.push('Ignored (not a shape this can make): '+r.dropped.map(esc).join(', '));
   status($('dsgStatus'),bits.join(' ')+' Stitch and round counts below are calculated from your gauge, not read from the photo.',r.confidence==='high'?'good':'warn');
  } else status($('dsgStatus'),'Pattern written from the parts you described.','good');
- $('dsgSummary').innerHTML=[
-  ['Parts',d.parts.length],['Pieces to make',d.piece_count],
-  ['Total stitches',d.total_stitches.toLocaleString()],['Height',d.total_height_cm+' cm']
- ].map(([k,v])=>`<div class="metric"><strong>${esc(String(v))}</strong><span>${esc(k)}</span></div>`).join('');
- $('dsgPartList').innerHTML=d.parts.map((p,i)=>`<div class="lineCard" style="padding:10px">
+ const y=d.yarn||{};
+ const tiles=[['Parts',d.parts.length],['Pieces to make',d.piece_count],
+  ['Total stitches',d.total_stitches.toLocaleString()],['Height',d.total_height_cm+' cm']];
+ if(y.available){
+  tiles.push(['Yarn needed',fmt(y.length_m)+' m']);
+  if(y.mass_g!=null)tiles.push(['Weight',fmt(y.mass_g)+' g']);
+  if(y.packages!=null)tiles.push([y.packages===1?'Ball/skein':'Balls/skeins',y.packages]);
+ }
+ $('dsgSummary').innerHTML=tiles.map(([k,v])=>`<div class="metric"><strong>${esc(String(v))}</strong><span>${esc(k)}</span></div>`).join('');
+ $('dsgYarnNote').classList.remove('hidden');
+ if(y.available){
+  const bits=[`Yarn figures include a ${y.allowance_percent}% allowance`];
+  if(y.yarn_name)bits.push(`for ${esc(y.yarn_name)}`);
+  if(y.packages!=null&&y.package_length_m)bits.push(`(${y.package_length_m} m per ball)`);
+  if(y.mass_g==null)bits.push('— weight needs a yarn with a known tex/weight, so only length is shown');
+  $('dsgYarnNote').innerHTML=`<span class="small muted">${bits.join(' ')}. Change the yarn, hook or allowance in “Yarn, hook and gauge” below and generate again.</span>`;
+ } else {
+  $('dsgYarnNote').innerHTML=`<span class="small muted">No yarn length yet: ${esc(y.reason||'choose a yarn below')}. The pattern itself is unaffected.</span>`;
+ }
+ $('dsgPartList').innerHTML=d.parts.map((p,i)=>{
+  const py=p.yarn;
+  const yarnLine=py?`<div class="small">${fmt(py.length_m_total)} m${py.mass_g_total!=null?' · '+fmt(py.mass_g_total)+' g':''}${p.copies>1?` (${fmt(py.length_m_each)} m each)`:''}</div>`:'';
+  return `<div class="lineCard" style="padding:10px">
    <div class="toolbar" style="margin:0;justify-content:space-between">
     <div><strong>${esc(p.name)}</strong> <span class="pill">make ${p.copies}</span>
-     <div class="small muted">${esc(p.archetype)} · ${p.round_count} rounds · up to ${Math.max(...p.stitch_counts)} sts · ${p.height_cm}×${p.width_cm} cm</div></div>
+     <div class="small muted">${esc(p.archetype)} · ${p.round_count} rounds · up to ${Math.max(...p.stitch_counts)} sts · ${p.height_cm}×${p.width_cm} cm</div>
+     ${yarnLine}</div>
     <button class="alt dsgUse" data-i="${i}" type="button">Open in the rounds editor</button>
-   </div></div>`).join('');
+   </div></div>`;}).join('');
  $('dsgPartList').querySelectorAll('.dsgUse').forEach(b=>b.onclick=()=>{
   const p=dsgDesign.parts[Number(b.dataset.i)];
   $('amiInitial').value=p.initial_stitches;lastInitial=p.initial_stitches;

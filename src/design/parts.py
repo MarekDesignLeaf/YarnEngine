@@ -178,15 +178,40 @@ def build_design(spec: dict) -> dict:
     }
 
 
+def _yarn_line(y: dict | None) -> str:
+    """'12.3 m · 18.4 g' for a part, empty when no yarn is known."""
+    if not y:
+        return ""
+    bits = [f"{y['length_m_total']} m"]
+    if y.get("mass_g_total") is not None:
+        bits.append(f"{y['mass_g_total']} g")
+    return " · ".join(bits)
+
+
 def written_pattern(design: dict) -> str:
     """The whole design as one written pattern, the way a book prints it."""
     out = [design["object"].upper(),
            f"Finished height about {design['total_height_cm']} cm at "
            f"{design['gauge_stitches_per_10cm']} sts / "
            f"{design['gauge_rows_per_10cm']} rows per 10 cm.",
-           "Worked in continuous rounds unless stated otherwise.", ""]
+           "Worked in continuous rounds unless stated otherwise."]
+    y = design.get("yarn") or {}
+    if y.get("available"):
+        need = f"YARN NEEDED: {y['length_m']} m"
+        if y.get("mass_g") is not None:
+            need += f" ({y['mass_g']} g)"
+        if y.get("yarn_name"):
+            need += f" of {y['yarn_name']}"
+        if y.get("packages") is not None:
+            need += f" — {y['packages']} ball{'s' if y['packages'] != 1 else ''}"
+            if y.get("package_length_m"):
+                need += f" of {y['package_length_m']} m"
+        out.append(need + f", including a {y.get('allowance_percent', 0)}% allowance.")
+    out.append("")
     for p in design["parts"]:
-        out.append(f"{p['name'].upper()} — make {p['copies']}")
+        head = f"{p['name'].upper()} — make {p['copies']}"
+        yl = _yarn_line(p.get("yarn"))
+        out.append(f"{head}   [{yl}]" if yl else head)
         out += p["written"]
         out.append("")
     if design.get("notes"):

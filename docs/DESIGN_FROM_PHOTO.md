@@ -72,6 +72,19 @@ provider.
   same, with a `photo_reading` block stating the model's confidence, what the
   photo could not show, and anything dropped as unusable.
 
+## Yarn length and weight
+
+When a yarn (or just a yarn diameter) is chosen in *Yarn, hook and gauge*, the
+designer costs every part with the same engine as the single-piece calculator,
+once per part, multiplied by how many of that part are needed. So the per-part
+figures and the total can never drift from what the calculator would say for
+the same piece — a test asserts they agree to the centimetre.
+
+Weight and ball count need a yarn record with a known tex and package length;
+with only a diameter, length alone is reported and the app says why rather than
+estimating grams from nothing. The totals, per-part figures and the allowance
+also appear at the top of the written pattern.
+
 ## What it cannot do
 
 A photo shows one side of a finished object. It cannot show the back, the
