@@ -147,3 +147,65 @@ def test_the_people_you_can_share_with_are_named_and_nothing_more(team):
     body = marek.get("/api/colleagues").json()
     assert [c["username"] for c in body["colleagues"]] == ["eva"]   # not myself
     assert set(body["colleagues"][0]) == {"user_id", "username", "role"}
+
+
+def test_rounds_read_the_same_whoever_wrote_them():
+    """The make-mode reads out rounds with the pattern writer, so a piece typed
+    into the editor reads exactly like a generated one."""
+    from fastapi.testclient import TestClient as TC
+    import src.web.app as app_module
+    plain = TC(app_module.app)
+    r = plain.post("/api/crochet/amigurumi/written", json={
+        "initial_stitches": 6,
+        "rounds": [{"operations": {"SC_INC": 6}}, {"operations": {"SC": 6, "SC_INC": 6}}]})
+    assert r.status_code == 200
+    assert r.json()["lines"] == ["R1: 6 sc in magic ring (6)",
+                                 "R2: inc in each st around (12)",
+                                 "R3: [sc, inc] x 6 (18)"]
+    assert r.json()["stitch_counts"] == [6, 12, 18]
+    bad = plain.post("/api/crochet/amigurumi/written",
+                     json={"initial_stitches": 6, "rounds": [{"operations": {"SC": 99}}]})
+    assert bad.status_code == 422          # rounds that cannot be worked are refused
+
+
+def test_working_through_a_piece_is_kept_on_the_server(team):
+    marek, eva = team
+    marek.post("/api/complex-consumption/calculate", json=AMI)
+    entry = marek.get("/api/worklog").json()["entries"][0]
+    eid = entry["entry_id"]
+
+    empty = marek.get(f"/api/worklog/{eid}/progress").json()
+    assert empty["done"] == [] and empty["elapsed_seconds"] == 0
+
+    saved = marek.put(f"/api/worklog/{eid}/progress",
+                      json={"current_round": 2, "done": [1, 2],
+                            "counters": [{"name": "Rows", "value": 2}], "running": True}).json()
+    assert saved["current_round"] == 2 and saved["done"] == [1, 2]
+    assert saved["running_since"] is not None
+
+    # it comes back on the next device, clock and all
+    again = marek.get(f"/api/worklog/{eid}/progress").json()
+    assert again["done"] == [1, 2] and again["counters"][0]["name"] == "Rows"
+
+    # and the log itself can show how far along without loading the piece
+    listed = marek.get("/api/worklog").json()["entries"][0]
+    assert listed["progress"]["done_count"] == 2 and listed["progress"]["running"] is True
+
+
+def test_someone_elses_piece_cannot_be_worked_through_or_spied_on(team):
+    marek, eva = team
+    marek.post("/api/complex-consumption/calculate", json=AMI)
+    marek.post("/api/worklog/shares", json={"user_id": user_id(marek, "eva")})
+    eid = marek.get("/api/worklog").json()["entries"][0]["entry_id"]
+    assert eva.get(f"/api/worklog/{eid}/progress").status_code == 404
+    assert eva.put(f"/api/worklog/{eid}/progress", json={"current_round": 9}).status_code == 404
+    # a shared log shows the work, not how far its owner has got with it
+    marek_id = user_id(eva, "marek")
+    shared = eva.get("/api/worklog", params={"owner": marek_id}).json()["entries"][0]
+    assert shared["progress"] is None
+
+
+def test_the_result_offers_to_make_the_piece_it_just_costed(team):
+    marek, _ = team
+    d = marek.post("/api/complex-consumption/calculate", json=AMI).json()
+    assert d["worklog_entry_id"] == marek.get("/api/worklog").json()["entries"][0]["entry_id"]

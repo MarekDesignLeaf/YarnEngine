@@ -138,6 +138,44 @@ button.cant{opacity:.4;box-shadow:none}
 #iosInstall button{flex:0 0 auto;padding:6px 12px;font-size:12.5px}
 /* 3D preview docked to the bottom of the screen, so the shape stays in view
    while scrolling a long list of rounds */
+/* Make mode: the pattern as a tick-off list, with the counters and the clock
+   always in reach at the bottom. Full screen, because this is what you look at
+   with a hook in your hand rather than a mouse. */
+#makeView{position:fixed;inset:0;z-index:130;background:var(--bg);display:flex;flex-direction:column}
+#makeView .mkTop{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);
+ border-bottom:1px solid var(--line);flex-wrap:wrap}
+#makeView .mkTop>div:not(.mkClockBox){flex:1 1 140px;min-width:0}
+#makeView .mkClockBox{display:flex;align-items:center;gap:8px;margin-left:auto;flex:0 0 auto}
+/* The title gives way, the clock and the buttons never do: this bar is read at
+   arm's length with a hook in hand. */
+#makeView .mkTitle{font-family:var(--font-display);font-weight:700;font-size:15px;line-height:1.2;
+ white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#makeView .mkSub{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#makeRounds{flex:1 1 auto;overflow:auto;padding:10px 14px 16px}
+.mkRound{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);
+ border-radius:12px;margin-bottom:8px;background:var(--card);cursor:pointer}
+.mkRound .mkNo{flex:0 0 26px;height:26px;border-radius:50%;border:1px solid var(--line);
+ display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--muted)}
+.mkRound .mkTxt{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.45}
+.mkRound.done{opacity:.55}
+.mkRound.done .mkNo{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.mkRound.now{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-pale,rgba(239,138,108,.25))}
+.mkRound.now .mkNo{border-color:var(--accent);color:var(--accent)}
+#makeBar{border-top:1px solid var(--line);background:var(--card);padding:8px 14px 12px}
+.mkCounters{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.mkCounter{border:1px solid var(--line);border-radius:12px;padding:6px 8px;text-align:center}
+.mkCounter .cName{font-size:11px;color:var(--muted);display:block;width:100%;border:0;background:transparent;text-align:center}
+.mkCounter .cVal{font-family:var(--font-display);font-weight:700;font-size:22px;line-height:1.1}
+.mkCounter .cBtns{display:flex;gap:4px;justify-content:center;margin-top:2px}
+.mkCounter button{min-height:26px;padding:1px 9px;font-size:13px}
+#mkClock{font-family:var(--font-display);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums}
+@media(max-width:600px){
+ #makeView .mkTitle{font-size:14px}.mkRound .mkTxt{font-size:13px}
+ #makeView .mkTop{gap:8px;padding:8px 12px}
+ #makeView .mkClockBox{width:100%;margin-left:0;justify-content:space-between}
+ #makeView .mkClockBox button{flex:1 1 0}
+ #mkClock{font-size:22px;flex:0 0 auto}
+}
 /* The yarn bar: which yarn, which shade and the figures that follow from
    them stay on screen on every tab, because every number in the app depends
    on them. It carries the back and 3D controls too. */
@@ -420,6 +458,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <h2 style="margin:0">Result</h2>
       <div class="toolbar" style="margin:0">
         <select id="unitToggle" style="width:auto"><option value="metric">g / m</option><option value="imperial">oz / yd</option></select>
+        <button id="btnMakeThis" class="alt hidden">Make this</button>
         <button id="btnPrintResult" class="alt">Print / export PDF</button>
       </div>
     </div>
@@ -686,6 +725,29 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 </div></div>
 
 </main>
+<div id="makeView" class="hidden">
+  <div class="mkTop">
+    <button type="button" id="mkClose" class="alt">← Back</button>
+    <div style="flex:1 1 0;min-width:0">
+      <div class="mkTitle" id="mkTitle">—</div>
+      <div class="mkSub" id="mkSub"></div>
+    </div>
+    <div class="mkClockBox">
+      <span id="mkClock">0:00</span>
+      <button type="button" id="mkRun" class="accent">Start</button>
+      <button type="button" id="mkDone" class="alt">Finished</button>
+    </div>
+  </div>
+  <div id="makeRounds"></div>
+  <div id="makeBar">
+    <div class="mkCounters" id="mkCounters"></div>
+    <div class="toolbar" style="margin-top:8px;justify-content:space-between">
+      <div class="toolbar" style="margin:0"><button type="button" id="mkAddCounter" class="alt">+ counter</button>
+      <button type="button" id="mkReset" class="alt">Start again</button></div>
+      <span class="small muted" id="mkStatus">Saved as you go.</span>
+    </div>
+  </div>
+</div>
 <div id="photoOverlay" class="hidden">
   <img id="photoOverlayImg" alt="Reference photo">
   <div class="toolbar"><button type="button" id="photoOverlayClose" class="alt">Close</button></div>
@@ -1466,7 +1528,7 @@ $('btnCalc').onclick=async()=>{
     title:$('pieceName').value.trim()||($('amiTemplate').value&&$('amiTemplate').value!=='custom'?$('amiTemplate').selectedOptions[0].text:null)};
    const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
-   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:amiFinishedSize(d.program_analysis.trace,c,copies),ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
+   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:amiFinishedSize(d.program_analysis.trace,c,copies),ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m,makeEntryId:d.worklog_entry_id});
   }
  }catch(e){
   // The server's own wording here is for API callers; on screen it has to say
@@ -1536,6 +1598,10 @@ function showResult(r){
  const massD=UNIT==='imperial'?1:0;
  if(r.stash){$('rStashBox').classList.remove('hidden');$('rStash').textContent=r.stash.sufficient?`Enough (${fmt(toMass(r.stash.have_g),massD)} ${unitMassLabel()} on hand)`:`Short ${fmt(toMass(r.stash.shortfall_g),massD)} ${unitMassLabel()} (have ${fmt(toMass(r.stash.have_g),massD)} ${unitMassLabel()})`;}
  else $('rStashBox').classList.add('hidden');
+ // "Make this" is only offered for a piece worked in rounds, which is the
+ // only thing there is to tick off round by round.
+ $('btnMakeThis').classList.toggle('hidden',!r.makeEntryId);
+ if(r.makeEntryId)$('btnMakeThis').onclick=()=>openMake(r.makeEntryId);
  $('resultCard').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
@@ -1911,6 +1977,7 @@ function updateBackButton(){
  $('btnBack').disabled=!(history.state&&history.state.ye&&history.length>1);
 }
 window.addEventListener('popstate',e=>{
+ if($('makeView')&&!$('makeView').classList.contains('hidden')){closeMake();return;}
  if($('photoOverlay')&&!$('photoOverlay').classList.contains('hidden')){closePhoto();return;}
  const v=(e.state&&e.state.ye)||{tab:'calc',mode:calcMode};
  applyView(v,false);updateBackButton();
@@ -2083,7 +2150,8 @@ function renderWorkLog(rows,owner){
  tb.innerHTML=rows.map(e=>{
   const sw=e.colour_hex?`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;background:${esc(e.colour_hex)};border:1px solid rgba(0,0,0,.25)"></span> `:'';
   return `<tr data-id="${e.entry_id}">
-   <td class="small">${esc(new Date(e.updated_at).toLocaleString())}${e.repeat_count>1?`<br><span class="muted">recalculated ×${e.repeat_count}</span>`:''}</td>
+   <td class="small">${esc(new Date(e.updated_at).toLocaleString())}${e.repeat_count>1?`<br><span class="muted">recalculated ×${e.repeat_count}</span>`:''}
+    ${e.progress?`<br><span class="muted">${e.progress.finished_at?'made':'making'} · ${mkFormat(e.progress.elapsed_seconds)}${e.progress.running?' ⏵':''}${e.progress.done_count?` · ${e.progress.done_count} rounds done`:''}</span>`:''}</td>
    <td>${esc(e.title)}<br><span class="small muted">${esc(e.kind)}${e.pieces>1?' · '+e.pieces+' pieces':''}${e.gauge_stitches?' · '+fmt(e.gauge_stitches,0)+'×'+fmt(e.gauge_rows,0)+' per 10 cm':''}${e.hook_mm?' · hook '+fmt(e.hook_mm,2)+' mm':''}</span></td>
    <td class="small">${esc(e.yarn_name||'—')}<br>${sw}${esc(e.colour_name||'')}</td>
    <td>${e.length_m!=null?fmt(toLen(e.length_m))+' '+unitLenLabel():'–'}</td>
@@ -2092,6 +2160,7 @@ function renderWorkLog(rows,owner){
    <td class="small">${e.stitches!=null?e.stitches.toLocaleString():'–'}</td>
    <td>${mine?`<input class="wlNote" data-id="${e.entry_id}" value="${esc(e.note||'')}" placeholder="note" style="min-width:120px">`:esc(e.note||'')}</td>
    <td class="small" style="white-space:nowrap">
+    ${mine&&(e.kind==='amigurumi'||e.kind==='branch')?`<button class="link wlMake" data-id="${e.entry_id}">make</button>`:''}
     <button class="link wlOpen" data-id="${e.entry_id}">open</button>
     ${mine?`<label title="Hide this one from the people you share with" style="font-weight:500"><input type="checkbox" class="wlPriv" data-id="${e.entry_id}" ${e.private?'checked':''} style="width:auto"> private</label>
     <button class="link wlDel" data-id="${e.entry_id}">delete</button>`:''}
@@ -2100,6 +2169,7 @@ function renderWorkLog(rows,owner){
  tb.querySelectorAll('.wlPriv').forEach(cb=>cb.onchange=()=>patchEntry(cb.dataset.id,{private:cb.checked}));
  tb.querySelectorAll('.wlDel').forEach(b=>b.onclick=()=>deleteEntry(b.dataset.id));
  tb.querySelectorAll('.wlOpen').forEach(b=>b.onclick=()=>openEntry(b.dataset.id));
+ tb.querySelectorAll('.wlMake').forEach(b=>b.onclick=()=>openMake(b.dataset.id));
 }
 async function patchEntry(id,body){
  try{await api('/api/worklog/'+id,{method:'PATCH',body});status($('wlStatus'),'Saved.','good');}
@@ -2146,6 +2216,136 @@ async function openEntry(id){
   window.scrollTo({top:0,behavior:'smooth'});
  }catch(err){status($('wlStatus'),err.message,'bad');}
 }
+/* ========================== making it ==================================
+   The piece in front of you while you work: the rounds as a tick-off list,
+   a row counter that follows it, counters of your own, and a clock. Progress
+   lives on the server, because a piece is made over days and whichever device
+   is to hand should know where you got to. */
+let MK={entry:null,lines:[],counts:[],done:new Set(),current:0,counters:[],running:false,
+        base:0,startedAt:null,timer:null,saveTimer:null};
+
+function mkFormat(sec){
+ sec=Math.max(0,Math.round(sec));
+ const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+ return (h?`${h}:${String(m).padStart(2,'0')}`:`${m}`)+`:${String(s).padStart(2,'0')}`;
+}
+function mkElapsed(){return MK.base+(MK.running&&MK.startedAt?(Date.now()-MK.startedAt)/1000:0);}
+function mkTick(){$('mkClock').textContent=mkFormat(mkElapsed());}
+
+async function openMake(entryId){
+ try{
+  const e=await api('/api/worklog/'+entryId);
+  const r=e.request||{};
+  const program=r.program||(e.kind==='amigurumi'?r:null);
+  if(!program||!program.rounds){
+   status($('wlStatus'),'Only a piece worked in rounds can be made step by step — this one is a '+esc(e.kind)+'.','warn');
+   return;
+  }
+  const w=await api('/api/crochet/amigurumi/written',{method:'POST',
+   body:{initial_stitches:program.initial_stitches,rounds:program.rounds,stitch:program.stitch||'SC'}});
+  const p=await api('/api/worklog/'+entryId+'/progress');
+  MK.entry=e;MK.lines=w.lines;MK.counts=w.stitch_counts;
+  MK.done=new Set(p.done||[]);MK.current=p.current_round||0;
+  MK.counters=(p.counters&&p.counters.length)?p.counters:[{name:'Rows',value:MK.done.size}];
+  MK.base=Number(p.seconds||0);MK.running=!!p.running_since;
+  MK.startedAt=MK.running?Date.now():null;
+  $('mkTitle').textContent=e.title;
+  $('mkSub').textContent=[e.yarn_name,e.colour_name,e.pieces>1?`${e.pieces} pieces`:null,
+   e.length_m!=null?`${fmt(toLen(e.length_m))} ${unitLenLabel()}`:null].filter(Boolean).join(' · ');
+  $('mkDone').textContent=p.finished_at?'Finished ✓':'Finished';
+  $('makeView').classList.remove('hidden');
+  history.pushState({ye:currentView(),make:entryId},'',location.pathname);
+  renderMake();renderCounters();
+  $('mkRun').textContent=MK.running?'Pause':'Start';
+  clearInterval(MK.timer);MK.timer=setInterval(mkTick,1000);mkTick();
+ }catch(err){status($('wlStatus'),err.message,'bad');}
+}
+function closeMake(){
+ $('makeView').classList.add('hidden');
+ clearInterval(MK.timer);MK.timer=null;
+ if(MK.running)saveMake({running:false});      // never leave the clock running unseen
+ loadWorkLogEntries();
+}
+function renderMake(){
+ $('makeRounds').innerHTML=MK.lines.map((line,i)=>{
+  const n=i+1,done=MK.done.has(n),now=!done&&n===MK.current+1;
+  return `<div class="mkRound ${done?'done':''} ${now?'now':''}" data-n="${n}">
+   <span class="mkNo">${done?'✓':n}</span><span class="mkTxt">${esc(line)}</span></div>`;
+ }).join('');
+ $('makeRounds').querySelectorAll('.mkRound').forEach(el=>el.onclick=()=>toggleRound(Number(el.dataset.n)));
+ const now=$('makeRounds').querySelector('.mkRound.now');
+ if(now)now.scrollIntoView({block:'center',behavior:'smooth'});
+}
+function toggleRound(n){
+ /* Ticking a round is the one thing that happens a thousand times, so it also
+    does the bookkeeping: everything before it counts as worked, and the row
+    counter follows rather than being kept by hand. */
+ if(MK.done.has(n)){
+  for(let i=n;i<=MK.lines.length;i++)MK.done.delete(i);
+  MK.current=n-1;
+ }else{
+  for(let i=1;i<=n;i++)MK.done.add(i);
+  MK.current=n;
+ }
+ const rows=MK.counters.find(c=>c.name==='Rows');
+ if(rows)rows.value=MK.done.size;
+ if(!MK.running&&MK.done.size)startClock(true);
+ renderMake();renderCounters();queueSave();
+}
+function renderCounters(){
+ $('mkCounters').innerHTML=MK.counters.map((c,i)=>`<div class="mkCounter">
+  <input class="cName" data-i="${i}" value="${esc(c.name)}" aria-label="Counter name">
+  <div class="cVal">${Number(c.value)||0}</div>
+  <div class="cBtns"><button type="button" class="alt cMinus" data-i="${i}">−</button>
+   <button type="button" class="alt cPlus" data-i="${i}">+</button>
+   ${MK.counters.length>1?`<button type="button" class="alt cDel" data-i="${i}" title="Remove">×</button>`:''}</div>
+ </div>`).join('');
+ $('mkCounters').querySelectorAll('.cPlus').forEach(b=>b.onclick=()=>bump(b.dataset.i,1));
+ $('mkCounters').querySelectorAll('.cMinus').forEach(b=>b.onclick=()=>bump(b.dataset.i,-1));
+ $('mkCounters').querySelectorAll('.cDel').forEach(b=>b.onclick=()=>{MK.counters.splice(Number(b.dataset.i),1);renderCounters();queueSave();});
+ $('mkCounters').querySelectorAll('.cName').forEach(inp=>inp.onchange=()=>{MK.counters[Number(inp.dataset.i)].name=inp.value.trim()||'Counter';queueSave();});
+}
+function bump(i,by){
+ const c=MK.counters[Number(i)];
+ c.value=Math.max(0,(Number(c.value)||0)+by);
+ if(c.name==='Rows'){
+  // the row counter and the checklist are the same fact, so they move together
+  MK.current=Math.max(0,Math.min(MK.lines.length,c.value));
+  MK.done=new Set(Array.from({length:MK.current},(_,k)=>k+1));
+  renderMake();
+ }
+ renderCounters();queueSave();
+}
+function startClock(on){
+ MK.running=on;
+ if(on){MK.startedAt=Date.now();}
+ else{MK.base=mkElapsed();MK.startedAt=null;}
+ $('mkRun').textContent=on?'Pause':'Start';
+ mkTick();saveMake({running:on});
+}
+function queueSave(){clearTimeout(MK.saveTimer);MK.saveTimer=setTimeout(()=>saveMake({}),600);}
+async function saveMake(extra){
+ if(!MK.entry)return;
+ try{
+  const p=await api('/api/worklog/'+MK.entry.entry_id+'/progress',{method:'PUT',
+   body:{current_round:MK.current,done:[...MK.done],counters:MK.counters,...extra}});
+  MK.base=Number(p.seconds||0);MK.running=!!p.running_since;
+  MK.startedAt=MK.running?Date.now()-((p.elapsed_seconds-p.seconds)*1000):null;
+  $('mkStatus').textContent='Saved '+new Date().toLocaleTimeString();
+ }catch(e){$('mkStatus').textContent='Not saved: '+e.message;}
+}
+$('mkClose').onclick=()=>{if(history.state&&history.state.make)history.back();else closeMake();};
+$('mkRun').onclick=()=>startClock(!MK.running);
+$('mkAddCounter').onclick=()=>{MK.counters.push({name:'Counter '+(MK.counters.length+1),value:0});renderCounters();queueSave();};
+$('mkReset').onclick=()=>{MK.done=new Set();MK.current=0;MK.counters.forEach(c=>c.value=0);renderMake();renderCounters();queueSave();};
+$('mkDone').onclick=async()=>{
+ const finishing=$('mkDone').textContent!=='Finished ✓';
+ await saveMake({finished:finishing,running:false});
+ MK.running=false;MK.startedAt=null;$('mkRun').textContent='Start';
+ $('mkDone').textContent=finishing?'Finished ✓':'Finished';
+ $('mkStatus').textContent=finishing?`Done in ${mkFormat(mkElapsed())}.`:'Reopened.';
+};
+
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;
 $('wlKind').onchange=loadWorkLogEntries;

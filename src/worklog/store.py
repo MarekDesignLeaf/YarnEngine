@@ -67,6 +67,22 @@ CREATE TABLE IF NOT EXISTS worklog_shares(
 );
 
 CREATE INDEX IF NOT EXISTS idx_worklog_shares_viewer ON worklog_shares(viewer_user_id);
+
+-- How far through making a piece someone is: which rounds are done, what the
+-- counters say, and how long it has taken. Kept on the server rather than in
+-- the browser because a piece is made over days, in a chair, on whichever
+-- device is to hand -- and because the time it took is worth keeping.
+CREATE TABLE IF NOT EXISTS worklog_progress(
+  entry_id INTEGER PRIMARY KEY,
+  user_id INTEGER,
+  current_round INTEGER NOT NULL DEFAULT 0,
+  done_json TEXT NOT NULL DEFAULT '[]',
+  counters_json TEXT NOT NULL DEFAULT '[]',
+  seconds REAL NOT NULL DEFAULT 0,
+  running_since TEXT,
+  finished_at TEXT,
+  updated_at TEXT NOT NULL
+);
 """
 
 # How long an identical repeat folds into the entry already there rather than
@@ -230,6 +246,98 @@ class WorkLogStore:
             "IFNULL(SUM(mass_g),0) AS mass_g, IFNULL(SUM(stitches),0) AS stitches "
             f"FROM worklog WHERE user_id IS ?{extra}", (owner_id,)).fetchone()
         return dict(row)
+
+    # ---- making it ----------------------------------------------------
+    def progress(self, entry_id, user_id):
+        """Where someone is in making a piece. Only the maker's own progress."""
+        row = self.conn.execute(
+            "SELECT * FROM worklog_progress WHERE entry_id=? AND user_id IS ?",
+            (entry_id, user_id)).fetchone()
+        if row is None:
+            return None
+        out = dict(row)
+        out["done"] = json.loads(out.pop("done_json"))
+        out["counters"] = json.loads(out.pop("counters_json"))
+        out["elapsed_seconds"] = self._elapsed(out)
+        return out
+
+    @staticmethod
+    def _elapsed(row) -> float:
+        """Seconds worked so far: what was banked, plus the running stretch.
+
+        The clock is kept as a start time rather than ticked, so closing the
+        app mid-round does not lose the time or invent any.
+        """
+        seconds = float(row["seconds"] or 0)
+        if row.get("running_since"):
+            started = datetime.datetime.fromisoformat(row["running_since"])
+            now = datetime.datetime.now(datetime.timezone.utc)
+            seconds += max(0.0, (now - started).total_seconds())
+        return round(seconds, 1)
+
+    def save_progress(self, entry_id, user_id, *, current_round=None, done=None,
+                      counters=None, running=None, finished=None):
+        entry = self.get(entry_id)
+        if entry is None or entry["user_id"] != user_id:
+            return None
+        now = utc_now()
+        row = self.conn.execute(
+            "SELECT * FROM worklog_progress WHERE entry_id=?", (entry_id,)).fetchone()
+        if row is None:
+            self.conn.execute(
+                "INSERT INTO worklog_progress(entry_id, user_id, updated_at) VALUES(?,?,?)",
+                (entry_id, user_id, now))
+            row = self.conn.execute(
+                "SELECT * FROM worklog_progress WHERE entry_id=?", (entry_id,)).fetchone()
+        row = dict(row)
+        seconds, running_since = float(row["seconds"] or 0), row["running_since"]
+        if running is not None:
+            if running and not running_since:
+                running_since = now
+            elif not running and running_since:
+                seconds = self._elapsed(row)       # bank the stretch just worked
+                running_since = None
+        sets = {"seconds": seconds, "running_since": running_since, "updated_at": now}
+        if current_round is not None:
+            sets["current_round"] = max(0, int(current_round))
+        if done is not None:
+            sets["done_json"] = json.dumps(sorted({int(x) for x in done}))
+        if counters is not None:
+            sets["counters_json"] = json.dumps(counters, ensure_ascii=False)
+        if finished is not None:
+            if finished and not row["finished_at"]:
+                sets["finished_at"] = now
+                # finishing stops the clock, so a piece left running overnight
+                # does not keep counting after it is done
+                sets["seconds"] = self._elapsed({**row, "running_since": running_since})
+                sets["running_since"] = None
+            elif not finished:
+                sets["finished_at"] = None
+        self.conn.execute(
+            f"UPDATE worklog_progress SET {', '.join(f'{k}=?' for k in sets)} WHERE entry_id=?",
+            (*sets.values(), entry_id))
+        self.conn.commit()
+        return self.progress(entry_id, user_id)
+
+    def progress_for(self, entry_ids, user_id) -> dict:
+        """A summary per entry, for showing time and how far along in a list."""
+        if not entry_ids:
+            return {}
+        marks = ",".join("?" for _ in entry_ids)
+        rows = self.conn.execute(
+            f"SELECT * FROM worklog_progress WHERE user_id IS ? AND entry_id IN ({marks})",
+            (user_id, *entry_ids)).fetchall()
+        out = {}
+        for r in rows:
+            r = dict(r)
+            out[r["entry_id"]] = {
+                "elapsed_seconds": self._elapsed(r),
+                "running": bool(r["running_since"]),
+                "current_round": r["current_round"],
+                "done_count": len(json.loads(r["done_json"])),
+                "finished_at": r["finished_at"],
+            }
+        return out
 
     # ---- sharing ------------------------------------------------------
     def share(self, owner_id, viewer_id) -> bool:

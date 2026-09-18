@@ -111,3 +111,48 @@ def test_totals_add_up_the_log(store):
     add(store, request={"a": 2}, length_m=5.5, mass_g=2.0, stitches=50)
     tot = store.totals(owner_id=1, viewer_id=1)
     assert tot == {"entries": 2, "length_m": 15.5, "mass_g": 6.0, "stitches": 150}
+
+
+def test_progress_belongs_to_the_maker_and_starts_empty(store):
+    row = add(store, user_id=1)
+    assert store.progress(row["entry_id"], 1) is None
+    assert store.save_progress(row["entry_id"], 2, running=True) is None   # not theirs
+    p = store.save_progress(row["entry_id"], 1, current_round=3, done=[1, 2, 3])
+    assert p["current_round"] == 3 and p["done"] == [1, 2, 3]
+    assert p["elapsed_seconds"] == 0 and p["running_since"] is None
+
+
+def test_the_clock_banks_time_instead_of_ticking(store):
+    import datetime as dt
+    row = add(store, user_id=1)
+    store.save_progress(row["entry_id"], 1, running=True)
+    # pretend the piece was started twenty minutes ago and put down
+    started = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(minutes=20)).isoformat()
+    store.conn.execute("UPDATE worklog_progress SET running_since=? WHERE entry_id=?",
+                       (started, row["entry_id"]))
+    store.conn.commit()
+    assert store.progress(row["entry_id"], 1)["elapsed_seconds"] == pytest.approx(1200, abs=5)
+    paused = store.save_progress(row["entry_id"], 1, running=False)
+    assert paused["running_since"] is None
+    assert paused["seconds"] == pytest.approx(1200, abs=5)
+    # paused time does not keep growing
+    assert store.progress(row["entry_id"], 1)["elapsed_seconds"] == pytest.approx(paused["seconds"])
+
+
+def test_finishing_a_piece_stops_the_clock(store):
+    row = add(store, user_id=1)
+    store.save_progress(row["entry_id"], 1, running=True)
+    done = store.save_progress(row["entry_id"], 1, finished=True)
+    assert done["finished_at"] and done["running_since"] is None
+    again = store.save_progress(row["entry_id"], 1, finished=False)
+    assert again["finished_at"] is None
+
+
+def test_a_log_can_show_time_and_how_far_along_without_loading_every_piece(store):
+    a = add(store, request={"a": 1}, user_id=1)
+    add(store, request={"b": 2}, user_id=1)
+    store.save_progress(a["entry_id"], 1, current_round=4, done=[1, 2, 3, 4])
+    summary = store.progress_for([a["entry_id"]], 1)
+    assert summary[a["entry_id"]]["done_count"] == 4
+    assert summary[a["entry_id"]]["current_round"] == 4
+    assert store.progress_for([], 1) == {}

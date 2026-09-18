@@ -33,7 +33,7 @@ from src.shaping.service import translate_shaping
 from src.spatial_shaping.service import analyse_spatial_shaping
 from src.stitch_groups.service import analyse_stitch_groups
 import base64
-from src.design.parts import build_design, written_pattern
+from src.design.parts import build_design, written_pattern, round_text, OP_WORDS
 from src.design.shapes import ARCHETYPES as DESIGN_ARCHETYPES
 from src.design.vision import (describe_photo, configured as vision_configured,
                                model_name as vision_model_name, env_key as vision_env_key,
@@ -780,6 +780,10 @@ def worklog_list(http_request: Request, owner: int | None = None, q: str | None 
                                  yarn_id=yarn_id, limit=limit, offset=offset)
     if entries is None:
         raise HTTPException(status_code=403, detail="this log has not been shared with you")
+    progress = (worklog_store.progress_for([e["entry_id"] for e in entries], me)
+                if owner_id == me else {})
+    for entry in entries:
+        entry["progress"] = progress.get(entry["entry_id"])
     return {"owner": {"user_id": owner_id, "username": _user_label(owner_id),
                       "is_me": owner_id == me},
             "entries": entries,
@@ -844,6 +848,30 @@ def worklog_update(entry_id: int, payload: dict, http_request: Request):
         raise HTTPException(status_code=404, detail="entry not found")
     row.pop("request_json", None)
     row.pop("result_json", None)
+    return row
+
+
+@app.get("/api/worklog/{entry_id}/progress")
+def worklog_progress(entry_id: int, http_request: Request):
+    """How far through making this piece you are. Your own work only."""
+    me = _current_user_id(http_request)
+    entry = worklog_store.get(entry_id)
+    if entry is None or entry["user_id"] != me:
+        raise HTTPException(status_code=404, detail="entry not found")
+    return worklog_store.progress(entry_id, me) or {
+        "entry_id": entry_id, "current_round": 0, "done": [], "counters": [],
+        "seconds": 0, "elapsed_seconds": 0, "running_since": None, "finished_at": None}
+
+
+@app.put("/api/worklog/{entry_id}/progress")
+def worklog_save_progress(entry_id: int, payload: dict, http_request: Request):
+    row = worklog_store.save_progress(
+        entry_id, _current_user_id(http_request),
+        current_round=payload.get("current_round"), done=payload.get("done"),
+        counters=payload.get("counters"), running=payload.get("running"),
+        finished=payload.get("finished"))
+    if row is None:
+        raise HTTPException(status_code=404, detail="entry not found")
     return row
 
 
@@ -1134,7 +1162,7 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
     copies=max(1,int(payload.get("copies") or 1))
     stitches=sum(int(v) for v in analysed["operation_counts"].values())
     rounds=len(analysed.get("trace") or [])
-    _log_calculation(
+    logged=_log_calculation(
         http_request, kind,
         payload.get("title") or (f"Amigurumi piece — {rounds} rounds" if kind=="amigurumi"
                                  else "Branch piece"),
@@ -1145,7 +1173,29 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
         length_m=(calc.recommended_length_m*copies if calc.recommended_length_m is not None else None),
         mass_g=(calc.mass_g*copies if calc.mass_g is not None else None),
         packages=calc.packages, stitches=stitches*copies, pieces=copies)
+    # so the result can offer to work through the piece straight away
+    result["worklog_entry_id"] = (logged or {}).get("entry_id")
     return result
+
+@app.post("/api/crochet/amigurumi/written")
+def crochet_amigurumi_written(payload: dict):
+    """Rounds -> the lines a person actually reads while making it.
+
+    The same writer the generated patterns use, so a piece reads identically
+    whether it came out of the designer or was typed into the rounds editor.
+    """
+    analysed = analyse_rounds(payload, service.operations)
+    if not analysed.get("valid"):
+        raise HTTPException(status_code=422, detail={"program_issues": analysed.get("issues", [])})
+    stitch = str(payload.get("stitch") or "SC").upper()
+    initial = int(payload.get("initial_stitches") or 6)
+    lines = [f"R1: {initial} {OP_WORDS.get(stitch, 'sc')} in magic ring ({initial})"]
+    for i, (r, step) in enumerate(zip(payload.get("rounds", []), analysed["trace"]), start=2):
+        lines.append(f"R{i}: " + round_text(r.get("operations", {}),
+                                            step["output_stitches"], plain=stitch))
+    return {"lines": lines, "stitch_counts": [initial] + [t["output_stitches"] for t in analysed["trace"]],
+            "round_count": len(lines)}
+
 
 @app.post("/api/crochet/amigurumi/analyse")
 def crochet_amigurumi_analyse(payload:dict):

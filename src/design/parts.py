@@ -129,6 +129,11 @@ def part_pattern(part: dict, gauge_stitches_per_10cm: float, gauge_rows_per_10cm
     }
 
 
+# The round writer is useful outside pattern generation too: the make-mode
+# reads out rounds the person typed themselves, and they should read the same.
+round_text = _round_text
+
+
 def build_design(spec: dict) -> dict:
     """A whole object: scale the parts to the stated height and write them out.
 

@@ -64,3 +64,28 @@ Recording is deliberately best-effort: a failure to write the log is swallowed,
 because a missing line is a nuisance and a 500 on a calculation that actually
 succeeded is not. `tests/worklog/` and `tests/web/test_worklog_api.py` cover
 the writing, the folding, and every rule above about who can see what.
+
+## Making it
+
+A piece worked in rounds can be worked through in the app: the rounds as a
+tick-off list with the current one marked, a row counter that follows the list
+rather than being kept by hand, counters of your own for repeats and colour
+changes, and a clock.
+
+The rounds are read out by the same writer the generated patterns use, so a
+piece typed into the editor reads exactly like one the designer produced —
+`POST /api/crochet/amigurumi/written` is that writer, and it refuses rounds
+that cannot be worked rather than printing nonsense.
+
+Progress is kept on the server (`worklog_progress`, one row per entry), because
+a piece is made over days and on whichever device is to hand. The clock is
+stored as banked seconds plus a start time rather than ticked, so closing the
+app mid-round neither loses the time nor invents any; finishing a piece stops
+it, so one left running overnight does not keep counting. Ticking a round is
+the action that happens a thousand times, so it does the bookkeeping too:
+everything before it counts as worked, the row counter follows, and the clock
+starts on the first tick.
+
+Progress is the maker's own. It is not part of what a shared log shows — a
+colleague sees the work and its figures, not how far along you are — and
+`GET`/`PUT /api/worklog/{id}/progress` answer 404 to anyone else.
