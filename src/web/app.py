@@ -32,6 +32,12 @@ from src.pattern_acquisition.pipeline import acquire_structured_text
 from src.shaping.service import translate_shaping
 from src.spatial_shaping.service import analyse_spatial_shaping
 from src.stitch_groups.service import analyse_stitch_groups
+import base64
+from src.design.parts import build_design, written_pattern
+from src.design.shapes import ARCHETYPES as DESIGN_ARCHETYPES
+from src.design.vision import (describe_photo, configured as vision_configured,
+                               model_name as vision_model_name,
+                               VisionUnavailable, CATEGORIES as VISION_CATEGORIES)
 from src.library.yarn import YarnRecord
 from src.import_pipeline.core import canonical_checksum
 from src.calibration.uncertainty import empirical_absolute_error_interval, validation_summary
@@ -450,6 +456,95 @@ def admin_ingestion_review(limit: int = 100):
         return [dict(r) for r in rows]
     finally:
         store.close()
+
+
+@app.get("/api/design/status")
+def design_status():
+    """Whether photo analysis is available on this server."""
+    return {"vision_configured": vision_configured(), "model": vision_model_name(),
+            "archetypes": DESIGN_ARCHETYPES, "categories": VISION_CATEGORIES}
+
+
+@app.post("/api/design/generate")
+def design_generate(payload: dict):
+    """Parts + a stated height -> the pattern for every part.
+
+    Deterministic and offline: no photo, no API key. This is the step that
+    produces every number a maker works from.
+    """
+    try:
+        design = build_design(payload)
+    except (KeyError, TypeError, ValueError) as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    design["written"] = written_pattern(design)
+    return design
+
+
+PHOTO_MAX_PER_HOUR = 20
+_photo_calls: dict[str, list[float]] = defaultdict(list)
+
+def _check_photo_rate_limit(request: Request):
+    """Each photo read costs real money at the vision provider, so cap how many
+    one account can trigger per hour."""
+    user = getattr(request.state, "user", None)
+    key = str(user["id"]) if user else "anonymous"
+    now = time.monotonic()
+    calls = _photo_calls[key]
+    while calls and calls[0] < now - 3600:
+        calls.pop(0)
+    if len(calls) >= PHOTO_MAX_PER_HOUR:
+        raise HTTPException(status_code=429, detail=(
+            f"photo analysis is limited to {PHOTO_MAX_PER_HOUR} photos an hour; "
+            "describe the parts yourself in the meantime"))
+    calls.append(now)
+
+
+@app.post("/api/design/from-photo")
+def design_from_photo(payload: dict, http_request: Request):
+    """Photo(s) + an approximate height -> the parts, then their patterns.
+
+    The vision model only describes the parts and their proportions; every
+    stitch count and round count below comes from the deterministic generator.
+    """
+    _check_photo_rate_limit(http_request)
+    images = []
+    for item in (payload.get("images") or [])[:4]:
+        try:
+            media = str(item.get("media_type") or "image/jpeg")
+            data = str(item.get("data") or "")
+            if "," in data and data.strip().startswith("data:"):
+                media = data.split(";")[0][5:] or media
+                data = data.split(",", 1)[1]
+            images.append((media, base64.b64decode(data, validate=True)))
+        except (AttributeError, ValueError, TypeError):
+            raise HTTPException(status_code=422, detail="an image could not be read")
+    if not images:
+        raise HTTPException(status_code=422, detail="at least one photo is required")
+    try:
+        described = describe_photo(images, hint=payload.get("hint"))
+    except VisionUnavailable as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    spec = {
+        "object": described["object"],
+        "total_height_cm": payload.get("total_height_cm"),
+        "gauge_stitches_per_10cm": payload.get("gauge_stitches_per_10cm", 20),
+        "gauge_rows_per_10cm": payload.get("gauge_rows_per_10cm", 22),
+        "initial_stitches": payload.get("initial_stitches", 6),
+        "parts": described["parts"],
+        "notes": described["assembly"],
+    }
+    try:
+        design = build_design(spec)
+    except (KeyError, TypeError, ValueError) as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    design["written"] = written_pattern(design)
+    design["photo_reading"] = {
+        "confidence": described["confidence"],
+        "uncertain": described["uncertain"],
+        "dropped": described["dropped"],
+        "model": described.get("model"),
+    }
+    return design
 
 
 @app.api_route("/", methods=["GET", "HEAD"])

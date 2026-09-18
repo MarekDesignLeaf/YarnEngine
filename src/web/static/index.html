@@ -242,6 +242,36 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
     <div class="toolbar" style="margin-top:0">
       <button id="modeFlat" class="accent">Flat piece from a pattern</button>
       <button id="modeAmi" class="alt">Amigurumi (rounds)</button>
+      <button id="modeDesign" class="alt">Design from a photo</button>
+    </div>
+    <div id="designBox" class="hidden" style="margin-top:12px">
+      <p class="small muted" style="margin-top:0">Upload a photo of the thing you want to make and say roughly how tall it should be. The parts are read from the photo; every stitch count and round count is then calculated from your gauge — nothing is guessed.</p>
+      <div class="fields">
+        <label><span>Photo(s) — up to 4</span><input id="dsgPhotos" type="file" accept="image/*" multiple></label>
+        <label><span>Finished height (cm)</span><input id="dsgHeight" type="number" min="2" step="0.5" value="24"></label>
+        <label><span>What is it? (optional hint)</span><input id="dsgHint" placeholder="e.g. sitting teddy bear"></label>
+        <label><span>Starting stitches (magic ring)</span><input id="dsgInitial" type="number" min="3" value="6"></label>
+      </div>
+      <div id="dsgThumbs" class="toolbar" style="gap:6px"></div>
+      <div class="toolbar">
+        <button id="btnDesignPhoto" class="accent">Read the photo and write the pattern</button>
+        <button id="btnDesignManual" class="alt">Describe the parts myself</button>
+      </div>
+      <div id="dsgStatus" class="status hidden"></div>
+      <div id="dsgManual" class="hidden" style="margin-top:10px">
+        <h3 style="margin-top:6px">Parts</h3>
+        <div id="dsgParts" style="display:grid;gap:8px"></div>
+        <div class="toolbar"><button id="btnDsgAddPart" class="alt">+ part</button><button id="btnDsgBuild" class="accent">Write the pattern</button></div>
+      </div>
+      <div id="dsgResult" class="hidden" style="margin-top:14px">
+        <div class="toolbar" style="justify-content:space-between">
+          <h3 style="margin:0">Pattern</h3>
+          <div class="toolbar" style="margin:0"><button id="btnDsgCopy" class="alt">Copy</button><button id="btnDsgPrint" class="alt">Print</button></div>
+        </div>
+        <div id="dsgSummary" class="metrics"></div>
+        <div id="dsgPartList" style="display:grid;gap:8px;margin-top:10px"></div>
+        <pre id="dsgWritten" class="chartbox" style="white-space:pre-wrap;font-size:12.5px;margin-top:10px;max-height:340px;overflow:auto"></pre>
+      </div>
     </div>
     <div id="flatBox" style="margin-top:12px">
       <div class="fields">
@@ -725,8 +755,8 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
-$('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
+$('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');$('modeDesign').onclick=()=>calcSetMode('design');
 let ami3dTimer=null;
 function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
 async function refreshAmi3D(){
@@ -1167,6 +1197,108 @@ $('btnGenRounds').onclick=()=>{
 };
 $('shapeEditorDetails').addEventListener('toggle',()=>{if($('shapeEditorDetails').open){window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleShapePreview();}});
 renderShapeEditor();renderShapeFields();
+
+/* ============================ design from a photo ============================
+   The photo decides *what the parts are*; the server's generator decides every
+   number, from the gauge and the stated height. The two are kept apart on
+   purpose, so a pattern is never invented by a language model. */
+let dsgPhotos=[],dsgDesign=null,dsgArchetypes={},dsgCategories=[];
+let dsgManualParts=[{name:'Head',category:'HEAD',archetype:'sphere',copies:1,height_fraction:0.34,width_fraction:0.34},
+                    {name:'Body',category:'BODY',archetype:'egg',copies:1,height_fraction:0.42,width_fraction:0.30}];
+
+api('/api/design/status').then(s=>{
+ dsgArchetypes=s.archetypes||{};dsgCategories=s.categories||[];
+ if(!s.vision_configured)status($('dsgStatus'),'Reading photos automatically is not switched on for this server yet. You can still describe the parts yourself — everything else works the same.','warn');
+}).catch(()=>{});
+
+$('dsgPhotos').addEventListener('change',async()=>{
+ dsgPhotos=[];$('dsgThumbs').innerHTML='';
+ for(const f of [...$('dsgPhotos').files].slice(0,4)){
+  if(f.size>5*1024*1024){status($('dsgStatus'),`${f.name} is larger than 5 MB — use a smaller photo.`,'bad');continue;}
+  const data=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f);});
+  dsgPhotos.push({media_type:f.type||'image/jpeg',data});
+  const img=document.createElement('img');img.src=data;img.className='thumb-sm';$('dsgThumbs').appendChild(img);
+ }
+});
+
+function dsgGauge(){return {gauge_stitches_per_10cm:Number($('gaugeSt').value)||20,gauge_rows_per_10cm:Number($('gaugeRows').value)||22,initial_stitches:Math.max(3,Number($('dsgInitial').value)||6)};}
+
+$('btnDesignPhoto').onclick=async()=>{
+ if(!dsgPhotos.length){status($('dsgStatus'),'Choose at least one photo first.','bad');return;}
+ status($('dsgStatus'),'Reading the photo…','');
+ $('btnDesignPhoto').disabled=true;
+ try{
+  const d=await api('/api/design/from-photo',{method:'POST',body:{images:dsgPhotos,total_height_cm:Number($('dsgHeight').value)||24,hint:$('dsgHint').value||null,...dsgGauge()}});
+  showDesign(d);
+ }catch(e){status($('dsgStatus'),e.message,'bad');}
+ finally{$('btnDesignPhoto').disabled=false;}
+};
+$('btnDesignManual').onclick=()=>{$('dsgManual').classList.remove('hidden');renderDsgParts();};
+
+function dsgPartRow(p,i){
+ const arch=Object.keys(dsgArchetypes).length?Object.keys(dsgArchetypes):['sphere','egg','cylinder','limb','cone','disc','dome'];
+ return `<div class="op-seg" data-part="${i}" style="flex-wrap:wrap">
+  <input class="dsgName" value="${esc(p.name||'')}" placeholder="Name" style="flex:1 1 110px;padding:6px">
+  <select class="dsgArch" style="flex:1 1 130px;padding:6px">${arch.map(a=>`<option value="${a}"${a===p.archetype?' selected':''}>${esc(a)}${dsgArchetypes[a]?' — '+esc(dsgArchetypes[a].split('(')[0].trim()):''}</option>`).join('')}</select>
+  <label style="flex:0 0 78px;margin:0"><span class="small muted">height %</span><input type="number" class="dsgH" min="1" max="150" value="${Math.round((p.height_fraction||0.3)*100)}" style="padding:6px"></label>
+  <label style="flex:0 0 78px;margin:0"><span class="small muted">width %</span><input type="number" class="dsgW" min="1" max="150" value="${Math.round((p.width_fraction||p.height_fraction||0.3)*100)}" style="padding:6px"></label>
+  <label style="flex:0 0 62px;margin:0"><span class="small muted">make</span><input type="number" class="dsgC" min="1" value="${p.copies||1}" style="padding:6px"></label>
+  <button class="segDel dsgDel" type="button" data-part="${i}" title="Remove">✕</button></div>`;
+}
+function renderDsgParts(){
+ $('dsgParts').innerHTML=dsgManualParts.map(dsgPartRow).join('');
+ $('dsgParts').querySelectorAll('.dsgDel').forEach(b=>b.onclick=()=>{dsgManualParts.splice(Number(b.dataset.part),1);renderDsgParts();});
+}
+function readDsgParts(){
+ return [...$('dsgParts').querySelectorAll('.op-seg')].map(row=>({
+  name:row.querySelector('.dsgName').value.trim()||'Part',
+  archetype:row.querySelector('.dsgArch').value,
+  copies:Math.max(1,Number(row.querySelector('.dsgC').value)||1),
+  height_fraction:Math.max(0.01,(Number(row.querySelector('.dsgH').value)||30)/100),
+  width_fraction:Math.max(0.01,(Number(row.querySelector('.dsgW').value)||30)/100)}));
+}
+$('btnDsgAddPart').onclick=()=>{dsgManualParts=readDsgParts();dsgManualParts.push({name:'Part',archetype:'sphere',copies:1,height_fraction:0.2,width_fraction:0.2});renderDsgParts();};
+$('btnDsgBuild').onclick=async()=>{
+ const parts=readDsgParts();
+ if(!parts.length){status($('dsgStatus'),'Add at least one part.','bad');return;}
+ try{
+  const d=await api('/api/design/generate',{method:'POST',body:{object:$('dsgHint').value||'amigurumi',total_height_cm:Number($('dsgHeight').value)||24,parts,...dsgGauge()}});
+  showDesign(d);
+ }catch(e){status($('dsgStatus'),e.message,'bad');}
+};
+
+function showDesign(d){
+ dsgDesign=d;
+ $('dsgResult').classList.remove('hidden');
+ const r=d.photo_reading;
+ if(r){
+  const bits=[`Read from the photo with ${esc(r.confidence)} confidence.`];
+  if(r.uncertain&&r.uncertain.length)bits.push('Not visible in the photo: '+r.uncertain.map(esc).join(' '));
+  if(r.dropped&&r.dropped.length)bits.push('Ignored (not a shape this can make): '+r.dropped.map(esc).join(', '));
+  status($('dsgStatus'),bits.join(' ')+' Stitch and round counts below are calculated from your gauge, not read from the photo.',r.confidence==='high'?'good':'warn');
+ } else status($('dsgStatus'),'Pattern written from the parts you described.','good');
+ $('dsgSummary').innerHTML=[
+  ['Parts',d.parts.length],['Pieces to make',d.piece_count],
+  ['Total stitches',d.total_stitches.toLocaleString()],['Height',d.total_height_cm+' cm']
+ ].map(([k,v])=>`<div class="metric"><strong>${esc(String(v))}</strong><span>${esc(k)}</span></div>`).join('');
+ $('dsgPartList').innerHTML=d.parts.map((p,i)=>`<div class="lineCard" style="padding:10px">
+   <div class="toolbar" style="margin:0;justify-content:space-between">
+    <div><strong>${esc(p.name)}</strong> <span class="pill">make ${p.copies}</span>
+     <div class="small muted">${esc(p.archetype)} · ${p.round_count} rounds · up to ${Math.max(...p.stitch_counts)} sts · ${p.height_cm}×${p.width_cm} cm</div></div>
+    <button class="alt dsgUse" data-i="${i}" type="button">Open in the rounds editor</button>
+   </div></div>`).join('');
+ $('dsgPartList').querySelectorAll('.dsgUse').forEach(b=>b.onclick=()=>{
+  const p=dsgDesign.parts[Number(b.dataset.i)];
+  $('amiInitial').value=p.initial_stitches;lastInitial=p.initial_stitches;
+  $('amiTemplate').value='custom';$('amiCopies').value=p.copies;
+  calcSetMode('ami');writeRounds(p.rounds);
+  status($('amiStatus'),`Loaded “${p.name}” — ${p.rounds.length+1} rounds. Calculate the yarn below, or adjust the rounds first.`,'good');
+  window.scrollTo({top:0,behavior:'smooth'});
+ });
+ $('dsgWritten').textContent=d.written;
+}
+$('btnDsgCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('dsgWritten').textContent);status($('dsgStatus'),'Pattern copied.','good');}catch(e){status($('dsgStatus'),'Could not copy — select the text and copy it manually.','warn');}};
+$('btnDsgPrint').onclick=()=>{const w=window.open('','_blank');if(!w)return;w.document.write('<pre style="font:13px/1.45 system-ui;white-space:pre-wrap">'+esc($('dsgWritten').textContent)+'</pre>');w.document.close();w.print();};
 
 /* ============================ calculation ============================ */
 function commonInputs(){return {yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
