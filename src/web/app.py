@@ -59,6 +59,8 @@ from src.crochet_calibration.quality import replicate_quality as crochet_replica
 from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
+from src.crochet_geometry.stitch_loop import (operation_length_mm, OPERATION_WRAPS,
+                                              OPERATION_WRAP_RATIO)
 from src.library.colours import match_colour
 from src.worklog.store import WorkLogStore
 import datetime, os, sqlite3, time
@@ -1920,6 +1922,156 @@ def delete_stash(yarn_id:str, http_request:Request):
             raise HTTPException(status_code=404,detail="stash entry not found")
     finally: store.close()
     return {"status":"deleted","yarn_id":yarn_id}
+
+
+# ------------------------------------------------------------- the stitches ---
+# What each stitch is for, in the words a person would use. Everything else on
+# this page -- how much yarn it takes, what it consumes and produces -- is read
+# from the operation registry and the geometry, not written down twice.
+STITCH_USES = {
+    "CH": "Starts a row and makes the gaps in lacy fabric. Adds a stitch without using one.",
+    "SLST": "Joins, travels and finishes. Adds no height at all.",
+    "SC": "The amigurumi stitch: short and dense, so stuffing does not show through.",
+    "SC_BLO": "Single crochet through the back loop only, which leaves a ridge — used for a fold or a sole.",
+    "SC_FLO": "Single crochet through the front loop only; the ridge faces the other way.",
+    "HDC": "Half again as tall as single crochet. Quicker, still fairly dense.",
+    "DC": "Twice the height of single crochet. Blankets and garments, where drape matters more than density.",
+    "TR": "Taller again, and openly holey. Lace and edgings.",
+    "DTR": "The tallest of the everyday stitches.",
+    "SC_INC": "Two single crochet in one stitch: this is how a flat circle grows.",
+    "HDC_INC": "The same increase worked in half double crochet.",
+    "DC_INC": "The same increase worked in double crochet.",
+    "SC2TOG": "Two stitches worked together as one: how a ball closes up.",
+    "SC3TOG": "Three into one, for a sharper decrease.",
+    "HDC2TOG": "The half double crochet decrease.",
+    "DC2TOG": "The double crochet decrease.",
+    "FPDC": "Worked around the post from the front, raising a ridge towards you — ribbing and cables.",
+    "BPDC": "The same from the back, so the ridge falls away.",
+    "PUFF3": "Several loops drawn up and closed together into a soft bump.",
+    "POPCORN5": "A cluster folded forward into a firm bobble.",
+}
+# The order a person meets them, not the order a computer sorts them: a chart
+# that opens on "back post double crochet" is a chart nobody reads.
+STITCH_ORDER = ["CH", "SLST", "SC", "HDC", "DC", "TR", "DTR",
+                "SC_INC", "HDC_INC", "DC_INC",
+                "SC2TOG", "SC3TOG", "HDC2TOG", "DC2TOG", "DC3TOG",
+                "SC_BLO", "SC_FLO", "HDC_BLO", "DC_BLO",
+                "FPDC", "BPDC", "PUFF3", "POPCORN5"]
+
+
+@app.get("/api/stitches")
+def stitches(hook_mm: float = 3.5, yarn_diameter_mm: float = 2.5):
+    """Every crochet stitch the app knows, and what each one costs.
+
+    The yarn figure is the geometry baseline at a stated hook and yarn, so it
+    is comparable between stitches rather than being a number to work from: a
+    double crochet takes about twice what a single crochet does, which is the
+    thing worth knowing when choosing one.
+    """
+    if not 0 < hook_mm <= 30 or not 0 < yarn_diameter_mm <= 15:
+        raise HTTPException(status_code=422, detail="hook and yarn diameter are in millimetres")
+    out = []
+    def teaching_order(pair):
+        op_id = pair[0]
+        return (STITCH_ORDER.index(op_id) if op_id in STITCH_ORDER else len(STITCH_ORDER), op_id)
+    for op_id, op in sorted(operation_map.items(), key=teaching_order):
+        family = (op.get("family") or "")
+        if not family.startswith("crochet"):
+            continue
+        try:
+            length = operation_length_mm(op_id, hook_mm, yarn_diameter_mm)
+            per_stitch_mm, measured = length.length_mm, length.measured_anchor
+        except KeyError:
+            per_stitch_mm, measured = None, False
+        out.append({
+            "operation_id": op_id,
+            "name": op.get("name") or op_id,
+            "abbreviation": OP_WORDS.get(op_id, op_id.lower()),
+            "family": family,
+            "consumes": op.get("consumes_stitches"),
+            "produces": op.get("produces_stitches"),
+            "wraps": OPERATION_WRAPS.get(op_id),
+            "yarn_mm": round(per_stitch_mm, 1) if per_stitch_mm else None,
+            "relative_to_sc": (round(OPERATION_WRAP_RATIO[op_id], 2)
+                               if op_id in OPERATION_WRAP_RATIO else None),
+            "measured": measured,
+            "use": STITCH_USES.get(op_id),
+        })
+    return {"hook_mm": hook_mm, "yarn_diameter_mm": yarn_diameter_mm,
+            "stitches": out,
+            "note": ("Yarn per stitch is the uncalibrated geometry baseline at this hook and "
+                     "yarn: wraps x tension x the loop around hook and yarn. It is for "
+                     "comparing stitches, not for costing a piece — the calculator does that "
+                     "from the whole program.")}
+
+
+# ------------------------------------------------------ the rest of the kit ---
+STASH_KINDS = {
+    "hook": "Hooks", "needle": "Needles", "supply": "Supplies", "tool": "Tools",
+}
+
+
+@app.get("/api/stash/items")
+def list_stash_items(http_request: Request, kind: str | None = None, q: str | None = None):
+    """Hooks, needles and the oddments, which is most of what a bag holds."""
+    if kind and kind not in STASH_KINDS:
+        raise HTTPException(status_code=422, detail=f"kind must be one of {sorted(STASH_KINDS)}")
+    store = service._store()
+    try:
+        items = store.list_stash_items(_current_user_id(http_request), kind=kind, query=q)
+        all_items = store.list_stash_items(_current_user_id(http_request))
+    finally:
+        store.close()
+    counts = {k: 0 for k in STASH_KINDS}
+    for item in all_items:
+        counts[item["kind"]] = counts.get(item["kind"], 0) + 1
+    return {"items": items, "kinds": STASH_KINDS, "counts": counts}
+
+
+@app.post("/api/stash/items")
+def upsert_stash_item(payload: dict, http_request: Request):
+    kind = str(payload.get("kind") or "").strip()
+    name = str(payload.get("name") or "").strip()
+    if kind not in STASH_KINDS:
+        raise HTTPException(status_code=422, detail=f"kind must be one of {sorted(STASH_KINDS)}")
+    if not name:
+        raise HTTPException(status_code=422, detail="give it a name")
+    def number(key, default=None):
+        value = payload.get(key)
+        if value in (None, ""):
+            return default
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=422, detail=f"{key} must be a number")
+    size = number("size_mm")
+    if size is not None and not 0 < size <= 50:
+        raise HTTPException(status_code=422, detail="a hook or needle is between 0 and 50 mm")
+    quantity = number("quantity", 1.0)
+    if quantity is None or quantity < 0:
+        raise HTTPException(status_code=422, detail="how many is not a negative number")
+    item = {"id": payload.get("id"), "kind": kind, "name": name[:120],
+            "brand": (str(payload.get("brand") or "").strip()[:80] or None),
+            "size_mm": size, "size_label": (str(payload.get("size_label") or "").strip()[:20] or None),
+            "quantity": quantity, "notes": (str(payload.get("notes") or "").strip()[:300] or None)}
+    store = service._store()
+    try:
+        store.upsert_stash_item(_current_user_id(http_request), item,
+                                datetime.datetime.now(datetime.timezone.utc).isoformat())
+        return {"status": "saved", "item": item}
+    finally:
+        store.close()
+
+
+@app.delete("/api/stash/items/{item_id}")
+def delete_stash_item(item_id: int, http_request: Request):
+    store = service._store()
+    try:
+        if not store.delete_stash_item(_current_user_id(http_request), item_id):
+            raise HTTPException(status_code=404, detail="not in your stash")
+    finally:
+        store.close()
+    return {"status": "deleted"}
 
 
 # --------------------------------------------------------- company/branding ---

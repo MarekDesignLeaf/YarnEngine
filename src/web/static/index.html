@@ -138,6 +138,16 @@ button.cant{opacity:.4;box-shadow:none}
 #iosInstall button{flex:0 0 auto;padding:6px 12px;font-size:12.5px}
 /* 3D preview docked to the bottom of the screen, so the shape stays in view
    while scrolling a long list of rounds */
+/* The stitch reference: symbol, name, what it is for, and what it costs —
+   read out of the operation table and the geometry rather than copied off a
+   chart, so it cannot drift from what the calculator actually does. */
+.stitchGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:10px}
+.stitchCard{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--card);display:flex;gap:10px}
+.stitchCard svg{width:34px;height:34px;flex:0 0 34px}
+.stitchCard .sName{font-weight:650;font-size:13.5px}
+.stitchCard .sAbbr{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted)}
+.stitchCard .sUse{font-size:12px;line-height:1.4;margin-top:3px}
+.stitchCard .sFacts{font-size:11px;color:var(--muted);margin-top:4px}
 /* Make mode: the pattern as a tick-off list, with the counters and the clock
    always in reach at the bottom. Full screen, because this is what you look at
    with a hook in your hand rather than a mouse. */
@@ -510,6 +520,17 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 <!-- ---------- PATTERN DATABASE ---------- -->
 <section id="tab-patterns" class="hidden">
   <div class="card">
+    <div class="toolbar" style="margin-top:0;justify-content:space-between">
+      <h2 style="margin:0">Stitches and symbols</h2>
+      <div class="toolbar" style="margin:0">
+        <select id="stFamily" style="width:auto"><option value="">every stitch</option></select>
+        <button id="btnStitches" class="alt">Show</button>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:0" id="stitchNote">The stitches this app knows, with what each one is for and what it costs in yarn.</p>
+    <div id="stitchGrid" class="stitchGrid"></div>
+  </div>
+  <div class="card">
     <h2>Graphical pattern library</h2>
     <div class="fields three">
       <label><span>Search</span><input id="patSearch" placeholder="sc, dc, puff, popcorn, blo…"></label>
@@ -566,6 +587,8 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 
 <!-- ---------- STASH ---------- -->
 <section id="tab-stash" class="hidden">
+  <div class="toolbar" id="stashKinds" style="margin-top:0"></div>
+  <div id="stashYarnPane">
   <div class="grid2">
     <div class="card"><h2>My yarn stash</h2><div style="overflow:auto"><table id="stashTable"><thead><tr><th>Yarn</th><th>Grams</th><th>Skeins</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table></div><div id="stashEmpty" class="muted hidden">Nothing in your stash yet.</div></div>
     <div class="card"><h2>Add / update stash</h2>
@@ -577,6 +600,31 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       </div>
       <div class="toolbar"><button id="btnStashSave">Save</button></div>
       <div id="stashStatus" class="status hidden"></div>
+    </div>
+  </div>
+  </div>
+  <div id="stashKitPane" class="hidden">
+    <div class="grid2">
+      <div class="card">
+        <div class="toolbar" style="margin-top:0;justify-content:space-between">
+          <h2 style="margin:0" id="stashKitTitle">Hooks</h2>
+          <input id="stashSearch" placeholder="Search your kit…" style="width:auto;min-width:160px">
+        </div>
+        <div style="overflow:auto"><table id="stashItemTable"><thead><tr>
+          <th>What</th><th>Size</th><th>How many</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table></div>
+        <div id="stashItemEmpty" class="muted hidden">Nothing here yet.</div>
+      </div>
+      <div class="card"><h2>Add to your kit</h2>
+        <div class="fields">
+          <label><span>What is it</span><input id="kiName" placeholder="e.g. Clover Amour, safety eyes"></label>
+          <label><span>Make (optional)</span><input id="kiBrand"></label>
+          <label><span>Size (mm, optional)</span><input id="kiSize" type="number" step="0.25" min="0.5" max="50"></label>
+          <label><span>How many</span><input id="kiQty" type="number" step="1" min="0" value="1"></label>
+          <label style="grid-column:1/-1"><span>Notes (optional)</span><input id="kiNotes"></label>
+        </div>
+        <div class="toolbar"><button id="btnKitSave">Save</button></div>
+        <div id="kitStatus" class="status hidden"></div>
+      </div>
     </div>
   </div>
 </section>
@@ -908,7 +956,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -2431,6 +2479,105 @@ $('btnImportSources').onclick=async()=>{
   box.classList.remove('hidden');
  }catch(e){status($('impStatus'),e.message,'bad');}
 };
+
+/* ====================== the rest of the kit ============================
+   Yarn stays where it is, because it points at a library record with a tex and
+   a length. A hook is just a hook, so it lives in its own list with the
+   needles and the oddments. */
+let KIT={kind:'yarn',kinds:{},counts:{},items:[]};
+let kitTimer=null;
+
+function renderKindChips(){
+ const chips=[['yarn','Yarn',null],...Object.entries(KIT.kinds).map(([k,label])=>[k,label,KIT.counts[k]||0])];
+ $('stashKinds').innerHTML=chips.map(([k,label,count])=>
+  `<button type="button" class="${KIT.kind===k?'accent':'alt'} kitChip" data-kind="${k}">${esc(label)}${count!=null?` (${count})`:''}</button>`).join('');
+ $('stashKinds').querySelectorAll('.kitChip').forEach(b=>b.onclick=()=>{KIT.kind=b.dataset.kind;showKitPane();});
+}
+function showKitPane(){
+ const yarn=KIT.kind==='yarn';
+ $('stashYarnPane').classList.toggle('hidden',!yarn);
+ $('stashKitPane').classList.toggle('hidden',yarn);
+ renderKindChips();
+ if(!yarn){$('stashKitTitle').textContent=KIT.kinds[KIT.kind]||'Kit';loadKit();}
+}
+async function loadKit(){
+ try{
+  const p=new URLSearchParams();
+  if(KIT.kind!=='yarn')p.set('kind',KIT.kind);
+  if($('stashSearch').value.trim())p.set('q',$('stashSearch').value.trim());
+  const d=await api('/api/stash/items'+(p.toString()?'?'+p:''));
+  KIT.kinds=d.kinds;KIT.counts=d.counts;KIT.items=d.items;
+  renderKindChips();
+  const tb=$('stashItemTable').querySelector('tbody');
+  $('stashItemEmpty').classList.toggle('hidden',d.items.length>0);
+  tb.innerHTML=d.items.map(i=>`<tr>
+   <td>${esc(i.name)}${i.brand?`<br><span class="small muted">${esc(i.brand)}</span>`:''}</td>
+   <td>${i.size_mm?fmt(i.size_mm,2)+' mm':esc(i.size_label||'–')}</td>
+   <td>${fmt(i.quantity,0)}</td>
+   <td class="small">${esc(i.notes||'')}</td>
+   <td class="small" style="white-space:nowrap">
+    <button class="link kitEdit" data-id="${i.id}">edit</button>
+    <button class="link kitDel" data-id="${i.id}">delete</button></td></tr>`).join('');
+  tb.querySelectorAll('.kitDel').forEach(b=>b.onclick=async()=>{
+   try{await api('/api/stash/items/'+b.dataset.id,{method:'DELETE'});loadKit();}
+   catch(e){status($('kitStatus'),e.message,'bad');}});
+  tb.querySelectorAll('.kitEdit').forEach(b=>b.onclick=()=>{
+   const i=KIT.items.find(x=>String(x.id)===b.dataset.id);if(!i)return;
+   $('kiName').value=i.name;$('kiBrand').value=i.brand||'';
+   $('kiSize').value=i.size_mm??'';$('kiQty').value=i.quantity;$('kiNotes').value=i.notes||'';
+   $('btnKitSave').dataset.id=i.id;
+   status($('kitStatus'),`Editing “${i.name}”. Saving replaces it.`,'');});
+ }catch(e){status($('kitStatus'),e.message,'bad');}
+}
+$('stashSearch').addEventListener('input',()=>{clearTimeout(kitTimer);kitTimer=setTimeout(loadKit,250);});
+$('btnKitSave').onclick=async()=>{
+ const body={kind:KIT.kind,name:$('kiName').value.trim(),brand:$('kiBrand').value.trim()||null,
+  size_mm:$('kiSize').value||null,quantity:$('kiQty').value||1,notes:$('kiNotes').value.trim()||null,
+  id:$('btnKitSave').dataset.id?Number($('btnKitSave').dataset.id):null};
+ if(!body.name){status($('kitStatus'),'Give it a name first.','bad');return;}
+ try{
+  await api('/api/stash/items',{method:'POST',body});
+  delete $('btnKitSave').dataset.id;
+  ['kiName','kiBrand','kiSize','kiNotes'].forEach(id=>$(id).value='');$('kiQty').value=1;
+  status($('kitStatus'),'Saved.','good');loadKit();
+ }catch(e){status($('kitStatus'),e.message,'bad');}
+};
+
+/* ========================= the stitch reference ========================= */
+let STITCHES=null;
+async function loadStitches(){
+ try{
+  const hook=Number($('hook')?.value)||3.5, diam=Number($('diam')?.value)||2.5;
+  const d=await api(`/api/stitches?hook_mm=${hook}&yarn_diameter_mm=${diam}`);
+  STITCHES=d;
+  const fams=[...new Set(d.stitches.map(s=>s.family))].sort();
+  const keep=$('stFamily').value;
+  $('stFamily').innerHTML='<option value="">every stitch</option>'+fams.map(f=>
+   `<option value="${esc(f)}">${esc(f.replace('crochet_','').replace('_',' '))}</option>`).join('');
+  if(keep)$('stFamily').value=keep;
+  renderStitches();
+  $('stitchNote').textContent=d.note+` (at ${fmt(d.hook_mm,2)} mm hook, ${fmt(d.yarn_diameter_mm,2)} mm yarn — change the hook in the calculator to see other sizes.)`;
+ }catch(e){$('stitchGrid').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+}
+function renderStitches(){
+ if(!STITCHES)return;
+ const fam=$('stFamily').value;
+ const rows=STITCHES.stitches.filter(s=>!fam||s.family===fam);
+ $('stitchGrid').innerHTML=rows.map(s=>{
+  const facts=[`${s.consumes} → ${s.produces} st`];
+  if(s.relative_to_sc!=null)facts.push(`${s.relative_to_sc}× the yarn of a single crochet`);
+  if(s.yarn_mm!=null)facts.push(`≈ ${fmt(s.yarn_mm,0)} mm each`);
+  if(s.measured)facts.push('checked against measured swatches');
+  return `<div class="stitchCard">
+   <svg viewBox="0 0 20 20" role="img" aria-label="${esc(s.name)}">${glyph(s.operation_id)}</svg>
+   <div><div class="sName">${esc(s.name)}</div>
+    <div class="sAbbr">${esc(s.abbreviation)} · ${esc(s.operation_id)}</div>
+    ${s.use?`<div class="sUse">${esc(s.use)}</div>`:''}
+    <div class="sFacts">${esc(facts.join(' · '))}</div></div></div>`;
+ }).join('');
+}
+$('btnStitches').onclick=loadStitches;
+$('stFamily').onchange=renderStitches;
 
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;

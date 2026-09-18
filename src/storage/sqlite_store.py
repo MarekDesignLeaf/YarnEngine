@@ -97,6 +97,25 @@ CREATE TABLE IF NOT EXISTS stash(
   UNIQUE(user_id,yarn_id)
 );
 
+-- The rest of the kit. Yarn lives in `stash` because it points at a library
+-- record with a tex and a length; a hook is just a hook, so it is described
+-- here rather than being forced into the yarn table.
+CREATE TABLE IF NOT EXISTS stash_items(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  kind TEXT NOT NULL,
+  name TEXT NOT NULL,
+  brand TEXT,
+  size_mm REAL,
+  size_label TEXT,
+  quantity REAL NOT NULL DEFAULT 1,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_stash_items_user ON stash_items(user_id, kind, name);
+
 CREATE TABLE IF NOT EXISTS product_lines(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL UNIQUE,
@@ -303,6 +322,55 @@ class SQLiteStore:
 
     def count_colours(self):
         return self.conn.execute("SELECT COUNT(*) AS n FROM yarn_colours").fetchone()["n"]
+
+    # ---- the rest of the kit ------------------------------------------
+    def list_stash_items(self, user_id, kind=None, query=None):
+        where, params = ["user_id IS ?"], [user_id]
+        if kind:
+            where.append("kind=?"); params.append(kind)
+        if query:
+            where.append("(name LIKE ? OR IFNULL(brand,'') LIKE ? OR IFNULL(notes,'') LIKE ?)")
+            params += [f"%{query}%"] * 3
+        rows = self.conn.execute(
+            "SELECT * FROM stash_items WHERE " + " AND ".join(where) +
+            " ORDER BY kind, size_mm IS NULL, size_mm, name", params).fetchall()
+        return [dict(r) for r in rows]
+
+    def upsert_stash_item(self, user_id, item, now):
+        """One hook, needle or oddment. Same size and name means the same thing,
+        so adding it again changes the count instead of making a duplicate."""
+        if item.get("id"):
+            self.conn.execute(
+                "UPDATE stash_items SET kind=?,name=?,brand=?,size_mm=?,size_label=?,"
+                "quantity=?,notes=?,updated_at=? WHERE id=? AND user_id IS ?",
+                (item["kind"], item["name"], item.get("brand"), item.get("size_mm"),
+                 item.get("size_label"), item.get("quantity", 1), item.get("notes"),
+                 now, item["id"], user_id))
+        else:
+            existing = self.conn.execute(
+                "SELECT id FROM stash_items WHERE user_id IS ? AND kind=? AND name=? "
+                "AND IFNULL(size_mm,-1)=IFNULL(?,-1)",
+                (user_id, item["kind"], item["name"], item.get("size_mm"))).fetchone()
+            if existing:
+                self.conn.execute(
+                    "UPDATE stash_items SET quantity=?,brand=?,size_label=?,notes=?,updated_at=? "
+                    "WHERE id=?",
+                    (item.get("quantity", 1), item.get("brand"), item.get("size_label"),
+                     item.get("notes"), now, existing["id"]))
+            else:
+                self.conn.execute(
+                    "INSERT INTO stash_items(user_id,kind,name,brand,size_mm,size_label,"
+                    "quantity,notes,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?,?,?)",
+                    (user_id, item["kind"], item["name"], item.get("brand"),
+                     item.get("size_mm"), item.get("size_label"), item.get("quantity", 1),
+                     item.get("notes"), now, now))
+        self.conn.commit()
+
+    def delete_stash_item(self, user_id, item_id):
+        c = self.conn.cursor()
+        c.execute("DELETE FROM stash_items WHERE id=? AND user_id IS ?", (item_id, user_id))
+        self.conn.commit()
+        return c.rowcount > 0
 
     def get_setting(self,key,default=None):
         r=self.conn.execute("SELECT value FROM app_settings WHERE key=?",(key,)).fetchone()
