@@ -495,6 +495,20 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
     <p class="small muted">Status of the automated manufacturer-catalogue ingestion pipeline (M9). Source list and crawling run from the command line on the server; this is a read-only status view.</p>
     <div id="ingestStats" class="small"></div>
   </div>
+  <div class="card"><h2>Reading photos (AI vision)</h2>
+    <p class="small muted">Needed only for <strong>Design from a photo</strong>. Paste an API key from <a href="https://console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com</a> (it starts with <code>sk-ant-</code>). The key is stored on the server, is never sent back to a browser, and is left out of downloaded backups — if you restore a backup you will need to enter it again.</p>
+    <div id="visionState" class="small" style="margin-bottom:8px"></div>
+    <div class="fields">
+      <label><span>API key</span><input id="visionKey" type="password" autocomplete="off" placeholder="sk-ant-…"></label>
+      <label><span>Model (optional)</span><input id="visionModel" placeholder="leave empty for the default"></label>
+    </div>
+    <div class="toolbar">
+      <button id="btnSaveVision">Save key</button>
+      <button id="btnTestVision" class="alt">Test it</button>
+      <button id="btnClearVision" class="alt">Remove key</button>
+    </div>
+    <div id="visionStatus" class="status hidden"></div>
+  </div>
   <div class="card"><h2>Company info (shown in the app footer)</h2>
     <div class="fields">
       <label><span>Company name</span><input id="coName"></label>
@@ -713,7 +727,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -1208,7 +1222,7 @@ let dsgManualParts=[{name:'Head',category:'HEAD',archetype:'sphere',copies:1,hei
 
 api('/api/design/status').then(s=>{
  dsgArchetypes=s.archetypes||{};dsgCategories=s.categories||[];
- if(!s.vision_configured)status($('dsgStatus'),'Reading photos automatically is not switched on for this server yet. You can still describe the parts yourself — everything else works the same.','warn');
+ if(!s.vision_configured)status($('dsgStatus'),(ME&&ME.role==='admin')?'Reading photos automatically needs an API key — add one under Admin → Reading photos. You can still describe the parts yourself in the meantime.':'Reading photos automatically is not switched on yet. You can still describe the parts yourself — everything else works the same.','warn');
 }).catch(()=>{});
 
 $('dsgPhotos').addEventListener('change',async()=>{
@@ -1587,6 +1601,48 @@ async function loadCompanyForm(){
 $('btnSaveCompany').onclick=async()=>{
  const body={company_name:$('coName').value.trim()||null,website:$('coWeb').value.trim()||null,email:$('coEmail').value.trim()||null,phone:$('coPhone').value.trim()||null,company_number:$('coCompanyNo').value.trim()||null,vat_number:$('coVat').value.trim()||null,address:$('coAddress').value.trim()||null};
  try{await api('/api/admin/settings/company',{method:'PUT',body});status($('companyStatus'),t('msg.saved'),'good');loadCompanyFooter();}catch(e){status($('companyStatus'),e.message,'bad');}
+};
+
+/* ---- photo-reading credentials (admin) ----
+   The key is write-only from here: the server returns only whether one is set
+   and a masked hint, never the key itself. */
+function showVisionState(v){
+ const el=$('visionState');if(!el)return;
+ if(!v){el.innerHTML='';return;}
+ $('visionModel').value=v.model||'';
+ if(v.configured){
+  const where=v.key_source==='env'?'set on the server (environment variable)':'saved here';
+  el.innerHTML=`<span class="badge good">Photo reading is on</span> Key ${esc(where)}${v.key_hint?' — '+esc(v.key_hint):''}. Model: <strong>${esc(v.effective_model)}</strong>${v.model?'':' (default)'}.`;
+ } else {
+  el.innerHTML='<span class="badge warn">Not set up</span> Paste a key below to switch on reading photos. Everything else in the designer works without it.';
+ }
+}
+async function loadVisionForm(){
+ if(!ME||ME.role!=='admin')return;
+ try{showVisionState(await api('/api/admin/settings/vision'));}catch(e){}
+}
+$('btnSaveVision').onclick=async()=>{
+ const key=$('visionKey').value.trim();
+ if(!key){status($('visionStatus'),'Paste a key first, or use “Remove key”.','bad');return;}
+ try{
+  const v=await api('/api/admin/settings/vision',{method:'PUT',body:{api_key:key,model:$('visionModel').value.trim()}});
+  $('visionKey').value='';showVisionState(v);
+  status($('visionStatus'),'Key saved. Use “Test it” to check it works.','good');
+ }catch(e){status($('visionStatus'),e.message,'bad');}
+};
+$('btnClearVision').onclick=async()=>{
+ try{
+  const v=await api('/api/admin/settings/vision',{method:'PUT',body:{api_key:''}});
+  $('visionKey').value='';showVisionState(v);
+  status($('visionStatus'),v.configured?'Saved key removed — the server’s own environment key is being used.':'Key removed. Photo reading is off.','good');
+ }catch(e){status($('visionStatus'),e.message,'bad');}
+};
+$('btnTestVision').onclick=async()=>{
+ status($('visionStatus'),'Testing…','');
+ $('btnTestVision').disabled=true;
+ try{const r=await api('/api/admin/settings/vision/test',{method:'POST',body:{}});status($('visionStatus'),`${r.detail} (${r.model})`,'good');}
+ catch(e){status($('visionStatus'),'The key did not work: '+e.message,'bad');}
+ finally{$('btnTestVision').disabled=false;}
 };
 
 boot();

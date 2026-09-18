@@ -36,7 +36,8 @@ import base64
 from src.design.parts import build_design, written_pattern
 from src.design.shapes import ARCHETYPES as DESIGN_ARCHETYPES
 from src.design.vision import (describe_photo, configured as vision_configured,
-                               model_name as vision_model_name,
+                               model_name as vision_model_name, env_key as vision_env_key,
+                               mask_key as vision_mask_key, DEFAULT_MODEL as VISION_DEFAULT_MODEL,
                                VisionUnavailable, CATEGORIES as VISION_CATEGORIES)
 from src.library.yarn import YarnRecord
 from src.import_pipeline.core import canonical_checksum
@@ -458,11 +459,94 @@ def admin_ingestion_review(limit: int = 100):
         store.close()
 
 
+VISION_KEY_SETTING = "secret.anthropic_api_key"   # "secret." keeps it out of backups
+VISION_MODEL_SETTING = "vision.model"
+
+def _vision_settings() -> tuple[str, str]:
+    """(api key, model) as configured in the app, empty when not set."""
+    store = service._store()
+    try:
+        return (store.get_setting(VISION_KEY_SETTING, "") or "",
+                store.get_setting(VISION_MODEL_SETTING, "") or "")
+    finally:
+        store.close()
+
+
 @app.get("/api/design/status")
 def design_status():
     """Whether photo analysis is available on this server."""
-    return {"vision_configured": vision_configured(), "model": vision_model_name(),
+    key, model = _vision_settings()
+    return {"vision_configured": vision_configured(key), "model": vision_model_name(model),
+            "key_source": ("app" if key else ("env" if vision_env_key() else None)),
             "archetypes": DESIGN_ARCHETYPES, "categories": VISION_CATEGORIES}
+
+
+@app.get("/api/admin/settings/vision")
+def get_vision_settings():
+    """Admin view of the photo-reading credentials.
+
+    Never returns the key itself -- only whether one is set, where it came
+    from, and enough of it to recognise which key it is.
+    """
+    key, model = _vision_settings()
+    return {"configured": vision_configured(key),
+            "key_source": ("app" if key else ("env" if vision_env_key() else None)),
+            "key_hint": vision_mask_key(key) if key else vision_mask_key(vision_env_key()),
+            "model": model, "effective_model": vision_model_name(model),
+            "default_model": VISION_DEFAULT_MODEL}
+
+
+@app.put("/api/admin/settings/vision")
+def update_vision_settings(payload: dict):
+    """Store (or clear) the API key used to read photos.
+
+    An empty api_key clears the stored one, falling back to the environment
+    variable if the server has one.
+    """
+    key = payload.get("api_key")
+    model = payload.get("model")
+    store = service._store()
+    try:
+        if key is not None:
+            cleaned = str(key).strip()
+            if cleaned and (len(cleaned) < 20 or " " in cleaned):
+                raise HTTPException(status_code=422, detail="that does not look like an API key")
+            store.set_setting(VISION_KEY_SETTING, cleaned)
+        if model is not None:
+            store.set_setting(VISION_MODEL_SETTING, str(model).strip())
+        stored_key = store.get_setting(VISION_KEY_SETTING, "") or ""
+        stored_model = store.get_setting(VISION_MODEL_SETTING, "") or ""
+    finally:
+        store.close()
+    return {"configured": vision_configured(stored_key),
+            "key_source": ("app" if stored_key else ("env" if vision_env_key() else None)),
+            "key_hint": vision_mask_key(stored_key) if stored_key else vision_mask_key(vision_env_key()),
+            "model": stored_model, "effective_model": vision_model_name(stored_model),
+            "default_model": VISION_DEFAULT_MODEL}
+
+
+@app.post("/api/admin/settings/vision/test")
+def test_vision_settings():
+    """Check the stored key actually works, with one tiny real request."""
+    key, model = _vision_settings()
+    if not vision_configured(key):
+        raise HTTPException(status_code=422, detail="no API key is set yet")
+    import base64 as _b64
+    pixel = _b64.b64decode(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==")
+    try:
+        describe_photo([("image/png", pixel)], hint="single plain ball",
+                       api_key=key, model=model, timeout=30)
+    except VisionUnavailable as e:
+        msg = str(e)
+        # Being told "there is nothing recognisable in this 1px image" means the
+        # credentials and the model are fine, which is what is being tested.
+        if "no usable parts" in msg or "did not return" in msg or "could not read" in msg:
+            return {"ok": True, "detail": "The key works — the vision model answered.",
+                    "model": vision_model_name(model)}
+        raise HTTPException(status_code=502, detail=msg)
+    return {"ok": True, "detail": "The key works — the vision model answered.",
+            "model": vision_model_name(model)}
 
 
 @app.post("/api/design/generate")
@@ -520,8 +604,10 @@ def design_from_photo(payload: dict, http_request: Request):
             raise HTTPException(status_code=422, detail="an image could not be read")
     if not images:
         raise HTTPException(status_code=422, detail="at least one photo is required")
+    stored_key, stored_model = _vision_settings()
     try:
-        described = describe_photo(images, hint=payload.get("hint"))
+        described = describe_photo(images, hint=payload.get("hint"),
+                                   api_key=stored_key, model=stored_model)
     except VisionUnavailable as e:
         raise HTTPException(status_code=503, detail=str(e))
     spec = {

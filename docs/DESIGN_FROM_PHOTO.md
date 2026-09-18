@@ -36,18 +36,36 @@ be stuffed and sewn on.
 
 ## Configuration
 
-    ANTHROPIC_API_KEY        required for reading photos. Without it the photo
-                             endpoint answers 503 and says so; describing the
-                             parts by hand keeps working.
-    YARNENGINE_VISION_MODEL  optional, overrides the model id.
+The key can be set either way; a key saved in the app wins over the
+environment, and the admin page says which one is in use.
 
-Photo analysis is capped at `PHOTO_MAX_PER_HOUR` (20) requests per account per
-hour, because each one costs money at the provider.
+**In the app (usual way).** Admin -> *Reading photos (AI vision)*: paste the
+key, optionally name a model, and press *Test it* to make one tiny real request
+that proves the credentials work. The field is write-only — `GET
+/api/admin/settings/vision` returns whether a key is set, where it came from
+and a masked hint (`sk-ant-...0000`), never the key. It is stored in the
+settings table under `secret.anthropic_api_key`, and `src/storage/backup.py`
+deletes every `secret.*` setting from the snapshot it zips, so a downloaded
+backup can be mailed around without carrying a spendable credential. Restoring
+a backup therefore means entering the key again.
+
+**As a platform secret.** `ANTHROPIC_API_KEY` and `YARNENGINE_VISION_MODEL` are
+still read when nothing is saved in the app, for anyone who would rather keep
+credentials in Railway's own variable store.
+
+Without either, the photo endpoint answers 503 and says so; describing the
+parts by hand keeps working. Photo analysis is capped at `PHOTO_MAX_PER_HOUR`
+(20) requests per account per hour, because each one costs money at the
+provider.
 
 ## Endpoints
 
-- `GET /api/design/status` — is photo reading available, and the known
-  archetypes and part categories.
+- `GET /api/design/status` — is photo reading available (and from which
+  source), and the known archetypes and part categories.
+- `GET`/`PUT /api/admin/settings/vision` — read the masked state / set or clear
+  the key, admin only.
+- `POST /api/admin/settings/vision/test` — one real request to confirm the key
+  works.
 - `POST /api/design/generate` — parts + height + gauge -> patterns. Offline and
   deterministic; no API key involved.
 - `POST /api/design/from-photo` — images (base64) + approximate height -> the

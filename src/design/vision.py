@@ -78,12 +78,26 @@ class VisionUnavailable(RuntimeError):
     """Photo analysis is not configured or could not be reached."""
 
 
-def configured() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
+def env_key() -> str:
+    return os.environ.get("ANTHROPIC_API_KEY", "").strip()
 
 
-def model_name() -> str:
-    return os.environ.get("YARNENGINE_VISION_MODEL", "").strip() or DEFAULT_MODEL
+def configured(stored_key: str | None = None) -> bool:
+    return bool((stored_key or "").strip() or env_key())
+
+
+def model_name(stored_model: str | None = None) -> str:
+    return ((stored_model or "").strip()
+            or os.environ.get("YARNENGINE_VISION_MODEL", "").strip()
+            or DEFAULT_MODEL)
+
+
+def mask_key(key: str | None) -> str | None:
+    """What may be shown back to a browser: enough to recognise, not to use."""
+    key = (key or "").strip()
+    if not key:
+        return None
+    return f"{key[:7]}…{key[-4:]}" if len(key) > 14 else "…" + key[-2:]
 
 
 def _extract_json(text: str) -> dict:
@@ -147,15 +161,19 @@ def validate_parts(raw: dict) -> dict:
 
 
 def describe_photo(images: list[tuple[str, bytes]], hint: str | None = None,
-                   timeout: int = 60, _transport=None) -> dict:
+                   timeout: int = 60, api_key: str | None = None,
+                   model: str | None = None, _transport=None) -> dict:
     """Ask the vision model what parts the pictured object is made of.
 
-    images: (media_type, raw bytes) pairs. _transport is for tests.
+    images: (media_type, raw bytes) pairs. api_key/model come from the admin
+    page when set there, falling back to the environment. _transport is for
+    tests.
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY", "").strip()
+    api_key = (api_key or "").strip() or env_key()
     if not api_key and _transport is None:
         raise VisionUnavailable(
-            "photo analysis is not set up on this server yet (ANTHROPIC_API_KEY is not set)")
+            "photo analysis is not set up yet — an administrator can add an API key "
+            "on the admin page")
     if not images:
         raise VisionUnavailable("no photo was supplied")
     content = []
@@ -172,7 +190,8 @@ def describe_photo(images: list[tuple[str, bytes]], hint: str | None = None,
         text += f"\n\nThe maker says this is: {str(hint)[:200]}"
     content.append({"type": "text", "text": text})
 
-    body = {"model": model_name(), "max_tokens": 2000,
+    chosen_model = model_name(model)
+    body = {"model": chosen_model, "max_tokens": 2000,
             "messages": [{"role": "user", "content": content}]}
     if _transport is not None:
         raw_text = _transport(body)
@@ -192,5 +211,5 @@ def describe_photo(images: list[tuple[str, bytes]], hint: str | None = None,
         raw_text = "".join(b.get("text", "") for b in payload.get("content", [])
                            if b.get("type") == "text")
     described = validate_parts(_extract_json(raw_text))
-    described["model"] = model_name()
+    described["model"] = chosen_model
     return described
