@@ -1,0 +1,192 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_CHUNKY",
+  "brand": "Yarnsmiths",
+  "product": "Create Chunky",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-chunky-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "5000",
+      "name": "Black",
+      "hex": "#090a05",
+      "sku": "YS.CHUNKY.5000"
+    },
+    {
+      "code": "5010",
+      "name": "Dark Grey Heather",
+      "hex": "#4c4c48",
+      "sku": "YS.CHUNKY.5010"
+    },
+    {
+      "code": "5020",
+      "name": "Light Grey Heather",
+      "hex": "#9f9f9d",
+      "sku": "YS.CHUNKY.5020"
+    },
+    {
+      "code": "5030",
+      "name": "Silver",
+      "hex": "#b6b1aa",
+      "sku": "YS.CHUNKY.5030"
+    },
+    {
+      "code": "5040",
+      "name": "White",
+      "hex": "#e4e0d3",
+      "sku": "YS.CHUNKY.5040"
+    },
+    {
+      "code": "5050",
+      "name": "Cream",
+      "hex": "#e5dab9",
+      "sku": "YS.CHUNKY.5050"
+    },
+    {
+      "code": "5060",
+      "name": "Parchment",
+      "hex": "#b7ab99",
+      "sku": "YS.CHUNKY.5060"
+    },
+    {
+      "code": "5070",
+      "name": "Brown Bear",
+      "hex": "#635443",
+      "sku": "YS.CHUNKY.5070"
+    },
+    {
+      "code": "5100",
+      "name": "Scarlet Red",
+      "hex": "#700507",
+      "sku": "YS.CHUNKY.5100"
+    },
+    {
+      "code": "5110",
+      "name": "Bright Red",
+      "hex": "#c20a0b",
+      "sku": "YS.CHUNKY.5110"
+    },
+    {
+      "code": "5120",
+      "name": "Burnt Orange",
+      "hex": "#ae2210",
+      "sku": "YS.CHUNKY.5120"
+    },
+    {
+      "code": "5140",
+      "name": "Mustard Yellow",
+      "hex": "#cc8c18",
+      "sku": "YS.CHUNKY.5140"
+    },
+    {
+      "code": "5145",
+      "name": "Antique Gold",
+      "hex": "#9d651e",
+      "sku": "YS.CHUNKY.5145"
+    },
+    {
+      "code": "5170",
+      "name": "Lemon Yellow",
+      "hex": "#f0c05d",
+      "sku": "YS.CHUNKY.5170"
+    },
+    {
+      "code": "5200",
+      "name": "Grass Green",
+      "hex": "#6f8d3d",
+      "sku": "YS.CHUNKY.5200"
+    },
+    {
+      "code": "5210",
+      "name": "Christmas Green",
+      "hex": "#0a4124",
+      "sku": "YS.CHUNKY.5210"
+    },
+    {
+      "code": "5220",
+      "name": "Opal Green",
+      "hex": "#1c6c50",
+      "sku": "YS.CHUNKY.5220"
+    },
+    {
+      "code": "5230",
+      "name": "Teal",
+      "hex": "#0a5759",
+      "sku": "YS.CHUNKY.5230"
+    },
+    {
+      "code": "5250",
+      "name": "Light Turquoise",
+      "hex": "#4eadba",
+      "sku": "YS.CHUNKY.5250"
+    },
+    {
+      "code": "5260",
+      "name": "Sky Blue",
+      "hex": "#b1c8d5",
+      "sku": "YS.CHUNKY.5260"
+    },
+    {
+      "code": "5270",
+      "name": "Cornflower Blue",
+      "hex": "#567bab",
+      "sku": "YS.CHUNKY.5270"
+    },
+    {
+      "code": "5280",
+      "name": "Denim Blue",
+      "hex": "#495c7e",
+      "sku": "YS.CHUNKY.5280"
+    },
+    {
+      "code": "5300",
+      "name": "Royal Blue",
+      "hex": "#1a225b",
+      "sku": "YS.CHUNKY.5300"
+    },
+    {
+      "code": "5310",
+      "name": "Navy Blue",
+      "hex": "#181c28",
+      "sku": "YS.CHUNKY.5310"
+    },
+    {
+      "code": "5326",
+      "name": "Purple Orchid",
+      "hex": "#6f257b",
+      "sku": "YS.CHUNKY.5326"
+    },
+    {
+      "code": "5330",
+      "name": "Plum Purple",
+      "hex": "#4e1f38",
+      "sku": "YS.CHUNKY.5330"
+    },
+    {
+      "code": "5350",
+      "name": "Lilac",
+      "hex": "#a788b3",
+      "sku": "YS.CHUNKY.5350"
+    },
+    {
+      "code": "5374",
+      "name": "Pinkberry",
+      "hex": "#9a2c62",
+      "sku": "YS.CHUNKY.5374"
+    },
+    {
+      "code": "5380",
+      "name": "Rose Pink",
+      "hex": "#b1646f",
+      "sku": "YS.CHUNKY.5380"
+    },
+    {
+      "code": "5400",
+      "name": "Candyfloss Pink",
+      "hex": "#f9b3bc",
+      "sku": "YS.CHUNKY.5400"
+    }
+  ]
+}

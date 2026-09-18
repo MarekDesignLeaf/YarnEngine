@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SSOFTDKISLE",
+  "brand": "Yarnsmiths",
+  "product": "SnuggleSoft Fair Isle DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-snugglesoft-fair-isle-dk-50g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3B500",
+      "name": "Little Haven",
+      "hex": "#8d9e9d",
+      "sku": "YS.SSOFTDKISLE.3B500"
+    },
+    {
+      "code": "3B510",
+      "name": "Cozy Nook",
+      "hex": "#a1a27e",
+      "sku": "YS.SSOFTDKISLE.3B510"
+    },
+    {
+      "code": "3B520",
+      "name": "Tiny Treasure",
+      "hex": "#bd9da6",
+      "sku": "YS.SSOFTDKISLE.3B520"
+    },
+    {
+      "code": "3B530",
+      "name": "Wee Abode",
+      "hex": "#ac9b71",
+      "sku": "YS.SSOFTDKISLE.3B530"
+    },
+    {
+      "code": "3B540",
+      "name": "Petite Paradise",
+      "hex": "#9fa9a0",
+      "sku": "YS.SSOFTDKISLE.3B540"
+    },
+    {
+      "code": "3B550",
+      "name": "Secret Garden",
+      "hex": "#a6a79d",
+      "sku": "YS.SSOFTDKISLE.3B550"
+    },
+    {
+      "code": "3B560",
+      "name": "Snug Harbour",
+      "hex": "#8c958a",
+      "sku": "YS.SSOFTDKISLE.3B560"
+    },
+    {
+      "code": "3B570",
+      "name": "Little Nest",
+      "hex": "#716b6e",
+      "sku": "YS.SSOFTDKISLE.3B570"
+    },
+    {
+      "code": "3B580",
+      "name": "Cute Corner",
+      "hex": "#7b6650",
+      "sku": "YS.SSOFTDKISLE.3B580"
+    },
+    {
+      "code": "3B590",
+      "name": "Sweet Solitude",
+      "hex": "#a78f88",
+      "sku": "YS.SSOFTDKISLE.3B590"
+    }
+  ]
+}

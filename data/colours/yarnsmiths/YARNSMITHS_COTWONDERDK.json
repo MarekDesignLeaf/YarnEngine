@@ -1,0 +1,60 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTWONDERDK",
+  "brand": "Yarnsmiths",
+  "product": "Cotton Wonder DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-cotton-wonder-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2U100",
+      "name": "Bright Rainbow",
+      "hex": "#63594b",
+      "sku": "YS.COTWONDERDK.2U100"
+    },
+    {
+      "code": "2U110",
+      "name": "Garden Pond",
+      "hex": "#778770",
+      "sku": "YS.COTWONDERDK.2U110"
+    },
+    {
+      "code": "2U120",
+      "name": "Pastel Rainbow",
+      "hex": "#bec0b6",
+      "sku": "YS.COTWONDERDK.2U120"
+    },
+    {
+      "code": "2U130",
+      "name": "Spirit Sundown",
+      "hex": "#9d7e78",
+      "sku": "YS.COTWONDERDK.2U130"
+    },
+    {
+      "code": "2U140",
+      "name": "Coastal",
+      "hex": "#a4a59c",
+      "sku": "YS.COTWONDERDK.2U140"
+    },
+    {
+      "code": "2U150",
+      "name": "Lilac Garden",
+      "hex": "#6c6767",
+      "sku": "YS.COTWONDERDK.2U150"
+    },
+    {
+      "code": "2U160",
+      "name": "Foxgloves",
+      "hex": "#b5749c",
+      "sku": "YS.COTWONDERDK.2U160"
+    },
+    {
+      "code": "2U170",
+      "name": "Seaside Holiday",
+      "hex": "#928161",
+      "sku": "YS.COTWONDERDK.2U170"
+    }
+  ]
+}

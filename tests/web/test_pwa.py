@@ -56,3 +56,9 @@ def test_colour_is_chosen_from_a_list_and_never_typed_in():
     # the picker is a <select> fed from /api/colours; no free-text colour field
     assert '<select id="yarnColour">' in html
     assert "/api/colours" in html
+
+
+def test_weight_says_what_is_missing_rather_than_showing_a_dash():
+    html = c.get("/").text
+    assert 'id="rMassNote"' in html and 'id="rMassLabel"' in html
+    assert "needs a yarn" in html

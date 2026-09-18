@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PHPRINTARAN",
+  "brand": "Yarnsmiths",
+  "product": "Pebble Haze Aran Prints",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-pebble-haze-aran-prints-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2M030",
+      "name": "Peppercombe",
+      "hex": "#704c40",
+      "sku": "YS.PHPRINTARAN.2M030"
+    },
+    {
+      "code": "2M040",
+      "name": "Seaham",
+      "hex": "#756b58",
+      "sku": "YS.PHPRINTARAN.2M040"
+    },
+    {
+      "code": "2M050",
+      "name": "Chesil",
+      "hex": "#454553",
+      "sku": "YS.PHPRINTARAN.2M050"
+    },
+    {
+      "code": "2M060",
+      "name": "Blakeney",
+      "hex": "#526a6d",
+      "sku": "YS.PHPRINTARAN.2M060"
+    },
+    {
+      "code": "2M090",
+      "name": "Lulworth",
+      "hex": "#758b99",
+      "sku": "YS.PHPRINTARAN.2M090"
+    },
+    {
+      "code": "2M100",
+      "name": "Saltburn",
+      "hex": "#ac7c79",
+      "sku": "YS.PHPRINTARAN.2M100"
+    },
+    {
+      "code": "2M300",
+      "name": "Cold Knap",
+      "hex": "#585469",
+      "sku": "YS.PHPRINTARAN.2M300"
+    },
+    {
+      "code": "2M320",
+      "name": "Monmouth",
+      "hex": "#879296",
+      "sku": "YS.PHPRINTARAN.2M320"
+    },
+    {
+      "code": "2M330",
+      "name": "Sidmouth",
+      "hex": "#824d6b",
+      "sku": "YS.PHPRINTARAN.2M330"
+    },
+    {
+      "code": "2M340",
+      "name": "Penmouth",
+      "hex": "#a59d8e",
+      "sku": "YS.PHPRINTARAN.2M340"
+    }
+  ]
+}

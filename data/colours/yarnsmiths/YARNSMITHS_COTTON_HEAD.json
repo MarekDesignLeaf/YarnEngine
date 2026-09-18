@@ -1,0 +1,192 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTTON_HEAD",
+  "brand": "Yarnsmiths",
+  "product": "Headliner - 100% Cotton",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-headliner-100-cotton-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2R501",
+      "name": "Bright Rainbow",
+      "hex": "#937a2a",
+      "sku": "YS.COTTON-HEAD.2R501"
+    },
+    {
+      "code": "2R502",
+      "name": "Coastal",
+      "hex": "#6c8895",
+      "sku": "YS.COTTON-HEAD.2R502"
+    },
+    {
+      "code": "2R503",
+      "name": "Delphinium",
+      "hex": "#836e67",
+      "sku": "YS.COTTON-HEAD.2R503"
+    },
+    {
+      "code": "2R504",
+      "name": "Retro Dance",
+      "hex": "#653020",
+      "sku": "YS.COTTON-HEAD.2R504"
+    },
+    {
+      "code": "2R505",
+      "name": "Lake District",
+      "hex": "#42514b",
+      "sku": "YS.COTTON-HEAD.2R505"
+    },
+    {
+      "code": "2R506",
+      "name": "Sunset",
+      "hex": "#c05126",
+      "sku": "YS.COTTON-HEAD.2R506"
+    },
+    {
+      "code": "2R507",
+      "name": "Five Shades of Gandalf",
+      "hex": "#626465",
+      "sku": "YS.COTTON-HEAD.2R507"
+    },
+    {
+      "code": "2R508",
+      "name": "Annabelle Spectrum",
+      "hex": "#7e9294",
+      "sku": "YS.COTTON-HEAD.2R508"
+    },
+    {
+      "code": "2R509",
+      "name": "Garden Reflections",
+      "hex": "#856d61",
+      "sku": "YS.COTTON-HEAD.2R509"
+    },
+    {
+      "code": "2R510",
+      "name": "Seaside Holiday",
+      "hex": "#99a09f",
+      "sku": "YS.COTTON-HEAD.2R510"
+    },
+    {
+      "code": "2R511",
+      "name": "Sunflower Garden",
+      "hex": "#564225",
+      "sku": "YS.COTTON-HEAD.2R511"
+    },
+    {
+      "code": "2R512",
+      "name": "Rambling Rose",
+      "hex": "#6a6b30",
+      "sku": "YS.COTTON-HEAD.2R512"
+    },
+    {
+      "code": "2R513",
+      "name": "Pastel Rainbow",
+      "hex": "#cac8a5",
+      "sku": "YS.COTTON-HEAD.2R513"
+    },
+    {
+      "code": "2R514",
+      "name": "Minty Surprise",
+      "hex": "#4d8c8b",
+      "sku": "YS.COTTON-HEAD.2R514"
+    },
+    {
+      "code": "2R515",
+      "name": "Molly",
+      "hex": "#7a3260",
+      "sku": "YS.COTTON-HEAD.2R515"
+    },
+    {
+      "code": "2R516",
+      "name": "Blue Lagoon",
+      "hex": "#5d9391",
+      "sku": "YS.COTTON-HEAD.2R516"
+    },
+    {
+      "code": "2R517",
+      "name": "Judith",
+      "hex": "#3e4137",
+      "sku": "YS.COTTON-HEAD.2R517"
+    },
+    {
+      "code": "2R518",
+      "name": "Rainbow Fiesta",
+      "hex": "#bc6b35",
+      "sku": "YS.COTTON-HEAD.2R518"
+    },
+    {
+      "code": "2R519",
+      "name": "Woolly Smiths",
+      "hex": "#cfb4bf",
+      "sku": "YS.COTTON-HEAD.2R519"
+    },
+    {
+      "code": "2R520",
+      "name": "Spirit Sundown",
+      "hex": "#97906c",
+      "sku": "YS.COTTON-HEAD.2R520"
+    },
+    {
+      "code": "2R521",
+      "name": "Paradise",
+      "hex": "#af5d28",
+      "sku": "YS.COTTON-HEAD.2R521"
+    },
+    {
+      "code": "2R522",
+      "name": "Lilac Garden",
+      "hex": "#626255",
+      "sku": "YS.COTTON-HEAD.2R522"
+    },
+    {
+      "code": "2R523",
+      "name": "Autumn Leaves",
+      "hex": "#7f3d16",
+      "sku": "YS.COTTON-HEAD.2R523"
+    },
+    {
+      "code": "2R524",
+      "name": "Garden Pond",
+      "hex": "#83877c",
+      "sku": "YS.COTTON-HEAD.2R524"
+    },
+    {
+      "code": "2R525",
+      "name": "Rose Garden",
+      "hex": "#c9b588",
+      "sku": "YS.COTTON-HEAD.2R525"
+    },
+    {
+      "code": "2R526",
+      "name": "Foxgloves",
+      "hex": "#8b5376",
+      "sku": "YS.COTTON-HEAD.2R526"
+    },
+    {
+      "code": "2R527",
+      "name": "Marketing Team",
+      "hex": "#886128",
+      "sku": "YS.COTTON-HEAD.2R527"
+    },
+    {
+      "code": "2R528",
+      "name": "Neutral Tones",
+      "hex": "#d2c2a8",
+      "sku": "YS.COTTON-HEAD.2R528"
+    },
+    {
+      "code": "2R529",
+      "name": "Kasegaluk Lagoon",
+      "hex": "#6e7d7c",
+      "sku": "YS.COTTON-HEAD.2R529"
+    },
+    {
+      "code": "2R530",
+      "name": "Loganberry Rainbow",
+      "hex": "#3c311a",
+      "sku": "YS.COTTON-HEAD.2R530"
+    }
+  ]
+}

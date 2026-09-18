@@ -1,0 +1,252 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_CHENDK",
+  "brand": "Yarnsmiths",
+  "product": "Chenille DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-chenille-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3000",
+      "name": "Black",
+      "hex": "#06090a",
+      "sku": "YS.CHENDK.3000"
+    },
+    {
+      "code": "3008",
+      "name": "Storm Grey",
+      "hex": "#454d4d",
+      "sku": "YS.CHENDK.3008"
+    },
+    {
+      "code": "3030",
+      "name": "Silver",
+      "hex": "#afb3b8",
+      "sku": "YS.CHENDK.3030"
+    },
+    {
+      "code": "3035",
+      "name": "Pale Silver",
+      "hex": "#ced2d5",
+      "sku": "YS.CHENDK.3035"
+    },
+    {
+      "code": "3040",
+      "name": "White",
+      "hex": "#dadde2",
+      "sku": "YS.CHENDK.3040"
+    },
+    {
+      "code": "3050",
+      "name": "Cream",
+      "hex": "#d0d5ca",
+      "sku": "YS.CHENDK.3050"
+    },
+    {
+      "code": "3060",
+      "name": "Parchment",
+      "hex": "#aba198",
+      "sku": "YS.CHENDK.3060"
+    },
+    {
+      "code": "3062",
+      "name": "Blush",
+      "hex": "#e2d7c8",
+      "sku": "YS.CHENDK.3062"
+    },
+    {
+      "code": "3064",
+      "name": "Oatmeal",
+      "hex": "#bfb3a4",
+      "sku": "YS.CHENDK.3064"
+    },
+    {
+      "code": "3067",
+      "name": "Vanilla Fudge",
+      "hex": "#c49e68",
+      "sku": "YS.CHENDK.3067"
+    },
+    {
+      "code": "3069",
+      "name": "Latte",
+      "hex": "#826a5a",
+      "sku": "YS.CHENDK.3069"
+    },
+    {
+      "code": "3070",
+      "name": "Brown Bear",
+      "hex": "#574b3d",
+      "sku": "YS.CHENDK.3070"
+    },
+    {
+      "code": "3074",
+      "name": "Rust",
+      "hex": "#62401f",
+      "sku": "YS.CHENDK.3074"
+    },
+    {
+      "code": "3080",
+      "name": "Chocolate Brown",
+      "hex": "#211911",
+      "sku": "YS.CHENDK.3080"
+    },
+    {
+      "code": "3100",
+      "name": "Scarlet Red",
+      "hex": "#6b0311",
+      "sku": "YS.CHENDK.3100"
+    },
+    {
+      "code": "3110",
+      "name": "Bright Red",
+      "hex": "#8c061e",
+      "sku": "YS.CHENDK.3110"
+    },
+    {
+      "code": "3120",
+      "name": "Burnt Orange",
+      "hex": "#a63119",
+      "sku": "YS.CHENDK.3120"
+    },
+    {
+      "code": "3126",
+      "name": "Carrot",
+      "hex": "#c9531c",
+      "sku": "YS.CHENDK.3126"
+    },
+    {
+      "code": "3135",
+      "name": "Tangerine",
+      "hex": "#cb7a27",
+      "sku": "YS.CHENDK.3135"
+    },
+    {
+      "code": "3140",
+      "name": "Mustard Yellow",
+      "hex": "#c9983b",
+      "sku": "YS.CHENDK.3140"
+    },
+    {
+      "code": "3160",
+      "name": "Primrose Yellow",
+      "hex": "#d1bf2f",
+      "sku": "YS.CHENDK.3160"
+    },
+    {
+      "code": "3170",
+      "name": "Lemon Yellow",
+      "hex": "#d5bb71",
+      "sku": "YS.CHENDK.3170"
+    },
+    {
+      "code": "3185",
+      "name": "Light Sage",
+      "hex": "#849d81",
+      "sku": "YS.CHENDK.3185"
+    },
+    {
+      "code": "3186",
+      "name": "Celery",
+      "hex": "#a6b867",
+      "sku": "YS.CHENDK.3186"
+    },
+    {
+      "code": "3188",
+      "name": "Apple Green",
+      "hex": "#718414",
+      "sku": "YS.CHENDK.3188"
+    },
+    {
+      "code": "3200",
+      "name": "Grass Green",
+      "hex": "#5b903a",
+      "sku": "YS.CHENDK.3200"
+    },
+    {
+      "code": "3210",
+      "name": "Christmas Green",
+      "hex": "#073e25",
+      "sku": "YS.CHENDK.3210"
+    },
+    {
+      "code": "3224",
+      "name": "Aqua",
+      "hex": "#5db1a6",
+      "sku": "YS.CHENDK.3224"
+    },
+    {
+      "code": "3229",
+      "name": "Tropical Teal",
+      "hex": "#0e8098",
+      "sku": "YS.CHENDK.3229"
+    },
+    {
+      "code": "3256",
+      "name": "Duck Egg",
+      "hex": "#9bb8bc",
+      "sku": "YS.CHENDK.3256"
+    },
+    {
+      "code": "3260",
+      "name": "Sky Blue",
+      "hex": "#98b5cf",
+      "sku": "YS.CHENDK.3260"
+    },
+    {
+      "code": "3266",
+      "name": "Hydrangea Blue",
+      "hex": "#6592c7",
+      "sku": "YS.CHENDK.3266"
+    },
+    {
+      "code": "3274",
+      "name": "Strong Blue",
+      "hex": "#144690",
+      "sku": "YS.CHENDK.3274"
+    },
+    {
+      "code": "3326",
+      "name": "Purple Orchid",
+      "hex": "#642282",
+      "sku": "YS.CHENDK.3326"
+    },
+    {
+      "code": "3340",
+      "name": "Pale Lilac",
+      "hex": "#cabbd5",
+      "sku": "YS.CHENDK.3340"
+    },
+    {
+      "code": "3350",
+      "name": "Lilac",
+      "hex": "#886fa1",
+      "sku": "YS.CHENDK.3350"
+    },
+    {
+      "code": "3385",
+      "name": "Bubblegum",
+      "hex": "#cb5e95",
+      "sku": "YS.CHENDK.3385"
+    },
+    {
+      "code": "3400",
+      "name": "Candyfloss Pink",
+      "hex": "#e5a5c4",
+      "sku": "YS.CHENDK.3400"
+    },
+    {
+      "code": "3410",
+      "name": "Light Pink",
+      "hex": "#d8c0cc",
+      "sku": "YS.CHENDK.3410"
+    },
+    {
+      "code": "3422",
+      "name": "Peach",
+      "hex": "#deb9a7",
+      "sku": "YS.CHENDK.3422"
+    }
+  ]
+}

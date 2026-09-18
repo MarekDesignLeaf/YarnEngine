@@ -1,0 +1,24 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PLAYDK",
+  "brand": "Yarnsmiths",
+  "product": "Play DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-play-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "1F004",
+      "name": "Hop",
+      "hex": "#62535a",
+      "sku": "YS.PLAYDK.1F004"
+    },
+    {
+      "code": "1F007",
+      "name": "Skip",
+      "hex": "#372234",
+      "sku": "YS.PLAYDK.1F007"
+    }
+  ]
+}

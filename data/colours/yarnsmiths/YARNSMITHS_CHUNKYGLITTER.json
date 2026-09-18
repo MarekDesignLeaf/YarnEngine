@@ -1,0 +1,36 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_CHUNKYGLITTER",
+  "brand": "Yarnsmiths",
+  "product": "Create Chunky Glitter",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-chunky-glitter-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "G5030",
+      "name": "Silver",
+      "hex": "#adaea8",
+      "sku": "YS.CHUNKYGLITTER.G5030"
+    },
+    {
+      "code": "G5040",
+      "name": "White",
+      "hex": "#ddd9d1",
+      "sku": "YS.CHUNKYGLITTER.G5040"
+    },
+    {
+      "code": "G5100",
+      "name": "Red",
+      "hex": "#700509",
+      "sku": "YS.CHUNKYGLITTER.G5100"
+    },
+    {
+      "code": "G5210",
+      "name": "Green",
+      "hex": "#084128",
+      "sku": "YS.CHUNKYGLITTER.G5210"
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BIZARREDK",
+  "brand": "Yarnsmiths",
+  "product": "Bizarre DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-bizarre-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3G010",
+      "name": "Kerfuffle",
+      "hex": "#7e5a5e",
+      "sku": "YS.BIZARREDK.3G010"
+    },
+    {
+      "code": "3G020",
+      "name": "Gobbledygook",
+      "hex": "#4f7080",
+      "sku": "YS.BIZARREDK.3G020"
+    },
+    {
+      "code": "3G030",
+      "name": "Discombobulated",
+      "hex": "#bbb4bc",
+      "sku": "YS.BIZARREDK.3G030"
+    },
+    {
+      "code": "3G040",
+      "name": "Splendiferous",
+      "hex": "#d1b8a0",
+      "sku": "YS.BIZARREDK.3G040"
+    },
+    {
+      "code": "3G050",
+      "name": "Collywobbles",
+      "hex": "#738188",
+      "sku": "YS.BIZARREDK.3G050"
+    },
+    {
+      "code": "3G060",
+      "name": "Skewwhiff",
+      "hex": "#af9da6",
+      "sku": "YS.BIZARREDK.3G060"
+    },
+    {
+      "code": "3G070",
+      "name": "Bamboozle",
+      "hex": "#b3a6a2",
+      "sku": "YS.BIZARREDK.3G070"
+    },
+    {
+      "code": "3G080",
+      "name": "Malarkey",
+      "hex": "#cfb1a0",
+      "sku": "YS.BIZARREDK.3G080"
+    },
+    {
+      "code": "3G090",
+      "name": "Palaver",
+      "hex": "#8e8e80",
+      "sku": "YS.BIZARREDK.3G090"
+    },
+    {
+      "code": "3G100",
+      "name": "Shenanigans",
+      "hex": "#bfbdad",
+      "sku": "YS.BIZARREDK.3G100"
+    },
+    {
+      "code": "3G110",
+      "name": "Larrikin",
+      "hex": "#7d8079",
+      "sku": "YS.BIZARREDK.3G110"
+    },
+    {
+      "code": "3G120",
+      "name": "Hunkydory",
+      "hex": "#c5ac97",
+      "sku": "YS.BIZARREDK.3G120"
+    }
+  ]
+}

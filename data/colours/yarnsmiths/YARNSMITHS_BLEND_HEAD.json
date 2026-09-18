@@ -1,0 +1,192 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BLEND_HEAD",
+  "brand": "Yarnsmiths",
+  "product": "Headliner - The Blended One",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-headliner-the-blended-one-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2T501",
+      "name": "Bright Rainbow",
+      "hex": "#9f7e27",
+      "sku": "YS.BLEND-HEAD.2T501"
+    },
+    {
+      "code": "2T502",
+      "name": "Coastal",
+      "hex": "#6592aa",
+      "sku": "YS.BLEND-HEAD.2T502"
+    },
+    {
+      "code": "2T503",
+      "name": "Delphinium",
+      "hex": "#876f6b",
+      "sku": "YS.BLEND-HEAD.2T503"
+    },
+    {
+      "code": "2T504",
+      "name": "Retro Dance",
+      "hex": "#744437",
+      "sku": "YS.BLEND-HEAD.2T504"
+    },
+    {
+      "code": "2T505",
+      "name": "Lake District",
+      "hex": "#41514e",
+      "sku": "YS.BLEND-HEAD.2T505"
+    },
+    {
+      "code": "2T506",
+      "name": "Sunset",
+      "hex": "#cf5b34",
+      "sku": "YS.BLEND-HEAD.2T506"
+    },
+    {
+      "code": "2T507",
+      "name": "Five Shades of Gandalf",
+      "hex": "#606363",
+      "sku": "YS.BLEND-HEAD.2T507"
+    },
+    {
+      "code": "2T508",
+      "name": "Annabelle Spectrum",
+      "hex": "#769194",
+      "sku": "YS.BLEND-HEAD.2T508"
+    },
+    {
+      "code": "2T509",
+      "name": "Garden Reflections",
+      "hex": "#88726b",
+      "sku": "YS.BLEND-HEAD.2T509"
+    },
+    {
+      "code": "2T510",
+      "name": "Seaside Holiday",
+      "hex": "#97958a",
+      "sku": "YS.BLEND-HEAD.2T510"
+    },
+    {
+      "code": "2T511",
+      "name": "Sunflower Garden",
+      "hex": "#594a29",
+      "sku": "YS.BLEND-HEAD.2T511"
+    },
+    {
+      "code": "2T512",
+      "name": "Rambling Rose",
+      "hex": "#7b7934",
+      "sku": "YS.BLEND-HEAD.2T512"
+    },
+    {
+      "code": "2T513",
+      "name": "Pastel Rainbow",
+      "hex": "#c6c5a8",
+      "sku": "YS.BLEND-HEAD.2T513"
+    },
+    {
+      "code": "2T514",
+      "name": "Minty Surprise",
+      "hex": "#4d9893",
+      "sku": "YS.BLEND-HEAD.2T514"
+    },
+    {
+      "code": "2T515",
+      "name": "Molly",
+      "hex": "#953166",
+      "sku": "YS.BLEND-HEAD.2T515"
+    },
+    {
+      "code": "2T516",
+      "name": "Blue Lagoon",
+      "hex": "#5e928b",
+      "sku": "YS.BLEND-HEAD.2T516"
+    },
+    {
+      "code": "2T517",
+      "name": "Judith",
+      "hex": "#3c3f37",
+      "sku": "YS.BLEND-HEAD.2T517"
+    },
+    {
+      "code": "2T518",
+      "name": "Rainbow Fiesta",
+      "hex": "#cc7535",
+      "sku": "YS.BLEND-HEAD.2T518"
+    },
+    {
+      "code": "2T519",
+      "name": "Woolly Smiths",
+      "hex": "#d0adbe",
+      "sku": "YS.BLEND-HEAD.2T519"
+    },
+    {
+      "code": "2T520",
+      "name": "Spirit Sundown",
+      "hex": "#a5946c",
+      "sku": "YS.BLEND-HEAD.2T520"
+    },
+    {
+      "code": "2T521",
+      "name": "Paradise",
+      "hex": "#897d4b",
+      "sku": "YS.BLEND-HEAD.2T521"
+    },
+    {
+      "code": "2T522",
+      "name": "Lilac Garden",
+      "hex": "#645355",
+      "sku": "YS.BLEND-HEAD.2T522"
+    },
+    {
+      "code": "2T523",
+      "name": "Autumn Leaves",
+      "hex": "#7d3e1f",
+      "sku": "YS.BLEND-HEAD.2T523"
+    },
+    {
+      "code": "2T524",
+      "name": "Garden Pond",
+      "hex": "#7c9079",
+      "sku": "YS.BLEND-HEAD.2T524"
+    },
+    {
+      "code": "2T525",
+      "name": "Rose Garden",
+      "hex": "#cbb57f",
+      "sku": "YS.BLEND-HEAD.2T525"
+    },
+    {
+      "code": "2T526",
+      "name": "Foxgloves",
+      "hex": "#8f557d",
+      "sku": "YS.BLEND-HEAD.2T526"
+    },
+    {
+      "code": "2T527",
+      "name": "Marketing Team",
+      "hex": "#7d4928",
+      "sku": "YS.BLEND-HEAD.2T527"
+    },
+    {
+      "code": "2T528",
+      "name": "Neutral Tones",
+      "hex": "#c2b199",
+      "sku": "YS.BLEND-HEAD.2T528"
+    },
+    {
+      "code": "2T529",
+      "name": "Kasegaluk Lagoon",
+      "hex": "#6e807b",
+      "sku": "YS.BLEND-HEAD.2T529"
+    },
+    {
+      "code": "2T530",
+      "name": "Loganberry Rainbow",
+      "hex": "#54441a",
+      "sku": "YS.BLEND-HEAD.2T530"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SNUGRRB1800",
+  "brand": "Yarnsmiths",
+  "product": "Snug as a Bug Really Really BIG 1800g",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-snug-as-a-bug-really-really-big-1800g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3K040",
+      "name": "Soft Grey",
+      "hex": "#a5aeb7",
+      "sku": "YS.SNUGRRB1800.3K040"
+    },
+    {
+      "code": "3K080",
+      "name": "Oatmilk",
+      "hex": "#ccbea6",
+      "sku": "YS.SNUGRRB1800.3K080"
+    },
+    {
+      "code": "3K100",
+      "name": "Porcelain",
+      "hex": "#d9ded6",
+      "sku": "YS.SNUGRRB1800.3K100"
+    },
+    {
+      "code": "3K120",
+      "name": "Seaglass",
+      "hex": "#83b2ad",
+      "sku": "YS.SNUGRRB1800.3K120"
+    },
+    {
+      "code": "3K130",
+      "name": "Lagoon",
+      "hex": "#358b9e",
+      "sku": "YS.SNUGRRB1800.3K130"
+    },
+    {
+      "code": "3K200",
+      "name": "Piglet",
+      "hex": "#d5b6bb",
+      "sku": "YS.SNUGRRB1800.3K200"
+    }
+  ]
+}

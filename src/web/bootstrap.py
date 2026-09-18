@@ -4,7 +4,7 @@ from src.storage.migrations import ensure_version
 from src.import_pipeline.bulk import bulk_import_yarns, bulk_import_patterns
 from src.pattern_engine.registry import load_operation_registry
 import datetime
-from src.library.colours import import_palette
+from src.library.colours import import_palette, import_shade_cards
 
 
 def ensure_demo_database(root: Path, db_path: Path) -> None:
@@ -24,6 +24,9 @@ def ensure_demo_database(root: Path, db_path: Path) -> None:
         bulk_import_yarns(store, root / "data/yarns")
         # The shade catalogue every colour in the app is chosen from. Nothing
         # accepts a typed-in colour, so this has to exist before first use.
-        import_palette(store, root, datetime.datetime.now(datetime.timezone.utc).isoformat())
+        now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        import_palette(store, root, now)
+        # Manufacturer shade cards, offered ahead of the palette for their yarn.
+        import_shade_cards(store, root, now)
     finally:
         store.close()

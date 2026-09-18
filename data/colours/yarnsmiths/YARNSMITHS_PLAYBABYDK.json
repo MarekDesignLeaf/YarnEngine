@@ -1,0 +1,42 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PLAYBABYDK",
+  "brand": "Yarnsmiths",
+  "product": "Play Baby DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-play-baby-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "1B003",
+      "name": "Monkey Bars",
+      "hex": "#74756f",
+      "sku": "YS.PLAYBABYDK.1B003"
+    },
+    {
+      "code": "1B004",
+      "name": "Frisbee",
+      "hex": "#c8baa0",
+      "sku": "YS.PLAYBABYDK.1B004"
+    },
+    {
+      "code": "1B005",
+      "name": "Tiddlywinks",
+      "hex": "#b88d8e",
+      "sku": "YS.PLAYBABYDK.1B005"
+    },
+    {
+      "code": "1B008",
+      "name": "Bucket and Spade",
+      "hex": "#b0a995",
+      "sku": "YS.PLAYBABYDK.1B008"
+    },
+    {
+      "code": "1B009",
+      "name": "Bouncy Castle",
+      "hex": "#8f7b47",
+      "sku": "YS.PLAYBABYDK.1B009"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PHARAN",
+  "brand": "Yarnsmiths",
+  "product": "Pebble Haze Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-pebble-haze-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2L010",
+      "name": "Jet",
+      "hex": "#283335",
+      "sku": "YS.PHARAN.2L010"
+    },
+    {
+      "code": "2L020",
+      "name": "Basalt",
+      "hex": "#70787b",
+      "sku": "YS.PHARAN.2L020"
+    },
+    {
+      "code": "2L030",
+      "name": "Flint",
+      "hex": "#b3b8bc",
+      "sku": "YS.PHARAN.2L030"
+    },
+    {
+      "code": "2L040",
+      "name": "Marble",
+      "hex": "#dfe0dc",
+      "sku": "YS.PHARAN.2L040"
+    },
+    {
+      "code": "2L050",
+      "name": "Limestone",
+      "hex": "#d9d8c9",
+      "sku": "YS.PHARAN.2L050"
+    },
+    {
+      "code": "2L060",
+      "name": "Pumice",
+      "hex": "#aca692",
+      "sku": "YS.PHARAN.2L060"
+    },
+    {
+      "code": "2L070",
+      "name": "Dolomite",
+      "hex": "#9e978b",
+      "sku": "YS.PHARAN.2L070"
+    },
+    {
+      "code": "2L080",
+      "name": "Syenite",
+      "hex": "#ab9786",
+      "sku": "YS.PHARAN.2L080"
+    },
+    {
+      "code": "2L082",
+      "name": "Tiger's Eye",
+      "hex": "#866540",
+      "sku": "YS.PHARAN.2L082"
+    },
+    {
+      "code": "2L084",
+      "name": "Mudstone",
+      "hex": "#3a2a20",
+      "sku": "YS.PHARAN.2L084"
+    },
+    {
+      "code": "2L086",
+      "name": "Ruby",
+      "hex": "#4f2c36",
+      "sku": "YS.PHARAN.2L086"
+    },
+    {
+      "code": "2L090",
+      "name": "Red Serpentine",
+      "hex": "#8d2537",
+      "sku": "YS.PHARAN.2L090"
+    },
+    {
+      "code": "2L100",
+      "name": "Wulfenite",
+      "hex": "#ab5943",
+      "sku": "YS.PHARAN.2L100"
+    },
+    {
+      "code": "2L104",
+      "name": "Orange Topaz",
+      "hex": "#b7653c",
+      "sku": "YS.PHARAN.2L104"
+    },
+    {
+      "code": "2L110",
+      "name": "Yellow Amber",
+      "hex": "#cea94a",
+      "sku": "YS.PHARAN.2L110"
+    },
+    {
+      "code": "2L112",
+      "name": "Citrine",
+      "hex": "#e5dc57",
+      "sku": "YS.PHARAN.2L112"
+    },
+    {
+      "code": "2L114",
+      "name": "Yellow Topaz",
+      "hex": "#e4dfab",
+      "sku": "YS.PHARAN.2L114"
+    },
+    {
+      "code": "2L116",
+      "name": "Ludlamite",
+      "hex": "#b8d4c2",
+      "sku": "YS.PHARAN.2L116"
+    },
+    {
+      "code": "2L120",
+      "name": "Titanite",
+      "hex": "#8ca582",
+      "sku": "YS.PHARAN.2L120"
+    },
+    {
+      "code": "2L124",
+      "name": "Green Serpentine",
+      "hex": "#317f70",
+      "sku": "YS.PHARAN.2L124"
+    },
+    {
+      "code": "2L130",
+      "name": "Olivine",
+      "hex": "#5f827c",
+      "sku": "YS.PHARAN.2L130"
+    },
+    {
+      "code": "2L140",
+      "name": "Chrysocolla",
+      "hex": "#3a908b",
+      "sku": "YS.PHARAN.2L140"
+    },
+    {
+      "code": "2L146",
+      "name": "Sodalite",
+      "hex": "#345a78",
+      "sku": "YS.PHARAN.2L146"
+    },
+    {
+      "code": "2L150",
+      "name": "Blue Slate",
+      "hex": "#586e85",
+      "sku": "YS.PHARAN.2L150"
+    },
+    {
+      "code": "2L156",
+      "name": "Lapis Lazuli",
+      "hex": "#537ec0",
+      "sku": "YS.PHARAN.2L156"
+    },
+    {
+      "code": "2L160",
+      "name": "Chalcedony",
+      "hex": "#889db1",
+      "sku": "YS.PHARAN.2L160"
+    },
+    {
+      "code": "2L164",
+      "name": "Blue Beryl",
+      "hex": "#9ab8d5",
+      "sku": "YS.PHARAN.2L164"
+    },
+    {
+      "code": "2L166",
+      "name": "Lavender Quartz",
+      "hex": "#aeaec6",
+      "sku": "YS.PHARAN.2L166"
+    },
+    {
+      "code": "2L170",
+      "name": "Fluorite",
+      "hex": "#9a9ac1",
+      "sku": "YS.PHARAN.2L170"
+    },
+    {
+      "code": "2L180",
+      "name": "Iolite",
+      "hex": "#675da8",
+      "sku": "YS.PHARAN.2L180"
+    },
+    {
+      "code": "2L190",
+      "name": "Porphyry",
+      "hex": "#754764",
+      "sku": "YS.PHARAN.2L190"
+    },
+    {
+      "code": "2L194",
+      "name": "Pink Tourmaline",
+      "hex": "#bb5ea4",
+      "sku": "YS.PHARAN.2L194"
+    },
+    {
+      "code": "2L198",
+      "name": "Pink Smithsonite",
+      "hex": "#9d6b76",
+      "sku": "YS.PHARAN.2L198"
+    },
+    {
+      "code": "2L200",
+      "name": "Petalite",
+      "hex": "#d9b9be",
+      "sku": "YS.PHARAN.2L200"
+    },
+    {
+      "code": "2L210",
+      "name": "Coral",
+      "hex": "#c7928b",
+      "sku": "YS.PHARAN.2L210"
+    }
+  ]
+}

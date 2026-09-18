@@ -410,13 +410,14 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <div class="metrics">
         <div class="metric"><span>Recommended length</span><strong id="rLen">–</strong></div>
         <div class="metric"><span>Estimated range</span><strong id="rRange" style="font-size:16px">–</strong></div>
-        <div class="metric"><span>Weight</span><strong id="rMass">–</strong></div>
+        <div class="metric"><span id="rMassLabel">Weight</span><strong id="rMass">–</strong></div>
         <div class="metric"><span>Balls / skeins</span><strong id="rPacks">–</strong></div>
         <div class="metric"><span>Total stitches</span><strong id="rSt">–</strong></div>
         <div class="metric"><span>Achieved size</span><strong id="rSize" style="font-size:16px">–</strong></div>
         <div class="metric hidden" id="rCostBox"><span>Estimated cost</span><strong id="rCost">–</strong></div>
         <div class="metric hidden" id="rStashBox"><span>From your stash</span><strong id="rStash">–</strong></div>
       </div>
+      <div id="rMassNote" class="small muted" style="margin-top:6px"></div>
       <h3>Operations used</h3><div id="rOps" class="legend"></div>
       <h3>Accuracy notes</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
       <p class="small"><a href="/static/calibration_print.html" target="_blank" rel="noopener">Open a printable gauge-swatch calibration sheet ↗</a></p>
@@ -1407,7 +1408,14 @@ $('btnCalc').onclick=async()=>{
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
    showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} rounds × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
   }
- }catch(e){status($('calcStatus'),e.message,'bad');}
+ }catch(e){
+  // The server's own wording here is for API callers; on screen it has to say
+  // which control to touch.
+  const msg=/yarn diameter is required/i.test(e.message)
+   ? 'Choose a yarn in “Yarn, hook and gauge” below — the calculation needs to know how thick the yarn is. Without one you can enter a yarn diameter instead, but then only length can be worked out, not weight.'
+   : e.message;
+  status($('calcStatus'),msg,'bad');
+ }
 };
 function yarnById(id){return YARNS.find(y=>y.yarn_id===id);}
 /* ============================ units ============================ */
@@ -1425,7 +1433,24 @@ function showResult(r){
  $('resultBadge').innerHTML=`<span class="badge ${badge[0]}">${esc(badge[1])}</span>`;
  $('rLen').textContent=r.len!=null?fmt(toLen(r.len),1)+' '+unitLenLabel():'–';
  $('rRange').textContent=(r.lower!=null&&r.upper!=null)?`${fmt(toLen(r.lower),0)}–${fmt(toLen(r.upper),0)} ${unitLenLabel()}`:'–';
- $('rMass').textContent=r.mass!=null?fmt(toMass(r.mass),UNIT==='imperial'?1:0)+' '+unitMassLabel():'–';
+ /* Weight is the figure people came for, so it never just goes blank: if it
+    cannot be worked out, the tile says what is missing instead of a dash, and
+    with more than one piece it is labelled as the total with the per-piece
+    figure beside it. */
+ const copies=Math.max(1,r.copies||1);
+ $('rMassLabel').textContent=copies>1?`Weight (all ${copies})`:'Weight';
+ if(r.mass!=null){
+  $('rMass').textContent=fmt(toMass(r.mass),UNIT==='imperial'?1:0)+' '+unitMassLabel();
+  const y=yarnById($('yarn').value);
+  // one decimal per piece, so three of them visibly add up to the total
+  const each=copies>1?`${fmt(toMass(r.mass/copies),1)} ${unitMassLabel()} per piece · `:'';
+  $('rMassNote').textContent=y?`${each}${fmt((y.tex||y.package_mass_g/y.package_length_m*1000)/1000,3)} ${unitMassLabel()} per ${unitLenLabel()} (${y.brand} ${y.product}, ${y.package_mass_g} g / ${y.package_length_m} m)`:'';
+ } else {
+  $('rMass').textContent='needs a yarn';
+  $('rMass').style.fontSize='15px';
+  $('rMassNote').textContent='Weight and ball count need a yarn from the library — a diameter on its own gives length only. Choose one in “Yarn, hook and gauge”; it then shows in the bar at the top of the page.';
+ }
+ if(r.mass!=null)$('rMass').style.fontSize='';
  let packs=r.packs;if(packs==null&&r.packLen&&r.len)packs=Math.ceil(r.len/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
  $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
  $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} × ${n}</span>`).join('');
@@ -1735,9 +1760,11 @@ async function loadColours(){
  }catch(e){COLOURS=[];}
  const keep=$('yarnColour').value;
  const own=COLOURS.filter(c=>c.yarn_specific),gen=COLOURS.filter(c=>!c.yarn_specific);
- const group=(label,list)=>list.length?`<optgroup label="${esc(label)}">`+list.map(c=>`<option value="${esc(c.colour_id)}">${esc(c.name)}</option>`).join('')+'</optgroup>':'';
+ const label=c=>c.yarn_specific?`${c.code} ${c.name}`:c.name;
+ const group=(title,list)=>list.length?`<optgroup label="${esc(title)}">`+list.map(c=>`<option value="${esc(c.colour_id)}">${esc(label(c))}</option>`).join('')+'</optgroup>':'';
  $('yarnColour').innerHTML='<option value="">— no shade chosen —</option>'
-  +group('This yarn’s shades',own)+group(own.length?'Standard palette':'Shades',gen);
+  +group(own.length?`${(yarnById($('yarn').value)||{}).brand||'This yarn'} shade card (${own.length})`:'',own)
+  +group(own.length?'Standard palette':'Shades',gen);
  if(keep&&COLOURS.some(c=>c.colour_id===keep))$('yarnColour').value=keep;
  syncColour();
 }

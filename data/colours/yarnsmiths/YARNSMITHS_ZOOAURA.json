@@ -1,0 +1,114 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_ZOOAURA",
+  "brand": "Yarnsmiths",
+  "product": "Zooaura",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-zooaura-50g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "4B100",
+      "name": "Black Bear",
+      "hex": "#070707",
+      "sku": "YS.ZOOAURA.4B100"
+    },
+    {
+      "code": "4B110",
+      "name": "Chinchilla Grey",
+      "hex": "#1b2327",
+      "sku": "YS.ZOOAURA.4B110"
+    },
+    {
+      "code": "4B120",
+      "name": "Koala Grey",
+      "hex": "#949ba3",
+      "sku": "YS.ZOOAURA.4B120"
+    },
+    {
+      "code": "4B130",
+      "name": "Polar Bear",
+      "hex": "#d8dcde",
+      "sku": "YS.ZOOAURA.4B130"
+    },
+    {
+      "code": "4B140",
+      "name": "Sand Cat",
+      "hex": "#d2cfb9",
+      "sku": "YS.ZOOAURA.4B140"
+    },
+    {
+      "code": "4B150",
+      "name": "Golden Retriever",
+      "hex": "#beb095",
+      "sku": "YS.ZOOAURA.4B150"
+    },
+    {
+      "code": "4B160",
+      "name": "Wombat",
+      "hex": "#827261",
+      "sku": "YS.ZOOAURA.4B160"
+    },
+    {
+      "code": "4B170",
+      "name": "Brown Bear",
+      "hex": "#4c3d29",
+      "sku": "YS.ZOOAURA.4B170"
+    },
+    {
+      "code": "4B180",
+      "name": "Moose",
+      "hex": "#1f1f17",
+      "sku": "YS.ZOOAURA.4B180"
+    },
+    {
+      "code": "4B500",
+      "name": "Skunk",
+      "hex": "#383f3c",
+      "sku": "YS.ZOOAURA.4B500"
+    },
+    {
+      "code": "4B510",
+      "name": "Wolf",
+      "hex": "#1a2221",
+      "sku": "YS.ZOOAURA.4B510"
+    },
+    {
+      "code": "4B520",
+      "name": "Wolverine",
+      "hex": "#35392d",
+      "sku": "YS.ZOOAURA.4B520"
+    },
+    {
+      "code": "4B530",
+      "name": "Husky",
+      "hex": "#606569",
+      "sku": "YS.ZOOAURA.4B530"
+    },
+    {
+      "code": "4B540",
+      "name": "Otter",
+      "hex": "#5b5950",
+      "sku": "YS.ZOOAURA.4B540"
+    },
+    {
+      "code": "4B550",
+      "name": "Fennec Fox",
+      "hex": "#9e9988",
+      "sku": "YS.ZOOAURA.4B550"
+    },
+    {
+      "code": "4B710",
+      "name": "Snow Leopard",
+      "hex": "#3a4644",
+      "sku": "YS.ZOOAURA.4B710"
+    },
+    {
+      "code": "4B720",
+      "name": "Lynx",
+      "hex": "#c2b39f",
+      "sku": "YS.ZOOAURA.4B720"
+    }
+  ]
+}

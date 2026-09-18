@@ -1,0 +1,462 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTTON4PLY",
+  "brand": "Yarnsmiths",
+  "product": "Cotton 4 Ply",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-cotton-4-ply-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2000",
+      "name": "Black",
+      "hex": "#0b0b0b",
+      "sku": "YS.COTTON4PLY.2000"
+    },
+    {
+      "code": "2002",
+      "name": "Anthracite Grey",
+      "hex": "#2c302e",
+      "sku": "YS.COTTON4PLY.2002"
+    },
+    {
+      "code": "2008",
+      "name": "Storm Grey",
+      "hex": "#535d65",
+      "sku": "YS.COTTON4PLY.2008"
+    },
+    {
+      "code": "2025",
+      "name": "Platinum Grey",
+      "hex": "#98a0ab",
+      "sku": "YS.COTTON4PLY.2025"
+    },
+    {
+      "code": "2035",
+      "name": "Pale Silver",
+      "hex": "#c2c8ca",
+      "sku": "YS.COTTON4PLY.2035"
+    },
+    {
+      "code": "2040",
+      "name": "White",
+      "hex": "#dddddf",
+      "sku": "YS.COTTON4PLY.2040"
+    },
+    {
+      "code": "2042",
+      "name": "Ecru",
+      "hex": "#d1d0c8",
+      "sku": "YS.COTTON4PLY.2042"
+    },
+    {
+      "code": "2045",
+      "name": "Off White",
+      "hex": "#d9daca",
+      "sku": "YS.COTTON4PLY.2045"
+    },
+    {
+      "code": "2050",
+      "name": "Cream",
+      "hex": "#d9dcc7",
+      "sku": "YS.COTTON4PLY.2050"
+    },
+    {
+      "code": "2054",
+      "name": "Vanilla",
+      "hex": "#c3bfad",
+      "sku": "YS.COTTON4PLY.2054"
+    },
+    {
+      "code": "2062",
+      "name": "Blush",
+      "hex": "#d6ccb5",
+      "sku": "YS.COTTON4PLY.2062"
+    },
+    {
+      "code": "2063",
+      "name": "Champagne",
+      "hex": "#d1c1a0",
+      "sku": "YS.COTTON4PLY.2063"
+    },
+    {
+      "code": "2064",
+      "name": "Oatmeal",
+      "hex": "#c8b4a3",
+      "sku": "YS.COTTON4PLY.2064"
+    },
+    {
+      "code": "2065",
+      "name": "Warm Taupe",
+      "hex": "#aa8e85",
+      "sku": "YS.COTTON4PLY.2065"
+    },
+    {
+      "code": "2066",
+      "name": "Sand",
+      "hex": "#c4ad8a",
+      "sku": "YS.COTTON4PLY.2066"
+    },
+    {
+      "code": "2067",
+      "name": "Vanilla Fudge",
+      "hex": "#b59765",
+      "sku": "YS.COTTON4PLY.2067"
+    },
+    {
+      "code": "2068",
+      "name": "Caramel Fudge",
+      "hex": "#8b6a48",
+      "sku": "YS.COTTON4PLY.2068"
+    },
+    {
+      "code": "2068B",
+      "name": "Toffee Fudge",
+      "hex": "#a7805f",
+      "sku": "YS.COTTON4PLY.2068B"
+    },
+    {
+      "code": "2068F",
+      "name": "Cuppa Tea",
+      "hex": "#967d68",
+      "sku": "YS.COTTON4PLY.2068F"
+    },
+    {
+      "code": "2069",
+      "name": "Latte",
+      "hex": "#7f6e61",
+      "sku": "YS.COTTON4PLY.2069"
+    },
+    {
+      "code": "2074",
+      "name": "Rust",
+      "hex": "#644125",
+      "sku": "YS.COTTON4PLY.2074"
+    },
+    {
+      "code": "2076",
+      "name": "Copper",
+      "hex": "#651f14",
+      "sku": "YS.COTTON4PLY.2076"
+    },
+    {
+      "code": "2079",
+      "name": "Coffee Bean",
+      "hex": "#5c3c2f",
+      "sku": "YS.COTTON4PLY.2079"
+    },
+    {
+      "code": "2079B",
+      "name": "Cocoa",
+      "hex": "#3c3631",
+      "sku": "YS.COTTON4PLY.2079B"
+    },
+    {
+      "code": "2080",
+      "name": "Chocolate Brown",
+      "hex": "#211b16",
+      "sku": "YS.COTTON4PLY.2080"
+    },
+    {
+      "code": "2085",
+      "name": "Burgundy",
+      "hex": "#331620",
+      "sku": "YS.COTTON4PLY.2085"
+    },
+    {
+      "code": "2090",
+      "name": "Claret Red",
+      "hex": "#540c1f",
+      "sku": "YS.COTTON4PLY.2090"
+    },
+    {
+      "code": "2094",
+      "name": "Sienna Red",
+      "hex": "#6a071d",
+      "sku": "YS.COTTON4PLY.2094"
+    },
+    {
+      "code": "2100",
+      "name": "Scarlet Red",
+      "hex": "#88081f",
+      "sku": "YS.COTTON4PLY.2100"
+    },
+    {
+      "code": "2110",
+      "name": "Bright Red",
+      "hex": "#a71818",
+      "sku": "YS.COTTON4PLY.2110"
+    },
+    {
+      "code": "2124",
+      "name": "Ginger",
+      "hex": "#893618",
+      "sku": "YS.COTTON4PLY.2124"
+    },
+    {
+      "code": "2125",
+      "name": "Amber",
+      "hex": "#a74d0f",
+      "sku": "YS.COTTON4PLY.2125"
+    },
+    {
+      "code": "2126",
+      "name": "Carrot",
+      "hex": "#e6481c",
+      "sku": "YS.COTTON4PLY.2126"
+    },
+    {
+      "code": "2130",
+      "name": "Bright Orange",
+      "hex": "#e55c1a",
+      "sku": "YS.COTTON4PLY.2130"
+    },
+    {
+      "code": "2135",
+      "name": "Tangerine",
+      "hex": "#ee8619",
+      "sku": "YS.COTTON4PLY.2135"
+    },
+    {
+      "code": "2140",
+      "name": "Mustard Yellow",
+      "hex": "#ce932f",
+      "sku": "YS.COTTON4PLY.2140"
+    },
+    {
+      "code": "2145",
+      "name": "Antique Gold",
+      "hex": "#96631d",
+      "sku": "YS.COTTON4PLY.2145"
+    },
+    {
+      "code": "2150",
+      "name": "Sunshine Yellow",
+      "hex": "#ea9614",
+      "sku": "YS.COTTON4PLY.2150"
+    },
+    {
+      "code": "2160",
+      "name": "Primrose Yellow",
+      "hex": "#e5c529",
+      "sku": "YS.COTTON4PLY.2160"
+    },
+    {
+      "code": "2170",
+      "name": "Lemon Yellow",
+      "hex": "#e7ce7f",
+      "sku": "YS.COTTON4PLY.2170"
+    },
+    {
+      "code": "2185",
+      "name": "Light Sage",
+      "hex": "#72a17e",
+      "sku": "YS.COTTON4PLY.2185"
+    },
+    {
+      "code": "2186",
+      "name": "Celery",
+      "hex": "#a4bd5c",
+      "sku": "YS.COTTON4PLY.2186"
+    },
+    {
+      "code": "2188",
+      "name": "Apple Green",
+      "hex": "#6c8b25",
+      "sku": "YS.COTTON4PLY.2188"
+    },
+    {
+      "code": "2200",
+      "name": "Grass Green",
+      "hex": "#598834",
+      "sku": "YS.COTTON4PLY.2200"
+    },
+    {
+      "code": "2202",
+      "name": "Dark Sage",
+      "hex": "#537d5d",
+      "sku": "YS.COTTON4PLY.2202"
+    },
+    {
+      "code": "2204",
+      "name": "Country Green",
+      "hex": "#373d1f",
+      "sku": "YS.COTTON4PLY.2204"
+    },
+    {
+      "code": "2205B",
+      "name": "Willow",
+      "hex": "#7e7e4d",
+      "sku": "YS.COTTON4PLY.2205B"
+    },
+    {
+      "code": "2206",
+      "name": "Khaki",
+      "hex": "#575c39",
+      "sku": "YS.COTTON4PLY.2206"
+    },
+    {
+      "code": "2210",
+      "name": "Christmas Green",
+      "hex": "#0c5640",
+      "sku": "YS.COTTON4PLY.2210"
+    },
+    {
+      "code": "2215",
+      "name": "Clover",
+      "hex": "#11692f",
+      "sku": "YS.COTTON4PLY.2215"
+    },
+    {
+      "code": "2228",
+      "name": "Vintage Teal",
+      "hex": "#5d9ea5",
+      "sku": "YS.COTTON4PLY.2228"
+    },
+    {
+      "code": "2230",
+      "name": "Teal",
+      "hex": "#0a5a6a",
+      "sku": "YS.COTTON4PLY.2230"
+    },
+    {
+      "code": "2256",
+      "name": "Duck Egg",
+      "hex": "#90b3b5",
+      "sku": "YS.COTTON4PLY.2256"
+    },
+    {
+      "code": "2262",
+      "name": "Powder Blue",
+      "hex": "#9dc3d8",
+      "sku": "YS.COTTON4PLY.2262"
+    },
+    {
+      "code": "2266",
+      "name": "Hydrangea Blue",
+      "hex": "#709ed1",
+      "sku": "YS.COTTON4PLY.2266"
+    },
+    {
+      "code": "2270",
+      "name": "Cornflower Blue",
+      "hex": "#567eaf",
+      "sku": "YS.COTTON4PLY.2270"
+    },
+    {
+      "code": "2280",
+      "name": "Denim Blue",
+      "hex": "#5a637e",
+      "sku": "YS.COTTON4PLY.2280"
+    },
+    {
+      "code": "2290",
+      "name": "Deep Denim Blue",
+      "hex": "#1e303f",
+      "sku": "YS.COTTON4PLY.2290"
+    },
+    {
+      "code": "2305",
+      "name": "Sapphire Blue",
+      "hex": "#1f417a",
+      "sku": "YS.COTTON4PLY.2305"
+    },
+    {
+      "code": "2310",
+      "name": "Navy Blue",
+      "hex": "#191c2d",
+      "sku": "YS.COTTON4PLY.2310"
+    },
+    {
+      "code": "2322",
+      "name": "Amethyst",
+      "hex": "#54397d",
+      "sku": "YS.COTTON4PLY.2322"
+    },
+    {
+      "code": "2326",
+      "name": "Purple Orchid",
+      "hex": "#562163",
+      "sku": "YS.COTTON4PLY.2326"
+    },
+    {
+      "code": "2335",
+      "name": "Sugar Plum",
+      "hex": "#7a457f",
+      "sku": "YS.COTTON4PLY.2335"
+    },
+    {
+      "code": "2340",
+      "name": "Pale Lilac",
+      "hex": "#c0adca",
+      "sku": "YS.COTTON4PLY.2340"
+    },
+    {
+      "code": "2350",
+      "name": "Lilac",
+      "hex": "#987cb2",
+      "sku": "YS.COTTON4PLY.2350"
+    },
+    {
+      "code": "2364",
+      "name": "Petal Pink",
+      "hex": "#c373aa",
+      "sku": "YS.COTTON4PLY.2364"
+    },
+    {
+      "code": "2372",
+      "name": "Fandango Pink",
+      "hex": "#c23560",
+      "sku": "YS.COTTON4PLY.2372"
+    },
+    {
+      "code": "2376",
+      "name": "Vintage Pink",
+      "hex": "#903263",
+      "sku": "YS.COTTON4PLY.2376"
+    },
+    {
+      "code": "2380",
+      "name": "Rose Pink",
+      "hex": "#93607c",
+      "sku": "YS.COTTON4PLY.2380"
+    },
+    {
+      "code": "2390",
+      "name": "Fondant Pink",
+      "hex": "#db78a0",
+      "sku": "YS.COTTON4PLY.2390"
+    },
+    {
+      "code": "2400",
+      "name": "Candyfloss Pink",
+      "hex": "#e2b1c7",
+      "sku": "YS.COTTON4PLY.2400"
+    },
+    {
+      "code": "2404",
+      "name": "Blossom",
+      "hex": "#cd97a2",
+      "sku": "YS.COTTON4PLY.2404"
+    },
+    {
+      "code": "2410",
+      "name": "Light Pink",
+      "hex": "#dfc2d8",
+      "sku": "YS.COTTON4PLY.2410"
+    },
+    {
+      "code": "2422",
+      "name": "Peach",
+      "hex": "#e3c0b3",
+      "sku": "YS.COTTON4PLY.2422"
+    },
+    {
+      "code": "2428",
+      "name": "Vintage Peach",
+      "hex": "#7a3b40",
+      "sku": "YS.COTTON4PLY.2428"
+    }
+  ]
+}

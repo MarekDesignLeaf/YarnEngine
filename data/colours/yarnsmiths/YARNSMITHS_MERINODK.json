@@ -1,0 +1,732 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_MERINODK",
+  "brand": "Yarnsmiths",
+  "product": "Merino DK Superwash",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-dk-superwash-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3000",
+      "name": "Black",
+      "hex": "#080808",
+      "sku": "YS.MERINODK.3000"
+    },
+    {
+      "code": "3002",
+      "name": "Anthracite Grey",
+      "hex": "#26252b",
+      "sku": "YS.MERINODK.3002"
+    },
+    {
+      "code": "3005",
+      "name": "Gunmetal Grey",
+      "hex": "#3d4245",
+      "sku": "YS.MERINODK.3005"
+    },
+    {
+      "code": "3008",
+      "name": "Storm Grey",
+      "hex": "#474c50",
+      "sku": "YS.MERINODK.3008"
+    },
+    {
+      "code": "3012",
+      "name": "Medium Grey",
+      "hex": "#616d79",
+      "sku": "YS.MERINODK.3012"
+    },
+    {
+      "code": "3015",
+      "name": "Stone Grey",
+      "hex": "#808483",
+      "sku": "YS.MERINODK.3015"
+    },
+    {
+      "code": "3018",
+      "name": "Light Grey",
+      "hex": "#7c858f",
+      "sku": "YS.MERINODK.3018"
+    },
+    {
+      "code": "3025",
+      "name": "Platinum Grey",
+      "hex": "#81869d",
+      "sku": "YS.MERINODK.3025"
+    },
+    {
+      "code": "3030",
+      "name": "Silver",
+      "hex": "#969ca6",
+      "sku": "YS.MERINODK.3030"
+    },
+    {
+      "code": "3035",
+      "name": "Pale Silver",
+      "hex": "#cad0da",
+      "sku": "YS.MERINODK.3035"
+    },
+    {
+      "code": "3040",
+      "name": "White",
+      "hex": "#e0e1d9",
+      "sku": "YS.MERINODK.3040"
+    },
+    {
+      "code": "3045",
+      "name": "Off White",
+      "hex": "#d9dbcf",
+      "sku": "YS.MERINODK.3045"
+    },
+    {
+      "code": "3050",
+      "name": "Cream",
+      "hex": "#dadac2",
+      "sku": "YS.MERINODK.3050"
+    },
+    {
+      "code": "3060",
+      "name": "Parchment",
+      "hex": "#b0aaa7",
+      "sku": "YS.MERINODK.3060"
+    },
+    {
+      "code": "3061",
+      "name": "Linen",
+      "hex": "#b9b5ae",
+      "sku": "YS.MERINODK.3061"
+    },
+    {
+      "code": "3062",
+      "name": "Blush",
+      "hex": "#cec5b5",
+      "sku": "YS.MERINODK.3062"
+    },
+    {
+      "code": "3063",
+      "name": "Champagne",
+      "hex": "#d2beae",
+      "sku": "YS.MERINODK.3063"
+    },
+    {
+      "code": "3064",
+      "name": "Oatmeal",
+      "hex": "#c0a99b",
+      "sku": "YS.MERINODK.3064"
+    },
+    {
+      "code": "3065",
+      "name": "Warm Taupe",
+      "hex": "#9b807b",
+      "sku": "YS.MERINODK.3065"
+    },
+    {
+      "code": "3066",
+      "name": "Sand",
+      "hex": "#baa388",
+      "sku": "YS.MERINODK.3066"
+    },
+    {
+      "code": "3067",
+      "name": "Vanilla Fudge",
+      "hex": "#b59166",
+      "sku": "YS.MERINODK.3067"
+    },
+    {
+      "code": "3069",
+      "name": "Latte",
+      "hex": "#786857",
+      "sku": "YS.MERINODK.3069"
+    },
+    {
+      "code": "3070",
+      "name": "Brown Bear",
+      "hex": "#564b45",
+      "sku": "YS.MERINODK.3070"
+    },
+    {
+      "code": "3072",
+      "name": "Bronze",
+      "hex": "#4c3b19",
+      "sku": "YS.MERINODK.3072"
+    },
+    {
+      "code": "3074",
+      "name": "Rust",
+      "hex": "#4c3119",
+      "sku": "YS.MERINODK.3074"
+    },
+    {
+      "code": "3076",
+      "name": "Copper",
+      "hex": "#672a20",
+      "sku": "YS.MERINODK.3076"
+    },
+    {
+      "code": "3078",
+      "name": "Brick",
+      "hex": "#623134",
+      "sku": "YS.MERINODK.3078"
+    },
+    {
+      "code": "3080",
+      "name": "Chocolate Brown",
+      "hex": "#1f1913",
+      "sku": "YS.MERINODK.3080"
+    },
+    {
+      "code": "3085",
+      "name": "Burgundy",
+      "hex": "#2d0c1d",
+      "sku": "YS.MERINODK.3085"
+    },
+    {
+      "code": "3090",
+      "name": "Claret Red",
+      "hex": "#510a1e",
+      "sku": "YS.MERINODK.3090"
+    },
+    {
+      "code": "3094",
+      "name": "Sienna Red",
+      "hex": "#470a11",
+      "sku": "YS.MERINODK.3094"
+    },
+    {
+      "code": "3096",
+      "name": "Crimson",
+      "hex": "#750322",
+      "sku": "YS.MERINODK.3096"
+    },
+    {
+      "code": "3100",
+      "name": "Scarlet Red",
+      "hex": "#71050d",
+      "sku": "YS.MERINODK.3100"
+    },
+    {
+      "code": "3110",
+      "name": "Bright Red",
+      "hex": "#8a080f",
+      "sku": "YS.MERINODK.3110"
+    },
+    {
+      "code": "3115",
+      "name": "Paprika",
+      "hex": "#902a20",
+      "sku": "YS.MERINODK.3115"
+    },
+    {
+      "code": "3120",
+      "name": "Burnt Orange",
+      "hex": "#8f2921",
+      "sku": "YS.MERINODK.3120"
+    },
+    {
+      "code": "3124",
+      "name": "Ginger",
+      "hex": "#7f3415",
+      "sku": "YS.MERINODK.3124"
+    },
+    {
+      "code": "3126",
+      "name": "Carrot",
+      "hex": "#ae380c",
+      "sku": "YS.MERINODK.3126"
+    },
+    {
+      "code": "3130",
+      "name": "Bright Orange",
+      "hex": "#dc591d",
+      "sku": "YS.MERINODK.3130"
+    },
+    {
+      "code": "3135",
+      "name": "Tangerine",
+      "hex": "#d97a1e",
+      "sku": "YS.MERINODK.3135"
+    },
+    {
+      "code": "3140",
+      "name": "Mustard Yellow",
+      "hex": "#c79234",
+      "sku": "YS.MERINODK.3140"
+    },
+    {
+      "code": "3145",
+      "name": "Antique Gold",
+      "hex": "#8a571a",
+      "sku": "YS.MERINODK.3145"
+    },
+    {
+      "code": "3150",
+      "name": "Sunshine Yellow",
+      "hex": "#cd8119",
+      "sku": "YS.MERINODK.3150"
+    },
+    {
+      "code": "3160",
+      "name": "Primrose Yellow",
+      "hex": "#ccad36",
+      "sku": "YS.MERINODK.3160"
+    },
+    {
+      "code": "3164",
+      "name": "Bright Yellow",
+      "hex": "#cfc218",
+      "sku": "YS.MERINODK.3164"
+    },
+    {
+      "code": "3166",
+      "name": "Canary Yellow",
+      "hex": "#c7b65a",
+      "sku": "YS.MERINODK.3166"
+    },
+    {
+      "code": "3170",
+      "name": "Lemon Yellow",
+      "hex": "#d0be82",
+      "sku": "YS.MERINODK.3170"
+    },
+    {
+      "code": "3180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#d8d1a5",
+      "sku": "YS.MERINODK.3180"
+    },
+    {
+      "code": "3181",
+      "name": "Hint of Mint",
+      "hex": "#a5c7bb",
+      "sku": "YS.MERINODK.3181"
+    },
+    {
+      "code": "3183",
+      "name": "Mojito Green",
+      "hex": "#5d946e",
+      "sku": "YS.MERINODK.3183"
+    },
+    {
+      "code": "3185",
+      "name": "Light Sage",
+      "hex": "#87a796",
+      "sku": "YS.MERINODK.3185"
+    },
+    {
+      "code": "3186",
+      "name": "Celery",
+      "hex": "#99a25b",
+      "sku": "YS.MERINODK.3186"
+    },
+    {
+      "code": "3187",
+      "name": "Olive Green",
+      "hex": "#87852f",
+      "sku": "YS.MERINODK.3187"
+    },
+    {
+      "code": "3188",
+      "name": "Apple Green",
+      "hex": "#5a6e1a",
+      "sku": "YS.MERINODK.3188"
+    },
+    {
+      "code": "3190",
+      "name": "Lime Green",
+      "hex": "#96b040",
+      "sku": "YS.MERINODK.3190"
+    },
+    {
+      "code": "3195",
+      "name": "Bright Green",
+      "hex": "#61a02c",
+      "sku": "YS.MERINODK.3195"
+    },
+    {
+      "code": "3200",
+      "name": "Grass Green",
+      "hex": "#588246",
+      "sku": "YS.MERINODK.3200"
+    },
+    {
+      "code": "3202",
+      "name": "Dark Sage",
+      "hex": "#44614f",
+      "sku": "YS.MERINODK.3202"
+    },
+    {
+      "code": "3204",
+      "name": "Country Green",
+      "hex": "#3f432f",
+      "sku": "YS.MERINODK.3204"
+    },
+    {
+      "code": "3206",
+      "name": "Khaki",
+      "hex": "#4c4e2f",
+      "sku": "YS.MERINODK.3206"
+    },
+    {
+      "code": "3208",
+      "name": "Bottle Green",
+      "hex": "#0f2215",
+      "sku": "YS.MERINODK.3208"
+    },
+    {
+      "code": "3210",
+      "name": "Christmas Green",
+      "hex": "#064a2e",
+      "sku": "YS.MERINODK.3210"
+    },
+    {
+      "code": "3215",
+      "name": "Clover",
+      "hex": "#19722f",
+      "sku": "YS.MERINODK.3215"
+    },
+    {
+      "code": "3220",
+      "name": "Opal Green",
+      "hex": "#086656",
+      "sku": "YS.MERINODK.3220"
+    },
+    {
+      "code": "3222",
+      "name": "Spearmint Green",
+      "hex": "#517d7a",
+      "sku": "YS.MERINODK.3222"
+    },
+    {
+      "code": "3224",
+      "name": "Aqua",
+      "hex": "#3fb5b3",
+      "sku": "YS.MERINODK.3224"
+    },
+    {
+      "code": "3226",
+      "name": "Seafoam",
+      "hex": "#46b0ad",
+      "sku": "YS.MERINODK.3226"
+    },
+    {
+      "code": "3228",
+      "name": "Vintage Teal",
+      "hex": "#3a8c9c",
+      "sku": "YS.MERINODK.3228"
+    },
+    {
+      "code": "3229",
+      "name": "Tropical Teal",
+      "hex": "#0b84a0",
+      "sku": "YS.MERINODK.3229"
+    },
+    {
+      "code": "3230",
+      "name": "Teal",
+      "hex": "#0d5161",
+      "sku": "YS.MERINODK.3230"
+    },
+    {
+      "code": "3234",
+      "name": "Petrol",
+      "hex": "#163d58",
+      "sku": "YS.MERINODK.3234"
+    },
+    {
+      "code": "3236",
+      "name": "Deep Ocean",
+      "hex": "#142c44",
+      "sku": "YS.MERINODK.3236"
+    },
+    {
+      "code": "3240",
+      "name": "Dark Turquoise",
+      "hex": "#105d96",
+      "sku": "YS.MERINODK.3240"
+    },
+    {
+      "code": "3250",
+      "name": "Light Turquoise",
+      "hex": "#3aa1c8",
+      "sku": "YS.MERINODK.3250"
+    },
+    {
+      "code": "3251",
+      "name": "Steel Blue",
+      "hex": "#407690",
+      "sku": "YS.MERINODK.3251"
+    },
+    {
+      "code": "3252",
+      "name": "Fjord Blue",
+      "hex": "#31485c",
+      "sku": "YS.MERINODK.3252"
+    },
+    {
+      "code": "3254",
+      "name": "Robin Egg",
+      "hex": "#84c2d0",
+      "sku": "YS.MERINODK.3254"
+    },
+    {
+      "code": "3256",
+      "name": "Duck Egg",
+      "hex": "#94b6c2",
+      "sku": "YS.MERINODK.3256"
+    },
+    {
+      "code": "3258",
+      "name": "Glacier Blue",
+      "hex": "#81a7ba",
+      "sku": "YS.MERINODK.3258"
+    },
+    {
+      "code": "3260",
+      "name": "Sky Blue",
+      "hex": "#9cadc2",
+      "sku": "YS.MERINODK.3260"
+    },
+    {
+      "code": "3262",
+      "name": "Powder Blue",
+      "hex": "#86b2d0",
+      "sku": "YS.MERINODK.3262"
+    },
+    {
+      "code": "3266",
+      "name": "Hydrangea Blue",
+      "hex": "#6c8dc0",
+      "sku": "YS.MERINODK.3266"
+    },
+    {
+      "code": "3270",
+      "name": "Cornflower Blue",
+      "hex": "#3967b4",
+      "sku": "YS.MERINODK.3270"
+    },
+    {
+      "code": "3274",
+      "name": "Strong Blue",
+      "hex": "#1944a6",
+      "sku": "YS.MERINODK.3274"
+    },
+    {
+      "code": "3276",
+      "name": "Ultramarine Blue",
+      "hex": "#3f6d9a",
+      "sku": "YS.MERINODK.3276"
+    },
+    {
+      "code": "3280",
+      "name": "Denim Blue",
+      "hex": "#445571",
+      "sku": "YS.MERINODK.3280"
+    },
+    {
+      "code": "3285",
+      "name": "Delft Blue",
+      "hex": "#334868",
+      "sku": "YS.MERINODK.3285"
+    },
+    {
+      "code": "3290",
+      "name": "Deep Denim Blue",
+      "hex": "#1b2840",
+      "sku": "YS.MERINODK.3290"
+    },
+    {
+      "code": "3300",
+      "name": "Royal Blue",
+      "hex": "#16245b",
+      "sku": "YS.MERINODK.3300"
+    },
+    {
+      "code": "3305",
+      "name": "Sapphire Blue",
+      "hex": "#203467",
+      "sku": "YS.MERINODK.3305"
+    },
+    {
+      "code": "3310",
+      "name": "Navy Blue",
+      "hex": "#10141e",
+      "sku": "YS.MERINODK.3310"
+    },
+    {
+      "code": "3315",
+      "name": "Vibrant Violet",
+      "hex": "#221156",
+      "sku": "YS.MERINODK.3315"
+    },
+    {
+      "code": "3320",
+      "name": "Deep Purple",
+      "hex": "#241338",
+      "sku": "YS.MERINODK.3320"
+    },
+    {
+      "code": "3322",
+      "name": "Amethyst",
+      "hex": "#453769",
+      "sku": "YS.MERINODK.3322"
+    },
+    {
+      "code": "3324",
+      "name": "Just Purple",
+      "hex": "#37154f",
+      "sku": "YS.MERINODK.3324"
+    },
+    {
+      "code": "3326",
+      "name": "Purple Orchid",
+      "hex": "#54227a",
+      "sku": "YS.MERINODK.3326"
+    },
+    {
+      "code": "3330",
+      "name": "Plum Purple",
+      "hex": "#361d3b",
+      "sku": "YS.MERINODK.3330"
+    },
+    {
+      "code": "3335",
+      "name": "Sugar Plum",
+      "hex": "#8f599a",
+      "sku": "YS.MERINODK.3335"
+    },
+    {
+      "code": "3340",
+      "name": "Pale Lilac",
+      "hex": "#afa6cf",
+      "sku": "YS.MERINODK.3340"
+    },
+    {
+      "code": "3350",
+      "name": "Lilac",
+      "hex": "#8478ad",
+      "sku": "YS.MERINODK.3350"
+    },
+    {
+      "code": "3354",
+      "name": "Grape Juice",
+      "hex": "#46425a",
+      "sku": "YS.MERINODK.3354"
+    },
+    {
+      "code": "3356",
+      "name": "Dark Lavender",
+      "hex": "#585594",
+      "sku": "YS.MERINODK.3356"
+    },
+    {
+      "code": "3360",
+      "name": "Lavender",
+      "hex": "#6063a1",
+      "sku": "YS.MERINODK.3360"
+    },
+    {
+      "code": "3362",
+      "name": "Bluebell",
+      "hex": "#6173ac",
+      "sku": "YS.MERINODK.3362"
+    },
+    {
+      "code": "3364",
+      "name": "Petal Pink",
+      "hex": "#bd76ad",
+      "sku": "YS.MERINODK.3364"
+    },
+    {
+      "code": "3366",
+      "name": "Magenta",
+      "hex": "#8e1397",
+      "sku": "YS.MERINODK.3366"
+    },
+    {
+      "code": "3368",
+      "name": "Bright Pink",
+      "hex": "#ac057a",
+      "sku": "YS.MERINODK.3368"
+    },
+    {
+      "code": "3370",
+      "name": "Fuchsia Pink",
+      "hex": "#770644",
+      "sku": "YS.MERINODK.3370"
+    },
+    {
+      "code": "3372",
+      "name": "Fandango Pink",
+      "hex": "#b02e58",
+      "sku": "YS.MERINODK.3372"
+    },
+    {
+      "code": "3374",
+      "name": "Pinkberry",
+      "hex": "#7e2062",
+      "sku": "YS.MERINODK.3374"
+    },
+    {
+      "code": "3376",
+      "name": "Vintage Pink",
+      "hex": "#853b5c",
+      "sku": "YS.MERINODK.3376"
+    },
+    {
+      "code": "3380",
+      "name": "Rose Pink",
+      "hex": "#945f7d",
+      "sku": "YS.MERINODK.3380"
+    },
+    {
+      "code": "3385",
+      "name": "Bubblegum",
+      "hex": "#b75194",
+      "sku": "YS.MERINODK.3385"
+    },
+    {
+      "code": "3390",
+      "name": "Fondant Pink",
+      "hex": "#c174a5",
+      "sku": "YS.MERINODK.3390"
+    },
+    {
+      "code": "3400",
+      "name": "Candyfloss Pink",
+      "hex": "#dfa0b8",
+      "sku": "YS.MERINODK.3400"
+    },
+    {
+      "code": "3410",
+      "name": "Light Pink",
+      "hex": "#ceb4c0",
+      "sku": "YS.MERINODK.3410"
+    },
+    {
+      "code": "3420",
+      "name": "Peachy Pink",
+      "hex": "#cab7be",
+      "sku": "YS.MERINODK.3420"
+    },
+    {
+      "code": "3422",
+      "name": "Peach",
+      "hex": "#d2b1a8",
+      "sku": "YS.MERINODK.3422"
+    },
+    {
+      "code": "3426",
+      "name": "Dusky Peach",
+      "hex": "#c78473",
+      "sku": "YS.MERINODK.3426"
+    },
+    {
+      "code": "3428",
+      "name": "Vintage Peach",
+      "hex": "#783b41",
+      "sku": "YS.MERINODK.3428"
+    }
+  ]
+}

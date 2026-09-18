@@ -99,7 +99,20 @@ colour the model describes ("light brown") is *matched* onto that catalogue by
 `src/library/colours.py` rather than stored as written -- so the app always
 shows a real catalogue entry, already selected, which can then be changed to a
 different catalogue entry. A description that matches nothing leaves the colour
-unset instead of inventing one. The chosen shade is what the header shows, what
+unset instead of inventing one.
+
+All 53 Yarnsmiths ranges carry their real shade cards — 1,844 shades in
+`data/colours/yarnsmiths/`, read from each range's own page. The name and code
+are as the maker lists them; the hex was measured from that shade's ball photo
+on the same page (the yarn's own pixels, with the studio background and the
+extremes of shadow and highlight discarded), so it is an observation of the
+shop's picture rather than a colour invented from the shade's name — which is
+why "Bottle Green" comes out `#132a1a` and not a guess. The colour family each
+shade is filed under is worked out from its hue, not claimed from the maker:
+nearest-neighbour in RGB puts every dark shade next to black, so hue decides
+the family and saturation and lightness separate the greys from the browns.
+`scripts/import_yarnsmiths_shades.py` replays the capture in
+`data/ingestion/yarnsmiths_shades_capture_2026-09-18.txt`. The chosen shade is what the header shows, what
 the exploded piece drawings are filled with, and what the 3D preview is
 rendered in.
 

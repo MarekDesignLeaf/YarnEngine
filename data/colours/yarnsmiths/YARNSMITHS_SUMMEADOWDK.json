@@ -1,0 +1,102 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SUMMEADOWDK",
+  "brand": "Yarnsmiths",
+  "product": "Summer Meadow DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-summer-meadow-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2X010",
+      "name": "Snow Drop",
+      "hex": "#dfdfd9",
+      "sku": "YS.SUMMEADOWDK.2X010"
+    },
+    {
+      "code": "2X020",
+      "name": "Hellebore",
+      "hex": "#c6c4bb",
+      "sku": "YS.SUMMEADOWDK.2X020"
+    },
+    {
+      "code": "2X030",
+      "name": "Pampas Grass",
+      "hex": "#9d907d",
+      "sku": "YS.SUMMEADOWDK.2X030"
+    },
+    {
+      "code": "2X040",
+      "name": "Crocosmia",
+      "hex": "#a0692e",
+      "sku": "YS.SUMMEADOWDK.2X040"
+    },
+    {
+      "code": "2X050",
+      "name": "Buttercup",
+      "hex": "#a78e34",
+      "sku": "YS.SUMMEADOWDK.2X050"
+    },
+    {
+      "code": "2X060",
+      "name": "Primrose",
+      "hex": "#c3bd7c",
+      "sku": "YS.SUMMEADOWDK.2X060"
+    },
+    {
+      "code": "2X070",
+      "name": "Sage",
+      "hex": "#89967c",
+      "sku": "YS.SUMMEADOWDK.2X070"
+    },
+    {
+      "code": "2X080",
+      "name": "Nettle",
+      "hex": "#677f70",
+      "sku": "YS.SUMMEADOWDK.2X080"
+    },
+    {
+      "code": "2X090",
+      "name": "Mint",
+      "hex": "#93adae",
+      "sku": "YS.SUMMEADOWDK.2X090"
+    },
+    {
+      "code": "2X100",
+      "name": "Nigella",
+      "hex": "#2c4655",
+      "sku": "YS.SUMMEADOWDK.2X100"
+    },
+    {
+      "code": "2X110",
+      "name": "Forget Me Not",
+      "hex": "#435d73",
+      "sku": "YS.SUMMEADOWDK.2X110"
+    },
+    {
+      "code": "2X120",
+      "name": "Pansy",
+      "hex": "#17212b",
+      "sku": "YS.SUMMEADOWDK.2X120"
+    },
+    {
+      "code": "2X130",
+      "name": "Fox Glove",
+      "hex": "#785c6e",
+      "sku": "YS.SUMMEADOWDK.2X130"
+    },
+    {
+      "code": "2X140",
+      "name": "Hollyhock",
+      "hex": "#95686c",
+      "sku": "YS.SUMMEADOWDK.2X140"
+    },
+    {
+      "code": "2X150",
+      "name": "Cosmos",
+      "hex": "#a17e86",
+      "sku": "YS.SUMMEADOWDK.2X150"
+    }
+  ]
+}

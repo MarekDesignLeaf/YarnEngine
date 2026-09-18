@@ -1,0 +1,84 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_FLURRYCHUNKY",
+  "brand": "Yarnsmiths",
+  "product": "Flurry Chunky",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-flurry-chunky-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2Q010",
+      "name": "Snow White",
+      "hex": "#ced2d5",
+      "sku": "YS.FLURRYCHUNKY.2Q010"
+    },
+    {
+      "code": "2Q020",
+      "name": "Clotted Cream",
+      "hex": "#d5d3c2",
+      "sku": "YS.FLURRYCHUNKY.2Q020"
+    },
+    {
+      "code": "2Q030",
+      "name": "Oatmilk",
+      "hex": "#b6af9c",
+      "sku": "YS.FLURRYCHUNKY.2Q030"
+    },
+    {
+      "code": "2Q040",
+      "name": "Sandy Camel",
+      "hex": "#837254",
+      "sku": "YS.FLURRYCHUNKY.2Q040"
+    },
+    {
+      "code": "2Q050",
+      "name": "Teddy Bear",
+      "hex": "#6d5143",
+      "sku": "YS.FLURRYCHUNKY.2Q050"
+    },
+    {
+      "code": "2Q060",
+      "name": "Duckling",
+      "hex": "#cbc289",
+      "sku": "YS.FLURRYCHUNKY.2Q060"
+    },
+    {
+      "code": "2Q070",
+      "name": "Baby Blue",
+      "hex": "#8da9c8",
+      "sku": "YS.FLURRYCHUNKY.2Q070"
+    },
+    {
+      "code": "2Q080",
+      "name": "Baby Pink",
+      "hex": "#e1adc5",
+      "sku": "YS.FLURRYCHUNKY.2Q080"
+    },
+    {
+      "code": "2Q090",
+      "name": "Seaglass",
+      "hex": "#94bcb4",
+      "sku": "YS.FLURRYCHUNKY.2Q090"
+    },
+    {
+      "code": "2Q100",
+      "name": "Piglet",
+      "hex": "#dcb7c0",
+      "sku": "YS.FLURRYCHUNKY.2Q100"
+    },
+    {
+      "code": "2Q110",
+      "name": "Soft Grey",
+      "hex": "#adb6bb",
+      "sku": "YS.FLURRYCHUNKY.2Q110"
+    },
+    {
+      "code": "2Q120",
+      "name": "Hint of Grey",
+      "hex": "#cdd0d5",
+      "sku": "YS.FLURRYCHUNKY.2Q120"
+    }
+  ]
+}

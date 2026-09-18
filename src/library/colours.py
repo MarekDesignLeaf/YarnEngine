@@ -16,6 +16,7 @@ from pathlib import Path
 
 PALETTE_FILE = "data/colours/standard_palette.json"
 PALETTE_PREFIX = "PAL_"
+SHADE_CARD_DIR = "data/colours"
 
 # Words people (and vision models) use for a colour, mapped onto the palette
 # family they belong to. Used only as a last resort, when no shade name matches.
@@ -51,6 +52,8 @@ def load_palette(root: Path) -> list[dict]:
             "source_type": data.get("source_type", "standard_palette"),
             "source_reference": data.get("source_reference"),
         })
+    global _PALETTE_CACHE
+    _PALETTE_CACHE = rows
     return rows
 
 
@@ -60,6 +63,92 @@ def import_palette(store, root: Path, now: str) -> int:
     for row in rows:
         store.upsert_colour(row, now)
     return len(rows)
+
+
+def load_shade_cards(root: Path) -> list[dict]:
+    """Every captured manufacturer shade card, as catalogue rows.
+
+    A card belongs to one yarn, so its rows carry that yarn_id and are offered
+    ahead of the generic palette for it. The colour family is worked out from
+    the shade's own colour rather than claimed from the maker, so the picker
+    can group and sort; the name, code and hex are as captured.
+    """
+    rows: list[dict] = []
+    for path in sorted((Path(root) / SHADE_CARD_DIR).rglob("*.json")):
+        data = json.loads(path.read_text())
+        if data.get("record_type") != "yarn_shade_card":
+            continue
+        yarn_id = data["yarn_id"]
+        for shade in data["shades"]:
+            rows.append({
+                "colour_id": f"{yarn_id}__{re.sub(r'[^A-Za-z0-9]+', '_', shade['code'])}",
+                "yarn_id": yarn_id,
+                "code": shade["code"],
+                "name": shade["name"],
+                "hex": shade["hex"],
+                "family": family_of(shade["hex"]),
+                "source_type": data.get("source_type", "manufacturer_web"),
+                "source_reference": data.get("source_reference"),
+            })
+    return rows
+
+
+def import_shade_cards(store, root: Path, now: str) -> int:
+    """Idempotent, like the palette: re-running refreshes each shade in place."""
+    rows = load_shade_cards(root)
+    for row in rows:
+        store.upsert_colour(row, now)
+    return len(rows)
+
+
+def _rgb(hex_colour: str) -> tuple[int, int, int]:
+    h = hex_colour.lstrip("#")
+    return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
+
+
+def family_of(hex_colour: str, palette: list[dict] | None = None) -> str | None:
+    """Which colour family a measured shade belongs to.
+
+    Nearest-neighbour in RGB is no good here: a dark bottle green is closer to
+    black than to any green, and half the shade card would come out "Neutral".
+    Hue decides the family, with saturation and lightness separating the greys
+    and the browns -- which is how a person reads a shade card.
+    """
+    r, g, b = (v / 255.0 for v in _rgb(hex_colour))
+    hi, lo = max(r, g, b), min(r, g, b)
+    value, chroma = hi, hi - lo
+    sat = 0.0 if hi == 0 else chroma / hi
+    if chroma < 1e-6:
+        hue = 0.0
+    elif hi == r:
+        hue = (60 * ((g - b) / chroma)) % 360
+    elif hi == g:
+        hue = 60 * ((b - r) / chroma) + 120
+    else:
+        hue = 60 * ((r - g) / chroma) + 240
+
+    if sat < 0.20 or chroma < 0.05:
+        if value > 0.85 or value < 0.14:
+            return "Neutral"                # white, cream, black
+        return "Neutral" if 14 <= hue < 70 else "Grey"   # warm naturals vs true greys
+    if 14 <= hue < 48 and (value < 0.62 or sat < 0.55):
+        return "Brown"                      # a dulled or darkened orange
+    if hue < 14 or hue >= 345:
+        return "Red"
+    if hue < 42:
+        return "Orange"
+    if hue < 70:
+        return "Yellow"
+    if hue < 168:
+        return "Green"
+    if hue < 258:
+        return "Blue"
+    if hue < 312:
+        return "Purple"
+    return "Pink"
+
+
+_PALETTE_CACHE: list[dict] = []
 
 
 def _norm(text: str) -> str:

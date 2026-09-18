@@ -1,0 +1,1897 @@
+#yarnsmiths-create-aran-all-colours|YS.ARAN
+4000|Black|#090907
+4005|Gunmetal Grey|#454e4d
+4010|Dark Grey Heather|#4b4f56
+4020|Light Grey Heather|#8c929b
+4030|Silver|#b4bab9
+4035|Pale Silver|#c2c9cc
+4040|White|#d9dde0
+4045|Off White|#d9dad7
+4050|Cream|#d9dacb
+4060|Parchment|#beb19f
+4061|Linen|#bbbbac
+4063|Champagne|#d0bda5
+4064|Oatmeal|#c2b2a3
+4067|Vanilla Fudge|#ab8f5c
+4069|Latte|#857261
+4070|Brown Bear|#635a4b
+4074|Rust|#694620
+4076|Copper|#6f2e1a
+4080|Chocolate Brown|#1f1710
+4090|Claret Red|#650921
+4100|Scarlet Red|#76060f
+4110|Bright Red|#af0508
+4120|Burnt Orange|#a63018
+4124|Ginger|#914011
+4126|Carrot|#be420e
+4140|Mustard Yellow|#d29c22
+4145|Antique Gold|#ba8127
+4166|Canary Yellow|#e0c962
+4180|Pale Lemon Yellow|#e5e0b6
+4185|Light Sage|#85a686
+4186|Celery|#b1b56b
+4188|Apple Green|#748d1e
+4200|Grass Green|#5a8b41
+4202|Dark Sage|#4e7052
+4204|Country Green|#394326
+4210|Christmas Green|#064c30
+4220|Opal Green|#0e745e
+4228|Vintage Teal|#48979f
+4230|Teal|#087280
+4240|Dark Turquoise|#1168a7
+4256|Duck Egg|#99b7b9
+4266|Hydrangea Blue|#73a0cf
+4270|Cornflower Blue|#5586c3
+4274|Strong Blue|#2256a5
+4280|Denim Blue|#546285
+4300|Royal Blue|#17276b
+4310|Navy Blue|#15162b
+4326|Purple Orchid|#6b258a
+4330|Plum Purple|#50224b
+4335|Sugar Plum|#784a7a
+4340|Pale Lilac|#cdbed8
+4350|Lilac|#917dbb
+4354|Grape Juice|#625470
+4360|Lavender|#6a6ba8
+4364|Petal Pink|#cd81b6
+4374|Pinkberry|#92245c
+4380|Rose Pink|#b6708a
+4410|Light Pink|#eec9db
+4426|Dusky Peach|#c57d68
+4428|Vintage Peach|#985250
+#yarnsmiths-create-baby-4-ply-all-colours|YS.BABY4PLY
+4P05|Baby White|#dfdccb
+4P10|Baby Cream|#e2dab9
+4P20|Baby Silver|#d2cdca
+4P30|Soft Pink|#f5cec2
+4P35|Baby Pink|#f0c6c9
+4P50|Baby Blue|#b6cddb
+4P60|Baby Mint|#ccd9c4
+#yarnsmiths-create-baby-aran-all-colours|YS.BABYARAN
+AR05|Baby White|#e5e1d4
+AR10|Baby Cream|#e4dbba
+AR20|Baby Silver|#cecac5
+AR30|Soft Pink|#f9d3c8
+AR35|Baby Pink|#f6cacf
+AR50|Baby Blue|#b4ccd8
+AR60|Baby Mint|#d0deca
+#yarnsmiths-create-baby-dk-all-colours|YS.BABYDK
+DK05|Baby White|#e8e3d3
+DK10|Baby Cream|#efe0b7
+DK15|Baby Lemon|#e4d29a
+DK20|Baby Silver|#d2cec8
+DK25|Baby Grey|#b4afa9
+DK30|Soft Pink|#efc7bd
+DK35|Baby Pink|#e1b9bb
+DK40|Baby Rose|#b56b76
+DK45|Soft Blue|#b6d8d3
+DK50|Baby Blue|#b5c9ce
+DK55|Baby Denim|#616779
+DK60|Baby Mint|#becab6
+DK65|Baby Lilac|#bea8b3
+#yarnsmiths-bizarre-dk-all-colours|YS.BIZARREDK
+3G010|Kerfuffle|#7e5a5e
+3G020|Gobbledygook|#4f7080
+3G030|Discombobulated|#bbb4bc
+3G040|Splendiferous|#d1b8a0
+3G050|Collywobbles|#738188
+3G060|Skewwhiff|#af9da6
+3G070|Bamboozle|#b3a6a2
+3G080|Malarkey|#cfb1a0
+3G090|Palaver|#8e8e80
+3G100|Shenanigans|#bfbdad
+3G110|Larrikin|#7d8079
+3G120|Hunkydory|#c5ac97
+#yarnsmiths-headliner-the-blended-one-all-colours|YS.BLEND-HEAD
+2T501|Bright Rainbow|#9f7e27
+2T502|Coastal|#6592aa
+2T503|Delphinium|#876f6b
+2T504|Retro Dance|#744437
+2T505|Lake District|#41514e
+2T506|Sunset|#cf5b34
+2T507|Five Shades of Gandalf|#606363
+2T508|Annabelle Spectrum|#769194
+2T509|Garden Reflections|#88726b
+2T510|Seaside Holiday|#97958a
+2T511|Sunflower Garden|#594a29
+2T512|Rambling Rose|#7b7934
+2T513|Pastel Rainbow|#c6c5a8
+2T514|Minty Surprise|#4d9893
+2T515|Molly|#953166
+2T516|Blue Lagoon|#5e928b
+2T517|Judith|#3c3f37
+2T518|Rainbow Fiesta|#cc7535
+2T519|Woolly Smiths|#d0adbe
+2T520|Spirit Sundown|#a5946c
+2T521|Paradise|#897d4b
+2T522|Lilac Garden|#645355
+2T523|Autumn Leaves|#7d3e1f
+2T524|Garden Pond|#7c9079
+2T525|Rose Garden|#cbb57f
+2T526|Foxgloves|#8f557d
+2T527|Marketing Team|#7d4928
+2T528|Neutral Tones|#c2b199
+2T529|Kasegaluk Lagoon|#6e807b
+2T530|Loganberry Rainbow|#54441a
+#yarnsmiths-support-act-the-blended-one-all-colours|YS.BLEND-SUPP
+2T000|Black|#101010
+2T005|Gunmetal Grey|#475155
+2T030|Silver|#ababab
+2T040|White|#e3e3e3
+2T045|Off White|#d4d4c1
+2T060|Parchment|#a8a4a0
+2T063|Champagne|#c9bb9e
+2T070|Brown Bear|#5b5047
+2T074|Rust|#623a1f
+2T090|Claret Red|#4e0d19
+2T100|Scarlet Red|#911123
+2T126|Carrot|#e0452b
+2T140|Mustard Yellow|#ba8528
+2T160|Primrose Yellow|#e1bc33
+2T180|Pale Lemon Yellow|#cecd9b
+2T185|Light Sage|#739877
+2T188|Apple Green|#667d27
+2T202|Dark Sage|#476f52
+2T204|Country Green|#2c2e1a
+2T210|Christmas Green|#0e4a35
+2T224|Aqua|#58a6a1
+2T230|Teal|#0f5768
+2T251|Steel Blue|#3d6a7a
+2T256|Duck Egg|#8da3a1
+2T262|Powder Blue|#91b0c6
+2T274|Strong Blue|#1e5696
+2T290|Deep Denim Blue|#1b2435
+2T322|Amethyst|#4a3368
+2T330|Plum Purple|#401b43
+2T335|Sugar Plum|#794e7d
+2T340|Pale Lilac|#b1a5ca
+2T364|Petal Pink|#c473a3
+2T374|Pinkberry|#70144c
+2T410|Light Pink|#d7bacb
+2T420|Peachy Pink|#d9c4c1
+#yarnsmiths-chenille-chunky-all-colours|YS.CHENCHUNKY
+5000|Black|#090b0a
+5002|Anthracite Grey|#2a2d28
+5008|Storm Grey|#353c3f
+5015|Stone Grey|#868a84
+5025|Platinum Grey|#868c9e
+5030|Silver|#a3a7ac
+5035|Pale Silver|#d0d5d9
+5040|White|#e0e4e7
+5050|Cream|#dbdecd
+5060|Parchment|#b8b3aa
+5061|Linen|#c2bcaf
+5062|Blush|#d6c8b9
+5064|Oatmeal|#c7b8aa
+5065|Warm Taupe|#a98c85
+5066|Sand|#c0a07a
+5067|Vanilla Fudge|#b58e59
+5069|Latte|#735f4f
+5070|Brown Bear|#534c3f
+5074|Rust|#5a381a
+5076|Copper|#77311f
+5080|Chocolate Brown|#1b130f
+5090|Claret Red|#4e0418
+5100|Scarlet Red|#6f0510
+5110|Bright Red|#8f0b17
+5120|Burnt Orange|#9b3019
+5126|Carrot|#c1501b
+5135|Tangerine|#cb7b24
+5140|Mustard Yellow|#d59f3c
+5145|Antique Gold|#a2690f
+5160|Primrose Yellow|#d4c437
+5170|Lemon Yellow|#d9c380
+5180|Pale Lemon Yellow|#dad6b4
+5181|Hint of Mint|#abcebc
+5185|Light Sage|#8eb09c
+5186|Celery|#a2be66
+5188|Apple Green|#6c851a
+5200|Grass Green|#548433
+5202|Dark Sage|#4e7352
+5208|Bottle Green|#194d3b
+5210|Christmas Green|#08553a
+5215|Clover|#197931
+5220|Opal Green|#116854
+5222|Spearmint Green|#638d84
+5224|Aqua|#6cc1b9
+5229|Tropical Teal|#1e7f8f
+5230|Teal|#096e7b
+5240|Dark Turquoise|#0c5690
+5252|Fjord Blue|#294753
+5256|Duck Egg|#a2bcb9
+5260|Sky Blue|#a6c0df
+5266|Hydrangea Blue|#739dc6
+5274|Strong Blue|#19529d
+5290|Deep Denim Blue|#203147
+5300|Royal Blue|#1c2f64
+5322|Amethyst|#513d75
+5326|Purple Orchid|#652485
+5330|Plum Purple|#3f1a3f
+5335|Sugar Plum|#87527f
+5340|Pale Lilac|#bdb5cd
+5350|Lilac|#907cb3
+5360|Lavender|#66699a
+5364|Petal Pink|#c27ba9
+5366|Magenta|#6c115b
+5372|Fandango Pink|#b61d43
+5374|Pinkberry|#903261
+5380|Rose Pink|#92576f
+5385|Bubblegum|#bc4784
+5400|Candyfloss Pink|#e3a0c4
+5410|Light Pink|#d9bbd0
+5422|Peach|#debdb0
+#yarnsmiths-chenille-dk-all-colours|YS.CHENDK
+3000|Black|#06090a
+3008|Storm Grey|#454d4d
+3030|Silver|#afb3b8
+3035|Pale Silver|#ced2d5
+3040|White|#dadde2
+3050|Cream|#d0d5ca
+3060|Parchment|#aba198
+3062|Blush|#e2d7c8
+3064|Oatmeal|#bfb3a4
+3067|Vanilla Fudge|#c49e68
+3069|Latte|#826a5a
+3070|Brown Bear|#574b3d
+3074|Rust|#62401f
+3080|Chocolate Brown|#211911
+3100|Scarlet Red|#6b0311
+3110|Bright Red|#8c061e
+3120|Burnt Orange|#a63119
+3126|Carrot|#c9531c
+3135|Tangerine|#cb7a27
+3140|Mustard Yellow|#c9983b
+3160|Primrose Yellow|#d1bf2f
+3170|Lemon Yellow|#d5bb71
+3185|Light Sage|#849d81
+3186|Celery|#a6b867
+3188|Apple Green|#718414
+3200|Grass Green|#5b903a
+3210|Christmas Green|#073e25
+3224|Aqua|#5db1a6
+3229|Tropical Teal|#0e8098
+3256|Duck Egg|#9bb8bc
+3260|Sky Blue|#98b5cf
+3266|Hydrangea Blue|#6592c7
+3274|Strong Blue|#144690
+3326|Purple Orchid|#642282
+3340|Pale Lilac|#cabbd5
+3350|Lilac|#886fa1
+3385|Bubblegum|#cb5e95
+3400|Candyfloss Pink|#e5a5c4
+3410|Light Pink|#d8c0cc
+3422|Peach|#deb9a7
+#yarnsmiths-create-chunky-all-colours|YS.CHUNKY
+5000|Black|#090a05
+5010|Dark Grey Heather|#4c4c48
+5020|Light Grey Heather|#9f9f9d
+5030|Silver|#b6b1aa
+5040|White|#e4e0d3
+5050|Cream|#e5dab9
+5060|Parchment|#b7ab99
+5070|Brown Bear|#635443
+5100|Scarlet Red|#700507
+5110|Bright Red|#c20a0b
+5120|Burnt Orange|#ae2210
+5140|Mustard Yellow|#cc8c18
+5145|Antique Gold|#9d651e
+5170|Lemon Yellow|#f0c05d
+5200|Grass Green|#6f8d3d
+5210|Christmas Green|#0a4124
+5220|Opal Green|#1c6c50
+5230|Teal|#0a5759
+5250|Light Turquoise|#4eadba
+5260|Sky Blue|#b1c8d5
+5270|Cornflower Blue|#567bab
+5280|Denim Blue|#495c7e
+5300|Royal Blue|#1a225b
+5310|Navy Blue|#181c28
+5326|Purple Orchid|#6f257b
+5330|Plum Purple|#4e1f38
+5350|Lilac|#a788b3
+5374|Pinkberry|#9a2c62
+5380|Rose Pink|#b1646f
+5400|Candyfloss Pink|#f9b3bc
+#yarnsmiths-create-chunky-glitter-all-colours|YS.CHUNKYGLITTER
+G5030|Silver|#adaea8
+G5040|White|#ddd9d1
+G5100|Red|#700509
+G5210|Green|#084128
+#yarnsmiths-cotton-4-ply-all-colours|YS.COTTON4PLY
+2000|Black|#0b0b0b
+2002|Anthracite Grey|#2c302e
+2008|Storm Grey|#535d65
+2025|Platinum Grey|#98a0ab
+2035|Pale Silver|#c2c8ca
+2040|White|#dddddf
+2042|Ecru|#d1d0c8
+2045|Off White|#d9daca
+2050|Cream|#d9dcc7
+2054|Vanilla|#c3bfad
+2062|Blush|#d6ccb5
+2063|Champagne|#d1c1a0
+2064|Oatmeal|#c8b4a3
+2065|Warm Taupe|#aa8e85
+2066|Sand|#c4ad8a
+2067|Vanilla Fudge|#b59765
+2068|Caramel Fudge|#8b6a48
+2068B|Toffee Fudge|#a7805f
+2068F|Cuppa Tea|#967d68
+2069|Latte|#7f6e61
+2074|Rust|#644125
+2076|Copper|#651f14
+2079|Coffee Bean|#5c3c2f
+2079B|Cocoa|#3c3631
+2080|Chocolate Brown|#211b16
+2085|Burgundy|#331620
+2090|Claret Red|#540c1f
+2094|Sienna Red|#6a071d
+2100|Scarlet Red|#88081f
+2110|Bright Red|#a71818
+2124|Ginger|#893618
+2125|Amber|#a74d0f
+2126|Carrot|#e6481c
+2130|Bright Orange|#e55c1a
+2135|Tangerine|#ee8619
+2140|Mustard Yellow|#ce932f
+2145|Antique Gold|#96631d
+2150|Sunshine Yellow|#ea9614
+2160|Primrose Yellow|#e5c529
+2170|Lemon Yellow|#e7ce7f
+2185|Light Sage|#72a17e
+2186|Celery|#a4bd5c
+2188|Apple Green|#6c8b25
+2200|Grass Green|#598834
+2202|Dark Sage|#537d5d
+2204|Country Green|#373d1f
+2205B|Willow|#7e7e4d
+2206|Khaki|#575c39
+2210|Christmas Green|#0c5640
+2215|Clover|#11692f
+2228|Vintage Teal|#5d9ea5
+2230|Teal|#0a5a6a
+2256|Duck Egg|#90b3b5
+2262|Powder Blue|#9dc3d8
+2266|Hydrangea Blue|#709ed1
+2270|Cornflower Blue|#567eaf
+2280|Denim Blue|#5a637e
+2290|Deep Denim Blue|#1e303f
+2305|Sapphire Blue|#1f417a
+2310|Navy Blue|#191c2d
+2322|Amethyst|#54397d
+2326|Purple Orchid|#562163
+2335|Sugar Plum|#7a457f
+2340|Pale Lilac|#c0adca
+2350|Lilac|#987cb2
+2364|Petal Pink|#c373aa
+2372|Fandango Pink|#c23560
+2376|Vintage Pink|#903263
+2380|Rose Pink|#93607c
+2390|Fondant Pink|#db78a0
+2400|Candyfloss Pink|#e2b1c7
+2404|Blossom|#cd97a2
+2410|Light Pink|#dfc2d8
+2422|Peach|#e3c0b3
+2428|Vintage Peach|#7a3b40
+#yarnsmiths-cotton-aran-all-colours|YS.COTTONARAN
+4000|Black|#080808
+4001|Washed Black|#142021
+4002|Anthracite Grey|#212826
+4004|Slate Grey|#2f3c45
+4005|Gunmetal Grey|#464b50
+4006|Smoke Grey|#44504e
+4008|Storm Grey|#4d5558
+4012|Medium Grey|#5a666d
+4015|Stone Grey|#8d8b81
+4018|Light Grey|#949ba2
+4025|Platinum Grey|#838a91
+4030|Silver|#aeafb2
+4032|Soft Silver|#c6c3b7
+4035|Pale Silver|#c6cdcd
+4040|White|#dddedd
+4042|Ecru|#cfcfc8
+4045|Off White|#e0e2d2
+4050|Cream|#dae0d1
+4054|Vanilla|#c4c4b3
+4056|Almond Milk|#b9b6a1
+4060|Parchment|#abaaa4
+4061|Linen|#b1ac9a
+4062|Blush|#d7ceba
+4063|Champagne|#cfc4a5
+4064|Oatmeal|#c7b3a6
+4065|Warm Taupe|#a78e87
+4065B|Cool Taupe|#a59492
+4066|Sand|#c4ab8c
+4067|Vanilla Fudge|#bea069
+4068|Caramel Fudge|#997854
+4068B|Toffee Fudge|#b48b68
+4068D|Coffee Fudge|#816750
+4068F|Cuppa Tea|#93745e
+4069|Latte|#6f6051
+4070|Brown Bear|#5b4f45
+4072|Bronze|#54431a
+4074|Rust|#603c20
+4076|Copper|#702519
+4077|Terracotta|#924a36
+4078|Brick|#683434
+4079|Coffee Bean|#563828
+4079B|Cocoa|#433930
+4080|Chocolate Brown|#1e1510
+4085|Burgundy|#281018
+4090|Claret Red|#530d1d
+4094|Sienna Red|#700f22
+4096|Crimson|#8a0727
+4100|Scarlet Red|#85061a
+4110|Bright Red|#a21314
+4115|Paprika|#a82626
+4120|Burnt Orange|#931916
+4122|Chilli|#8e3830
+4124|Ginger|#943c17
+4125|Amber|#af5112
+4126|Carrot|#dd481f
+4130|Bright Orange|#e76309
+4135|Tangerine|#ee8917
+4140|Mustard Yellow|#b7832a
+4145|Antique Gold|#936215
+4147|Harvest Gold|#d7a921
+4150|Sunshine Yellow|#eda317
+4155|Buttercup|#e2bf15
+4160|Primrose Yellow|#dfc837
+4164|Bright Yellow|#e5d648
+4166|Canary Yellow|#e6d36e
+4170|Lemon Yellow|#e0cc83
+4180|Pale Lemon Yellow|#ced0a2
+4181|Hint of Mint|#aed0b6
+4182|Mint Choc Chip|#6dbc70
+4183|Mojito Green|#57a56c
+4184|Refreshing Green|#4dbd6c
+4184B|Jade Green|#35a180
+4185|Light Sage|#72a27d
+4185B|Eucalyptus|#8da187
+4185D|Lime Sorbet|#c1c792
+4186|Celery|#a1b45f
+4186B|Lemon Lime|#abb03a
+4187|Olive Green|#857920
+4188|Apple Green|#68841d
+4189|Parakeet Green|#9abe59
+4190|Lime Green|#abd161
+4195|Bright Green|#40a132
+4200|Grass Green|#59903f
+4201|Shamrock Green|#2b8a55
+4201B|Thyme|#688c5e
+4202|Dark Sage|#4c7a5a
+4204|Country Green|#2d371c
+4205|Woodland|#494f44
+4205B|Willow|#858351
+4206|Khaki|#646742
+4207|Strong Green|#19351d
+4208|Bottle Green|#102115
+4209|Fir Green|#213e34
+4210|Christmas Green|#084735
+4215|Clover|#0b6427
+4220|Opal Green|#096452
+4221|Aqua Green|#0d9180
+4221B|Sea Green|#347c6a
+4221D|Misty Green|#9db1a5
+4222|Spearmint Green|#649086
+4223|Lagoon|#48756e
+4223B|Light Aqua Green|#50bcb1
+4223D|Icy Green|#91ddd4
+4223F|Peppermint Cream|#b0d1d1
+4224|Aqua|#58c0c0
+4226|Seafoam|#2e9d98
+4227|Deep Aqua|#077678
+4228|Vintage Teal|#55989f
+4228B|Marine Blue|#34aeb6
+4229|Tropical Teal|#097e93
+4230|Teal|#0c6981
+4231|Dark Teal|#114f5c
+4232|Blue Spruce|#233e3e
+4232B|Pacific|#325656
+4233|Light Petrol|#225b6f
+4234|Petrol|#1f4255
+4236|Deep Ocean|#163d57
+4240|Dark Turquoise|#0a5e9d
+4244|Peacock|#105f88
+4246|Kingfisher Blue|#1a81af
+4250|Light Turquoise|#2daeda
+4250B|Soft Cyan|#74c5dc
+4250D|Frost Blue|#95ced3
+4251|Steel Blue|#55879b
+4252|Fjord Blue|#2f515a
+4254|Robin Egg|#7dc7c5
+4256|Duck Egg|#91b0b0
+4257|Ice Blue|#b8caca
+4258|Glacier Blue|#8bcbde
+4260|Sky Blue|#b1c7cb
+4261|Baby Blue|#aec6d5
+4262|Powder Blue|#9fc1d6
+4263|Forget Me Not|#67a2be
+4264|Island Blue|#6095c1
+4266|Hydrangea Blue|#6c99cf
+4270|Cornflower Blue|#4e7fb0
+4274|Strong Blue|#1a5aa3
+4276|Ultramarine Blue|#40799c
+4278|Riviera Blue|#4a5d8d
+4280|Denim Blue|#646c90
+4285|Delft Blue|#305173
+4288|Deep Indigo|#1d3045
+4290|Deep Denim Blue|#1b2b3b
+4300|Royal Blue|#232e68
+4305|Sapphire Blue|#22427d
+4308|Light Navy|#141f38
+4310|Navy Blue|#101524
+4312|Aubergine|#1c1328
+4315|Vibrant Violet|#281648
+4318|Purple Sprouting|#3e244d
+4320|Deep Purple|#2f1745
+4322|Amethyst|#513c75
+4324|Just Purple|#492264
+4326|Purple Orchid|#582064
+4330|Plum Purple|#431c4f
+4331|Boysenberry|#5e1c4e
+4332|Damson|#4c2d3f
+4333|Vintage Plum|#594451
+4333B|Mulberry|#74536d
+4334|Crocus|#936792
+4335|Sugar Plum|#714374
+4336|Orchid|#997ca7
+4338|Light Orchid|#b793b4
+4340|Pale Lilac|#c0b0cc
+4350|Lilac|#967eb3
+4352|Soft Violet|#75548b
+4354|Grape Juice|#554162
+4356|Dark Lavender|#605b9a
+4360|Lavender|#8286bd
+4362|Bluebell|#6583c0
+4364|Petal Pink|#ba6a9a
+4365|Petunia Pink|#9e487c
+4366|Magenta|#841857
+4368|Bright Pink|#8e1256
+4369|Shocking Pink|#be3070
+4370|Fuchsia Pink|#9e0748
+4371|Cerise|#8e1940
+4371B|Pomegranate|#9b2e3e
+4372|Fandango Pink|#ba3556
+4373|Candy Apple|#b53545
+4373B|Watermelon|#bd4f5e
+4374|Pinkberry|#781a52
+4376|Vintage Pink|#9d3f6e
+4378|Peony Pink|#972750
+4380|Rose Pink|#9d657e
+4385|Bubblegum|#bb4582
+4390|Fondant Pink|#d97ea5
+4400|Candyfloss Pink|#e6b6cb
+4402|Flamingo Pink|#c9707e
+4404|Blossom|#d09fa2
+4406|Pink Sherbet|#e5b4be
+4408|Baby Pink|#e3bec6
+4410|Light Pink|#e0c5d4
+4420|Peachy Pink|#d4c2be
+4421|Soft Apricot|#dcc9b6
+4422|Peach|#d9b9aa
+4424|Coral|#d69a93
+4425|Apricot|#d89979
+4426|Dusky Peach|#b26e5d
+4428|Vintage Peach|#843e41
+#yarnsmiths-cotton-dk-all-colours|YS.COTTONDK
+3000|Black|#0c0c0c
+3001|Washed Black|#1c2220
+3002|Anthracite Grey|#282e2e
+3005|Gunmetal Grey|#3b4447
+3008|Storm Grey|#4d5256
+3012|Medium Grey|#606770
+3015|Stone Grey|#858b82
+3018|Light Grey|#98a3aa
+3025|Platinum Grey|#9c9fa9
+3030|Silver|#aab0b1
+3035|Pale Silver|#b5bdc0
+3040|White|#e2e4e6
+3042|Ecru|#dbd8ce
+3045|Off White|#dcdfcd
+3050|Cream|#dcdecb
+3054|Vanilla|#cac3ab
+3056|Almond Milk|#c2c0ac
+3060|Parchment|#a7a6a3
+3061|Linen|#b4b3a8
+3062|Blush|#d8ccb9
+3063|Champagne|#d7c6a8
+3064|Oatmeal|#c1ad9d
+3065|Warm Taupe|#a18d82
+3065B|Cool Taupe|#a2918a
+3066|Sand|#bda784
+3067|Vanilla Fudge|#b8996c
+3068|Caramel Fudge|#95734c
+3068B|Toffee Fudge|#b4835d
+3068D|Coffee Fudge|#886b55
+3068F|Cuppa Tea|#907259
+3069|Latte|#6c5f51
+3070|Brown Bear|#5a5247
+3072|Bronze|#58431d
+3074|Rust|#634127
+3076|Copper|#6d2417
+3077|Terracotta|#7c3628
+3078|Brick|#6a3738
+3079|Coffee Bean|#59382b
+3079B|Cocoa|#342c24
+3080|Chocolate Brown|#1d1712
+3085|Burgundy|#32141e
+3090|Claret Red|#500b1d
+3094|Sienna Red|#62081c
+3096|Crimson|#860722
+3100|Scarlet Red|#86061b
+3110|Bright Red|#9f0e13
+3115|Paprika|#9c2221
+3120|Burnt Orange|#95201a
+3124|Ginger|#7f3012
+3125|Amber|#9a430c
+3126|Carrot|#e54a23
+3130|Bright Orange|#ed5e0a
+3135|Tangerine|#ee8913
+3140|Mustard Yellow|#b48321
+3145|Antique Gold|#8e6020
+3147|Harvest Gold|#cc9c23
+3150|Sunshine Yellow|#e18f12
+3155|Buttercup|#e5ce0a
+3160|Primrose Yellow|#e5c834
+3164|Bright Yellow|#e2d045
+3166|Canary Yellow|#e3ca5d
+3170|Lemon Yellow|#dcc780
+3180|Pale Lemon Yellow|#d1d1a5
+3181|Hint of Mint|#a7d0b4
+3183|Mojito Green|#5fa46d
+3185|Light Sage|#749b78
+3185B|Eucalyptus|#829379
+3186|Celery|#a3b960
+3187|Olive Green|#827629
+3188|Apple Green|#637b1c
+3190|Lime Green|#99bf51
+3195|Bright Green|#56a234
+3200|Grass Green|#56843d
+3201B|Thyme|#63834c
+3202|Dark Sage|#4b7259
+3204|Country Green|#2f3916
+3205B|Willow|#7a7a43
+3206|Khaki|#5c6142
+3207|Strong Green|#1f4927
+3208|Bottle Green|#0f2621
+3209|Fir Green|#223b34
+3210|Christmas Green|#064935
+3215|Clover|#12682d
+3220|Opal Green|#075d49
+3222|Spearmint Green|#6a9287
+3224|Aqua|#55b0b2
+3226|Seafoam|#2d9d99
+3228|Vintage Teal|#5498a1
+3229|Tropical Teal|#0f758c
+3230|Teal|#076074
+3231|Dark Teal|#0d4e58
+3234|Petrol|#173c4f
+3236|Deep Ocean|#143953
+3240|Dark Turquoise|#1268a4
+3246|Kingfisher Blue|#1f83af
+3250|Light Turquoise|#1b8eb8
+3251|Steel Blue|#457b91
+3252|Fjord Blue|#29444e
+3254|Robin Egg|#79c1c0
+3256|Duck Egg|#a0b8b5
+3258|Glacier Blue|#93cfe0
+3260|Sky Blue|#a4bfd0
+3261|Baby Blue|#afc3d7
+3262|Powder Blue|#9ebed7
+3266|Hydrangea Blue|#5e8dc1
+3270|Cornflower Blue|#4772a7
+3274|Strong Blue|#164f94
+3276|Ultramarine Blue|#3c7293
+3280|Denim Blue|#4f5c7d
+3285|Delft Blue|#37577c
+3290|Deep Denim Blue|#202b39
+3300|Royal Blue|#232b6b
+3305|Sapphire Blue|#24407f
+3308|Light Navy|#131e32
+3310|Navy Blue|#0b111e
+3315|Vibrant Violet|#2e1d53
+3320|Deep Purple|#29143f
+3322|Amethyst|#4c3378
+3324|Just Purple|#472362
+3326|Purple Orchid|#501f61
+3330|Plum Purple|#3c1c44
+3335|Sugar Plum|#6f467c
+3340|Pale Lilac|#b0a9c8
+3350|Lilac|#8d79b0
+3354|Grape Juice|#50435f
+3356|Dark Lavender|#58528c
+3360|Lavender|#7f84bf
+3362|Bluebell|#6279b4
+3364|Petal Pink|#bb72a4
+3366|Magenta|#78114f
+3368|Bright Pink|#8f0b55
+3369|Shocking Pink|#bd2268
+3370|Fuchsia Pink|#860d42
+3372|Fandango Pink|#b8305c
+3374|Pinkberry|#731c4f
+3376|Vintage Pink|#822e5a
+3380|Rose Pink|#935f76
+3385|Bubblegum|#aa417f
+3390|Fondant Pink|#cd73a1
+3400|Candyfloss Pink|#e5aac8
+3402|Flamingo Pink|#df7f8e
+3404|Blossom|#c98d94
+3408|Baby Pink|#e5bcc4
+3410|Light Pink|#dcc1d2
+3420|Peachy Pink|#d7cac7
+3421|Soft Apricot|#d5bdac
+3422|Peach|#e6c2b3
+3425|Apricot|#de997d
+3426|Dusky Peach|#a66958
+3428|Vintage Peach|#763a40
+#yarnsmiths-headliner-100-cotton-all-colours|YS.COTTON-HEAD
+2R501|Bright Rainbow|#937a2a
+2R502|Coastal|#6c8895
+2R503|Delphinium|#836e67
+2R504|Retro Dance|#653020
+2R505|Lake District|#42514b
+2R506|Sunset|#c05126
+2R507|Five Shades of Gandalf|#626465
+2R508|Annabelle Spectrum|#7e9294
+2R509|Garden Reflections|#856d61
+2R510|Seaside Holiday|#99a09f
+2R511|Sunflower Garden|#564225
+2R512|Rambling Rose|#6a6b30
+2R513|Pastel Rainbow|#cac8a5
+2R514|Minty Surprise|#4d8c8b
+2R515|Molly|#7a3260
+2R516|Blue Lagoon|#5d9391
+2R517|Judith|#3e4137
+2R518|Rainbow Fiesta|#bc6b35
+2R519|Woolly Smiths|#cfb4bf
+2R520|Spirit Sundown|#97906c
+2R521|Paradise|#af5d28
+2R522|Lilac Garden|#626255
+2R523|Autumn Leaves|#7f3d16
+2R524|Garden Pond|#83877c
+2R525|Rose Garden|#c9b588
+2R526|Foxgloves|#8b5376
+2R527|Marketing Team|#886128
+2R528|Neutral Tones|#d2c2a8
+2R529|Kasegaluk Lagoon|#6e7d7c
+2R530|Loganberry Rainbow|#3c311a
+#yarnsmiths-support-act-100-cotton-all-colours|YS.COTTON-SUPP
+2R000|Black|#0d0d0d
+2R005|Gunmetal Grey|#3a4446
+2R030|Silver|#b1b6b4
+2R040|White|#dcdfe2
+2R045|Off White|#cdcfbf
+2R060|Parchment|#b3aeaa
+2R063|Champagne|#c8b79d
+2R070|Brown Bear|#554f47
+2R074|Rust|#653e27
+2R090|Claret Red|#590b1c
+2R100|Scarlet Red|#820b1e
+2R126|Carrot|#d23f1c
+2R140|Mustard Yellow|#aa7526
+2R160|Primrose Yellow|#ddb42d
+2R180|Pale Lemon Yellow|#e3db9e
+2R185|Light Sage|#729a79
+2R188|Apple Green|#5f762d
+2R202|Dark Sage|#4d7156
+2R204|Country Green|#323821
+2R210|Christmas Green|#094230
+2R224|Aqua|#54b0b0
+2R230|Teal|#0d5661
+2R251|Steel Blue|#4b7586
+2R256|Duck Egg|#7a969a
+2R262|Powder Blue|#819fb6
+2R274|Strong Blue|#1e4e8e
+2R290|Deep Denim Blue|#14202e
+2R322|Amethyst|#423163
+2R330|Plum Purple|#38193e
+2R335|Sugar Plum|#664570
+2R340|Pale Lilac|#b1a7c3
+2R364|Petal Pink|#b0709b
+2R374|Pinkberry|#6c1448
+2R410|Light Pink|#ddbccd
+2R420|Peachy Pink|#ccbcbc
+#yarnsmiths-cotton-wonder-dk-all-colours|YS.COTWONDERDK
+2U100|Bright Rainbow|#63594b
+2U110|Garden Pond|#778770
+2U120|Pastel Rainbow|#bec0b6
+2U130|Spirit Sundown|#9d7e78
+2U140|Coastal|#a4a59c
+2U150|Lilac Garden|#6c6767
+2U160|Foxgloves|#b5749c
+2U170|Seaside Holiday|#928161
+#yarnsmiths-create-dk-all-colours|YS.DK
+3000|Black|#080904
+3002|Anthracite Grey|#2f2e29
+3005|Gunmetal Grey|#4c514b
+3008|Storm Grey|#6d6d65
+3010|Dark Grey Heather|#5e5e5a
+3015|Stone Grey|#908d7a
+3020|Light Grey Heather|#9a9996
+3025|Platinum Grey|#a6a1a0
+3030|Silver|#afafa5
+3035|Pale Silver|#d2cec8
+3040|White|#f8f4ea
+3045|Off White|#f4ecd4
+3050|Cream|#e9dbb9
+3060|Parchment|#c0b3a0
+3061|Linen|#bfb194
+3062|Blush|#f5d1ad
+3063|Champagne|#e1bf96
+3064|Oatmeal|#c8ae93
+3065|Warm Taupe|#9e887c
+3066|Sand|#cba678
+3067|Vanilla Fudge|#be9357
+3069|Latte|#856c53
+3070|Brown Bear|#796a55
+3072|Bronze|#564315
+3074|Rust|#6a411d
+3076|Copper|#6f2211
+3078|Brick|#733730
+3080|Chocolate Brown|#281b0f
+3085|Burgundy|#341114
+3090|Claret Red|#5c081b
+3094|Sienna Red|#57110f
+3096|Crimson|#8c071d
+3100|Scarlet Red|#7c080f
+3110|Bright Red|#b80c0f
+3115|Paprika|#b6341f
+3120|Burnt Orange|#9f200e
+3124|Ginger|#a4350f
+3126|Carrot|#dc3b08
+3130|Bright Orange|#f45008
+3135|Tangerine|#fa8214
+3140|Mustard Yellow|#c48818
+3145|Antique Gold|#ae6c11
+3150|Sunshine Yellow|#e38e09
+3160|Primrose Yellow|#dba61c
+3164|Bright Yellow|#f8d43d
+3166|Canary Yellow|#eeca55
+3170|Lemon Yellow|#e0b056
+3180|Pale Lemon Yellow|#e9daa5
+3181|Hint of Mint|#bfd8b2
+3183|Mojito Green|#70a765
+3185|Light Sage|#91a580
+3186|Celery|#a9b158
+3187|Olive Green|#98852e
+3188|Apple Green|#669116
+3190|Lime Green|#a6c13e
+3195|Bright Green|#6caf40
+3200|Grass Green|#628636
+3202|Dark Sage|#577651
+3204|Country Green|#3a4226
+3206|Khaki|#736f43
+3208|Bottle Green|#132a1a
+3210|Christmas Green|#094929
+3215|Clover|#216727
+3220|Opal Green|#0f6648
+3222|Spearmint Green|#70937e
+3224|Aqua|#6dc6af
+3226|Seafoam|#52b79d
+3228|Vintage Teal|#6ca79f
+3229|Tropical Teal|#1c858b
+3230|Teal|#09686a
+3234|Petrol|#214452
+3236|Deep Ocean|#1a3348
+3240|Dark Turquoise|#186286
+3250|Light Turquoise|#32a2ad
+3251|Steel Blue|#577c7d
+3252|Fjord Blue|#38515a
+3254|Robin Egg|#8fbcab
+3256|Duck Egg|#a9c0b2
+3258|Glacier Blue|#9fcbc5
+3260|Sky Blue|#b6c9ce
+3262|Powder Blue|#a4c3cc
+3266|Hydrangea Blue|#8bafcf
+3270|Cornflower Blue|#446d99
+3274|Strong Blue|#295693
+3276|Ultramarine Blue|#466f81
+3280|Denim Blue|#7d8496
+3285|Delft Blue|#465a72
+3290|Deep Denim Blue|#222936
+3300|Royal Blue|#13204e
+3305|Sapphire Blue|#233d74
+3310|Navy Blue|#171b29
+3315|Vibrant Violet|#361362
+3320|Deep Purple|#280f31
+3322|Amethyst|#654276
+3324|Just Purple|#5d0d67
+3326|Purple Orchid|#7c2488
+3330|Plum Purple|#40182f
+3335|Sugar Plum|#91597b
+3340|Pale Lilac|#d1bccf
+3350|Lilac|#906f9a
+3354|Grape Juice|#6b5566
+3356|Dark Lavender|#6b5983
+3360|Lavender|#65679d
+3362|Bluebell|#767cbb
+3364|Petal Pink|#de94b2
+3366|Magenta|#9f0978
+3368|Bright Pink|#c21369
+3370|Fuchsia Pink|#9d0d4c
+3372|Fandango Pink|#d03953
+3374|Pinkberry|#a3245b
+3376|Vintage Pink|#9b3b55
+3380|Rose Pink|#9c525b
+3385|Bubblegum|#e95f96
+3390|Fondant Pink|#da798f
+3400|Candyfloss Pink|#ef9bc7
+3410|Light Pink|#f5cace
+3420|Peachy Pink|#ecbeae
+3422|Peach|#fbbf9f
+3426|Dusky Peach|#cd7e60
+3428|Vintage Peach|#a04742
+#yarnsmiths-create-dk-glitter-all-colours|YS.DKGLITTER
+G3030|Silver|#9e9e96
+G3040|White|#e4dcd6
+G3100|Red|#6f0407
+G3210|Green|#0a3c24
+#yarnsmiths-elvis-dk-all-colours|YS.ELVISDK
+1A003|Sheldon|#82aa7f
+1A010|Gary|#dab7a8
+#yarnsmiths-flurry-chunky-all-colours|YS.FLURRYCHUNKY
+2Q010|Snow White|#ced2d5
+2Q020|Clotted Cream|#d5d3c2
+2Q030|Oatmilk|#b6af9c
+2Q040|Sandy Camel|#837254
+2Q050|Teddy Bear|#6d5143
+2Q060|Duckling|#cbc289
+2Q070|Baby Blue|#8da9c8
+2Q080|Baby Pink|#e1adc5
+2Q090|Seaglass|#94bcb4
+2Q100|Piglet|#dcb7c0
+2Q110|Soft Grey|#adb6bb
+2Q120|Hint of Grey|#cdd0d5
+#yarnsmiths-freespirit-aran-all-colours|YS.FSARAN
+1D001|Luna|#818274
+1D003|Grey Dagger|#8e7365
+1D005|Morpho|#78616d
+1D006|Madagascan Sunset|#49302b
+1D008|Malachite|#64512c
+1D010|Fiery Jewel|#70492c
+1D011|Paradise Birdwing|#513838
+1D012|Rosy Maple|#563547
+1D014|Peacock|#412c35
+1D015|Adonis|#5b7453
+#yarnsmiths-glow-in-the-dark-all-colours|YS.GLOW
+5045|White|#c6c7c0
+#yarnsmiths-kid-mohair-silk-all-colours|YS.KIDSILK
+3000|Black|#0e0e0e
+3002|Anthracite Grey|#23252a
+3008|Storm Grey|#484c51
+3015|Stone Grey|#7c807b
+3025|Platinum Grey|#9197a6
+3030|Silver|#aeb1b5
+3035|Pale Silver|#c4c4c7
+3040|White|#e4e2dc
+3045|Off White|#d9d9cc
+3050|Cream|#d8d6c6
+3060|Parchment|#c1b9b4
+3063|Champagne|#d6c4b1
+3065|Taupe|#b29a90
+3066|Sand|#c1a88a
+3069|Latte|#7f6c5d
+3074|Rust|#4d2e15
+3080|Chocolate Brown|#281c17
+3090|Claret Red|#4d0e1a
+3100|Scarlet Red|#6d1217
+3124|Ginger|#9b4a22
+3140|Mustard Yellow|#d3a53e
+3185|Light Sage|#8bae95
+3202|Dark Sage|#4f755a
+3204|Country Green|#3c3f29
+3208|Bottle Green|#10291c
+3228|Vintage Teal|#579eaa
+3252|Fjord Blue|#375c79
+3256|Duck Egg|#93aab7
+3260|Sky Blue|#92a9bf
+3285|Delft Blue|#445c84
+3290|Deep Denim Blue|#1b2942
+3310|Navy Blue|#131829
+3320|Deep Purple|#20173e
+3335|Sugar Plum|#79587c
+3340|Pale Lilac|#ada9c1
+3360|Lavender|#7177bc
+3376|Vintage Pink|#8f415a
+3380|Rose Pink|#ae788d
+3410|Light Pink|#d2b3c3
+3428|Vintage Peach|#985151
+#yarnsmiths-kid-mohair-silk-hand-dye-25g-all-colours|YS.KIDSILKHAND
+2W010|Sand Dollar|#6b4a11
+2W020|Rock Lobster|#52593d
+2W030|Kelp|#602129
+2W040|Abalone|#5c6672
+2W050|Sea Urchin|#665448
+2W060|Anemone|#6c333a
+2W070|Sea Holly|#233037
+2W080|Tidal Pool|#274c60
+2W090|Starfish|#452918
+2W100|Seal Pup|#4d534f
+#yarnsmiths-lagoon-chunky-all-colours|YS.LAGOONCHUNKY
+2N020|Chuuk Lagoon|#463020
+2N050|Kasegaluk Lagoon|#697481
+2N060|Kaldalon Lagoon|#4b565a
+2N070|Giola Lagoon|#571932
+2N080|Marana Grado|#252d2c
+2N090|Nanuya Levu|#17251d
+2N110|Balos Lagoon|#282c45
+2N120|Blue Lagoon|#2c5a65
+2N140|Camino Lagoon|#604b53
+2N150|Pileh Lagoon|#3f2614
+#yarnsmiths-lagoon-dk-all-colours|YS.LAGOONDK
+2J010|Venetian Lagoon|#756750
+2J020|Chuuk Lagoon|#7b3b1d
+2J030|Diamond Lagoon|#4e5048
+2J040|Marovo Lagoon|#212923
+2J050|Kasegaluk Lagoon|#5b6a74
+2J060|Kaldalon Lagoon|#424e4f
+2J070|Giola Lagoon|#5e1d2e
+2J080|Marano Grado|#393c3a
+2J090|Nanuya Levu|#386039
+2J100|Milnerton Lagoon|#6f625f
+2J110|Balos Lagoon|#2c2942
+2J120|Blue Lagoon|#3a6465
+2J130|Laguna Colorada|#744129
+2J140|Camino Lagoon|#64424b
+2J150|Pileh Lagoon|#392f22
+2J160|Morning Shadow|#5d5764
+2J170|Freshwater Lagoon|#5b5754
+2J180|Algae|#4f2d31
+2J190|Autumn Sunset|#592a1f
+2J200|Cold Water lagoon|#1f3d46
+2J210|Hazy Day|#5c3448
+2J220|Lily Pond|#763e3d
+2J230|Double Rainbow|#3c3129
+2J240|Cool Morning|#4c413a
+2J250|Foggy Heights|#443632
+2J260|Pink Salt Lake|#bf949f
+2J270|Whirlpool|#a5b3b4
+2J280|Golden Hour|#ac7769
+2J290|Rock Pool|#6d737a
+2J300|Sand Dune|#8e5b4b
+2J310|Morning Mist|#352029
+2J320|Evening Mist|#917f8d
+#yarnsmiths-merino-aran-superwash-all-colours|YS.MERINOARAN
+4000|Black|#070b0b
+4002|Anthracite Grey|#292930
+4005|Gunmetal Grey|#434c51
+4008|Storm Grey|#5a5e66
+4012|Medium Grey|#686f7b
+4015|Stone Grey|#7c817e
+4018|Light Grey|#868c9b
+4025|Platinum Grey|#7f8aa1
+4030|Silver|#a9aab2
+4035|Pale Silver|#c7ced5
+4040|White|#d9dddc
+4045|Off White|#d5d5c4
+4050|Cream|#dadcc6
+4060|Parchment|#b6b1b0
+4061|Linen|#c2c0b3
+4062|Blush|#dcd3c7
+4063|Champagne|#decfc4
+4064|Oatmeal|#cdbdb0
+4065|Warm Taupe|#ae978f
+4066|Sand|#c7ac8b
+4067|Vanilla Fudge|#b79666
+4069|Latte|#756455
+4070|Brown Bear|#63574c
+4072|Bronze|#59431b
+4074|Rust|#643d20
+4076|Copper|#77291d
+4078|Brick|#6c3337
+4080|Chocolate Brown|#2b1e19
+4085|Burgundy|#3c0d22
+4090|Claret Red|#5f0822
+4094|Sienna Red|#561014
+4096|Crimson|#7c0426
+4100|Scarlet Red|#86081a
+4110|Bright Red|#9b0c10
+4115|Paprika|#a2312a
+4120|Burnt Orange|#ab2e23
+4124|Ginger|#993617
+4126|Carrot|#ca420f
+4130|Bright Orange|#eb6725
+4135|Tangerine|#f08b1e
+4140|Mustard Yellow|#d0952a
+4145|Antique Gold|#9f671f
+4150|Sunshine Yellow|#e3891c
+4160|Primrose Yellow|#e7c24a
+4164|Bright Yellow|#e6d22d
+4166|Canary Yellow|#dac865
+4170|Lemon Yellow|#ded090
+4180|Pale Lemon Yellow|#dddbb8
+4181|Hint of Mint|#bae0d5
+4183|Mojito Green|#5dab7d
+4185|Light Sage|#86af97
+4186|Celery|#a7b161
+4187|Olive Green|#a4a133
+4188|Apple Green|#687f20
+4190|Lime Green|#a5c654
+4195|Bright Green|#63b42b
+4200|Grass Green|#548842
+4202|Dark Sage|#456e54
+4204|Country Green|#464c37
+4206|Khaki|#61623c
+4208|Bottle Green|#09271c
+4210|Christmas Green|#064c2f
+4215|Clover|#117a31
+4220|Opal Green|#0b6d61
+4222|Spearmint Green|#55938d
+4224|Aqua|#46b7b2
+4226|Seafoam|#2ba6a2
+4228|Vintage Teal|#3f98ad
+4229|Tropical Teal|#0b93af
+4230|Teal|#08556b
+4234|Petrol|#164160
+4236|Deep Ocean|#112c4d
+4240|Dark Turquoise|#0f5a92
+4250|Light Turquoise|#2e9bbb
+4251|Steel Blue|#4a859f
+4252|Fjord Blue|#2e4864
+4254|Robin Egg|#7ebac7
+4256|Duck Egg|#8db2c0
+4258|Glacier Blue|#8ac1d6
+4260|Sky Blue|#abbed3
+4262|Powder Blue|#92bfe0
+4266|Hydrangea Blue|#6892ce
+4270|Cornflower Blue|#3b71be
+4274|Strong Blue|#234ca3
+4276|Ultramarine Blue|#3c6b95
+4280|Denim Blue|#516387
+4285|Delft Blue|#425b84
+4290|Deep Denim Blue|#1f2d4a
+4300|Royal Blue|#1c2b7b
+4305|Sapphire Blue|#264389
+4310|Navy Blue|#191a2f
+4315|Vibrant Violet|#2e1371
+4320|Deep Purple|#30124e
+4322|Amethyst|#513882
+4324|Just Purple|#3e1757
+4326|Purple Orchid|#521c73
+4330|Plum Purple|#49284e
+4335|Sugar Plum|#794d89
+4340|Pale Lilac|#ada8d2
+4350|Lilac|#9685c3
+4354|Grape Juice|#564d70
+4356|Dark Lavender|#6560ac
+4360|Lavender|#6263ad
+4362|Bluebell|#6b7ebb
+4364|Petal Pink|#c179b1
+4366|Magenta|#911b92
+4368|Bright Pink|#c00d86
+4370|Fuchsia Pink|#960b64
+4372|Fandango Pink|#ca3464
+4374|Pinkberry|#922571
+4376|Vintage Pink|#8e3c5d
+4380|Rose Pink|#9d6382
+4385|Bubblegum|#ce5da2
+4390|Fondant Pink|#dc8ab8
+4400|Candyfloss Pink|#ebb0c4
+4410|Light Pink|#e0c9d1
+4420|Peachy Pink|#dccbd1
+4422|Peach|#e6c6b4
+4426|Dusky Peach|#cc8476
+4428|Vintage Peach|#91423f
+#yarnsmiths-merino-aran-superwash-tweeds-all-colours|YS.MERINOARANTWEED
+T4800|Stormy Sky Tweed|#252c2b
+T4810|Silver Mist Tweed|#989e9d
+T4820|Multi Tweed|#c0b5af
+T4830|Natural Tweed|#b0b3a5
+T4840|Linen Tweed|#a8a9a0
+T4850|Claret Tweed|#52081a
+T4860|Ginger Tweed|#863519
+T4870|Antique Gold Tweed|#936025
+T4880|Country Green Tweed|#3e432f
+T4890|Petrol Tweed|#193d56
+T4900|Robin Egg Tweed|#60878a
+T4910|Delft Blue Tweed|#304463
+T4920|Navy Blue Tweed|#151624
+T4930|Plum Purple Tweed|#472346
+T4940|Vintage Pink Tweed|#743349
+#yarnsmiths-merino-dk-superwash-all-colours|YS.MERINODK
+3000|Black|#080808
+3002|Anthracite Grey|#26252b
+3005|Gunmetal Grey|#3d4245
+3008|Storm Grey|#474c50
+3012|Medium Grey|#616d79
+3015|Stone Grey|#808483
+3018|Light Grey|#7c858f
+3025|Platinum Grey|#81869d
+3030|Silver|#969ca6
+3035|Pale Silver|#cad0da
+3040|White|#e0e1d9
+3045|Off White|#d9dbcf
+3050|Cream|#dadac2
+3060|Parchment|#b0aaa7
+3061|Linen|#b9b5ae
+3062|Blush|#cec5b5
+3063|Champagne|#d2beae
+3064|Oatmeal|#c0a99b
+3065|Warm Taupe|#9b807b
+3066|Sand|#baa388
+3067|Vanilla Fudge|#b59166
+3069|Latte|#786857
+3070|Brown Bear|#564b45
+3072|Bronze|#4c3b19
+3074|Rust|#4c3119
+3076|Copper|#672a20
+3078|Brick|#623134
+3080|Chocolate Brown|#1f1913
+3085|Burgundy|#2d0c1d
+3090|Claret Red|#510a1e
+3094|Sienna Red|#470a11
+3096|Crimson|#750322
+3100|Scarlet Red|#71050d
+3110|Bright Red|#8a080f
+3115|Paprika|#902a20
+3120|Burnt Orange|#8f2921
+3124|Ginger|#7f3415
+3126|Carrot|#ae380c
+3130|Bright Orange|#dc591d
+3135|Tangerine|#d97a1e
+3140|Mustard Yellow|#c79234
+3145|Antique Gold|#8a571a
+3150|Sunshine Yellow|#cd8119
+3160|Primrose Yellow|#ccad36
+3164|Bright Yellow|#cfc218
+3166|Canary Yellow|#c7b65a
+3170|Lemon Yellow|#d0be82
+3180|Pale Lemon Yellow|#d8d1a5
+3181|Hint of Mint|#a5c7bb
+3183|Mojito Green|#5d946e
+3185|Light Sage|#87a796
+3186|Celery|#99a25b
+3187|Olive Green|#87852f
+3188|Apple Green|#5a6e1a
+3190|Lime Green|#96b040
+3195|Bright Green|#61a02c
+3200|Grass Green|#588246
+3202|Dark Sage|#44614f
+3204|Country Green|#3f432f
+3206|Khaki|#4c4e2f
+3208|Bottle Green|#0f2215
+3210|Christmas Green|#064a2e
+3215|Clover|#19722f
+3220|Opal Green|#086656
+3222|Spearmint Green|#517d7a
+3224|Aqua|#3fb5b3
+3226|Seafoam|#46b0ad
+3228|Vintage Teal|#3a8c9c
+3229|Tropical Teal|#0b84a0
+3230|Teal|#0d5161
+3234|Petrol|#163d58
+3236|Deep Ocean|#142c44
+3240|Dark Turquoise|#105d96
+3250|Light Turquoise|#3aa1c8
+3251|Steel Blue|#407690
+3252|Fjord Blue|#31485c
+3254|Robin Egg|#84c2d0
+3256|Duck Egg|#94b6c2
+3258|Glacier Blue|#81a7ba
+3260|Sky Blue|#9cadc2
+3262|Powder Blue|#86b2d0
+3266|Hydrangea Blue|#6c8dc0
+3270|Cornflower Blue|#3967b4
+3274|Strong Blue|#1944a6
+3276|Ultramarine Blue|#3f6d9a
+3280|Denim Blue|#445571
+3285|Delft Blue|#334868
+3290|Deep Denim Blue|#1b2840
+3300|Royal Blue|#16245b
+3305|Sapphire Blue|#203467
+3310|Navy Blue|#10141e
+3315|Vibrant Violet|#221156
+3320|Deep Purple|#241338
+3322|Amethyst|#453769
+3324|Just Purple|#37154f
+3326|Purple Orchid|#54227a
+3330|Plum Purple|#361d3b
+3335|Sugar Plum|#8f599a
+3340|Pale Lilac|#afa6cf
+3350|Lilac|#8478ad
+3354|Grape Juice|#46425a
+3356|Dark Lavender|#585594
+3360|Lavender|#6063a1
+3362|Bluebell|#6173ac
+3364|Petal Pink|#bd76ad
+3366|Magenta|#8e1397
+3368|Bright Pink|#ac057a
+3370|Fuchsia Pink|#770644
+3372|Fandango Pink|#b02e58
+3374|Pinkberry|#7e2062
+3376|Vintage Pink|#853b5c
+3380|Rose Pink|#945f7d
+3385|Bubblegum|#b75194
+3390|Fondant Pink|#c174a5
+3400|Candyfloss Pink|#dfa0b8
+3410|Light Pink|#ceb4c0
+3420|Peachy Pink|#cab7be
+3422|Peach|#d2b1a8
+3426|Dusky Peach|#c78473
+3428|Vintage Peach|#783b41
+#yarnsmiths-merino-dk-superwash-heathers-all-colours|YS.MERINODKHEATHER
+H3500|Smoky Onyx|#111719
+H3510|Stormy Sky|#212624
+H3520|Silver Mist|#959b99
+H3530|Aged Ivory|#918880
+H3540|Fawn Whisper|#6a6156
+H3550|Rustic Oak|#3c362c
+H3560|Deep Oxblood|#1b140f
+H3570|Red Grouse|#2e1313
+H3580|Glowing Ember|#4f251a
+H3590|Golden Gorse|#8a6527
+H3600|Dappled Fern|#454c30
+H3610|Marbled Emerald|#2b3627
+H3620|Forest Glade|#222a1b
+H3630|Petrol Mist|#1e373c
+H3640|Frosted Aqua|#6e99aa
+H3650|Vintage Denim|#4d5964
+H3660|Inkwell Blue|#29374e
+H3670|Amethyst Glow|#211b2d
+H3680|Highland Magenta|#40193d
+H3690|Hushed Rose|#734258
+#yarnsmiths-merino-dk-superwash-tweeds-all-colours|YS.MERINODKTWEED
+T3800|Stormy Sky Tweed|#2c3330
+T3810|Silver Mist Tweed|#8c9395
+T3820|Multi Tweed|#cac1b7
+T3830|Natural Tweed|#b1b7af
+T3840|Linen Tweed|#a19d96
+T3850|Claret Tweed|#520b1c
+T3860|Ginger Tweed|#813a1e
+T3870|Antique Gold Tweed|#885a21
+T3880|Country Green Tweed|#424433
+T3890|Petrol Tweed|#1d4560
+T3900|Robin Egg Tweed|#679ca2
+T3910|Delft Blue Tweed|#324c6c
+T3920|Navy Blue Tweed|#111520
+T3930|Plum Purple Tweed|#3a1e3f
+T3940|Vintage Pink Tweed|#762d4a
+#yarnsmiths-nirvana-aran-all-colours|YS.NIRVANAARAN
+2P030|Summer Solstice|#6d4932
+2P050|Forest Wander|#4e5641
+2P060|Cosy Fireside|#3a2a34
+2P070|Blissful Bloom|#843d55
+2P090|Sage Serenity|#6b7c6b
+2P100|Tranquil Twilight|#35545e
+2P010|Inner Peace|#5d5b52|YS.X.NIRVANAARAN.2P010
+2P020|Quiet Mind|#59564b|YS.X.NIRVANAARAN.2P020
+2P040|Mellow Dreams|#b29171|YS.X.NIRVANAARAN.2P040
+2P080|Peaceful Presence|#756d6c|YS.X.NIRVANAARAN.2P080
+#yarnsmiths-pebble-haze-aran-all-colours|YS.PHARAN
+2L010|Jet|#283335
+2L020|Basalt|#70787b
+2L030|Flint|#b3b8bc
+2L040|Marble|#dfe0dc
+2L050|Limestone|#d9d8c9
+2L060|Pumice|#aca692
+2L070|Dolomite|#9e978b
+2L080|Syenite|#ab9786
+2L082|Tiger's Eye|#866540
+2L084|Mudstone|#3a2a20
+2L086|Ruby|#4f2c36
+2L090|Red Serpentine|#8d2537
+2L100|Wulfenite|#ab5943
+2L104|Orange Topaz|#b7653c
+2L110|Yellow Amber|#cea94a
+2L112|Citrine|#e5dc57
+2L114|Yellow Topaz|#e4dfab
+2L116|Ludlamite|#b8d4c2
+2L120|Titanite|#8ca582
+2L124|Green Serpentine|#317f70
+2L130|Olivine|#5f827c
+2L140|Chrysocolla|#3a908b
+2L146|Sodalite|#345a78
+2L150|Blue Slate|#586e85
+2L156|Lapis Lazuli|#537ec0
+2L160|Chalcedony|#889db1
+2L164|Blue Beryl|#9ab8d5
+2L166|Lavender Quartz|#aeaec6
+2L170|Fluorite|#9a9ac1
+2L180|Iolite|#675da8
+2L190|Porphyry|#754764
+2L194|Pink Tourmaline|#bb5ea4
+2L198|Pink Smithsonite|#9d6b76
+2L200|Petalite|#d9b9be
+2L210|Coral|#c7928b
+#yarnsmiths-pebble-haze-dk-all-colours|YS.PHDK
+2C010|Jet|#2c3230
+2C020|Basalt|#808486
+2C030|Flint|#bdbfbe
+2C040|Marble|#e6e0ce
+2C050|Limestone|#e5d8bc
+2C060|Pumice|#b8ac91
+2C070|Dolomite|#9d9589
+2C080|Syenite|#b79d89
+2C082|Tiger's Eye|#80684c
+2C084|Mudstone|#453a34
+2C086|Ruby|#5a363e
+2C090|Red Serpentine|#a22d37
+2C100|Wulfenite|#b3573b
+2C104|Orange Topaz|#b06f4a
+2C110|Yellow Amber|#d8aa46
+2C112|Citrine|#cbc34c
+2C114|Yellow Topaz|#cfca9d
+2C116|Ludlamite|#b0c8b7
+2C120|Titanite|#89a782
+2C124|Green Serpentine|#327f69
+2C130|Olivine|#6a8581
+2C140|Chrysocolla|#50938c
+2C146|Sodalite|#36566d
+2C150|Blue Slate|#6b7b96
+2C156|Lapis Lazuli|#557cc1
+2C160|Chalcedony|#849db1
+2C164|Blue Beryl|#8faac7
+2C166|Lavender Quartz|#9c9eba
+2C170|Fluorite|#9c9bbc
+2C180|Iolite|#6c66aa
+2C190|Porphyry|#855d78
+2C194|Pink Tourmaline|#ad5393
+2C198|Pink Smithsonite|#9a6a71
+2C200|Petalite|#e9cad4
+2C210|Coral|#bc817a
+#yarnsmiths-pebble-haze-dk-prints-all-colours|YS.PHPRINTDK
+2D010|Salterton|#ab8c77
+2D020|Aldeburgh|#677363
+2D030|Peppercombe|#7e5a58
+2D040|Seaham|#8d7666
+2D050|Chesil|#555769
+2D060|Blakeney|#74857f
+2D070|Elgol|#c56855
+2D080|Birling|#8c8276
+2D090|Lulworth|#8d9da7
+2D100|Saltburn|#c68784
+2D110|Charmouth|#b3ac9d
+2D120|Marloes Sands|#a67a8c
+2D130|Amble|#8b9371
+2D140|Cleethorpes|#8f7d78
+2D300|Cold Knap|#6d636c
+2D310|Ryhope|#9e6f60
+2D320|Monmouth|#969a97
+2D330|Sidmouth|#954658
+2D340|Penmouth|#baa691
+2D350|Llanbedrog|#9c705a
+#yarnsmiths-pebble-haze-aran-prints-all-colours|YS.PHPRINTARAN
+2M030|Peppercombe|#704c40
+2M040|Seaham|#756b58
+2M050|Chesil|#454553
+2M060|Blakeney|#526a6d
+2M090|Lulworth|#758b99
+2M100|Saltburn|#ac7c79
+2M300|Cold Knap|#585469
+2M320|Monmouth|#879296
+2M330|Sidmouth|#824d6b
+2M340|Penmouth|#a59d8e
+#yarnsmiths-play-baby-dk-all-colours|YS.PLAYBABYDK
+1B003|Monkey Bars|#74756f
+1B004|Frisbee|#c8baa0
+1B005|Tiddlywinks|#b88d8e
+1B008|Bucket and Spade|#b0a995
+1B009|Bouncy Castle|#8f7b47
+#yarnsmiths-play-chunky-all-colours|YS.PLAYCHUNKY
+1G004|Hop|#562f2d
+1G006|Dance|#1f352d
+1G008|Hike|#242f2e
+1G014|Shout|#535c59
+#yarnsmiths-play-dk-all-colours|YS.PLAYDK
+1F004|Hop|#62535a
+1F007|Skip|#372234
+#yarnsmiths-snug-as-a-bug-300g-all-colours|YS.SNUG
+2A010|Black|#080904
+2A020|Storm Grey|#303531
+2A030|Warm Grey|#858374
+2A040|Soft Grey|#999993
+2A050|Snow White|#e5e1d9
+2A060|Teddy Bear|#55331e
+2A070|Cookie|#857351
+2A080|Oatmilk|#bda57d
+2A090|Duckling|#e8ca76
+2A100|Porcelain|#ede1d0
+2A101|Blush|#e3b897
+2A102|Sandy Camel|#7f6233
+2A103|Elephant Grey|#b2aa98
+2A104|Hint of Grey|#d9d7d2
+2A105|Clotted Cream|#e8dfbf
+2A110|Soft Sage|#4a8579
+2A120|Seaglass|#96b8ae
+2A130|Lagoon|#408891
+2A140|Baby Blue|#9bb0c2
+2A150|Nautical|#1c2535
+2A160|Petal Purple|#a055b1
+2A170|Grape|#715c7a
+2A180|Feisty Fuchsia|#b71b53
+2A190|Baby Pink|#f1a7b7
+2A200|Piglet|#d4a39b
+2A210|Sangria|#660518
+2A220|Goldfish|#c12915
+2A230|Sunshine|#ae820d
+2A240|Monster Green|#2f3c13
+2A250|Delphinium Blue|#3c67b7
+2A260|Fire Engine|#a6060e
+2A270|Tangerine|#f3590a
+2A280|Banana|#ebbc36
+2A290|Shamrock|#2e8d59
+2A300|Island Blue|#407cb3
+2A310|Flamingo Pink|#d52e45
+2A320|Lush Lime|#7fa82a
+2A330|Purple Power|#572a5e
+2F030|Fairy Lights|#c8ad9e
+2F050|Lilac Charm|#d1b9bf
+2F060|City Lights|#a9af9a
+2F070|Wood Smoke|#bcaf9a
+2F080|Rose Blossom|#d2b5a9
+2H010|City Fog|#bfb7ae
+2H020|Raspberry Ripple|#e8bdc0
+2H030|Ocean Dreams|#c1c5c8
+2H040|Pastel Whispers|#e9c3b4
+2H050|Desert Blush|#dbb199
+2H060|Forest Floor|#799a96
+2H070|Unicorn Sunset|#eea998
+2H080|Sand Dunes|#c6b9a3
+2H090|Bright Idea|#89a168
+2H100|Shadow Mist|#b0aaa3
+#yarnsmiths-snug-as-a-bug-big-300g-all-colours|YS.SNUGBIG
+2B010|Black|#080808
+2B020|Storm Grey|#2d3230
+2B030|Warm Grey|#828278
+2B040|Soft Grey|#a8a8b4
+2B050|Snow White|#e8ebf0
+2B060|Teddy Bear|#644436
+2B070|Cookie|#887863
+2B080|Oatmilk|#c7b8a0
+2B090|Duckling|#deca7a
+2B100|Porcelain|#ede9e6
+2B101|Blush|#e5c1b0
+2B102|Sandy Camel|#856f4d
+2B103|Elephant Grey|#a5a19e
+2B104|Hint of Grey|#caccd6
+2B105|Clotted Cream|#dfdec9
+2B110|Soft Sage|#4a837b
+2B120|Seaglass|#84b4b1
+2B130|Lagoon|#387b90
+2B140|Baby Blue|#86aed5
+2B150|Nautical|#202d4d
+2B160|Petal Purple|#9d55b5
+2B170|Grape|#846991
+2B180|Feisty Fuchsia|#d22963
+2B190|Baby Pink|#e09cbd
+2B200|Piglet|#d7b2b9
+2B210|Sangria|#62081d
+2B220|Goldfish|#c62e19
+2B230|Sunshine|#b4941f
+2B240|Monster Green|#435123
+2B250|Delphinium Blue|#3f69b9
+2B260|Fire Engine|#9f0312
+2B270|Tangerine|#ed5216
+2B280|Banana|#ebc238
+2B290|Shamrock|#287948
+2B300|Island Blue|#2e73c2
+2B310|Flamingo Pink|#d83d63
+2B320|Lush Lime|#7ea530
+2B330|Purple Power|#4a2360
+2Y010|City Fog|#c0c4c2
+2Y020|Raspberry Ripple|#dab7cc
+2Y030|Ocean Dreams|#5b77a6
+2Y060|Forest Floor|#6b96a3
+2Y070|Unicorn Sunset|#c78c7e
+2Y080|Sand Dunes|#bdbebc
+2Y110|Frothy Coffee|#d4d3cd
+2Y510|Calming Clouds|#d1b5cb
+2Y520|Pencil Case|#699c65
+2Y530|Clowning Around|#49a985
+2Y610|Minty Moon|#cfd7d8
+2Y620|Inky Bloom|#9f97b7
+#yarnsmiths-snug-as-a-bug-really-really-big-1800g-all-colours|YS.SNUGRRB1800
+3K040|Soft Grey|#a5aeb7
+3K080|Oatmilk|#ccbea6
+3K100|Porcelain|#d9ded6
+3K120|Seaglass|#83b2ad
+3K130|Lagoon|#358b9e
+3K200|Piglet|#d5b6bb
+#yarnsmiths-snug-as-a-bug-really-really-big-300g-all-colours|YS.SNUGRRB300
+3J010|Black|#080a09
+3J020|Storm Grey|#324248
+3J030|Warm Grey|#7c827c
+3J040|Soft Grey|#9a9fa3
+3J050|Snow White|#e2e7eb
+3J060|Teddy Bear|#5b412f
+3J070|Cookie|#7a6e57
+3J080|Oatmilk|#beb49b
+3J090|Duckling|#d7ca82
+3J100|Porcelain|#d9dad5
+3J103|Elephant Grey|#a5a59b
+3J104|Hint of Grey|#cfd4db
+3J110|Soft Sage|#3e8371
+3J120|Seaglass|#79b2ac
+3J130|Lagoon|#348395
+3J140|Baby Blue|#8ab3da
+3J150|Nautical|#122541
+3J170|Grape|#69536e
+3J190|Baby Pink|#e1a1bc
+3J200|Piglet|#c08f91
+#yarnsmiths-merino-sock-hand-dye-all-colours|YS.SOCKHAND
+2V010|Strawberry Tart|#6e3425
+2V020|Fruit Trifle|#908687
+2V030|Raspberry Parfait|#5a6d62
+2V040|Sweet Sorbet|#93a8ac
+2V050|Key Lime|#929f75
+2V060|Blueberry Pie|#19404b
+2V070|Berry Cheesecake|#b7b9b3
+2V080|Mississippi Mud|#907372
+2V090|Black Forest|#8c8886
+2V100|Birthday Cupcake|#beb1b0
+2V110|Apple & Blackberry Crumble|#b78597
+2V120|Fruit Twist|#c4b695
+2V130|Mint Sundae|#7e7f68
+2V140|Ginger Snap|#bf8151
+2V150|Summer Pudding|#cebcb3
+2V160|Lime Jelly|#aeb4a0
+2V170|Citrus Surprise|#b85726
+2V180|Cookie Dough|#bbb38e
+2V190|Blueberry Muffin|#88999a
+2V200|Iced Tray Bake|#a5a5a2
+#yarnsmiths-merino-sock-prints-all-colours|YS.SOCKPRINT
+2G010|Boo!|#78473d
+2G020|Windbreak|#ab9068
+2G030|Tutti Fruitti|#8c755d
+2G040|Berry Burst|#966069
+2G060|Rainy Days|#5f6163
+2G070|Trifle|#75344b
+2G080|Fruit Salad|#b28465
+2G100|Muted Earth|#836752
+2G110|Clowning Around|#976a4a
+2G130|Wax Crayons|#a56756
+2G140|Denim Days|#31363a
+2G150|Hazy Dreams|#9c8e84
+2G820|Jolly Holly|#872f36
+2G800|Festive Fairisle|#f0efea|YS.X.SOCKPRINT.2G800
+2G810|Mistletoe Magic|#eae8e3|YS.X.SOCKPRINT.2G810
+#yarnsmiths-merino-sock-all-colours|YS.SOCKSOLID
+2K000|Black|#0b0c08
+2K003|Graphite|#2c302d
+2K004|Charcoal Heather|#3a3a33
+2K008|Storm Grey|#585b58
+2K012|Grey Heather|#8a9087
+2K014|Soft Grey|#919088
+2K025|Platinum|#9ea7a0
+2K032|Hint of Grey|#c7c7bf
+2K040|White|#ece9e0
+2K045|Off White|#f2e7c7
+2K060|Parchment|#c5bfa8
+2K061|Linen|#d5c6a9
+2K068|Camel|#9d8562
+2K079|Rich Brown|#422b1a
+2K080|Chocolate Brown|#1a1812
+2K085|Burgundy|#3e1818
+2K090|Claret|#741b24
+2K098|Crimson|#9c1a23
+2K122|Cinnamon|#9f4926
+2K125|Pumpkin|#cc4c11
+2K140|Mustard|#ca921f
+2K152|Sun Yellow|#f8a91e
+2K172|Duckling|#f8d472
+2K198|Pistachio|#95a55e
+2K201|Moss Green|#536126
+2K203|Leafy Green|#466439
+2K205|Khaki|#565d27
+2K207|Country Green|#293119
+2K209|Bottle|#1b2d19
+2K212|Christmas Green|#0b6534
+2K223|Spearmint|#66aaad
+2K232|Teal|#1a585d
+2K235|Deep Teal|#0b344e
+2K252|Fjord Blue|#234747
+2K266|Hydrangea|#8297b1
+2K274|Strong Blue|#183763
+2K285|Delft Blue|#33507d
+2K302|Royal Blue|#20284a
+2K311|Navy Blue|#141a29
+2K312|Midnight Blue|#0e0f0f
+2K313|Blueberry|#22124b
+2K317|Violet|#442e69
+2K321|Deep Plum|#2f172a
+2K332|Dusky Mauve|#947b8c
+2K355|Dark Grape|#31232c
+2K356|Lavender|#87759b
+2K367|Magenta|#6d1f6a
+2K370|Fuchsia|#780a4c
+2K390|Fondant Pink|#f29ead
+2K405|Baby Pink|#eab7b8
+#yarnsmiths-snugglesoft-dk-50g-all-colours|YS.SSOFTDK
+3A000|Black|#0a0a0a
+3A016|Baby Elephant|#8b9396
+3A030|Cloud|#a9aeb2
+3A035|Baby Silver|#b6babb
+3A040|White|#e3e4e0
+3A050|Cream|#d2d0bd
+3A064|Biscuit|#b4ad9f
+3A070|Teddy Bear|#61554a
+3A100|Scarlet|#6a0612
+3A120|Pumpkin|#8b2d16
+3A142|Golden Sun|#b3821d
+3A170|Duckling|#dec46f
+3A182|Mint|#8aa48f
+3A186|Spring Meadow|#767843
+3A202|Sage|#506b57
+3A228|Teal Mist|#437f8a
+3A256|Duck Egg|#95aaa8
+3A260|Baby Blue|#94b0c3
+3A284|Denim Dream|#405c79
+3A308|Classic Navy|#151d31
+3A336|Pastel Berry|#8f8190
+3A350|Lilac|#a4a5c0
+3A376|Pink Velvet|#7d455b
+3A380|Cherry Blossom|#ab818f
+3A410|Baby Pink|#ceb5b8
+#yarnsmiths-snugglesoft-fair-isle-dk-50g-all-colours|YS.SSOFTDKISLE
+3B500|Little Haven|#8d9e9d
+3B510|Cozy Nook|#a1a27e
+3B520|Tiny Treasure|#bd9da6
+3B530|Wee Abode|#ac9b71
+3B540|Petite Paradise|#9fa9a0
+3B550|Secret Garden|#a6a79d
+3B560|Snug Harbour|#8c958a
+3B570|Little Nest|#716b6e
+3B580|Cute Corner|#7b6650
+3B590|Sweet Solitude|#a78f88
+#yarnsmiths-summer-meadow-dk-all-colours|YS.SUMMEADOWDK
+2X010|Snow Drop|#dfdfd9
+2X020|Hellebore|#c6c4bb
+2X030|Pampas Grass|#9d907d
+2X040|Crocosmia|#a0692e
+2X050|Buttercup|#a78e34
+2X060|Primrose|#c3bd7c
+2X070|Sage|#89967c
+2X080|Nettle|#677f70
+2X090|Mint|#93adae
+2X100|Nigella|#2c4655
+2X110|Forget Me Not|#435d73
+2X120|Pansy|#17212b
+2X130|Fox Glove|#785c6e
+2X140|Hollyhock|#95686c
+2X150|Cosmos|#a17e86
+#yarnsmiths-create-super-chunky-all-colours|YS.SUPER
+6000|Black|#090a05
+6010|Dark Grey Heather|#5b5b59
+6020|Light Grey Heather|#94938f
+6030|Silver|#b9b5a9
+6040|White|#e5e0d4
+6050|Cream|#e2d9b7
+6060|Parchment|#b5a996
+6070|Brown Bear|#645443
+6076|Copper|#702413
+6090|Claret Red|#5b0619
+6100|Scarlet Red|#800310
+6120|Burnt Orange|#b02713
+6140|Mustard Yellow|#cc9a1c
+6145|Antique Gold|#a76b1a
+6200|Grass Green|#6c8e31
+6210|Christmas Green|#0b4428
+6220|Opal Green|#166e51
+6230|Teal|#0d6569
+6236|Deep Ocean|#194268
+6240|Dark Turquoise|#116faf
+6270|Cornflower Blue|#5479a9
+6280|Denim Blue|#5e6376
+6290|Deep Denim Blue|#1f2e41
+6326|Purple Orchid|#7d278a
+6330|Plum Purple|#4f1f3f
+6335|Sugar Plum|#8d5f91
+6350|Lilac|#aa8ab7
+6360|Lavender|#8277a2
+6374|Pinkberry|#8a225a
+6380|Rose Pink|#a5667e
+#yarnsmiths-woolly-wool-all-colours|YS.WOOLLYWOOL
+6000|Black|#060c0c
+6002|Anthracite Grey|#262529
+6008|Storm Grey|#50535c
+6015|Stone Grey|#7e7e7e
+6030|Silver|#9a99a6
+6035|Pale Silver|#babeca
+6040|White|#e0e3db
+6045|Off White|#dddccf
+6050|Cream|#d0d1bb
+6061|Linen|#bbb4b0
+6062|Blush|#dacdc7
+6064|Oatmeal|#b09e9b
+6065|Warm Taupe|#a58881
+6066|Sand|#b79a7c
+6067|Vanilla Fudge|#ae8f63
+6069|Latte|#7d6557
+6070|Brown Bear|#65564d
+6074|Rust|#633f22
+6076|Copper|#763122
+6080|Chocolate Brown|#211813
+6085|Burgundy|#350b1d
+6090|Claret Red|#580d20
+6100|Scarlet Red|#6f050f
+6110|Bright Red|#950a0c
+6124|Ginger|#8e370c
+6126|Carrot|#c64216
+6140|Mustard Yellow|#d19b3b
+6145|Antique Gold|#a26116
+6160|Primrose Yellow|#dec14b
+6170|Lemon Yellow|#d2c07f
+6185|Light Sage|#8abba4
+6186|Celery|#a9b45a
+6187|Olive Green|#958b2c
+6188|Apple Green|#667b23
+6202|Dark Sage|#5a856a
+6204|Country Green|#40412c
+6206|Khaki|#5a5937
+6208|Bottle Green|#10271f
+6210|Christmas Green|#084c2d
+6220|Opal Green|#075d51
+6222|Spearmint Green|#49847e
+6228|Vintage Teal|#4995a8
+6229|Tropical Teal|#0a8ca7
+6230|Teal|#105767
+6234|Petrol|#194464
+6252|Fjord Blue|#3d566c
+6254|Robin Egg|#69a8b2
+6256|Duck Egg|#94b3c4
+6262|Powder Blue|#74a6cc
+6266|Hydrangea Blue|#5678ac
+6270|Cornflower Blue|#3965b1
+6274|Strong Blue|#1c419b
+6290|Deep Denim Blue|#232e4c
+6305|Sapphire Blue|#233a7c
+6310|Navy Blue|#1a1b29
+6320|Deep Purple|#2a1147
+6322|Amethyst|#472f7b
+6324|Just Purple|#3d1452
+6335|Sugar Plum|#774a86
+6350|Lilac|#8571b7
+6370|Fuchsia Pink|#850551
+6374|Pinkberry|#892967
+6376|Vintage Pink|#8b365f
+6380|Rose Pink|#9b5278
+6385|Bubblegum|#b33681
+6390|Fondant Pink|#c0679c
+6410|Light Pink|#d6b0c1
+6422|Peach|#e1bab1
+6426|Dusky Peach|#c6776b
+6428|Vintage Peach|#943d3a
+H6510|Stormy Sky Heather|#242b2e
+H6520|Silver Mist Heather|#9ba3a0
+H6530|Aged Ivory Heather|#a5a29a
+H6540|Fawn Whisper Heather|#7c796c
+H6550|Rustic Oak Heather|#504738
+#yarnsmiths-zooaura-50g-all-colours|YS.ZOOAURA
+4B100|Black Bear|#070707
+4B110|Chinchilla Grey|#1b2327
+4B120|Koala Grey|#949ba3
+4B130|Polar Bear|#d8dcde
+4B140|Sand Cat|#d2cfb9
+4B150|Golden Retriever|#beb095
+4B160|Wombat|#827261
+4B170|Brown Bear|#4c3d29
+4B180|Moose|#1f1f17
+4B500|Skunk|#383f3c
+4B510|Wolf|#1a2221
+4B520|Wolverine|#35392d
+4B530|Husky|#606569
+4B540|Otter|#5b5950
+4B550|Fennec Fox|#9e9988
+4B710|Snow Leopard|#3a4644
+4B720|Lynx|#c2b39f

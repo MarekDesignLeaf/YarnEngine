@@ -1,0 +1,132 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SOCKHAND",
+  "brand": "Yarnsmiths",
+  "product": "Merino Sock Hand Dye",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-sock-hand-dye-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2V010",
+      "name": "Strawberry Tart",
+      "hex": "#6e3425",
+      "sku": "YS.SOCKHAND.2V010"
+    },
+    {
+      "code": "2V020",
+      "name": "Fruit Trifle",
+      "hex": "#908687",
+      "sku": "YS.SOCKHAND.2V020"
+    },
+    {
+      "code": "2V030",
+      "name": "Raspberry Parfait",
+      "hex": "#5a6d62",
+      "sku": "YS.SOCKHAND.2V030"
+    },
+    {
+      "code": "2V040",
+      "name": "Sweet Sorbet",
+      "hex": "#93a8ac",
+      "sku": "YS.SOCKHAND.2V040"
+    },
+    {
+      "code": "2V050",
+      "name": "Key Lime",
+      "hex": "#929f75",
+      "sku": "YS.SOCKHAND.2V050"
+    },
+    {
+      "code": "2V060",
+      "name": "Blueberry Pie",
+      "hex": "#19404b",
+      "sku": "YS.SOCKHAND.2V060"
+    },
+    {
+      "code": "2V070",
+      "name": "Berry Cheesecake",
+      "hex": "#b7b9b3",
+      "sku": "YS.SOCKHAND.2V070"
+    },
+    {
+      "code": "2V080",
+      "name": "Mississippi Mud",
+      "hex": "#907372",
+      "sku": "YS.SOCKHAND.2V080"
+    },
+    {
+      "code": "2V090",
+      "name": "Black Forest",
+      "hex": "#8c8886",
+      "sku": "YS.SOCKHAND.2V090"
+    },
+    {
+      "code": "2V100",
+      "name": "Birthday Cupcake",
+      "hex": "#beb1b0",
+      "sku": "YS.SOCKHAND.2V100"
+    },
+    {
+      "code": "2V110",
+      "name": "Apple & Blackberry Crumble",
+      "hex": "#b78597",
+      "sku": "YS.SOCKHAND.2V110"
+    },
+    {
+      "code": "2V120",
+      "name": "Fruit Twist",
+      "hex": "#c4b695",
+      "sku": "YS.SOCKHAND.2V120"
+    },
+    {
+      "code": "2V130",
+      "name": "Mint Sundae",
+      "hex": "#7e7f68",
+      "sku": "YS.SOCKHAND.2V130"
+    },
+    {
+      "code": "2V140",
+      "name": "Ginger Snap",
+      "hex": "#bf8151",
+      "sku": "YS.SOCKHAND.2V140"
+    },
+    {
+      "code": "2V150",
+      "name": "Summer Pudding",
+      "hex": "#cebcb3",
+      "sku": "YS.SOCKHAND.2V150"
+    },
+    {
+      "code": "2V160",
+      "name": "Lime Jelly",
+      "hex": "#aeb4a0",
+      "sku": "YS.SOCKHAND.2V160"
+    },
+    {
+      "code": "2V170",
+      "name": "Citrus Surprise",
+      "hex": "#b85726",
+      "sku": "YS.SOCKHAND.2V170"
+    },
+    {
+      "code": "2V180",
+      "name": "Cookie Dough",
+      "hex": "#bbb38e",
+      "sku": "YS.SOCKHAND.2V180"
+    },
+    {
+      "code": "2V190",
+      "name": "Blueberry Muffin",
+      "hex": "#88999a",
+      "sku": "YS.SOCKHAND.2V190"
+    },
+    {
+      "code": "2V200",
+      "name": "Iced Tray Bake",
+      "hex": "#a5a5a2",
+      "sku": "YS.SOCKHAND.2V200"
+    }
+  ]
+}

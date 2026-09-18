@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_LAGOONCHUNKY",
+  "brand": "Yarnsmiths",
+  "product": "Lagoon Chunky",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-lagoon-chunky-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2N020",
+      "name": "Chuuk Lagoon",
+      "hex": "#463020",
+      "sku": "YS.LAGOONCHUNKY.2N020"
+    },
+    {
+      "code": "2N050",
+      "name": "Kasegaluk Lagoon",
+      "hex": "#697481",
+      "sku": "YS.LAGOONCHUNKY.2N050"
+    },
+    {
+      "code": "2N060",
+      "name": "Kaldalon Lagoon",
+      "hex": "#4b565a",
+      "sku": "YS.LAGOONCHUNKY.2N060"
+    },
+    {
+      "code": "2N070",
+      "name": "Giola Lagoon",
+      "hex": "#571932",
+      "sku": "YS.LAGOONCHUNKY.2N070"
+    },
+    {
+      "code": "2N080",
+      "name": "Marana Grado",
+      "hex": "#252d2c",
+      "sku": "YS.LAGOONCHUNKY.2N080"
+    },
+    {
+      "code": "2N090",
+      "name": "Nanuya Levu",
+      "hex": "#17251d",
+      "sku": "YS.LAGOONCHUNKY.2N090"
+    },
+    {
+      "code": "2N110",
+      "name": "Balos Lagoon",
+      "hex": "#282c45",
+      "sku": "YS.LAGOONCHUNKY.2N110"
+    },
+    {
+      "code": "2N120",
+      "name": "Blue Lagoon",
+      "hex": "#2c5a65",
+      "sku": "YS.LAGOONCHUNKY.2N120"
+    },
+    {
+      "code": "2N140",
+      "name": "Camino Lagoon",
+      "hex": "#604b53",
+      "sku": "YS.LAGOONCHUNKY.2N140"
+    },
+    {
+      "code": "2N150",
+      "name": "Pileh Lagoon",
+      "hex": "#3f2614",
+      "sku": "YS.LAGOONCHUNKY.2N150"
+    }
+  ]
+}

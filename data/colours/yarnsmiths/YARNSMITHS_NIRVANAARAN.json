@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_NIRVANAARAN",
+  "brand": "Yarnsmiths",
+  "product": "Nirvana Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-nirvana-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2P030",
+      "name": "Summer Solstice",
+      "hex": "#6d4932",
+      "sku": "YS.NIRVANAARAN.2P030"
+    },
+    {
+      "code": "2P050",
+      "name": "Forest Wander",
+      "hex": "#4e5641",
+      "sku": "YS.NIRVANAARAN.2P050"
+    },
+    {
+      "code": "2P060",
+      "name": "Cosy Fireside",
+      "hex": "#3a2a34",
+      "sku": "YS.NIRVANAARAN.2P060"
+    },
+    {
+      "code": "2P070",
+      "name": "Blissful Bloom",
+      "hex": "#843d55",
+      "sku": "YS.NIRVANAARAN.2P070"
+    },
+    {
+      "code": "2P090",
+      "name": "Sage Serenity",
+      "hex": "#6b7c6b",
+      "sku": "YS.NIRVANAARAN.2P090"
+    },
+    {
+      "code": "2P100",
+      "name": "Tranquil Twilight",
+      "hex": "#35545e",
+      "sku": "YS.NIRVANAARAN.2P100"
+    },
+    {
+      "code": "2P010",
+      "name": "Inner Peace",
+      "hex": "#5d5b52",
+      "sku": "YS.X.NIRVANAARAN.2P010"
+    },
+    {
+      "code": "2P020",
+      "name": "Quiet Mind",
+      "hex": "#59564b",
+      "sku": "YS.X.NIRVANAARAN.2P020"
+    },
+    {
+      "code": "2P040",
+      "name": "Mellow Dreams",
+      "hex": "#b29171",
+      "sku": "YS.X.NIRVANAARAN.2P040"
+    },
+    {
+      "code": "2P080",
+      "name": "Peaceful Presence",
+      "hex": "#756d6c",
+      "sku": "YS.X.NIRVANAARAN.2P080"
+    }
+  ]
+}

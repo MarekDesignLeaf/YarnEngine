@@ -1,0 +1,912 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTTONDK",
+  "brand": "Yarnsmiths",
+  "product": "Cotton DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-cotton-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3000",
+      "name": "Black",
+      "hex": "#0c0c0c",
+      "sku": "YS.COTTONDK.3000"
+    },
+    {
+      "code": "3001",
+      "name": "Washed Black",
+      "hex": "#1c2220",
+      "sku": "YS.COTTONDK.3001"
+    },
+    {
+      "code": "3002",
+      "name": "Anthracite Grey",
+      "hex": "#282e2e",
+      "sku": "YS.COTTONDK.3002"
+    },
+    {
+      "code": "3005",
+      "name": "Gunmetal Grey",
+      "hex": "#3b4447",
+      "sku": "YS.COTTONDK.3005"
+    },
+    {
+      "code": "3008",
+      "name": "Storm Grey",
+      "hex": "#4d5256",
+      "sku": "YS.COTTONDK.3008"
+    },
+    {
+      "code": "3012",
+      "name": "Medium Grey",
+      "hex": "#606770",
+      "sku": "YS.COTTONDK.3012"
+    },
+    {
+      "code": "3015",
+      "name": "Stone Grey",
+      "hex": "#858b82",
+      "sku": "YS.COTTONDK.3015"
+    },
+    {
+      "code": "3018",
+      "name": "Light Grey",
+      "hex": "#98a3aa",
+      "sku": "YS.COTTONDK.3018"
+    },
+    {
+      "code": "3025",
+      "name": "Platinum Grey",
+      "hex": "#9c9fa9",
+      "sku": "YS.COTTONDK.3025"
+    },
+    {
+      "code": "3030",
+      "name": "Silver",
+      "hex": "#aab0b1",
+      "sku": "YS.COTTONDK.3030"
+    },
+    {
+      "code": "3035",
+      "name": "Pale Silver",
+      "hex": "#b5bdc0",
+      "sku": "YS.COTTONDK.3035"
+    },
+    {
+      "code": "3040",
+      "name": "White",
+      "hex": "#e2e4e6",
+      "sku": "YS.COTTONDK.3040"
+    },
+    {
+      "code": "3042",
+      "name": "Ecru",
+      "hex": "#dbd8ce",
+      "sku": "YS.COTTONDK.3042"
+    },
+    {
+      "code": "3045",
+      "name": "Off White",
+      "hex": "#dcdfcd",
+      "sku": "YS.COTTONDK.3045"
+    },
+    {
+      "code": "3050",
+      "name": "Cream",
+      "hex": "#dcdecb",
+      "sku": "YS.COTTONDK.3050"
+    },
+    {
+      "code": "3054",
+      "name": "Vanilla",
+      "hex": "#cac3ab",
+      "sku": "YS.COTTONDK.3054"
+    },
+    {
+      "code": "3056",
+      "name": "Almond Milk",
+      "hex": "#c2c0ac",
+      "sku": "YS.COTTONDK.3056"
+    },
+    {
+      "code": "3060",
+      "name": "Parchment",
+      "hex": "#a7a6a3",
+      "sku": "YS.COTTONDK.3060"
+    },
+    {
+      "code": "3061",
+      "name": "Linen",
+      "hex": "#b4b3a8",
+      "sku": "YS.COTTONDK.3061"
+    },
+    {
+      "code": "3062",
+      "name": "Blush",
+      "hex": "#d8ccb9",
+      "sku": "YS.COTTONDK.3062"
+    },
+    {
+      "code": "3063",
+      "name": "Champagne",
+      "hex": "#d7c6a8",
+      "sku": "YS.COTTONDK.3063"
+    },
+    {
+      "code": "3064",
+      "name": "Oatmeal",
+      "hex": "#c1ad9d",
+      "sku": "YS.COTTONDK.3064"
+    },
+    {
+      "code": "3065",
+      "name": "Warm Taupe",
+      "hex": "#a18d82",
+      "sku": "YS.COTTONDK.3065"
+    },
+    {
+      "code": "3065B",
+      "name": "Cool Taupe",
+      "hex": "#a2918a",
+      "sku": "YS.COTTONDK.3065B"
+    },
+    {
+      "code": "3066",
+      "name": "Sand",
+      "hex": "#bda784",
+      "sku": "YS.COTTONDK.3066"
+    },
+    {
+      "code": "3067",
+      "name": "Vanilla Fudge",
+      "hex": "#b8996c",
+      "sku": "YS.COTTONDK.3067"
+    },
+    {
+      "code": "3068",
+      "name": "Caramel Fudge",
+      "hex": "#95734c",
+      "sku": "YS.COTTONDK.3068"
+    },
+    {
+      "code": "3068B",
+      "name": "Toffee Fudge",
+      "hex": "#b4835d",
+      "sku": "YS.COTTONDK.3068B"
+    },
+    {
+      "code": "3068D",
+      "name": "Coffee Fudge",
+      "hex": "#886b55",
+      "sku": "YS.COTTONDK.3068D"
+    },
+    {
+      "code": "3068F",
+      "name": "Cuppa Tea",
+      "hex": "#907259",
+      "sku": "YS.COTTONDK.3068F"
+    },
+    {
+      "code": "3069",
+      "name": "Latte",
+      "hex": "#6c5f51",
+      "sku": "YS.COTTONDK.3069"
+    },
+    {
+      "code": "3070",
+      "name": "Brown Bear",
+      "hex": "#5a5247",
+      "sku": "YS.COTTONDK.3070"
+    },
+    {
+      "code": "3072",
+      "name": "Bronze",
+      "hex": "#58431d",
+      "sku": "YS.COTTONDK.3072"
+    },
+    {
+      "code": "3074",
+      "name": "Rust",
+      "hex": "#634127",
+      "sku": "YS.COTTONDK.3074"
+    },
+    {
+      "code": "3076",
+      "name": "Copper",
+      "hex": "#6d2417",
+      "sku": "YS.COTTONDK.3076"
+    },
+    {
+      "code": "3077",
+      "name": "Terracotta",
+      "hex": "#7c3628",
+      "sku": "YS.COTTONDK.3077"
+    },
+    {
+      "code": "3078",
+      "name": "Brick",
+      "hex": "#6a3738",
+      "sku": "YS.COTTONDK.3078"
+    },
+    {
+      "code": "3079",
+      "name": "Coffee Bean",
+      "hex": "#59382b",
+      "sku": "YS.COTTONDK.3079"
+    },
+    {
+      "code": "3079B",
+      "name": "Cocoa",
+      "hex": "#342c24",
+      "sku": "YS.COTTONDK.3079B"
+    },
+    {
+      "code": "3080",
+      "name": "Chocolate Brown",
+      "hex": "#1d1712",
+      "sku": "YS.COTTONDK.3080"
+    },
+    {
+      "code": "3085",
+      "name": "Burgundy",
+      "hex": "#32141e",
+      "sku": "YS.COTTONDK.3085"
+    },
+    {
+      "code": "3090",
+      "name": "Claret Red",
+      "hex": "#500b1d",
+      "sku": "YS.COTTONDK.3090"
+    },
+    {
+      "code": "3094",
+      "name": "Sienna Red",
+      "hex": "#62081c",
+      "sku": "YS.COTTONDK.3094"
+    },
+    {
+      "code": "3096",
+      "name": "Crimson",
+      "hex": "#860722",
+      "sku": "YS.COTTONDK.3096"
+    },
+    {
+      "code": "3100",
+      "name": "Scarlet Red",
+      "hex": "#86061b",
+      "sku": "YS.COTTONDK.3100"
+    },
+    {
+      "code": "3110",
+      "name": "Bright Red",
+      "hex": "#9f0e13",
+      "sku": "YS.COTTONDK.3110"
+    },
+    {
+      "code": "3115",
+      "name": "Paprika",
+      "hex": "#9c2221",
+      "sku": "YS.COTTONDK.3115"
+    },
+    {
+      "code": "3120",
+      "name": "Burnt Orange",
+      "hex": "#95201a",
+      "sku": "YS.COTTONDK.3120"
+    },
+    {
+      "code": "3124",
+      "name": "Ginger",
+      "hex": "#7f3012",
+      "sku": "YS.COTTONDK.3124"
+    },
+    {
+      "code": "3125",
+      "name": "Amber",
+      "hex": "#9a430c",
+      "sku": "YS.COTTONDK.3125"
+    },
+    {
+      "code": "3126",
+      "name": "Carrot",
+      "hex": "#e54a23",
+      "sku": "YS.COTTONDK.3126"
+    },
+    {
+      "code": "3130",
+      "name": "Bright Orange",
+      "hex": "#ed5e0a",
+      "sku": "YS.COTTONDK.3130"
+    },
+    {
+      "code": "3135",
+      "name": "Tangerine",
+      "hex": "#ee8913",
+      "sku": "YS.COTTONDK.3135"
+    },
+    {
+      "code": "3140",
+      "name": "Mustard Yellow",
+      "hex": "#b48321",
+      "sku": "YS.COTTONDK.3140"
+    },
+    {
+      "code": "3145",
+      "name": "Antique Gold",
+      "hex": "#8e6020",
+      "sku": "YS.COTTONDK.3145"
+    },
+    {
+      "code": "3147",
+      "name": "Harvest Gold",
+      "hex": "#cc9c23",
+      "sku": "YS.COTTONDK.3147"
+    },
+    {
+      "code": "3150",
+      "name": "Sunshine Yellow",
+      "hex": "#e18f12",
+      "sku": "YS.COTTONDK.3150"
+    },
+    {
+      "code": "3155",
+      "name": "Buttercup",
+      "hex": "#e5ce0a",
+      "sku": "YS.COTTONDK.3155"
+    },
+    {
+      "code": "3160",
+      "name": "Primrose Yellow",
+      "hex": "#e5c834",
+      "sku": "YS.COTTONDK.3160"
+    },
+    {
+      "code": "3164",
+      "name": "Bright Yellow",
+      "hex": "#e2d045",
+      "sku": "YS.COTTONDK.3164"
+    },
+    {
+      "code": "3166",
+      "name": "Canary Yellow",
+      "hex": "#e3ca5d",
+      "sku": "YS.COTTONDK.3166"
+    },
+    {
+      "code": "3170",
+      "name": "Lemon Yellow",
+      "hex": "#dcc780",
+      "sku": "YS.COTTONDK.3170"
+    },
+    {
+      "code": "3180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#d1d1a5",
+      "sku": "YS.COTTONDK.3180"
+    },
+    {
+      "code": "3181",
+      "name": "Hint of Mint",
+      "hex": "#a7d0b4",
+      "sku": "YS.COTTONDK.3181"
+    },
+    {
+      "code": "3183",
+      "name": "Mojito Green",
+      "hex": "#5fa46d",
+      "sku": "YS.COTTONDK.3183"
+    },
+    {
+      "code": "3185",
+      "name": "Light Sage",
+      "hex": "#749b78",
+      "sku": "YS.COTTONDK.3185"
+    },
+    {
+      "code": "3185B",
+      "name": "Eucalyptus",
+      "hex": "#829379",
+      "sku": "YS.COTTONDK.3185B"
+    },
+    {
+      "code": "3186",
+      "name": "Celery",
+      "hex": "#a3b960",
+      "sku": "YS.COTTONDK.3186"
+    },
+    {
+      "code": "3187",
+      "name": "Olive Green",
+      "hex": "#827629",
+      "sku": "YS.COTTONDK.3187"
+    },
+    {
+      "code": "3188",
+      "name": "Apple Green",
+      "hex": "#637b1c",
+      "sku": "YS.COTTONDK.3188"
+    },
+    {
+      "code": "3190",
+      "name": "Lime Green",
+      "hex": "#99bf51",
+      "sku": "YS.COTTONDK.3190"
+    },
+    {
+      "code": "3195",
+      "name": "Bright Green",
+      "hex": "#56a234",
+      "sku": "YS.COTTONDK.3195"
+    },
+    {
+      "code": "3200",
+      "name": "Grass Green",
+      "hex": "#56843d",
+      "sku": "YS.COTTONDK.3200"
+    },
+    {
+      "code": "3201B",
+      "name": "Thyme",
+      "hex": "#63834c",
+      "sku": "YS.COTTONDK.3201B"
+    },
+    {
+      "code": "3202",
+      "name": "Dark Sage",
+      "hex": "#4b7259",
+      "sku": "YS.COTTONDK.3202"
+    },
+    {
+      "code": "3204",
+      "name": "Country Green",
+      "hex": "#2f3916",
+      "sku": "YS.COTTONDK.3204"
+    },
+    {
+      "code": "3205B",
+      "name": "Willow",
+      "hex": "#7a7a43",
+      "sku": "YS.COTTONDK.3205B"
+    },
+    {
+      "code": "3206",
+      "name": "Khaki",
+      "hex": "#5c6142",
+      "sku": "YS.COTTONDK.3206"
+    },
+    {
+      "code": "3207",
+      "name": "Strong Green",
+      "hex": "#1f4927",
+      "sku": "YS.COTTONDK.3207"
+    },
+    {
+      "code": "3208",
+      "name": "Bottle Green",
+      "hex": "#0f2621",
+      "sku": "YS.COTTONDK.3208"
+    },
+    {
+      "code": "3209",
+      "name": "Fir Green",
+      "hex": "#223b34",
+      "sku": "YS.COTTONDK.3209"
+    },
+    {
+      "code": "3210",
+      "name": "Christmas Green",
+      "hex": "#064935",
+      "sku": "YS.COTTONDK.3210"
+    },
+    {
+      "code": "3215",
+      "name": "Clover",
+      "hex": "#12682d",
+      "sku": "YS.COTTONDK.3215"
+    },
+    {
+      "code": "3220",
+      "name": "Opal Green",
+      "hex": "#075d49",
+      "sku": "YS.COTTONDK.3220"
+    },
+    {
+      "code": "3222",
+      "name": "Spearmint Green",
+      "hex": "#6a9287",
+      "sku": "YS.COTTONDK.3222"
+    },
+    {
+      "code": "3224",
+      "name": "Aqua",
+      "hex": "#55b0b2",
+      "sku": "YS.COTTONDK.3224"
+    },
+    {
+      "code": "3226",
+      "name": "Seafoam",
+      "hex": "#2d9d99",
+      "sku": "YS.COTTONDK.3226"
+    },
+    {
+      "code": "3228",
+      "name": "Vintage Teal",
+      "hex": "#5498a1",
+      "sku": "YS.COTTONDK.3228"
+    },
+    {
+      "code": "3229",
+      "name": "Tropical Teal",
+      "hex": "#0f758c",
+      "sku": "YS.COTTONDK.3229"
+    },
+    {
+      "code": "3230",
+      "name": "Teal",
+      "hex": "#076074",
+      "sku": "YS.COTTONDK.3230"
+    },
+    {
+      "code": "3231",
+      "name": "Dark Teal",
+      "hex": "#0d4e58",
+      "sku": "YS.COTTONDK.3231"
+    },
+    {
+      "code": "3234",
+      "name": "Petrol",
+      "hex": "#173c4f",
+      "sku": "YS.COTTONDK.3234"
+    },
+    {
+      "code": "3236",
+      "name": "Deep Ocean",
+      "hex": "#143953",
+      "sku": "YS.COTTONDK.3236"
+    },
+    {
+      "code": "3240",
+      "name": "Dark Turquoise",
+      "hex": "#1268a4",
+      "sku": "YS.COTTONDK.3240"
+    },
+    {
+      "code": "3246",
+      "name": "Kingfisher Blue",
+      "hex": "#1f83af",
+      "sku": "YS.COTTONDK.3246"
+    },
+    {
+      "code": "3250",
+      "name": "Light Turquoise",
+      "hex": "#1b8eb8",
+      "sku": "YS.COTTONDK.3250"
+    },
+    {
+      "code": "3251",
+      "name": "Steel Blue",
+      "hex": "#457b91",
+      "sku": "YS.COTTONDK.3251"
+    },
+    {
+      "code": "3252",
+      "name": "Fjord Blue",
+      "hex": "#29444e",
+      "sku": "YS.COTTONDK.3252"
+    },
+    {
+      "code": "3254",
+      "name": "Robin Egg",
+      "hex": "#79c1c0",
+      "sku": "YS.COTTONDK.3254"
+    },
+    {
+      "code": "3256",
+      "name": "Duck Egg",
+      "hex": "#a0b8b5",
+      "sku": "YS.COTTONDK.3256"
+    },
+    {
+      "code": "3258",
+      "name": "Glacier Blue",
+      "hex": "#93cfe0",
+      "sku": "YS.COTTONDK.3258"
+    },
+    {
+      "code": "3260",
+      "name": "Sky Blue",
+      "hex": "#a4bfd0",
+      "sku": "YS.COTTONDK.3260"
+    },
+    {
+      "code": "3261",
+      "name": "Baby Blue",
+      "hex": "#afc3d7",
+      "sku": "YS.COTTONDK.3261"
+    },
+    {
+      "code": "3262",
+      "name": "Powder Blue",
+      "hex": "#9ebed7",
+      "sku": "YS.COTTONDK.3262"
+    },
+    {
+      "code": "3266",
+      "name": "Hydrangea Blue",
+      "hex": "#5e8dc1",
+      "sku": "YS.COTTONDK.3266"
+    },
+    {
+      "code": "3270",
+      "name": "Cornflower Blue",
+      "hex": "#4772a7",
+      "sku": "YS.COTTONDK.3270"
+    },
+    {
+      "code": "3274",
+      "name": "Strong Blue",
+      "hex": "#164f94",
+      "sku": "YS.COTTONDK.3274"
+    },
+    {
+      "code": "3276",
+      "name": "Ultramarine Blue",
+      "hex": "#3c7293",
+      "sku": "YS.COTTONDK.3276"
+    },
+    {
+      "code": "3280",
+      "name": "Denim Blue",
+      "hex": "#4f5c7d",
+      "sku": "YS.COTTONDK.3280"
+    },
+    {
+      "code": "3285",
+      "name": "Delft Blue",
+      "hex": "#37577c",
+      "sku": "YS.COTTONDK.3285"
+    },
+    {
+      "code": "3290",
+      "name": "Deep Denim Blue",
+      "hex": "#202b39",
+      "sku": "YS.COTTONDK.3290"
+    },
+    {
+      "code": "3300",
+      "name": "Royal Blue",
+      "hex": "#232b6b",
+      "sku": "YS.COTTONDK.3300"
+    },
+    {
+      "code": "3305",
+      "name": "Sapphire Blue",
+      "hex": "#24407f",
+      "sku": "YS.COTTONDK.3305"
+    },
+    {
+      "code": "3308",
+      "name": "Light Navy",
+      "hex": "#131e32",
+      "sku": "YS.COTTONDK.3308"
+    },
+    {
+      "code": "3310",
+      "name": "Navy Blue",
+      "hex": "#0b111e",
+      "sku": "YS.COTTONDK.3310"
+    },
+    {
+      "code": "3315",
+      "name": "Vibrant Violet",
+      "hex": "#2e1d53",
+      "sku": "YS.COTTONDK.3315"
+    },
+    {
+      "code": "3320",
+      "name": "Deep Purple",
+      "hex": "#29143f",
+      "sku": "YS.COTTONDK.3320"
+    },
+    {
+      "code": "3322",
+      "name": "Amethyst",
+      "hex": "#4c3378",
+      "sku": "YS.COTTONDK.3322"
+    },
+    {
+      "code": "3324",
+      "name": "Just Purple",
+      "hex": "#472362",
+      "sku": "YS.COTTONDK.3324"
+    },
+    {
+      "code": "3326",
+      "name": "Purple Orchid",
+      "hex": "#501f61",
+      "sku": "YS.COTTONDK.3326"
+    },
+    {
+      "code": "3330",
+      "name": "Plum Purple",
+      "hex": "#3c1c44",
+      "sku": "YS.COTTONDK.3330"
+    },
+    {
+      "code": "3335",
+      "name": "Sugar Plum",
+      "hex": "#6f467c",
+      "sku": "YS.COTTONDK.3335"
+    },
+    {
+      "code": "3340",
+      "name": "Pale Lilac",
+      "hex": "#b0a9c8",
+      "sku": "YS.COTTONDK.3340"
+    },
+    {
+      "code": "3350",
+      "name": "Lilac",
+      "hex": "#8d79b0",
+      "sku": "YS.COTTONDK.3350"
+    },
+    {
+      "code": "3354",
+      "name": "Grape Juice",
+      "hex": "#50435f",
+      "sku": "YS.COTTONDK.3354"
+    },
+    {
+      "code": "3356",
+      "name": "Dark Lavender",
+      "hex": "#58528c",
+      "sku": "YS.COTTONDK.3356"
+    },
+    {
+      "code": "3360",
+      "name": "Lavender",
+      "hex": "#7f84bf",
+      "sku": "YS.COTTONDK.3360"
+    },
+    {
+      "code": "3362",
+      "name": "Bluebell",
+      "hex": "#6279b4",
+      "sku": "YS.COTTONDK.3362"
+    },
+    {
+      "code": "3364",
+      "name": "Petal Pink",
+      "hex": "#bb72a4",
+      "sku": "YS.COTTONDK.3364"
+    },
+    {
+      "code": "3366",
+      "name": "Magenta",
+      "hex": "#78114f",
+      "sku": "YS.COTTONDK.3366"
+    },
+    {
+      "code": "3368",
+      "name": "Bright Pink",
+      "hex": "#8f0b55",
+      "sku": "YS.COTTONDK.3368"
+    },
+    {
+      "code": "3369",
+      "name": "Shocking Pink",
+      "hex": "#bd2268",
+      "sku": "YS.COTTONDK.3369"
+    },
+    {
+      "code": "3370",
+      "name": "Fuchsia Pink",
+      "hex": "#860d42",
+      "sku": "YS.COTTONDK.3370"
+    },
+    {
+      "code": "3372",
+      "name": "Fandango Pink",
+      "hex": "#b8305c",
+      "sku": "YS.COTTONDK.3372"
+    },
+    {
+      "code": "3374",
+      "name": "Pinkberry",
+      "hex": "#731c4f",
+      "sku": "YS.COTTONDK.3374"
+    },
+    {
+      "code": "3376",
+      "name": "Vintage Pink",
+      "hex": "#822e5a",
+      "sku": "YS.COTTONDK.3376"
+    },
+    {
+      "code": "3380",
+      "name": "Rose Pink",
+      "hex": "#935f76",
+      "sku": "YS.COTTONDK.3380"
+    },
+    {
+      "code": "3385",
+      "name": "Bubblegum",
+      "hex": "#aa417f",
+      "sku": "YS.COTTONDK.3385"
+    },
+    {
+      "code": "3390",
+      "name": "Fondant Pink",
+      "hex": "#cd73a1",
+      "sku": "YS.COTTONDK.3390"
+    },
+    {
+      "code": "3400",
+      "name": "Candyfloss Pink",
+      "hex": "#e5aac8",
+      "sku": "YS.COTTONDK.3400"
+    },
+    {
+      "code": "3402",
+      "name": "Flamingo Pink",
+      "hex": "#df7f8e",
+      "sku": "YS.COTTONDK.3402"
+    },
+    {
+      "code": "3404",
+      "name": "Blossom",
+      "hex": "#c98d94",
+      "sku": "YS.COTTONDK.3404"
+    },
+    {
+      "code": "3408",
+      "name": "Baby Pink",
+      "hex": "#e5bcc4",
+      "sku": "YS.COTTONDK.3408"
+    },
+    {
+      "code": "3410",
+      "name": "Light Pink",
+      "hex": "#dcc1d2",
+      "sku": "YS.COTTONDK.3410"
+    },
+    {
+      "code": "3420",
+      "name": "Peachy Pink",
+      "hex": "#d7cac7",
+      "sku": "YS.COTTONDK.3420"
+    },
+    {
+      "code": "3421",
+      "name": "Soft Apricot",
+      "hex": "#d5bdac",
+      "sku": "YS.COTTONDK.3421"
+    },
+    {
+      "code": "3422",
+      "name": "Peach",
+      "hex": "#e6c2b3",
+      "sku": "YS.COTTONDK.3422"
+    },
+    {
+      "code": "3425",
+      "name": "Apricot",
+      "hex": "#de997d",
+      "sku": "YS.COTTONDK.3425"
+    },
+    {
+      "code": "3426",
+      "name": "Dusky Peach",
+      "hex": "#a66958",
+      "sku": "YS.COTTONDK.3426"
+    },
+    {
+      "code": "3428",
+      "name": "Vintage Peach",
+      "hex": "#763a40",
+      "sku": "YS.COTTONDK.3428"
+    }
+  ]
+}

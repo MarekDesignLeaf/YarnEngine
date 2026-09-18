@@ -1,0 +1,18 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_GLOW",
+  "brand": "Yarnsmiths",
+  "product": "Glow in the Dark",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-glow-in-the-dark-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "5045",
+      "name": "White",
+      "hex": "#c6c7c0",
+      "sku": "YS.GLOW.5045"
+    }
+  ]
+}

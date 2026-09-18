@@ -1,0 +1,132 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_MERINODKHEATHER",
+  "brand": "Yarnsmiths",
+  "product": "Merino DK Superwash Heathers",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-dk-superwash-heathers-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "H3500",
+      "name": "Smoky Onyx",
+      "hex": "#111719",
+      "sku": "YS.MERINODKHEATHER.H3500"
+    },
+    {
+      "code": "H3510",
+      "name": "Stormy Sky",
+      "hex": "#212624",
+      "sku": "YS.MERINODKHEATHER.H3510"
+    },
+    {
+      "code": "H3520",
+      "name": "Silver Mist",
+      "hex": "#959b99",
+      "sku": "YS.MERINODKHEATHER.H3520"
+    },
+    {
+      "code": "H3530",
+      "name": "Aged Ivory",
+      "hex": "#918880",
+      "sku": "YS.MERINODKHEATHER.H3530"
+    },
+    {
+      "code": "H3540",
+      "name": "Fawn Whisper",
+      "hex": "#6a6156",
+      "sku": "YS.MERINODKHEATHER.H3540"
+    },
+    {
+      "code": "H3550",
+      "name": "Rustic Oak",
+      "hex": "#3c362c",
+      "sku": "YS.MERINODKHEATHER.H3550"
+    },
+    {
+      "code": "H3560",
+      "name": "Deep Oxblood",
+      "hex": "#1b140f",
+      "sku": "YS.MERINODKHEATHER.H3560"
+    },
+    {
+      "code": "H3570",
+      "name": "Red Grouse",
+      "hex": "#2e1313",
+      "sku": "YS.MERINODKHEATHER.H3570"
+    },
+    {
+      "code": "H3580",
+      "name": "Glowing Ember",
+      "hex": "#4f251a",
+      "sku": "YS.MERINODKHEATHER.H3580"
+    },
+    {
+      "code": "H3590",
+      "name": "Golden Gorse",
+      "hex": "#8a6527",
+      "sku": "YS.MERINODKHEATHER.H3590"
+    },
+    {
+      "code": "H3600",
+      "name": "Dappled Fern",
+      "hex": "#454c30",
+      "sku": "YS.MERINODKHEATHER.H3600"
+    },
+    {
+      "code": "H3610",
+      "name": "Marbled Emerald",
+      "hex": "#2b3627",
+      "sku": "YS.MERINODKHEATHER.H3610"
+    },
+    {
+      "code": "H3620",
+      "name": "Forest Glade",
+      "hex": "#222a1b",
+      "sku": "YS.MERINODKHEATHER.H3620"
+    },
+    {
+      "code": "H3630",
+      "name": "Petrol Mist",
+      "hex": "#1e373c",
+      "sku": "YS.MERINODKHEATHER.H3630"
+    },
+    {
+      "code": "H3640",
+      "name": "Frosted Aqua",
+      "hex": "#6e99aa",
+      "sku": "YS.MERINODKHEATHER.H3640"
+    },
+    {
+      "code": "H3650",
+      "name": "Vintage Denim",
+      "hex": "#4d5964",
+      "sku": "YS.MERINODKHEATHER.H3650"
+    },
+    {
+      "code": "H3660",
+      "name": "Inkwell Blue",
+      "hex": "#29374e",
+      "sku": "YS.MERINODKHEATHER.H3660"
+    },
+    {
+      "code": "H3670",
+      "name": "Amethyst Glow",
+      "hex": "#211b2d",
+      "sku": "YS.MERINODKHEATHER.H3670"
+    },
+    {
+      "code": "H3680",
+      "name": "Highland Magenta",
+      "hex": "#40193d",
+      "sku": "YS.MERINODKHEATHER.H3680"
+    },
+    {
+      "code": "H3690",
+      "name": "Hushed Rose",
+      "hex": "#734258",
+      "sku": "YS.MERINODKHEATHER.H3690"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PLAYCHUNKY",
+  "brand": "Yarnsmiths",
+  "product": "Play Chunky",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-play-chunky-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "1G004",
+      "name": "Hop",
+      "hex": "#562f2d",
+      "sku": "YS.PLAYCHUNKY.1G004"
+    },
+    {
+      "code": "1G006",
+      "name": "Dance",
+      "hex": "#1f352d",
+      "sku": "YS.PLAYCHUNKY.1G006"
+    },
+    {
+      "code": "1G008",
+      "name": "Hike",
+      "hex": "#242f2e",
+      "sku": "YS.PLAYCHUNKY.1G008"
+    },
+    {
+      "code": "1G014",
+      "name": "Shout",
+      "hex": "#535c59",
+      "sku": "YS.PLAYCHUNKY.1G014"
+    }
+  ]
+}

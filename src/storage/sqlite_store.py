@@ -288,9 +288,13 @@ class SQLiteStore:
             rows = self.conn.execute(
                 "SELECT * FROM yarn_colours WHERE yarn_id IS NULL ORDER BY family,name").fetchall()
         else:
+            # A maker's own card is read in shade-code order, the way it is
+            # printed; the generic palette is grouped by colour family.
             rows = self.conn.execute(
                 "SELECT * FROM yarn_colours WHERE yarn_id=? OR yarn_id IS NULL "
-                "ORDER BY yarn_id IS NULL, family, name", (yarn_id,)).fetchall()
+                "ORDER BY yarn_id IS NULL, "
+                "CASE WHEN yarn_id IS NULL THEN family END, "
+                "CASE WHEN yarn_id IS NULL THEN name ELSE code END", (yarn_id,)).fetchall()
         return [dict(r) for r in rows]
 
     def get_colour(self, colour_id):

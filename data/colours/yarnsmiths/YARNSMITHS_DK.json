@@ -1,0 +1,732 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_DK",
+  "brand": "Yarnsmiths",
+  "product": "Create DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3000",
+      "name": "Black",
+      "hex": "#080904",
+      "sku": "YS.DK.3000"
+    },
+    {
+      "code": "3002",
+      "name": "Anthracite Grey",
+      "hex": "#2f2e29",
+      "sku": "YS.DK.3002"
+    },
+    {
+      "code": "3005",
+      "name": "Gunmetal Grey",
+      "hex": "#4c514b",
+      "sku": "YS.DK.3005"
+    },
+    {
+      "code": "3008",
+      "name": "Storm Grey",
+      "hex": "#6d6d65",
+      "sku": "YS.DK.3008"
+    },
+    {
+      "code": "3010",
+      "name": "Dark Grey Heather",
+      "hex": "#5e5e5a",
+      "sku": "YS.DK.3010"
+    },
+    {
+      "code": "3015",
+      "name": "Stone Grey",
+      "hex": "#908d7a",
+      "sku": "YS.DK.3015"
+    },
+    {
+      "code": "3020",
+      "name": "Light Grey Heather",
+      "hex": "#9a9996",
+      "sku": "YS.DK.3020"
+    },
+    {
+      "code": "3025",
+      "name": "Platinum Grey",
+      "hex": "#a6a1a0",
+      "sku": "YS.DK.3025"
+    },
+    {
+      "code": "3030",
+      "name": "Silver",
+      "hex": "#afafa5",
+      "sku": "YS.DK.3030"
+    },
+    {
+      "code": "3035",
+      "name": "Pale Silver",
+      "hex": "#d2cec8",
+      "sku": "YS.DK.3035"
+    },
+    {
+      "code": "3040",
+      "name": "White",
+      "hex": "#f8f4ea",
+      "sku": "YS.DK.3040"
+    },
+    {
+      "code": "3045",
+      "name": "Off White",
+      "hex": "#f4ecd4",
+      "sku": "YS.DK.3045"
+    },
+    {
+      "code": "3050",
+      "name": "Cream",
+      "hex": "#e9dbb9",
+      "sku": "YS.DK.3050"
+    },
+    {
+      "code": "3060",
+      "name": "Parchment",
+      "hex": "#c0b3a0",
+      "sku": "YS.DK.3060"
+    },
+    {
+      "code": "3061",
+      "name": "Linen",
+      "hex": "#bfb194",
+      "sku": "YS.DK.3061"
+    },
+    {
+      "code": "3062",
+      "name": "Blush",
+      "hex": "#f5d1ad",
+      "sku": "YS.DK.3062"
+    },
+    {
+      "code": "3063",
+      "name": "Champagne",
+      "hex": "#e1bf96",
+      "sku": "YS.DK.3063"
+    },
+    {
+      "code": "3064",
+      "name": "Oatmeal",
+      "hex": "#c8ae93",
+      "sku": "YS.DK.3064"
+    },
+    {
+      "code": "3065",
+      "name": "Warm Taupe",
+      "hex": "#9e887c",
+      "sku": "YS.DK.3065"
+    },
+    {
+      "code": "3066",
+      "name": "Sand",
+      "hex": "#cba678",
+      "sku": "YS.DK.3066"
+    },
+    {
+      "code": "3067",
+      "name": "Vanilla Fudge",
+      "hex": "#be9357",
+      "sku": "YS.DK.3067"
+    },
+    {
+      "code": "3069",
+      "name": "Latte",
+      "hex": "#856c53",
+      "sku": "YS.DK.3069"
+    },
+    {
+      "code": "3070",
+      "name": "Brown Bear",
+      "hex": "#796a55",
+      "sku": "YS.DK.3070"
+    },
+    {
+      "code": "3072",
+      "name": "Bronze",
+      "hex": "#564315",
+      "sku": "YS.DK.3072"
+    },
+    {
+      "code": "3074",
+      "name": "Rust",
+      "hex": "#6a411d",
+      "sku": "YS.DK.3074"
+    },
+    {
+      "code": "3076",
+      "name": "Copper",
+      "hex": "#6f2211",
+      "sku": "YS.DK.3076"
+    },
+    {
+      "code": "3078",
+      "name": "Brick",
+      "hex": "#733730",
+      "sku": "YS.DK.3078"
+    },
+    {
+      "code": "3080",
+      "name": "Chocolate Brown",
+      "hex": "#281b0f",
+      "sku": "YS.DK.3080"
+    },
+    {
+      "code": "3085",
+      "name": "Burgundy",
+      "hex": "#341114",
+      "sku": "YS.DK.3085"
+    },
+    {
+      "code": "3090",
+      "name": "Claret Red",
+      "hex": "#5c081b",
+      "sku": "YS.DK.3090"
+    },
+    {
+      "code": "3094",
+      "name": "Sienna Red",
+      "hex": "#57110f",
+      "sku": "YS.DK.3094"
+    },
+    {
+      "code": "3096",
+      "name": "Crimson",
+      "hex": "#8c071d",
+      "sku": "YS.DK.3096"
+    },
+    {
+      "code": "3100",
+      "name": "Scarlet Red",
+      "hex": "#7c080f",
+      "sku": "YS.DK.3100"
+    },
+    {
+      "code": "3110",
+      "name": "Bright Red",
+      "hex": "#b80c0f",
+      "sku": "YS.DK.3110"
+    },
+    {
+      "code": "3115",
+      "name": "Paprika",
+      "hex": "#b6341f",
+      "sku": "YS.DK.3115"
+    },
+    {
+      "code": "3120",
+      "name": "Burnt Orange",
+      "hex": "#9f200e",
+      "sku": "YS.DK.3120"
+    },
+    {
+      "code": "3124",
+      "name": "Ginger",
+      "hex": "#a4350f",
+      "sku": "YS.DK.3124"
+    },
+    {
+      "code": "3126",
+      "name": "Carrot",
+      "hex": "#dc3b08",
+      "sku": "YS.DK.3126"
+    },
+    {
+      "code": "3130",
+      "name": "Bright Orange",
+      "hex": "#f45008",
+      "sku": "YS.DK.3130"
+    },
+    {
+      "code": "3135",
+      "name": "Tangerine",
+      "hex": "#fa8214",
+      "sku": "YS.DK.3135"
+    },
+    {
+      "code": "3140",
+      "name": "Mustard Yellow",
+      "hex": "#c48818",
+      "sku": "YS.DK.3140"
+    },
+    {
+      "code": "3145",
+      "name": "Antique Gold",
+      "hex": "#ae6c11",
+      "sku": "YS.DK.3145"
+    },
+    {
+      "code": "3150",
+      "name": "Sunshine Yellow",
+      "hex": "#e38e09",
+      "sku": "YS.DK.3150"
+    },
+    {
+      "code": "3160",
+      "name": "Primrose Yellow",
+      "hex": "#dba61c",
+      "sku": "YS.DK.3160"
+    },
+    {
+      "code": "3164",
+      "name": "Bright Yellow",
+      "hex": "#f8d43d",
+      "sku": "YS.DK.3164"
+    },
+    {
+      "code": "3166",
+      "name": "Canary Yellow",
+      "hex": "#eeca55",
+      "sku": "YS.DK.3166"
+    },
+    {
+      "code": "3170",
+      "name": "Lemon Yellow",
+      "hex": "#e0b056",
+      "sku": "YS.DK.3170"
+    },
+    {
+      "code": "3180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#e9daa5",
+      "sku": "YS.DK.3180"
+    },
+    {
+      "code": "3181",
+      "name": "Hint of Mint",
+      "hex": "#bfd8b2",
+      "sku": "YS.DK.3181"
+    },
+    {
+      "code": "3183",
+      "name": "Mojito Green",
+      "hex": "#70a765",
+      "sku": "YS.DK.3183"
+    },
+    {
+      "code": "3185",
+      "name": "Light Sage",
+      "hex": "#91a580",
+      "sku": "YS.DK.3185"
+    },
+    {
+      "code": "3186",
+      "name": "Celery",
+      "hex": "#a9b158",
+      "sku": "YS.DK.3186"
+    },
+    {
+      "code": "3187",
+      "name": "Olive Green",
+      "hex": "#98852e",
+      "sku": "YS.DK.3187"
+    },
+    {
+      "code": "3188",
+      "name": "Apple Green",
+      "hex": "#669116",
+      "sku": "YS.DK.3188"
+    },
+    {
+      "code": "3190",
+      "name": "Lime Green",
+      "hex": "#a6c13e",
+      "sku": "YS.DK.3190"
+    },
+    {
+      "code": "3195",
+      "name": "Bright Green",
+      "hex": "#6caf40",
+      "sku": "YS.DK.3195"
+    },
+    {
+      "code": "3200",
+      "name": "Grass Green",
+      "hex": "#628636",
+      "sku": "YS.DK.3200"
+    },
+    {
+      "code": "3202",
+      "name": "Dark Sage",
+      "hex": "#577651",
+      "sku": "YS.DK.3202"
+    },
+    {
+      "code": "3204",
+      "name": "Country Green",
+      "hex": "#3a4226",
+      "sku": "YS.DK.3204"
+    },
+    {
+      "code": "3206",
+      "name": "Khaki",
+      "hex": "#736f43",
+      "sku": "YS.DK.3206"
+    },
+    {
+      "code": "3208",
+      "name": "Bottle Green",
+      "hex": "#132a1a",
+      "sku": "YS.DK.3208"
+    },
+    {
+      "code": "3210",
+      "name": "Christmas Green",
+      "hex": "#094929",
+      "sku": "YS.DK.3210"
+    },
+    {
+      "code": "3215",
+      "name": "Clover",
+      "hex": "#216727",
+      "sku": "YS.DK.3215"
+    },
+    {
+      "code": "3220",
+      "name": "Opal Green",
+      "hex": "#0f6648",
+      "sku": "YS.DK.3220"
+    },
+    {
+      "code": "3222",
+      "name": "Spearmint Green",
+      "hex": "#70937e",
+      "sku": "YS.DK.3222"
+    },
+    {
+      "code": "3224",
+      "name": "Aqua",
+      "hex": "#6dc6af",
+      "sku": "YS.DK.3224"
+    },
+    {
+      "code": "3226",
+      "name": "Seafoam",
+      "hex": "#52b79d",
+      "sku": "YS.DK.3226"
+    },
+    {
+      "code": "3228",
+      "name": "Vintage Teal",
+      "hex": "#6ca79f",
+      "sku": "YS.DK.3228"
+    },
+    {
+      "code": "3229",
+      "name": "Tropical Teal",
+      "hex": "#1c858b",
+      "sku": "YS.DK.3229"
+    },
+    {
+      "code": "3230",
+      "name": "Teal",
+      "hex": "#09686a",
+      "sku": "YS.DK.3230"
+    },
+    {
+      "code": "3234",
+      "name": "Petrol",
+      "hex": "#214452",
+      "sku": "YS.DK.3234"
+    },
+    {
+      "code": "3236",
+      "name": "Deep Ocean",
+      "hex": "#1a3348",
+      "sku": "YS.DK.3236"
+    },
+    {
+      "code": "3240",
+      "name": "Dark Turquoise",
+      "hex": "#186286",
+      "sku": "YS.DK.3240"
+    },
+    {
+      "code": "3250",
+      "name": "Light Turquoise",
+      "hex": "#32a2ad",
+      "sku": "YS.DK.3250"
+    },
+    {
+      "code": "3251",
+      "name": "Steel Blue",
+      "hex": "#577c7d",
+      "sku": "YS.DK.3251"
+    },
+    {
+      "code": "3252",
+      "name": "Fjord Blue",
+      "hex": "#38515a",
+      "sku": "YS.DK.3252"
+    },
+    {
+      "code": "3254",
+      "name": "Robin Egg",
+      "hex": "#8fbcab",
+      "sku": "YS.DK.3254"
+    },
+    {
+      "code": "3256",
+      "name": "Duck Egg",
+      "hex": "#a9c0b2",
+      "sku": "YS.DK.3256"
+    },
+    {
+      "code": "3258",
+      "name": "Glacier Blue",
+      "hex": "#9fcbc5",
+      "sku": "YS.DK.3258"
+    },
+    {
+      "code": "3260",
+      "name": "Sky Blue",
+      "hex": "#b6c9ce",
+      "sku": "YS.DK.3260"
+    },
+    {
+      "code": "3262",
+      "name": "Powder Blue",
+      "hex": "#a4c3cc",
+      "sku": "YS.DK.3262"
+    },
+    {
+      "code": "3266",
+      "name": "Hydrangea Blue",
+      "hex": "#8bafcf",
+      "sku": "YS.DK.3266"
+    },
+    {
+      "code": "3270",
+      "name": "Cornflower Blue",
+      "hex": "#446d99",
+      "sku": "YS.DK.3270"
+    },
+    {
+      "code": "3274",
+      "name": "Strong Blue",
+      "hex": "#295693",
+      "sku": "YS.DK.3274"
+    },
+    {
+      "code": "3276",
+      "name": "Ultramarine Blue",
+      "hex": "#466f81",
+      "sku": "YS.DK.3276"
+    },
+    {
+      "code": "3280",
+      "name": "Denim Blue",
+      "hex": "#7d8496",
+      "sku": "YS.DK.3280"
+    },
+    {
+      "code": "3285",
+      "name": "Delft Blue",
+      "hex": "#465a72",
+      "sku": "YS.DK.3285"
+    },
+    {
+      "code": "3290",
+      "name": "Deep Denim Blue",
+      "hex": "#222936",
+      "sku": "YS.DK.3290"
+    },
+    {
+      "code": "3300",
+      "name": "Royal Blue",
+      "hex": "#13204e",
+      "sku": "YS.DK.3300"
+    },
+    {
+      "code": "3305",
+      "name": "Sapphire Blue",
+      "hex": "#233d74",
+      "sku": "YS.DK.3305"
+    },
+    {
+      "code": "3310",
+      "name": "Navy Blue",
+      "hex": "#171b29",
+      "sku": "YS.DK.3310"
+    },
+    {
+      "code": "3315",
+      "name": "Vibrant Violet",
+      "hex": "#361362",
+      "sku": "YS.DK.3315"
+    },
+    {
+      "code": "3320",
+      "name": "Deep Purple",
+      "hex": "#280f31",
+      "sku": "YS.DK.3320"
+    },
+    {
+      "code": "3322",
+      "name": "Amethyst",
+      "hex": "#654276",
+      "sku": "YS.DK.3322"
+    },
+    {
+      "code": "3324",
+      "name": "Just Purple",
+      "hex": "#5d0d67",
+      "sku": "YS.DK.3324"
+    },
+    {
+      "code": "3326",
+      "name": "Purple Orchid",
+      "hex": "#7c2488",
+      "sku": "YS.DK.3326"
+    },
+    {
+      "code": "3330",
+      "name": "Plum Purple",
+      "hex": "#40182f",
+      "sku": "YS.DK.3330"
+    },
+    {
+      "code": "3335",
+      "name": "Sugar Plum",
+      "hex": "#91597b",
+      "sku": "YS.DK.3335"
+    },
+    {
+      "code": "3340",
+      "name": "Pale Lilac",
+      "hex": "#d1bccf",
+      "sku": "YS.DK.3340"
+    },
+    {
+      "code": "3350",
+      "name": "Lilac",
+      "hex": "#906f9a",
+      "sku": "YS.DK.3350"
+    },
+    {
+      "code": "3354",
+      "name": "Grape Juice",
+      "hex": "#6b5566",
+      "sku": "YS.DK.3354"
+    },
+    {
+      "code": "3356",
+      "name": "Dark Lavender",
+      "hex": "#6b5983",
+      "sku": "YS.DK.3356"
+    },
+    {
+      "code": "3360",
+      "name": "Lavender",
+      "hex": "#65679d",
+      "sku": "YS.DK.3360"
+    },
+    {
+      "code": "3362",
+      "name": "Bluebell",
+      "hex": "#767cbb",
+      "sku": "YS.DK.3362"
+    },
+    {
+      "code": "3364",
+      "name": "Petal Pink",
+      "hex": "#de94b2",
+      "sku": "YS.DK.3364"
+    },
+    {
+      "code": "3366",
+      "name": "Magenta",
+      "hex": "#9f0978",
+      "sku": "YS.DK.3366"
+    },
+    {
+      "code": "3368",
+      "name": "Bright Pink",
+      "hex": "#c21369",
+      "sku": "YS.DK.3368"
+    },
+    {
+      "code": "3370",
+      "name": "Fuchsia Pink",
+      "hex": "#9d0d4c",
+      "sku": "YS.DK.3370"
+    },
+    {
+      "code": "3372",
+      "name": "Fandango Pink",
+      "hex": "#d03953",
+      "sku": "YS.DK.3372"
+    },
+    {
+      "code": "3374",
+      "name": "Pinkberry",
+      "hex": "#a3245b",
+      "sku": "YS.DK.3374"
+    },
+    {
+      "code": "3376",
+      "name": "Vintage Pink",
+      "hex": "#9b3b55",
+      "sku": "YS.DK.3376"
+    },
+    {
+      "code": "3380",
+      "name": "Rose Pink",
+      "hex": "#9c525b",
+      "sku": "YS.DK.3380"
+    },
+    {
+      "code": "3385",
+      "name": "Bubblegum",
+      "hex": "#e95f96",
+      "sku": "YS.DK.3385"
+    },
+    {
+      "code": "3390",
+      "name": "Fondant Pink",
+      "hex": "#da798f",
+      "sku": "YS.DK.3390"
+    },
+    {
+      "code": "3400",
+      "name": "Candyfloss Pink",
+      "hex": "#ef9bc7",
+      "sku": "YS.DK.3400"
+    },
+    {
+      "code": "3410",
+      "name": "Light Pink",
+      "hex": "#f5cace",
+      "sku": "YS.DK.3410"
+    },
+    {
+      "code": "3420",
+      "name": "Peachy Pink",
+      "hex": "#ecbeae",
+      "sku": "YS.DK.3420"
+    },
+    {
+      "code": "3422",
+      "name": "Peach",
+      "hex": "#fbbf9f",
+      "sku": "YS.DK.3422"
+    },
+    {
+      "code": "3426",
+      "name": "Dusky Peach",
+      "hex": "#cd7e60",
+      "sku": "YS.DK.3426"
+    },
+    {
+      "code": "3428",
+      "name": "Vintage Peach",
+      "hex": "#a04742",
+      "sku": "YS.DK.3428"
+    }
+  ]
+}

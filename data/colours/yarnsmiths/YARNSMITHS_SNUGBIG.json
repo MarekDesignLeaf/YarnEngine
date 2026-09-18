@@ -1,0 +1,312 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SNUGBIG",
+  "brand": "Yarnsmiths",
+  "product": "Snug as a Bug BIG",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-snug-as-a-bug-big-300g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2B010",
+      "name": "Black",
+      "hex": "#080808",
+      "sku": "YS.SNUGBIG.2B010"
+    },
+    {
+      "code": "2B020",
+      "name": "Storm Grey",
+      "hex": "#2d3230",
+      "sku": "YS.SNUGBIG.2B020"
+    },
+    {
+      "code": "2B030",
+      "name": "Warm Grey",
+      "hex": "#828278",
+      "sku": "YS.SNUGBIG.2B030"
+    },
+    {
+      "code": "2B040",
+      "name": "Soft Grey",
+      "hex": "#a8a8b4",
+      "sku": "YS.SNUGBIG.2B040"
+    },
+    {
+      "code": "2B050",
+      "name": "Snow White",
+      "hex": "#e8ebf0",
+      "sku": "YS.SNUGBIG.2B050"
+    },
+    {
+      "code": "2B060",
+      "name": "Teddy Bear",
+      "hex": "#644436",
+      "sku": "YS.SNUGBIG.2B060"
+    },
+    {
+      "code": "2B070",
+      "name": "Cookie",
+      "hex": "#887863",
+      "sku": "YS.SNUGBIG.2B070"
+    },
+    {
+      "code": "2B080",
+      "name": "Oatmilk",
+      "hex": "#c7b8a0",
+      "sku": "YS.SNUGBIG.2B080"
+    },
+    {
+      "code": "2B090",
+      "name": "Duckling",
+      "hex": "#deca7a",
+      "sku": "YS.SNUGBIG.2B090"
+    },
+    {
+      "code": "2B100",
+      "name": "Porcelain",
+      "hex": "#ede9e6",
+      "sku": "YS.SNUGBIG.2B100"
+    },
+    {
+      "code": "2B101",
+      "name": "Blush",
+      "hex": "#e5c1b0",
+      "sku": "YS.SNUGBIG.2B101"
+    },
+    {
+      "code": "2B102",
+      "name": "Sandy Camel",
+      "hex": "#856f4d",
+      "sku": "YS.SNUGBIG.2B102"
+    },
+    {
+      "code": "2B103",
+      "name": "Elephant Grey",
+      "hex": "#a5a19e",
+      "sku": "YS.SNUGBIG.2B103"
+    },
+    {
+      "code": "2B104",
+      "name": "Hint of Grey",
+      "hex": "#caccd6",
+      "sku": "YS.SNUGBIG.2B104"
+    },
+    {
+      "code": "2B105",
+      "name": "Clotted Cream",
+      "hex": "#dfdec9",
+      "sku": "YS.SNUGBIG.2B105"
+    },
+    {
+      "code": "2B110",
+      "name": "Soft Sage",
+      "hex": "#4a837b",
+      "sku": "YS.SNUGBIG.2B110"
+    },
+    {
+      "code": "2B120",
+      "name": "Seaglass",
+      "hex": "#84b4b1",
+      "sku": "YS.SNUGBIG.2B120"
+    },
+    {
+      "code": "2B130",
+      "name": "Lagoon",
+      "hex": "#387b90",
+      "sku": "YS.SNUGBIG.2B130"
+    },
+    {
+      "code": "2B140",
+      "name": "Baby Blue",
+      "hex": "#86aed5",
+      "sku": "YS.SNUGBIG.2B140"
+    },
+    {
+      "code": "2B150",
+      "name": "Nautical",
+      "hex": "#202d4d",
+      "sku": "YS.SNUGBIG.2B150"
+    },
+    {
+      "code": "2B160",
+      "name": "Petal Purple",
+      "hex": "#9d55b5",
+      "sku": "YS.SNUGBIG.2B160"
+    },
+    {
+      "code": "2B170",
+      "name": "Grape",
+      "hex": "#846991",
+      "sku": "YS.SNUGBIG.2B170"
+    },
+    {
+      "code": "2B180",
+      "name": "Feisty Fuchsia",
+      "hex": "#d22963",
+      "sku": "YS.SNUGBIG.2B180"
+    },
+    {
+      "code": "2B190",
+      "name": "Baby Pink",
+      "hex": "#e09cbd",
+      "sku": "YS.SNUGBIG.2B190"
+    },
+    {
+      "code": "2B200",
+      "name": "Piglet",
+      "hex": "#d7b2b9",
+      "sku": "YS.SNUGBIG.2B200"
+    },
+    {
+      "code": "2B210",
+      "name": "Sangria",
+      "hex": "#62081d",
+      "sku": "YS.SNUGBIG.2B210"
+    },
+    {
+      "code": "2B220",
+      "name": "Goldfish",
+      "hex": "#c62e19",
+      "sku": "YS.SNUGBIG.2B220"
+    },
+    {
+      "code": "2B230",
+      "name": "Sunshine",
+      "hex": "#b4941f",
+      "sku": "YS.SNUGBIG.2B230"
+    },
+    {
+      "code": "2B240",
+      "name": "Monster Green",
+      "hex": "#435123",
+      "sku": "YS.SNUGBIG.2B240"
+    },
+    {
+      "code": "2B250",
+      "name": "Delphinium Blue",
+      "hex": "#3f69b9",
+      "sku": "YS.SNUGBIG.2B250"
+    },
+    {
+      "code": "2B260",
+      "name": "Fire Engine",
+      "hex": "#9f0312",
+      "sku": "YS.SNUGBIG.2B260"
+    },
+    {
+      "code": "2B270",
+      "name": "Tangerine",
+      "hex": "#ed5216",
+      "sku": "YS.SNUGBIG.2B270"
+    },
+    {
+      "code": "2B280",
+      "name": "Banana",
+      "hex": "#ebc238",
+      "sku": "YS.SNUGBIG.2B280"
+    },
+    {
+      "code": "2B290",
+      "name": "Shamrock",
+      "hex": "#287948",
+      "sku": "YS.SNUGBIG.2B290"
+    },
+    {
+      "code": "2B300",
+      "name": "Island Blue",
+      "hex": "#2e73c2",
+      "sku": "YS.SNUGBIG.2B300"
+    },
+    {
+      "code": "2B310",
+      "name": "Flamingo Pink",
+      "hex": "#d83d63",
+      "sku": "YS.SNUGBIG.2B310"
+    },
+    {
+      "code": "2B320",
+      "name": "Lush Lime",
+      "hex": "#7ea530",
+      "sku": "YS.SNUGBIG.2B320"
+    },
+    {
+      "code": "2B330",
+      "name": "Purple Power",
+      "hex": "#4a2360",
+      "sku": "YS.SNUGBIG.2B330"
+    },
+    {
+      "code": "2Y010",
+      "name": "City Fog",
+      "hex": "#c0c4c2",
+      "sku": "YS.SNUGBIG.2Y010"
+    },
+    {
+      "code": "2Y020",
+      "name": "Raspberry Ripple",
+      "hex": "#dab7cc",
+      "sku": "YS.SNUGBIG.2Y020"
+    },
+    {
+      "code": "2Y030",
+      "name": "Ocean Dreams",
+      "hex": "#5b77a6",
+      "sku": "YS.SNUGBIG.2Y030"
+    },
+    {
+      "code": "2Y060",
+      "name": "Forest Floor",
+      "hex": "#6b96a3",
+      "sku": "YS.SNUGBIG.2Y060"
+    },
+    {
+      "code": "2Y070",
+      "name": "Unicorn Sunset",
+      "hex": "#c78c7e",
+      "sku": "YS.SNUGBIG.2Y070"
+    },
+    {
+      "code": "2Y080",
+      "name": "Sand Dunes",
+      "hex": "#bdbebc",
+      "sku": "YS.SNUGBIG.2Y080"
+    },
+    {
+      "code": "2Y110",
+      "name": "Frothy Coffee",
+      "hex": "#d4d3cd",
+      "sku": "YS.SNUGBIG.2Y110"
+    },
+    {
+      "code": "2Y510",
+      "name": "Calming Clouds",
+      "hex": "#d1b5cb",
+      "sku": "YS.SNUGBIG.2Y510"
+    },
+    {
+      "code": "2Y520",
+      "name": "Pencil Case",
+      "hex": "#699c65",
+      "sku": "YS.SNUGBIG.2Y520"
+    },
+    {
+      "code": "2Y530",
+      "name": "Clowning Around",
+      "hex": "#49a985",
+      "sku": "YS.SNUGBIG.2Y530"
+    },
+    {
+      "code": "2Y610",
+      "name": "Minty Moon",
+      "hex": "#cfd7d8",
+      "sku": "YS.SNUGBIG.2Y610"
+    },
+    {
+      "code": "2Y620",
+      "name": "Inky Bloom",
+      "hex": "#9f97b7",
+      "sku": "YS.SNUGBIG.2Y620"
+    }
+  ]
+}

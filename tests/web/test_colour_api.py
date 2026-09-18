@@ -51,3 +51,24 @@ def test_a_design_without_a_colour_says_so_instead_of_guessing():
     d = c.post("/api/design/generate", json=SPEC).json()
     assert d["colour"] is None and d["colour_source"] == "not set"
     assert all(p["colour"] is None for p in d["parts"])
+
+
+def test_a_yarn_with_a_captured_card_offers_its_own_shades_first():
+    body = c.get("/api/colours", params={"yarn_id": "YARNSMITHS_DK"}).json()
+    own = [x for x in body["colours"] if x["yarn_specific"]]
+    assert body["yarn_specific_count"] == 120 == len(own)
+    # the maker's own card comes first, in the shade-code order it is printed in
+    assert [x["colour_id"] for x in body["colours"][:120]] == [x["colour_id"] for x in own]
+    assert [x["code"] for x in own] == sorted(x["code"] for x in own)
+    black = next(x for x in own if x["code"] == "3000")
+    assert black["name"] == "Black" and black["hex"] == "#080904"
+    # and the generic palette is still there behind it
+    assert any(x["colour_id"].startswith("PAL_") for x in body["colours"])
+
+
+def test_a_shade_from_the_makers_card_can_be_chosen_for_a_design():
+    d = c.post("/api/design/generate",
+               json={**SPEC, "colour_id": "YARNSMITHS_DK__3208"}).json()
+    assert d["colour"]["name"] == "Bottle Green"
+    assert d["colour"]["yarn_specific"] is True
+    assert all(p["colour"]["hex"] == d["colour"]["hex"] for p in d["parts"])

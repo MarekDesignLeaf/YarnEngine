@@ -1,0 +1,372 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_ARAN",
+  "brand": "Yarnsmiths",
+  "product": "Create Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "4000",
+      "name": "Black",
+      "hex": "#090907",
+      "sku": "YS.ARAN.4000"
+    },
+    {
+      "code": "4005",
+      "name": "Gunmetal Grey",
+      "hex": "#454e4d",
+      "sku": "YS.ARAN.4005"
+    },
+    {
+      "code": "4010",
+      "name": "Dark Grey Heather",
+      "hex": "#4b4f56",
+      "sku": "YS.ARAN.4010"
+    },
+    {
+      "code": "4020",
+      "name": "Light Grey Heather",
+      "hex": "#8c929b",
+      "sku": "YS.ARAN.4020"
+    },
+    {
+      "code": "4030",
+      "name": "Silver",
+      "hex": "#b4bab9",
+      "sku": "YS.ARAN.4030"
+    },
+    {
+      "code": "4035",
+      "name": "Pale Silver",
+      "hex": "#c2c9cc",
+      "sku": "YS.ARAN.4035"
+    },
+    {
+      "code": "4040",
+      "name": "White",
+      "hex": "#d9dde0",
+      "sku": "YS.ARAN.4040"
+    },
+    {
+      "code": "4045",
+      "name": "Off White",
+      "hex": "#d9dad7",
+      "sku": "YS.ARAN.4045"
+    },
+    {
+      "code": "4050",
+      "name": "Cream",
+      "hex": "#d9dacb",
+      "sku": "YS.ARAN.4050"
+    },
+    {
+      "code": "4060",
+      "name": "Parchment",
+      "hex": "#beb19f",
+      "sku": "YS.ARAN.4060"
+    },
+    {
+      "code": "4061",
+      "name": "Linen",
+      "hex": "#bbbbac",
+      "sku": "YS.ARAN.4061"
+    },
+    {
+      "code": "4063",
+      "name": "Champagne",
+      "hex": "#d0bda5",
+      "sku": "YS.ARAN.4063"
+    },
+    {
+      "code": "4064",
+      "name": "Oatmeal",
+      "hex": "#c2b2a3",
+      "sku": "YS.ARAN.4064"
+    },
+    {
+      "code": "4067",
+      "name": "Vanilla Fudge",
+      "hex": "#ab8f5c",
+      "sku": "YS.ARAN.4067"
+    },
+    {
+      "code": "4069",
+      "name": "Latte",
+      "hex": "#857261",
+      "sku": "YS.ARAN.4069"
+    },
+    {
+      "code": "4070",
+      "name": "Brown Bear",
+      "hex": "#635a4b",
+      "sku": "YS.ARAN.4070"
+    },
+    {
+      "code": "4074",
+      "name": "Rust",
+      "hex": "#694620",
+      "sku": "YS.ARAN.4074"
+    },
+    {
+      "code": "4076",
+      "name": "Copper",
+      "hex": "#6f2e1a",
+      "sku": "YS.ARAN.4076"
+    },
+    {
+      "code": "4080",
+      "name": "Chocolate Brown",
+      "hex": "#1f1710",
+      "sku": "YS.ARAN.4080"
+    },
+    {
+      "code": "4090",
+      "name": "Claret Red",
+      "hex": "#650921",
+      "sku": "YS.ARAN.4090"
+    },
+    {
+      "code": "4100",
+      "name": "Scarlet Red",
+      "hex": "#76060f",
+      "sku": "YS.ARAN.4100"
+    },
+    {
+      "code": "4110",
+      "name": "Bright Red",
+      "hex": "#af0508",
+      "sku": "YS.ARAN.4110"
+    },
+    {
+      "code": "4120",
+      "name": "Burnt Orange",
+      "hex": "#a63018",
+      "sku": "YS.ARAN.4120"
+    },
+    {
+      "code": "4124",
+      "name": "Ginger",
+      "hex": "#914011",
+      "sku": "YS.ARAN.4124"
+    },
+    {
+      "code": "4126",
+      "name": "Carrot",
+      "hex": "#be420e",
+      "sku": "YS.ARAN.4126"
+    },
+    {
+      "code": "4140",
+      "name": "Mustard Yellow",
+      "hex": "#d29c22",
+      "sku": "YS.ARAN.4140"
+    },
+    {
+      "code": "4145",
+      "name": "Antique Gold",
+      "hex": "#ba8127",
+      "sku": "YS.ARAN.4145"
+    },
+    {
+      "code": "4166",
+      "name": "Canary Yellow",
+      "hex": "#e0c962",
+      "sku": "YS.ARAN.4166"
+    },
+    {
+      "code": "4180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#e5e0b6",
+      "sku": "YS.ARAN.4180"
+    },
+    {
+      "code": "4185",
+      "name": "Light Sage",
+      "hex": "#85a686",
+      "sku": "YS.ARAN.4185"
+    },
+    {
+      "code": "4186",
+      "name": "Celery",
+      "hex": "#b1b56b",
+      "sku": "YS.ARAN.4186"
+    },
+    {
+      "code": "4188",
+      "name": "Apple Green",
+      "hex": "#748d1e",
+      "sku": "YS.ARAN.4188"
+    },
+    {
+      "code": "4200",
+      "name": "Grass Green",
+      "hex": "#5a8b41",
+      "sku": "YS.ARAN.4200"
+    },
+    {
+      "code": "4202",
+      "name": "Dark Sage",
+      "hex": "#4e7052",
+      "sku": "YS.ARAN.4202"
+    },
+    {
+      "code": "4204",
+      "name": "Country Green",
+      "hex": "#394326",
+      "sku": "YS.ARAN.4204"
+    },
+    {
+      "code": "4210",
+      "name": "Christmas Green",
+      "hex": "#064c30",
+      "sku": "YS.ARAN.4210"
+    },
+    {
+      "code": "4220",
+      "name": "Opal Green",
+      "hex": "#0e745e",
+      "sku": "YS.ARAN.4220"
+    },
+    {
+      "code": "4228",
+      "name": "Vintage Teal",
+      "hex": "#48979f",
+      "sku": "YS.ARAN.4228"
+    },
+    {
+      "code": "4230",
+      "name": "Teal",
+      "hex": "#087280",
+      "sku": "YS.ARAN.4230"
+    },
+    {
+      "code": "4240",
+      "name": "Dark Turquoise",
+      "hex": "#1168a7",
+      "sku": "YS.ARAN.4240"
+    },
+    {
+      "code": "4256",
+      "name": "Duck Egg",
+      "hex": "#99b7b9",
+      "sku": "YS.ARAN.4256"
+    },
+    {
+      "code": "4266",
+      "name": "Hydrangea Blue",
+      "hex": "#73a0cf",
+      "sku": "YS.ARAN.4266"
+    },
+    {
+      "code": "4270",
+      "name": "Cornflower Blue",
+      "hex": "#5586c3",
+      "sku": "YS.ARAN.4270"
+    },
+    {
+      "code": "4274",
+      "name": "Strong Blue",
+      "hex": "#2256a5",
+      "sku": "YS.ARAN.4274"
+    },
+    {
+      "code": "4280",
+      "name": "Denim Blue",
+      "hex": "#546285",
+      "sku": "YS.ARAN.4280"
+    },
+    {
+      "code": "4300",
+      "name": "Royal Blue",
+      "hex": "#17276b",
+      "sku": "YS.ARAN.4300"
+    },
+    {
+      "code": "4310",
+      "name": "Navy Blue",
+      "hex": "#15162b",
+      "sku": "YS.ARAN.4310"
+    },
+    {
+      "code": "4326",
+      "name": "Purple Orchid",
+      "hex": "#6b258a",
+      "sku": "YS.ARAN.4326"
+    },
+    {
+      "code": "4330",
+      "name": "Plum Purple",
+      "hex": "#50224b",
+      "sku": "YS.ARAN.4330"
+    },
+    {
+      "code": "4335",
+      "name": "Sugar Plum",
+      "hex": "#784a7a",
+      "sku": "YS.ARAN.4335"
+    },
+    {
+      "code": "4340",
+      "name": "Pale Lilac",
+      "hex": "#cdbed8",
+      "sku": "YS.ARAN.4340"
+    },
+    {
+      "code": "4350",
+      "name": "Lilac",
+      "hex": "#917dbb",
+      "sku": "YS.ARAN.4350"
+    },
+    {
+      "code": "4354",
+      "name": "Grape Juice",
+      "hex": "#625470",
+      "sku": "YS.ARAN.4354"
+    },
+    {
+      "code": "4360",
+      "name": "Lavender",
+      "hex": "#6a6ba8",
+      "sku": "YS.ARAN.4360"
+    },
+    {
+      "code": "4364",
+      "name": "Petal Pink",
+      "hex": "#cd81b6",
+      "sku": "YS.ARAN.4364"
+    },
+    {
+      "code": "4374",
+      "name": "Pinkberry",
+      "hex": "#92245c",
+      "sku": "YS.ARAN.4374"
+    },
+    {
+      "code": "4380",
+      "name": "Rose Pink",
+      "hex": "#b6708a",
+      "sku": "YS.ARAN.4380"
+    },
+    {
+      "code": "4410",
+      "name": "Light Pink",
+      "hex": "#eec9db",
+      "sku": "YS.ARAN.4410"
+    },
+    {
+      "code": "4426",
+      "name": "Dusky Peach",
+      "hex": "#c57d68",
+      "sku": "YS.ARAN.4426"
+    },
+    {
+      "code": "4428",
+      "name": "Vintage Peach",
+      "hex": "#985250",
+      "sku": "YS.ARAN.4428"
+    }
+  ]
+}

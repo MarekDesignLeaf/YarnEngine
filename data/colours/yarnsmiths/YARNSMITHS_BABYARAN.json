@@ -1,0 +1,54 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BABYARAN",
+  "brand": "Yarnsmiths",
+  "product": "Create Baby Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-baby-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "AR05",
+      "name": "Baby White",
+      "hex": "#e5e1d4",
+      "sku": "YS.BABYARAN.AR05"
+    },
+    {
+      "code": "AR10",
+      "name": "Baby Cream",
+      "hex": "#e4dbba",
+      "sku": "YS.BABYARAN.AR10"
+    },
+    {
+      "code": "AR20",
+      "name": "Baby Silver",
+      "hex": "#cecac5",
+      "sku": "YS.BABYARAN.AR20"
+    },
+    {
+      "code": "AR30",
+      "name": "Soft Pink",
+      "hex": "#f9d3c8",
+      "sku": "YS.BABYARAN.AR30"
+    },
+    {
+      "code": "AR35",
+      "name": "Baby Pink",
+      "hex": "#f6cacf",
+      "sku": "YS.BABYARAN.AR35"
+    },
+    {
+      "code": "AR50",
+      "name": "Baby Blue",
+      "hex": "#b4ccd8",
+      "sku": "YS.BABYARAN.AR50"
+    },
+    {
+      "code": "AR60",
+      "name": "Baby Mint",
+      "hex": "#d0deca",
+      "sku": "YS.BABYARAN.AR60"
+    }
+  ]
+}

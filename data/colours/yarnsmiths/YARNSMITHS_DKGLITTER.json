@@ -1,0 +1,36 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_DKGLITTER",
+  "brand": "Yarnsmiths",
+  "product": "Create DK Glitter",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-dk-glitter-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "G3030",
+      "name": "Silver",
+      "hex": "#9e9e96",
+      "sku": "YS.DKGLITTER.G3030"
+    },
+    {
+      "code": "G3040",
+      "name": "White",
+      "hex": "#e4dcd6",
+      "sku": "YS.DKGLITTER.G3040"
+    },
+    {
+      "code": "G3100",
+      "name": "Red",
+      "hex": "#6f0407",
+      "sku": "YS.DKGLITTER.G3100"
+    },
+    {
+      "code": "G3210",
+      "name": "Green",
+      "hex": "#0a3c24",
+      "sku": "YS.DKGLITTER.G3210"
+    }
+  ]
+}

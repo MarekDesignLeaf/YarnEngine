@@ -1,0 +1,204 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_LAGOONDK",
+  "brand": "Yarnsmiths",
+  "product": "Lagoon DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-lagoon-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2J010",
+      "name": "Venetian Lagoon",
+      "hex": "#756750",
+      "sku": "YS.LAGOONDK.2J010"
+    },
+    {
+      "code": "2J020",
+      "name": "Chuuk Lagoon",
+      "hex": "#7b3b1d",
+      "sku": "YS.LAGOONDK.2J020"
+    },
+    {
+      "code": "2J030",
+      "name": "Diamond Lagoon",
+      "hex": "#4e5048",
+      "sku": "YS.LAGOONDK.2J030"
+    },
+    {
+      "code": "2J040",
+      "name": "Marovo Lagoon",
+      "hex": "#212923",
+      "sku": "YS.LAGOONDK.2J040"
+    },
+    {
+      "code": "2J050",
+      "name": "Kasegaluk Lagoon",
+      "hex": "#5b6a74",
+      "sku": "YS.LAGOONDK.2J050"
+    },
+    {
+      "code": "2J060",
+      "name": "Kaldalon Lagoon",
+      "hex": "#424e4f",
+      "sku": "YS.LAGOONDK.2J060"
+    },
+    {
+      "code": "2J070",
+      "name": "Giola Lagoon",
+      "hex": "#5e1d2e",
+      "sku": "YS.LAGOONDK.2J070"
+    },
+    {
+      "code": "2J080",
+      "name": "Marano Grado",
+      "hex": "#393c3a",
+      "sku": "YS.LAGOONDK.2J080"
+    },
+    {
+      "code": "2J090",
+      "name": "Nanuya Levu",
+      "hex": "#386039",
+      "sku": "YS.LAGOONDK.2J090"
+    },
+    {
+      "code": "2J100",
+      "name": "Milnerton Lagoon",
+      "hex": "#6f625f",
+      "sku": "YS.LAGOONDK.2J100"
+    },
+    {
+      "code": "2J110",
+      "name": "Balos Lagoon",
+      "hex": "#2c2942",
+      "sku": "YS.LAGOONDK.2J110"
+    },
+    {
+      "code": "2J120",
+      "name": "Blue Lagoon",
+      "hex": "#3a6465",
+      "sku": "YS.LAGOONDK.2J120"
+    },
+    {
+      "code": "2J130",
+      "name": "Laguna Colorada",
+      "hex": "#744129",
+      "sku": "YS.LAGOONDK.2J130"
+    },
+    {
+      "code": "2J140",
+      "name": "Camino Lagoon",
+      "hex": "#64424b",
+      "sku": "YS.LAGOONDK.2J140"
+    },
+    {
+      "code": "2J150",
+      "name": "Pileh Lagoon",
+      "hex": "#392f22",
+      "sku": "YS.LAGOONDK.2J150"
+    },
+    {
+      "code": "2J160",
+      "name": "Morning Shadow",
+      "hex": "#5d5764",
+      "sku": "YS.LAGOONDK.2J160"
+    },
+    {
+      "code": "2J170",
+      "name": "Freshwater Lagoon",
+      "hex": "#5b5754",
+      "sku": "YS.LAGOONDK.2J170"
+    },
+    {
+      "code": "2J180",
+      "name": "Algae",
+      "hex": "#4f2d31",
+      "sku": "YS.LAGOONDK.2J180"
+    },
+    {
+      "code": "2J190",
+      "name": "Autumn Sunset",
+      "hex": "#592a1f",
+      "sku": "YS.LAGOONDK.2J190"
+    },
+    {
+      "code": "2J200",
+      "name": "Cold Water lagoon",
+      "hex": "#1f3d46",
+      "sku": "YS.LAGOONDK.2J200"
+    },
+    {
+      "code": "2J210",
+      "name": "Hazy Day",
+      "hex": "#5c3448",
+      "sku": "YS.LAGOONDK.2J210"
+    },
+    {
+      "code": "2J220",
+      "name": "Lily Pond",
+      "hex": "#763e3d",
+      "sku": "YS.LAGOONDK.2J220"
+    },
+    {
+      "code": "2J230",
+      "name": "Double Rainbow",
+      "hex": "#3c3129",
+      "sku": "YS.LAGOONDK.2J230"
+    },
+    {
+      "code": "2J240",
+      "name": "Cool Morning",
+      "hex": "#4c413a",
+      "sku": "YS.LAGOONDK.2J240"
+    },
+    {
+      "code": "2J250",
+      "name": "Foggy Heights",
+      "hex": "#443632",
+      "sku": "YS.LAGOONDK.2J250"
+    },
+    {
+      "code": "2J260",
+      "name": "Pink Salt Lake",
+      "hex": "#bf949f",
+      "sku": "YS.LAGOONDK.2J260"
+    },
+    {
+      "code": "2J270",
+      "name": "Whirlpool",
+      "hex": "#a5b3b4",
+      "sku": "YS.LAGOONDK.2J270"
+    },
+    {
+      "code": "2J280",
+      "name": "Golden Hour",
+      "hex": "#ac7769",
+      "sku": "YS.LAGOONDK.2J280"
+    },
+    {
+      "code": "2J290",
+      "name": "Rock Pool",
+      "hex": "#6d737a",
+      "sku": "YS.LAGOONDK.2J290"
+    },
+    {
+      "code": "2J300",
+      "name": "Sand Dune",
+      "hex": "#8e5b4b",
+      "sku": "YS.LAGOONDK.2J300"
+    },
+    {
+      "code": "2J310",
+      "name": "Morning Mist",
+      "hex": "#352029",
+      "sku": "YS.LAGOONDK.2J310"
+    },
+    {
+      "code": "2J320",
+      "name": "Evening Mist",
+      "hex": "#917f8d",
+      "sku": "YS.LAGOONDK.2J320"
+    }
+  ]
+}

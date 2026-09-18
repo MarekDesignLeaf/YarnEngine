@@ -1,0 +1,162 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SSOFTDK",
+  "brand": "Yarnsmiths",
+  "product": "SnuggleSoft DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-snugglesoft-dk-50g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3A000",
+      "name": "Black",
+      "hex": "#0a0a0a",
+      "sku": "YS.SSOFTDK.3A000"
+    },
+    {
+      "code": "3A016",
+      "name": "Baby Elephant",
+      "hex": "#8b9396",
+      "sku": "YS.SSOFTDK.3A016"
+    },
+    {
+      "code": "3A030",
+      "name": "Cloud",
+      "hex": "#a9aeb2",
+      "sku": "YS.SSOFTDK.3A030"
+    },
+    {
+      "code": "3A035",
+      "name": "Baby Silver",
+      "hex": "#b6babb",
+      "sku": "YS.SSOFTDK.3A035"
+    },
+    {
+      "code": "3A040",
+      "name": "White",
+      "hex": "#e3e4e0",
+      "sku": "YS.SSOFTDK.3A040"
+    },
+    {
+      "code": "3A050",
+      "name": "Cream",
+      "hex": "#d2d0bd",
+      "sku": "YS.SSOFTDK.3A050"
+    },
+    {
+      "code": "3A064",
+      "name": "Biscuit",
+      "hex": "#b4ad9f",
+      "sku": "YS.SSOFTDK.3A064"
+    },
+    {
+      "code": "3A070",
+      "name": "Teddy Bear",
+      "hex": "#61554a",
+      "sku": "YS.SSOFTDK.3A070"
+    },
+    {
+      "code": "3A100",
+      "name": "Scarlet",
+      "hex": "#6a0612",
+      "sku": "YS.SSOFTDK.3A100"
+    },
+    {
+      "code": "3A120",
+      "name": "Pumpkin",
+      "hex": "#8b2d16",
+      "sku": "YS.SSOFTDK.3A120"
+    },
+    {
+      "code": "3A142",
+      "name": "Golden Sun",
+      "hex": "#b3821d",
+      "sku": "YS.SSOFTDK.3A142"
+    },
+    {
+      "code": "3A170",
+      "name": "Duckling",
+      "hex": "#dec46f",
+      "sku": "YS.SSOFTDK.3A170"
+    },
+    {
+      "code": "3A182",
+      "name": "Mint",
+      "hex": "#8aa48f",
+      "sku": "YS.SSOFTDK.3A182"
+    },
+    {
+      "code": "3A186",
+      "name": "Spring Meadow",
+      "hex": "#767843",
+      "sku": "YS.SSOFTDK.3A186"
+    },
+    {
+      "code": "3A202",
+      "name": "Sage",
+      "hex": "#506b57",
+      "sku": "YS.SSOFTDK.3A202"
+    },
+    {
+      "code": "3A228",
+      "name": "Teal Mist",
+      "hex": "#437f8a",
+      "sku": "YS.SSOFTDK.3A228"
+    },
+    {
+      "code": "3A256",
+      "name": "Duck Egg",
+      "hex": "#95aaa8",
+      "sku": "YS.SSOFTDK.3A256"
+    },
+    {
+      "code": "3A260",
+      "name": "Baby Blue",
+      "hex": "#94b0c3",
+      "sku": "YS.SSOFTDK.3A260"
+    },
+    {
+      "code": "3A284",
+      "name": "Denim Dream",
+      "hex": "#405c79",
+      "sku": "YS.SSOFTDK.3A284"
+    },
+    {
+      "code": "3A308",
+      "name": "Classic Navy",
+      "hex": "#151d31",
+      "sku": "YS.SSOFTDK.3A308"
+    },
+    {
+      "code": "3A336",
+      "name": "Pastel Berry",
+      "hex": "#8f8190",
+      "sku": "YS.SSOFTDK.3A336"
+    },
+    {
+      "code": "3A350",
+      "name": "Lilac",
+      "hex": "#a4a5c0",
+      "sku": "YS.SSOFTDK.3A350"
+    },
+    {
+      "code": "3A376",
+      "name": "Pink Velvet",
+      "hex": "#7d455b",
+      "sku": "YS.SSOFTDK.3A376"
+    },
+    {
+      "code": "3A380",
+      "name": "Cherry Blossom",
+      "hex": "#ab818f",
+      "sku": "YS.SSOFTDK.3A380"
+    },
+    {
+      "code": "3A410",
+      "name": "Baby Pink",
+      "hex": "#ceb5b8",
+      "sku": "YS.SSOFTDK.3A410"
+    }
+  ]
+}

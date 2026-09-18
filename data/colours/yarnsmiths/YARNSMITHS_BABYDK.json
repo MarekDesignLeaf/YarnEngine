@@ -1,0 +1,90 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BABYDK",
+  "brand": "Yarnsmiths",
+  "product": "Create Baby DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-baby-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "DK05",
+      "name": "Baby White",
+      "hex": "#e8e3d3",
+      "sku": "YS.BABYDK.DK05"
+    },
+    {
+      "code": "DK10",
+      "name": "Baby Cream",
+      "hex": "#efe0b7",
+      "sku": "YS.BABYDK.DK10"
+    },
+    {
+      "code": "DK15",
+      "name": "Baby Lemon",
+      "hex": "#e4d29a",
+      "sku": "YS.BABYDK.DK15"
+    },
+    {
+      "code": "DK20",
+      "name": "Baby Silver",
+      "hex": "#d2cec8",
+      "sku": "YS.BABYDK.DK20"
+    },
+    {
+      "code": "DK25",
+      "name": "Baby Grey",
+      "hex": "#b4afa9",
+      "sku": "YS.BABYDK.DK25"
+    },
+    {
+      "code": "DK30",
+      "name": "Soft Pink",
+      "hex": "#efc7bd",
+      "sku": "YS.BABYDK.DK30"
+    },
+    {
+      "code": "DK35",
+      "name": "Baby Pink",
+      "hex": "#e1b9bb",
+      "sku": "YS.BABYDK.DK35"
+    },
+    {
+      "code": "DK40",
+      "name": "Baby Rose",
+      "hex": "#b56b76",
+      "sku": "YS.BABYDK.DK40"
+    },
+    {
+      "code": "DK45",
+      "name": "Soft Blue",
+      "hex": "#b6d8d3",
+      "sku": "YS.BABYDK.DK45"
+    },
+    {
+      "code": "DK50",
+      "name": "Baby Blue",
+      "hex": "#b5c9ce",
+      "sku": "YS.BABYDK.DK50"
+    },
+    {
+      "code": "DK55",
+      "name": "Baby Denim",
+      "hex": "#616779",
+      "sku": "YS.BABYDK.DK55"
+    },
+    {
+      "code": "DK60",
+      "name": "Baby Mint",
+      "hex": "#becab6",
+      "sku": "YS.BABYDK.DK60"
+    },
+    {
+      "code": "DK65",
+      "name": "Baby Lilac",
+      "hex": "#bea8b3",
+      "sku": "YS.BABYDK.DK65"
+    }
+  ]
+}

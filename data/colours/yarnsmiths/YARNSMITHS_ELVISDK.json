@@ -1,0 +1,24 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_ELVISDK",
+  "brand": "Yarnsmiths",
+  "product": "Elvis DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-elvis-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "1A003",
+      "name": "Sheldon",
+      "hex": "#82aa7f",
+      "sku": "YS.ELVISDK.1A003"
+    },
+    {
+      "code": "1A010",
+      "name": "Gary",
+      "hex": "#dab7a8",
+      "sku": "YS.ELVISDK.1A010"
+    }
+  ]
+}

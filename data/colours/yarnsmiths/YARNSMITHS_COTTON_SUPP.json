@@ -1,0 +1,222 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTTON_SUPP",
+  "brand": "Yarnsmiths",
+  "product": "Support Act - 100% Cotton",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-support-act-100-cotton-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2R000",
+      "name": "Black",
+      "hex": "#0d0d0d",
+      "sku": "YS.COTTON-SUPP.2R000"
+    },
+    {
+      "code": "2R005",
+      "name": "Gunmetal Grey",
+      "hex": "#3a4446",
+      "sku": "YS.COTTON-SUPP.2R005"
+    },
+    {
+      "code": "2R030",
+      "name": "Silver",
+      "hex": "#b1b6b4",
+      "sku": "YS.COTTON-SUPP.2R030"
+    },
+    {
+      "code": "2R040",
+      "name": "White",
+      "hex": "#dcdfe2",
+      "sku": "YS.COTTON-SUPP.2R040"
+    },
+    {
+      "code": "2R045",
+      "name": "Off White",
+      "hex": "#cdcfbf",
+      "sku": "YS.COTTON-SUPP.2R045"
+    },
+    {
+      "code": "2R060",
+      "name": "Parchment",
+      "hex": "#b3aeaa",
+      "sku": "YS.COTTON-SUPP.2R060"
+    },
+    {
+      "code": "2R063",
+      "name": "Champagne",
+      "hex": "#c8b79d",
+      "sku": "YS.COTTON-SUPP.2R063"
+    },
+    {
+      "code": "2R070",
+      "name": "Brown Bear",
+      "hex": "#554f47",
+      "sku": "YS.COTTON-SUPP.2R070"
+    },
+    {
+      "code": "2R074",
+      "name": "Rust",
+      "hex": "#653e27",
+      "sku": "YS.COTTON-SUPP.2R074"
+    },
+    {
+      "code": "2R090",
+      "name": "Claret Red",
+      "hex": "#590b1c",
+      "sku": "YS.COTTON-SUPP.2R090"
+    },
+    {
+      "code": "2R100",
+      "name": "Scarlet Red",
+      "hex": "#820b1e",
+      "sku": "YS.COTTON-SUPP.2R100"
+    },
+    {
+      "code": "2R126",
+      "name": "Carrot",
+      "hex": "#d23f1c",
+      "sku": "YS.COTTON-SUPP.2R126"
+    },
+    {
+      "code": "2R140",
+      "name": "Mustard Yellow",
+      "hex": "#aa7526",
+      "sku": "YS.COTTON-SUPP.2R140"
+    },
+    {
+      "code": "2R160",
+      "name": "Primrose Yellow",
+      "hex": "#ddb42d",
+      "sku": "YS.COTTON-SUPP.2R160"
+    },
+    {
+      "code": "2R180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#e3db9e",
+      "sku": "YS.COTTON-SUPP.2R180"
+    },
+    {
+      "code": "2R185",
+      "name": "Light Sage",
+      "hex": "#729a79",
+      "sku": "YS.COTTON-SUPP.2R185"
+    },
+    {
+      "code": "2R188",
+      "name": "Apple Green",
+      "hex": "#5f762d",
+      "sku": "YS.COTTON-SUPP.2R188"
+    },
+    {
+      "code": "2R202",
+      "name": "Dark Sage",
+      "hex": "#4d7156",
+      "sku": "YS.COTTON-SUPP.2R202"
+    },
+    {
+      "code": "2R204",
+      "name": "Country Green",
+      "hex": "#323821",
+      "sku": "YS.COTTON-SUPP.2R204"
+    },
+    {
+      "code": "2R210",
+      "name": "Christmas Green",
+      "hex": "#094230",
+      "sku": "YS.COTTON-SUPP.2R210"
+    },
+    {
+      "code": "2R224",
+      "name": "Aqua",
+      "hex": "#54b0b0",
+      "sku": "YS.COTTON-SUPP.2R224"
+    },
+    {
+      "code": "2R230",
+      "name": "Teal",
+      "hex": "#0d5661",
+      "sku": "YS.COTTON-SUPP.2R230"
+    },
+    {
+      "code": "2R251",
+      "name": "Steel Blue",
+      "hex": "#4b7586",
+      "sku": "YS.COTTON-SUPP.2R251"
+    },
+    {
+      "code": "2R256",
+      "name": "Duck Egg",
+      "hex": "#7a969a",
+      "sku": "YS.COTTON-SUPP.2R256"
+    },
+    {
+      "code": "2R262",
+      "name": "Powder Blue",
+      "hex": "#819fb6",
+      "sku": "YS.COTTON-SUPP.2R262"
+    },
+    {
+      "code": "2R274",
+      "name": "Strong Blue",
+      "hex": "#1e4e8e",
+      "sku": "YS.COTTON-SUPP.2R274"
+    },
+    {
+      "code": "2R290",
+      "name": "Deep Denim Blue",
+      "hex": "#14202e",
+      "sku": "YS.COTTON-SUPP.2R290"
+    },
+    {
+      "code": "2R322",
+      "name": "Amethyst",
+      "hex": "#423163",
+      "sku": "YS.COTTON-SUPP.2R322"
+    },
+    {
+      "code": "2R330",
+      "name": "Plum Purple",
+      "hex": "#38193e",
+      "sku": "YS.COTTON-SUPP.2R330"
+    },
+    {
+      "code": "2R335",
+      "name": "Sugar Plum",
+      "hex": "#664570",
+      "sku": "YS.COTTON-SUPP.2R335"
+    },
+    {
+      "code": "2R340",
+      "name": "Pale Lilac",
+      "hex": "#b1a7c3",
+      "sku": "YS.COTTON-SUPP.2R340"
+    },
+    {
+      "code": "2R364",
+      "name": "Petal Pink",
+      "hex": "#b0709b",
+      "sku": "YS.COTTON-SUPP.2R364"
+    },
+    {
+      "code": "2R374",
+      "name": "Pinkberry",
+      "hex": "#6c1448",
+      "sku": "YS.COTTON-SUPP.2R374"
+    },
+    {
+      "code": "2R410",
+      "name": "Light Pink",
+      "hex": "#ddbccd",
+      "sku": "YS.COTTON-SUPP.2R410"
+    },
+    {
+      "code": "2R420",
+      "name": "Peachy Pink",
+      "hex": "#ccbcbc",
+      "sku": "YS.COTTON-SUPP.2R420"
+    }
+  ]
+}

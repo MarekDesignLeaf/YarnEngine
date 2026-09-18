@@ -1,0 +1,1212 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_COTTONARAN",
+  "brand": "Yarnsmiths",
+  "product": "Cotton Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-cotton-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "4000",
+      "name": "Black",
+      "hex": "#080808",
+      "sku": "YS.COTTONARAN.4000"
+    },
+    {
+      "code": "4001",
+      "name": "Washed Black",
+      "hex": "#142021",
+      "sku": "YS.COTTONARAN.4001"
+    },
+    {
+      "code": "4002",
+      "name": "Anthracite Grey",
+      "hex": "#212826",
+      "sku": "YS.COTTONARAN.4002"
+    },
+    {
+      "code": "4004",
+      "name": "Slate Grey",
+      "hex": "#2f3c45",
+      "sku": "YS.COTTONARAN.4004"
+    },
+    {
+      "code": "4005",
+      "name": "Gunmetal Grey",
+      "hex": "#464b50",
+      "sku": "YS.COTTONARAN.4005"
+    },
+    {
+      "code": "4006",
+      "name": "Smoke Grey",
+      "hex": "#44504e",
+      "sku": "YS.COTTONARAN.4006"
+    },
+    {
+      "code": "4008",
+      "name": "Storm Grey",
+      "hex": "#4d5558",
+      "sku": "YS.COTTONARAN.4008"
+    },
+    {
+      "code": "4012",
+      "name": "Medium Grey",
+      "hex": "#5a666d",
+      "sku": "YS.COTTONARAN.4012"
+    },
+    {
+      "code": "4015",
+      "name": "Stone Grey",
+      "hex": "#8d8b81",
+      "sku": "YS.COTTONARAN.4015"
+    },
+    {
+      "code": "4018",
+      "name": "Light Grey",
+      "hex": "#949ba2",
+      "sku": "YS.COTTONARAN.4018"
+    },
+    {
+      "code": "4025",
+      "name": "Platinum Grey",
+      "hex": "#838a91",
+      "sku": "YS.COTTONARAN.4025"
+    },
+    {
+      "code": "4030",
+      "name": "Silver",
+      "hex": "#aeafb2",
+      "sku": "YS.COTTONARAN.4030"
+    },
+    {
+      "code": "4032",
+      "name": "Soft Silver",
+      "hex": "#c6c3b7",
+      "sku": "YS.COTTONARAN.4032"
+    },
+    {
+      "code": "4035",
+      "name": "Pale Silver",
+      "hex": "#c6cdcd",
+      "sku": "YS.COTTONARAN.4035"
+    },
+    {
+      "code": "4040",
+      "name": "White",
+      "hex": "#dddedd",
+      "sku": "YS.COTTONARAN.4040"
+    },
+    {
+      "code": "4042",
+      "name": "Ecru",
+      "hex": "#cfcfc8",
+      "sku": "YS.COTTONARAN.4042"
+    },
+    {
+      "code": "4045",
+      "name": "Off White",
+      "hex": "#e0e2d2",
+      "sku": "YS.COTTONARAN.4045"
+    },
+    {
+      "code": "4050",
+      "name": "Cream",
+      "hex": "#dae0d1",
+      "sku": "YS.COTTONARAN.4050"
+    },
+    {
+      "code": "4054",
+      "name": "Vanilla",
+      "hex": "#c4c4b3",
+      "sku": "YS.COTTONARAN.4054"
+    },
+    {
+      "code": "4056",
+      "name": "Almond Milk",
+      "hex": "#b9b6a1",
+      "sku": "YS.COTTONARAN.4056"
+    },
+    {
+      "code": "4060",
+      "name": "Parchment",
+      "hex": "#abaaa4",
+      "sku": "YS.COTTONARAN.4060"
+    },
+    {
+      "code": "4061",
+      "name": "Linen",
+      "hex": "#b1ac9a",
+      "sku": "YS.COTTONARAN.4061"
+    },
+    {
+      "code": "4062",
+      "name": "Blush",
+      "hex": "#d7ceba",
+      "sku": "YS.COTTONARAN.4062"
+    },
+    {
+      "code": "4063",
+      "name": "Champagne",
+      "hex": "#cfc4a5",
+      "sku": "YS.COTTONARAN.4063"
+    },
+    {
+      "code": "4064",
+      "name": "Oatmeal",
+      "hex": "#c7b3a6",
+      "sku": "YS.COTTONARAN.4064"
+    },
+    {
+      "code": "4065",
+      "name": "Warm Taupe",
+      "hex": "#a78e87",
+      "sku": "YS.COTTONARAN.4065"
+    },
+    {
+      "code": "4065B",
+      "name": "Cool Taupe",
+      "hex": "#a59492",
+      "sku": "YS.COTTONARAN.4065B"
+    },
+    {
+      "code": "4066",
+      "name": "Sand",
+      "hex": "#c4ab8c",
+      "sku": "YS.COTTONARAN.4066"
+    },
+    {
+      "code": "4067",
+      "name": "Vanilla Fudge",
+      "hex": "#bea069",
+      "sku": "YS.COTTONARAN.4067"
+    },
+    {
+      "code": "4068",
+      "name": "Caramel Fudge",
+      "hex": "#997854",
+      "sku": "YS.COTTONARAN.4068"
+    },
+    {
+      "code": "4068B",
+      "name": "Toffee Fudge",
+      "hex": "#b48b68",
+      "sku": "YS.COTTONARAN.4068B"
+    },
+    {
+      "code": "4068D",
+      "name": "Coffee Fudge",
+      "hex": "#816750",
+      "sku": "YS.COTTONARAN.4068D"
+    },
+    {
+      "code": "4068F",
+      "name": "Cuppa Tea",
+      "hex": "#93745e",
+      "sku": "YS.COTTONARAN.4068F"
+    },
+    {
+      "code": "4069",
+      "name": "Latte",
+      "hex": "#6f6051",
+      "sku": "YS.COTTONARAN.4069"
+    },
+    {
+      "code": "4070",
+      "name": "Brown Bear",
+      "hex": "#5b4f45",
+      "sku": "YS.COTTONARAN.4070"
+    },
+    {
+      "code": "4072",
+      "name": "Bronze",
+      "hex": "#54431a",
+      "sku": "YS.COTTONARAN.4072"
+    },
+    {
+      "code": "4074",
+      "name": "Rust",
+      "hex": "#603c20",
+      "sku": "YS.COTTONARAN.4074"
+    },
+    {
+      "code": "4076",
+      "name": "Copper",
+      "hex": "#702519",
+      "sku": "YS.COTTONARAN.4076"
+    },
+    {
+      "code": "4077",
+      "name": "Terracotta",
+      "hex": "#924a36",
+      "sku": "YS.COTTONARAN.4077"
+    },
+    {
+      "code": "4078",
+      "name": "Brick",
+      "hex": "#683434",
+      "sku": "YS.COTTONARAN.4078"
+    },
+    {
+      "code": "4079",
+      "name": "Coffee Bean",
+      "hex": "#563828",
+      "sku": "YS.COTTONARAN.4079"
+    },
+    {
+      "code": "4079B",
+      "name": "Cocoa",
+      "hex": "#433930",
+      "sku": "YS.COTTONARAN.4079B"
+    },
+    {
+      "code": "4080",
+      "name": "Chocolate Brown",
+      "hex": "#1e1510",
+      "sku": "YS.COTTONARAN.4080"
+    },
+    {
+      "code": "4085",
+      "name": "Burgundy",
+      "hex": "#281018",
+      "sku": "YS.COTTONARAN.4085"
+    },
+    {
+      "code": "4090",
+      "name": "Claret Red",
+      "hex": "#530d1d",
+      "sku": "YS.COTTONARAN.4090"
+    },
+    {
+      "code": "4094",
+      "name": "Sienna Red",
+      "hex": "#700f22",
+      "sku": "YS.COTTONARAN.4094"
+    },
+    {
+      "code": "4096",
+      "name": "Crimson",
+      "hex": "#8a0727",
+      "sku": "YS.COTTONARAN.4096"
+    },
+    {
+      "code": "4100",
+      "name": "Scarlet Red",
+      "hex": "#85061a",
+      "sku": "YS.COTTONARAN.4100"
+    },
+    {
+      "code": "4110",
+      "name": "Bright Red",
+      "hex": "#a21314",
+      "sku": "YS.COTTONARAN.4110"
+    },
+    {
+      "code": "4115",
+      "name": "Paprika",
+      "hex": "#a82626",
+      "sku": "YS.COTTONARAN.4115"
+    },
+    {
+      "code": "4120",
+      "name": "Burnt Orange",
+      "hex": "#931916",
+      "sku": "YS.COTTONARAN.4120"
+    },
+    {
+      "code": "4122",
+      "name": "Chilli",
+      "hex": "#8e3830",
+      "sku": "YS.COTTONARAN.4122"
+    },
+    {
+      "code": "4124",
+      "name": "Ginger",
+      "hex": "#943c17",
+      "sku": "YS.COTTONARAN.4124"
+    },
+    {
+      "code": "4125",
+      "name": "Amber",
+      "hex": "#af5112",
+      "sku": "YS.COTTONARAN.4125"
+    },
+    {
+      "code": "4126",
+      "name": "Carrot",
+      "hex": "#dd481f",
+      "sku": "YS.COTTONARAN.4126"
+    },
+    {
+      "code": "4130",
+      "name": "Bright Orange",
+      "hex": "#e76309",
+      "sku": "YS.COTTONARAN.4130"
+    },
+    {
+      "code": "4135",
+      "name": "Tangerine",
+      "hex": "#ee8917",
+      "sku": "YS.COTTONARAN.4135"
+    },
+    {
+      "code": "4140",
+      "name": "Mustard Yellow",
+      "hex": "#b7832a",
+      "sku": "YS.COTTONARAN.4140"
+    },
+    {
+      "code": "4145",
+      "name": "Antique Gold",
+      "hex": "#936215",
+      "sku": "YS.COTTONARAN.4145"
+    },
+    {
+      "code": "4147",
+      "name": "Harvest Gold",
+      "hex": "#d7a921",
+      "sku": "YS.COTTONARAN.4147"
+    },
+    {
+      "code": "4150",
+      "name": "Sunshine Yellow",
+      "hex": "#eda317",
+      "sku": "YS.COTTONARAN.4150"
+    },
+    {
+      "code": "4155",
+      "name": "Buttercup",
+      "hex": "#e2bf15",
+      "sku": "YS.COTTONARAN.4155"
+    },
+    {
+      "code": "4160",
+      "name": "Primrose Yellow",
+      "hex": "#dfc837",
+      "sku": "YS.COTTONARAN.4160"
+    },
+    {
+      "code": "4164",
+      "name": "Bright Yellow",
+      "hex": "#e5d648",
+      "sku": "YS.COTTONARAN.4164"
+    },
+    {
+      "code": "4166",
+      "name": "Canary Yellow",
+      "hex": "#e6d36e",
+      "sku": "YS.COTTONARAN.4166"
+    },
+    {
+      "code": "4170",
+      "name": "Lemon Yellow",
+      "hex": "#e0cc83",
+      "sku": "YS.COTTONARAN.4170"
+    },
+    {
+      "code": "4180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#ced0a2",
+      "sku": "YS.COTTONARAN.4180"
+    },
+    {
+      "code": "4181",
+      "name": "Hint of Mint",
+      "hex": "#aed0b6",
+      "sku": "YS.COTTONARAN.4181"
+    },
+    {
+      "code": "4182",
+      "name": "Mint Choc Chip",
+      "hex": "#6dbc70",
+      "sku": "YS.COTTONARAN.4182"
+    },
+    {
+      "code": "4183",
+      "name": "Mojito Green",
+      "hex": "#57a56c",
+      "sku": "YS.COTTONARAN.4183"
+    },
+    {
+      "code": "4184",
+      "name": "Refreshing Green",
+      "hex": "#4dbd6c",
+      "sku": "YS.COTTONARAN.4184"
+    },
+    {
+      "code": "4184B",
+      "name": "Jade Green",
+      "hex": "#35a180",
+      "sku": "YS.COTTONARAN.4184B"
+    },
+    {
+      "code": "4185",
+      "name": "Light Sage",
+      "hex": "#72a27d",
+      "sku": "YS.COTTONARAN.4185"
+    },
+    {
+      "code": "4185B",
+      "name": "Eucalyptus",
+      "hex": "#8da187",
+      "sku": "YS.COTTONARAN.4185B"
+    },
+    {
+      "code": "4185D",
+      "name": "Lime Sorbet",
+      "hex": "#c1c792",
+      "sku": "YS.COTTONARAN.4185D"
+    },
+    {
+      "code": "4186",
+      "name": "Celery",
+      "hex": "#a1b45f",
+      "sku": "YS.COTTONARAN.4186"
+    },
+    {
+      "code": "4186B",
+      "name": "Lemon Lime",
+      "hex": "#abb03a",
+      "sku": "YS.COTTONARAN.4186B"
+    },
+    {
+      "code": "4187",
+      "name": "Olive Green",
+      "hex": "#857920",
+      "sku": "YS.COTTONARAN.4187"
+    },
+    {
+      "code": "4188",
+      "name": "Apple Green",
+      "hex": "#68841d",
+      "sku": "YS.COTTONARAN.4188"
+    },
+    {
+      "code": "4189",
+      "name": "Parakeet Green",
+      "hex": "#9abe59",
+      "sku": "YS.COTTONARAN.4189"
+    },
+    {
+      "code": "4190",
+      "name": "Lime Green",
+      "hex": "#abd161",
+      "sku": "YS.COTTONARAN.4190"
+    },
+    {
+      "code": "4195",
+      "name": "Bright Green",
+      "hex": "#40a132",
+      "sku": "YS.COTTONARAN.4195"
+    },
+    {
+      "code": "4200",
+      "name": "Grass Green",
+      "hex": "#59903f",
+      "sku": "YS.COTTONARAN.4200"
+    },
+    {
+      "code": "4201",
+      "name": "Shamrock Green",
+      "hex": "#2b8a55",
+      "sku": "YS.COTTONARAN.4201"
+    },
+    {
+      "code": "4201B",
+      "name": "Thyme",
+      "hex": "#688c5e",
+      "sku": "YS.COTTONARAN.4201B"
+    },
+    {
+      "code": "4202",
+      "name": "Dark Sage",
+      "hex": "#4c7a5a",
+      "sku": "YS.COTTONARAN.4202"
+    },
+    {
+      "code": "4204",
+      "name": "Country Green",
+      "hex": "#2d371c",
+      "sku": "YS.COTTONARAN.4204"
+    },
+    {
+      "code": "4205",
+      "name": "Woodland",
+      "hex": "#494f44",
+      "sku": "YS.COTTONARAN.4205"
+    },
+    {
+      "code": "4205B",
+      "name": "Willow",
+      "hex": "#858351",
+      "sku": "YS.COTTONARAN.4205B"
+    },
+    {
+      "code": "4206",
+      "name": "Khaki",
+      "hex": "#646742",
+      "sku": "YS.COTTONARAN.4206"
+    },
+    {
+      "code": "4207",
+      "name": "Strong Green",
+      "hex": "#19351d",
+      "sku": "YS.COTTONARAN.4207"
+    },
+    {
+      "code": "4208",
+      "name": "Bottle Green",
+      "hex": "#102115",
+      "sku": "YS.COTTONARAN.4208"
+    },
+    {
+      "code": "4209",
+      "name": "Fir Green",
+      "hex": "#213e34",
+      "sku": "YS.COTTONARAN.4209"
+    },
+    {
+      "code": "4210",
+      "name": "Christmas Green",
+      "hex": "#084735",
+      "sku": "YS.COTTONARAN.4210"
+    },
+    {
+      "code": "4215",
+      "name": "Clover",
+      "hex": "#0b6427",
+      "sku": "YS.COTTONARAN.4215"
+    },
+    {
+      "code": "4220",
+      "name": "Opal Green",
+      "hex": "#096452",
+      "sku": "YS.COTTONARAN.4220"
+    },
+    {
+      "code": "4221",
+      "name": "Aqua Green",
+      "hex": "#0d9180",
+      "sku": "YS.COTTONARAN.4221"
+    },
+    {
+      "code": "4221B",
+      "name": "Sea Green",
+      "hex": "#347c6a",
+      "sku": "YS.COTTONARAN.4221B"
+    },
+    {
+      "code": "4221D",
+      "name": "Misty Green",
+      "hex": "#9db1a5",
+      "sku": "YS.COTTONARAN.4221D"
+    },
+    {
+      "code": "4222",
+      "name": "Spearmint Green",
+      "hex": "#649086",
+      "sku": "YS.COTTONARAN.4222"
+    },
+    {
+      "code": "4223",
+      "name": "Lagoon",
+      "hex": "#48756e",
+      "sku": "YS.COTTONARAN.4223"
+    },
+    {
+      "code": "4223B",
+      "name": "Light Aqua Green",
+      "hex": "#50bcb1",
+      "sku": "YS.COTTONARAN.4223B"
+    },
+    {
+      "code": "4223D",
+      "name": "Icy Green",
+      "hex": "#91ddd4",
+      "sku": "YS.COTTONARAN.4223D"
+    },
+    {
+      "code": "4223F",
+      "name": "Peppermint Cream",
+      "hex": "#b0d1d1",
+      "sku": "YS.COTTONARAN.4223F"
+    },
+    {
+      "code": "4224",
+      "name": "Aqua",
+      "hex": "#58c0c0",
+      "sku": "YS.COTTONARAN.4224"
+    },
+    {
+      "code": "4226",
+      "name": "Seafoam",
+      "hex": "#2e9d98",
+      "sku": "YS.COTTONARAN.4226"
+    },
+    {
+      "code": "4227",
+      "name": "Deep Aqua",
+      "hex": "#077678",
+      "sku": "YS.COTTONARAN.4227"
+    },
+    {
+      "code": "4228",
+      "name": "Vintage Teal",
+      "hex": "#55989f",
+      "sku": "YS.COTTONARAN.4228"
+    },
+    {
+      "code": "4228B",
+      "name": "Marine Blue",
+      "hex": "#34aeb6",
+      "sku": "YS.COTTONARAN.4228B"
+    },
+    {
+      "code": "4229",
+      "name": "Tropical Teal",
+      "hex": "#097e93",
+      "sku": "YS.COTTONARAN.4229"
+    },
+    {
+      "code": "4230",
+      "name": "Teal",
+      "hex": "#0c6981",
+      "sku": "YS.COTTONARAN.4230"
+    },
+    {
+      "code": "4231",
+      "name": "Dark Teal",
+      "hex": "#114f5c",
+      "sku": "YS.COTTONARAN.4231"
+    },
+    {
+      "code": "4232",
+      "name": "Blue Spruce",
+      "hex": "#233e3e",
+      "sku": "YS.COTTONARAN.4232"
+    },
+    {
+      "code": "4232B",
+      "name": "Pacific",
+      "hex": "#325656",
+      "sku": "YS.COTTONARAN.4232B"
+    },
+    {
+      "code": "4233",
+      "name": "Light Petrol",
+      "hex": "#225b6f",
+      "sku": "YS.COTTONARAN.4233"
+    },
+    {
+      "code": "4234",
+      "name": "Petrol",
+      "hex": "#1f4255",
+      "sku": "YS.COTTONARAN.4234"
+    },
+    {
+      "code": "4236",
+      "name": "Deep Ocean",
+      "hex": "#163d57",
+      "sku": "YS.COTTONARAN.4236"
+    },
+    {
+      "code": "4240",
+      "name": "Dark Turquoise",
+      "hex": "#0a5e9d",
+      "sku": "YS.COTTONARAN.4240"
+    },
+    {
+      "code": "4244",
+      "name": "Peacock",
+      "hex": "#105f88",
+      "sku": "YS.COTTONARAN.4244"
+    },
+    {
+      "code": "4246",
+      "name": "Kingfisher Blue",
+      "hex": "#1a81af",
+      "sku": "YS.COTTONARAN.4246"
+    },
+    {
+      "code": "4250",
+      "name": "Light Turquoise",
+      "hex": "#2daeda",
+      "sku": "YS.COTTONARAN.4250"
+    },
+    {
+      "code": "4250B",
+      "name": "Soft Cyan",
+      "hex": "#74c5dc",
+      "sku": "YS.COTTONARAN.4250B"
+    },
+    {
+      "code": "4250D",
+      "name": "Frost Blue",
+      "hex": "#95ced3",
+      "sku": "YS.COTTONARAN.4250D"
+    },
+    {
+      "code": "4251",
+      "name": "Steel Blue",
+      "hex": "#55879b",
+      "sku": "YS.COTTONARAN.4251"
+    },
+    {
+      "code": "4252",
+      "name": "Fjord Blue",
+      "hex": "#2f515a",
+      "sku": "YS.COTTONARAN.4252"
+    },
+    {
+      "code": "4254",
+      "name": "Robin Egg",
+      "hex": "#7dc7c5",
+      "sku": "YS.COTTONARAN.4254"
+    },
+    {
+      "code": "4256",
+      "name": "Duck Egg",
+      "hex": "#91b0b0",
+      "sku": "YS.COTTONARAN.4256"
+    },
+    {
+      "code": "4257",
+      "name": "Ice Blue",
+      "hex": "#b8caca",
+      "sku": "YS.COTTONARAN.4257"
+    },
+    {
+      "code": "4258",
+      "name": "Glacier Blue",
+      "hex": "#8bcbde",
+      "sku": "YS.COTTONARAN.4258"
+    },
+    {
+      "code": "4260",
+      "name": "Sky Blue",
+      "hex": "#b1c7cb",
+      "sku": "YS.COTTONARAN.4260"
+    },
+    {
+      "code": "4261",
+      "name": "Baby Blue",
+      "hex": "#aec6d5",
+      "sku": "YS.COTTONARAN.4261"
+    },
+    {
+      "code": "4262",
+      "name": "Powder Blue",
+      "hex": "#9fc1d6",
+      "sku": "YS.COTTONARAN.4262"
+    },
+    {
+      "code": "4263",
+      "name": "Forget Me Not",
+      "hex": "#67a2be",
+      "sku": "YS.COTTONARAN.4263"
+    },
+    {
+      "code": "4264",
+      "name": "Island Blue",
+      "hex": "#6095c1",
+      "sku": "YS.COTTONARAN.4264"
+    },
+    {
+      "code": "4266",
+      "name": "Hydrangea Blue",
+      "hex": "#6c99cf",
+      "sku": "YS.COTTONARAN.4266"
+    },
+    {
+      "code": "4270",
+      "name": "Cornflower Blue",
+      "hex": "#4e7fb0",
+      "sku": "YS.COTTONARAN.4270"
+    },
+    {
+      "code": "4274",
+      "name": "Strong Blue",
+      "hex": "#1a5aa3",
+      "sku": "YS.COTTONARAN.4274"
+    },
+    {
+      "code": "4276",
+      "name": "Ultramarine Blue",
+      "hex": "#40799c",
+      "sku": "YS.COTTONARAN.4276"
+    },
+    {
+      "code": "4278",
+      "name": "Riviera Blue",
+      "hex": "#4a5d8d",
+      "sku": "YS.COTTONARAN.4278"
+    },
+    {
+      "code": "4280",
+      "name": "Denim Blue",
+      "hex": "#646c90",
+      "sku": "YS.COTTONARAN.4280"
+    },
+    {
+      "code": "4285",
+      "name": "Delft Blue",
+      "hex": "#305173",
+      "sku": "YS.COTTONARAN.4285"
+    },
+    {
+      "code": "4288",
+      "name": "Deep Indigo",
+      "hex": "#1d3045",
+      "sku": "YS.COTTONARAN.4288"
+    },
+    {
+      "code": "4290",
+      "name": "Deep Denim Blue",
+      "hex": "#1b2b3b",
+      "sku": "YS.COTTONARAN.4290"
+    },
+    {
+      "code": "4300",
+      "name": "Royal Blue",
+      "hex": "#232e68",
+      "sku": "YS.COTTONARAN.4300"
+    },
+    {
+      "code": "4305",
+      "name": "Sapphire Blue",
+      "hex": "#22427d",
+      "sku": "YS.COTTONARAN.4305"
+    },
+    {
+      "code": "4308",
+      "name": "Light Navy",
+      "hex": "#141f38",
+      "sku": "YS.COTTONARAN.4308"
+    },
+    {
+      "code": "4310",
+      "name": "Navy Blue",
+      "hex": "#101524",
+      "sku": "YS.COTTONARAN.4310"
+    },
+    {
+      "code": "4312",
+      "name": "Aubergine",
+      "hex": "#1c1328",
+      "sku": "YS.COTTONARAN.4312"
+    },
+    {
+      "code": "4315",
+      "name": "Vibrant Violet",
+      "hex": "#281648",
+      "sku": "YS.COTTONARAN.4315"
+    },
+    {
+      "code": "4318",
+      "name": "Purple Sprouting",
+      "hex": "#3e244d",
+      "sku": "YS.COTTONARAN.4318"
+    },
+    {
+      "code": "4320",
+      "name": "Deep Purple",
+      "hex": "#2f1745",
+      "sku": "YS.COTTONARAN.4320"
+    },
+    {
+      "code": "4322",
+      "name": "Amethyst",
+      "hex": "#513c75",
+      "sku": "YS.COTTONARAN.4322"
+    },
+    {
+      "code": "4324",
+      "name": "Just Purple",
+      "hex": "#492264",
+      "sku": "YS.COTTONARAN.4324"
+    },
+    {
+      "code": "4326",
+      "name": "Purple Orchid",
+      "hex": "#582064",
+      "sku": "YS.COTTONARAN.4326"
+    },
+    {
+      "code": "4330",
+      "name": "Plum Purple",
+      "hex": "#431c4f",
+      "sku": "YS.COTTONARAN.4330"
+    },
+    {
+      "code": "4331",
+      "name": "Boysenberry",
+      "hex": "#5e1c4e",
+      "sku": "YS.COTTONARAN.4331"
+    },
+    {
+      "code": "4332",
+      "name": "Damson",
+      "hex": "#4c2d3f",
+      "sku": "YS.COTTONARAN.4332"
+    },
+    {
+      "code": "4333",
+      "name": "Vintage Plum",
+      "hex": "#594451",
+      "sku": "YS.COTTONARAN.4333"
+    },
+    {
+      "code": "4333B",
+      "name": "Mulberry",
+      "hex": "#74536d",
+      "sku": "YS.COTTONARAN.4333B"
+    },
+    {
+      "code": "4334",
+      "name": "Crocus",
+      "hex": "#936792",
+      "sku": "YS.COTTONARAN.4334"
+    },
+    {
+      "code": "4335",
+      "name": "Sugar Plum",
+      "hex": "#714374",
+      "sku": "YS.COTTONARAN.4335"
+    },
+    {
+      "code": "4336",
+      "name": "Orchid",
+      "hex": "#997ca7",
+      "sku": "YS.COTTONARAN.4336"
+    },
+    {
+      "code": "4338",
+      "name": "Light Orchid",
+      "hex": "#b793b4",
+      "sku": "YS.COTTONARAN.4338"
+    },
+    {
+      "code": "4340",
+      "name": "Pale Lilac",
+      "hex": "#c0b0cc",
+      "sku": "YS.COTTONARAN.4340"
+    },
+    {
+      "code": "4350",
+      "name": "Lilac",
+      "hex": "#967eb3",
+      "sku": "YS.COTTONARAN.4350"
+    },
+    {
+      "code": "4352",
+      "name": "Soft Violet",
+      "hex": "#75548b",
+      "sku": "YS.COTTONARAN.4352"
+    },
+    {
+      "code": "4354",
+      "name": "Grape Juice",
+      "hex": "#554162",
+      "sku": "YS.COTTONARAN.4354"
+    },
+    {
+      "code": "4356",
+      "name": "Dark Lavender",
+      "hex": "#605b9a",
+      "sku": "YS.COTTONARAN.4356"
+    },
+    {
+      "code": "4360",
+      "name": "Lavender",
+      "hex": "#8286bd",
+      "sku": "YS.COTTONARAN.4360"
+    },
+    {
+      "code": "4362",
+      "name": "Bluebell",
+      "hex": "#6583c0",
+      "sku": "YS.COTTONARAN.4362"
+    },
+    {
+      "code": "4364",
+      "name": "Petal Pink",
+      "hex": "#ba6a9a",
+      "sku": "YS.COTTONARAN.4364"
+    },
+    {
+      "code": "4365",
+      "name": "Petunia Pink",
+      "hex": "#9e487c",
+      "sku": "YS.COTTONARAN.4365"
+    },
+    {
+      "code": "4366",
+      "name": "Magenta",
+      "hex": "#841857",
+      "sku": "YS.COTTONARAN.4366"
+    },
+    {
+      "code": "4368",
+      "name": "Bright Pink",
+      "hex": "#8e1256",
+      "sku": "YS.COTTONARAN.4368"
+    },
+    {
+      "code": "4369",
+      "name": "Shocking Pink",
+      "hex": "#be3070",
+      "sku": "YS.COTTONARAN.4369"
+    },
+    {
+      "code": "4370",
+      "name": "Fuchsia Pink",
+      "hex": "#9e0748",
+      "sku": "YS.COTTONARAN.4370"
+    },
+    {
+      "code": "4371",
+      "name": "Cerise",
+      "hex": "#8e1940",
+      "sku": "YS.COTTONARAN.4371"
+    },
+    {
+      "code": "4371B",
+      "name": "Pomegranate",
+      "hex": "#9b2e3e",
+      "sku": "YS.COTTONARAN.4371B"
+    },
+    {
+      "code": "4372",
+      "name": "Fandango Pink",
+      "hex": "#ba3556",
+      "sku": "YS.COTTONARAN.4372"
+    },
+    {
+      "code": "4373",
+      "name": "Candy Apple",
+      "hex": "#b53545",
+      "sku": "YS.COTTONARAN.4373"
+    },
+    {
+      "code": "4373B",
+      "name": "Watermelon",
+      "hex": "#bd4f5e",
+      "sku": "YS.COTTONARAN.4373B"
+    },
+    {
+      "code": "4374",
+      "name": "Pinkberry",
+      "hex": "#781a52",
+      "sku": "YS.COTTONARAN.4374"
+    },
+    {
+      "code": "4376",
+      "name": "Vintage Pink",
+      "hex": "#9d3f6e",
+      "sku": "YS.COTTONARAN.4376"
+    },
+    {
+      "code": "4378",
+      "name": "Peony Pink",
+      "hex": "#972750",
+      "sku": "YS.COTTONARAN.4378"
+    },
+    {
+      "code": "4380",
+      "name": "Rose Pink",
+      "hex": "#9d657e",
+      "sku": "YS.COTTONARAN.4380"
+    },
+    {
+      "code": "4385",
+      "name": "Bubblegum",
+      "hex": "#bb4582",
+      "sku": "YS.COTTONARAN.4385"
+    },
+    {
+      "code": "4390",
+      "name": "Fondant Pink",
+      "hex": "#d97ea5",
+      "sku": "YS.COTTONARAN.4390"
+    },
+    {
+      "code": "4400",
+      "name": "Candyfloss Pink",
+      "hex": "#e6b6cb",
+      "sku": "YS.COTTONARAN.4400"
+    },
+    {
+      "code": "4402",
+      "name": "Flamingo Pink",
+      "hex": "#c9707e",
+      "sku": "YS.COTTONARAN.4402"
+    },
+    {
+      "code": "4404",
+      "name": "Blossom",
+      "hex": "#d09fa2",
+      "sku": "YS.COTTONARAN.4404"
+    },
+    {
+      "code": "4406",
+      "name": "Pink Sherbet",
+      "hex": "#e5b4be",
+      "sku": "YS.COTTONARAN.4406"
+    },
+    {
+      "code": "4408",
+      "name": "Baby Pink",
+      "hex": "#e3bec6",
+      "sku": "YS.COTTONARAN.4408"
+    },
+    {
+      "code": "4410",
+      "name": "Light Pink",
+      "hex": "#e0c5d4",
+      "sku": "YS.COTTONARAN.4410"
+    },
+    {
+      "code": "4420",
+      "name": "Peachy Pink",
+      "hex": "#d4c2be",
+      "sku": "YS.COTTONARAN.4420"
+    },
+    {
+      "code": "4421",
+      "name": "Soft Apricot",
+      "hex": "#dcc9b6",
+      "sku": "YS.COTTONARAN.4421"
+    },
+    {
+      "code": "4422",
+      "name": "Peach",
+      "hex": "#d9b9aa",
+      "sku": "YS.COTTONARAN.4422"
+    },
+    {
+      "code": "4424",
+      "name": "Coral",
+      "hex": "#d69a93",
+      "sku": "YS.COTTONARAN.4424"
+    },
+    {
+      "code": "4425",
+      "name": "Apricot",
+      "hex": "#d89979",
+      "sku": "YS.COTTONARAN.4425"
+    },
+    {
+      "code": "4426",
+      "name": "Dusky Peach",
+      "hex": "#b26e5d",
+      "sku": "YS.COTTONARAN.4426"
+    },
+    {
+      "code": "4428",
+      "name": "Vintage Peach",
+      "hex": "#843e41",
+      "sku": "YS.COTTONARAN.4428"
+    }
+  ]
+}

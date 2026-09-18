@@ -1,0 +1,102 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SOCKPRINT",
+  "brand": "Yarnsmiths",
+  "product": "Merino Sock Prints",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-sock-prints-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2G010",
+      "name": "Boo!",
+      "hex": "#78473d",
+      "sku": "YS.SOCKPRINT.2G010"
+    },
+    {
+      "code": "2G020",
+      "name": "Windbreak",
+      "hex": "#ab9068",
+      "sku": "YS.SOCKPRINT.2G020"
+    },
+    {
+      "code": "2G030",
+      "name": "Tutti Fruitti",
+      "hex": "#8c755d",
+      "sku": "YS.SOCKPRINT.2G030"
+    },
+    {
+      "code": "2G040",
+      "name": "Berry Burst",
+      "hex": "#966069",
+      "sku": "YS.SOCKPRINT.2G040"
+    },
+    {
+      "code": "2G060",
+      "name": "Rainy Days",
+      "hex": "#5f6163",
+      "sku": "YS.SOCKPRINT.2G060"
+    },
+    {
+      "code": "2G070",
+      "name": "Trifle",
+      "hex": "#75344b",
+      "sku": "YS.SOCKPRINT.2G070"
+    },
+    {
+      "code": "2G080",
+      "name": "Fruit Salad",
+      "hex": "#b28465",
+      "sku": "YS.SOCKPRINT.2G080"
+    },
+    {
+      "code": "2G100",
+      "name": "Muted Earth",
+      "hex": "#836752",
+      "sku": "YS.SOCKPRINT.2G100"
+    },
+    {
+      "code": "2G110",
+      "name": "Clowning Around",
+      "hex": "#976a4a",
+      "sku": "YS.SOCKPRINT.2G110"
+    },
+    {
+      "code": "2G130",
+      "name": "Wax Crayons",
+      "hex": "#a56756",
+      "sku": "YS.SOCKPRINT.2G130"
+    },
+    {
+      "code": "2G140",
+      "name": "Denim Days",
+      "hex": "#31363a",
+      "sku": "YS.SOCKPRINT.2G140"
+    },
+    {
+      "code": "2G150",
+      "name": "Hazy Dreams",
+      "hex": "#9c8e84",
+      "sku": "YS.SOCKPRINT.2G150"
+    },
+    {
+      "code": "2G820",
+      "name": "Jolly Holly",
+      "hex": "#872f36",
+      "sku": "YS.SOCKPRINT.2G820"
+    },
+    {
+      "code": "2G800",
+      "name": "Festive Fairisle",
+      "hex": "#f0efea",
+      "sku": "YS.X.SOCKPRINT.2G800"
+    },
+    {
+      "code": "2G810",
+      "name": "Mistletoe Magic",
+      "hex": "#eae8e3",
+      "sku": "YS.X.SOCKPRINT.2G810"
+    }
+  ]
+}

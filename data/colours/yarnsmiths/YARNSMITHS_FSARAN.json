@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_FSARAN",
+  "brand": "Yarnsmiths",
+  "product": "Freespirit Aran",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-freespirit-aran-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "1D001",
+      "name": "Luna",
+      "hex": "#818274",
+      "sku": "YS.FSARAN.1D001"
+    },
+    {
+      "code": "1D003",
+      "name": "Grey Dagger",
+      "hex": "#8e7365",
+      "sku": "YS.FSARAN.1D003"
+    },
+    {
+      "code": "1D005",
+      "name": "Morpho",
+      "hex": "#78616d",
+      "sku": "YS.FSARAN.1D005"
+    },
+    {
+      "code": "1D006",
+      "name": "Madagascan Sunset",
+      "hex": "#49302b",
+      "sku": "YS.FSARAN.1D006"
+    },
+    {
+      "code": "1D008",
+      "name": "Malachite",
+      "hex": "#64512c",
+      "sku": "YS.FSARAN.1D008"
+    },
+    {
+      "code": "1D010",
+      "name": "Fiery Jewel",
+      "hex": "#70492c",
+      "sku": "YS.FSARAN.1D010"
+    },
+    {
+      "code": "1D011",
+      "name": "Paradise Birdwing",
+      "hex": "#513838",
+      "sku": "YS.FSARAN.1D011"
+    },
+    {
+      "code": "1D012",
+      "name": "Rosy Maple",
+      "hex": "#563547",
+      "sku": "YS.FSARAN.1D012"
+    },
+    {
+      "code": "1D014",
+      "name": "Peacock",
+      "hex": "#412c35",
+      "sku": "YS.FSARAN.1D014"
+    },
+    {
+      "code": "1D015",
+      "name": "Adonis",
+      "hex": "#5b7453",
+      "sku": "YS.FSARAN.1D015"
+    }
+  ]
+}

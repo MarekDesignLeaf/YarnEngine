@@ -1,0 +1,54 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BABY4PLY",
+  "brand": "Yarnsmiths",
+  "product": "Create Baby 4 Ply",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-baby-4-ply-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "4P05",
+      "name": "Baby White",
+      "hex": "#dfdccb",
+      "sku": "YS.BABY4PLY.4P05"
+    },
+    {
+      "code": "4P10",
+      "name": "Baby Cream",
+      "hex": "#e2dab9",
+      "sku": "YS.BABY4PLY.4P10"
+    },
+    {
+      "code": "4P20",
+      "name": "Baby Silver",
+      "hex": "#d2cdca",
+      "sku": "YS.BABY4PLY.4P20"
+    },
+    {
+      "code": "4P30",
+      "name": "Soft Pink",
+      "hex": "#f5cec2",
+      "sku": "YS.BABY4PLY.4P30"
+    },
+    {
+      "code": "4P35",
+      "name": "Baby Pink",
+      "hex": "#f0c6c9",
+      "sku": "YS.BABY4PLY.4P35"
+    },
+    {
+      "code": "4P50",
+      "name": "Baby Blue",
+      "hex": "#b6cddb",
+      "sku": "YS.BABY4PLY.4P50"
+    },
+    {
+      "code": "4P60",
+      "name": "Baby Mint",
+      "hex": "#ccd9c4",
+      "sku": "YS.BABY4PLY.4P60"
+    }
+  ]
+}

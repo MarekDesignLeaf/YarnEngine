@@ -1,0 +1,312 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SOCKSOLID",
+  "brand": "Yarnsmiths",
+  "product": "Merino Sock",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-sock-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2K000",
+      "name": "Black",
+      "hex": "#0b0c08",
+      "sku": "YS.SOCKSOLID.2K000"
+    },
+    {
+      "code": "2K003",
+      "name": "Graphite",
+      "hex": "#2c302d",
+      "sku": "YS.SOCKSOLID.2K003"
+    },
+    {
+      "code": "2K004",
+      "name": "Charcoal Heather",
+      "hex": "#3a3a33",
+      "sku": "YS.SOCKSOLID.2K004"
+    },
+    {
+      "code": "2K008",
+      "name": "Storm Grey",
+      "hex": "#585b58",
+      "sku": "YS.SOCKSOLID.2K008"
+    },
+    {
+      "code": "2K012",
+      "name": "Grey Heather",
+      "hex": "#8a9087",
+      "sku": "YS.SOCKSOLID.2K012"
+    },
+    {
+      "code": "2K014",
+      "name": "Soft Grey",
+      "hex": "#919088",
+      "sku": "YS.SOCKSOLID.2K014"
+    },
+    {
+      "code": "2K025",
+      "name": "Platinum",
+      "hex": "#9ea7a0",
+      "sku": "YS.SOCKSOLID.2K025"
+    },
+    {
+      "code": "2K032",
+      "name": "Hint of Grey",
+      "hex": "#c7c7bf",
+      "sku": "YS.SOCKSOLID.2K032"
+    },
+    {
+      "code": "2K040",
+      "name": "White",
+      "hex": "#ece9e0",
+      "sku": "YS.SOCKSOLID.2K040"
+    },
+    {
+      "code": "2K045",
+      "name": "Off White",
+      "hex": "#f2e7c7",
+      "sku": "YS.SOCKSOLID.2K045"
+    },
+    {
+      "code": "2K060",
+      "name": "Parchment",
+      "hex": "#c5bfa8",
+      "sku": "YS.SOCKSOLID.2K060"
+    },
+    {
+      "code": "2K061",
+      "name": "Linen",
+      "hex": "#d5c6a9",
+      "sku": "YS.SOCKSOLID.2K061"
+    },
+    {
+      "code": "2K068",
+      "name": "Camel",
+      "hex": "#9d8562",
+      "sku": "YS.SOCKSOLID.2K068"
+    },
+    {
+      "code": "2K079",
+      "name": "Rich Brown",
+      "hex": "#422b1a",
+      "sku": "YS.SOCKSOLID.2K079"
+    },
+    {
+      "code": "2K080",
+      "name": "Chocolate Brown",
+      "hex": "#1a1812",
+      "sku": "YS.SOCKSOLID.2K080"
+    },
+    {
+      "code": "2K085",
+      "name": "Burgundy",
+      "hex": "#3e1818",
+      "sku": "YS.SOCKSOLID.2K085"
+    },
+    {
+      "code": "2K090",
+      "name": "Claret",
+      "hex": "#741b24",
+      "sku": "YS.SOCKSOLID.2K090"
+    },
+    {
+      "code": "2K098",
+      "name": "Crimson",
+      "hex": "#9c1a23",
+      "sku": "YS.SOCKSOLID.2K098"
+    },
+    {
+      "code": "2K122",
+      "name": "Cinnamon",
+      "hex": "#9f4926",
+      "sku": "YS.SOCKSOLID.2K122"
+    },
+    {
+      "code": "2K125",
+      "name": "Pumpkin",
+      "hex": "#cc4c11",
+      "sku": "YS.SOCKSOLID.2K125"
+    },
+    {
+      "code": "2K140",
+      "name": "Mustard",
+      "hex": "#ca921f",
+      "sku": "YS.SOCKSOLID.2K140"
+    },
+    {
+      "code": "2K152",
+      "name": "Sun Yellow",
+      "hex": "#f8a91e",
+      "sku": "YS.SOCKSOLID.2K152"
+    },
+    {
+      "code": "2K172",
+      "name": "Duckling",
+      "hex": "#f8d472",
+      "sku": "YS.SOCKSOLID.2K172"
+    },
+    {
+      "code": "2K198",
+      "name": "Pistachio",
+      "hex": "#95a55e",
+      "sku": "YS.SOCKSOLID.2K198"
+    },
+    {
+      "code": "2K201",
+      "name": "Moss Green",
+      "hex": "#536126",
+      "sku": "YS.SOCKSOLID.2K201"
+    },
+    {
+      "code": "2K203",
+      "name": "Leafy Green",
+      "hex": "#466439",
+      "sku": "YS.SOCKSOLID.2K203"
+    },
+    {
+      "code": "2K205",
+      "name": "Khaki",
+      "hex": "#565d27",
+      "sku": "YS.SOCKSOLID.2K205"
+    },
+    {
+      "code": "2K207",
+      "name": "Country Green",
+      "hex": "#293119",
+      "sku": "YS.SOCKSOLID.2K207"
+    },
+    {
+      "code": "2K209",
+      "name": "Bottle",
+      "hex": "#1b2d19",
+      "sku": "YS.SOCKSOLID.2K209"
+    },
+    {
+      "code": "2K212",
+      "name": "Christmas Green",
+      "hex": "#0b6534",
+      "sku": "YS.SOCKSOLID.2K212"
+    },
+    {
+      "code": "2K223",
+      "name": "Spearmint",
+      "hex": "#66aaad",
+      "sku": "YS.SOCKSOLID.2K223"
+    },
+    {
+      "code": "2K232",
+      "name": "Teal",
+      "hex": "#1a585d",
+      "sku": "YS.SOCKSOLID.2K232"
+    },
+    {
+      "code": "2K235",
+      "name": "Deep Teal",
+      "hex": "#0b344e",
+      "sku": "YS.SOCKSOLID.2K235"
+    },
+    {
+      "code": "2K252",
+      "name": "Fjord Blue",
+      "hex": "#234747",
+      "sku": "YS.SOCKSOLID.2K252"
+    },
+    {
+      "code": "2K266",
+      "name": "Hydrangea",
+      "hex": "#8297b1",
+      "sku": "YS.SOCKSOLID.2K266"
+    },
+    {
+      "code": "2K274",
+      "name": "Strong Blue",
+      "hex": "#183763",
+      "sku": "YS.SOCKSOLID.2K274"
+    },
+    {
+      "code": "2K285",
+      "name": "Delft Blue",
+      "hex": "#33507d",
+      "sku": "YS.SOCKSOLID.2K285"
+    },
+    {
+      "code": "2K302",
+      "name": "Royal Blue",
+      "hex": "#20284a",
+      "sku": "YS.SOCKSOLID.2K302"
+    },
+    {
+      "code": "2K311",
+      "name": "Navy Blue",
+      "hex": "#141a29",
+      "sku": "YS.SOCKSOLID.2K311"
+    },
+    {
+      "code": "2K312",
+      "name": "Midnight Blue",
+      "hex": "#0e0f0f",
+      "sku": "YS.SOCKSOLID.2K312"
+    },
+    {
+      "code": "2K313",
+      "name": "Blueberry",
+      "hex": "#22124b",
+      "sku": "YS.SOCKSOLID.2K313"
+    },
+    {
+      "code": "2K317",
+      "name": "Violet",
+      "hex": "#442e69",
+      "sku": "YS.SOCKSOLID.2K317"
+    },
+    {
+      "code": "2K321",
+      "name": "Deep Plum",
+      "hex": "#2f172a",
+      "sku": "YS.SOCKSOLID.2K321"
+    },
+    {
+      "code": "2K332",
+      "name": "Dusky Mauve",
+      "hex": "#947b8c",
+      "sku": "YS.SOCKSOLID.2K332"
+    },
+    {
+      "code": "2K355",
+      "name": "Dark Grape",
+      "hex": "#31232c",
+      "sku": "YS.SOCKSOLID.2K355"
+    },
+    {
+      "code": "2K356",
+      "name": "Lavender",
+      "hex": "#87759b",
+      "sku": "YS.SOCKSOLID.2K356"
+    },
+    {
+      "code": "2K367",
+      "name": "Magenta",
+      "hex": "#6d1f6a",
+      "sku": "YS.SOCKSOLID.2K367"
+    },
+    {
+      "code": "2K370",
+      "name": "Fuchsia",
+      "hex": "#780a4c",
+      "sku": "YS.SOCKSOLID.2K370"
+    },
+    {
+      "code": "2K390",
+      "name": "Fondant Pink",
+      "hex": "#f29ead",
+      "sku": "YS.SOCKSOLID.2K390"
+    },
+    {
+      "code": "2K405",
+      "name": "Baby Pink",
+      "hex": "#eab7b8",
+      "sku": "YS.SOCKSOLID.2K405"
+    }
+  ]
+}

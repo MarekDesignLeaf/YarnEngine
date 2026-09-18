@@ -1,0 +1,462 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_WOOLLYWOOL",
+  "brand": "Yarnsmiths",
+  "product": "Woolly Wool",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-woolly-wool-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "6000",
+      "name": "Black",
+      "hex": "#060c0c",
+      "sku": "YS.WOOLLYWOOL.6000"
+    },
+    {
+      "code": "6002",
+      "name": "Anthracite Grey",
+      "hex": "#262529",
+      "sku": "YS.WOOLLYWOOL.6002"
+    },
+    {
+      "code": "6008",
+      "name": "Storm Grey",
+      "hex": "#50535c",
+      "sku": "YS.WOOLLYWOOL.6008"
+    },
+    {
+      "code": "6015",
+      "name": "Stone Grey",
+      "hex": "#7e7e7e",
+      "sku": "YS.WOOLLYWOOL.6015"
+    },
+    {
+      "code": "6030",
+      "name": "Silver",
+      "hex": "#9a99a6",
+      "sku": "YS.WOOLLYWOOL.6030"
+    },
+    {
+      "code": "6035",
+      "name": "Pale Silver",
+      "hex": "#babeca",
+      "sku": "YS.WOOLLYWOOL.6035"
+    },
+    {
+      "code": "6040",
+      "name": "White",
+      "hex": "#e0e3db",
+      "sku": "YS.WOOLLYWOOL.6040"
+    },
+    {
+      "code": "6045",
+      "name": "Off White",
+      "hex": "#dddccf",
+      "sku": "YS.WOOLLYWOOL.6045"
+    },
+    {
+      "code": "6050",
+      "name": "Cream",
+      "hex": "#d0d1bb",
+      "sku": "YS.WOOLLYWOOL.6050"
+    },
+    {
+      "code": "6061",
+      "name": "Linen",
+      "hex": "#bbb4b0",
+      "sku": "YS.WOOLLYWOOL.6061"
+    },
+    {
+      "code": "6062",
+      "name": "Blush",
+      "hex": "#dacdc7",
+      "sku": "YS.WOOLLYWOOL.6062"
+    },
+    {
+      "code": "6064",
+      "name": "Oatmeal",
+      "hex": "#b09e9b",
+      "sku": "YS.WOOLLYWOOL.6064"
+    },
+    {
+      "code": "6065",
+      "name": "Warm Taupe",
+      "hex": "#a58881",
+      "sku": "YS.WOOLLYWOOL.6065"
+    },
+    {
+      "code": "6066",
+      "name": "Sand",
+      "hex": "#b79a7c",
+      "sku": "YS.WOOLLYWOOL.6066"
+    },
+    {
+      "code": "6067",
+      "name": "Vanilla Fudge",
+      "hex": "#ae8f63",
+      "sku": "YS.WOOLLYWOOL.6067"
+    },
+    {
+      "code": "6069",
+      "name": "Latte",
+      "hex": "#7d6557",
+      "sku": "YS.WOOLLYWOOL.6069"
+    },
+    {
+      "code": "6070",
+      "name": "Brown Bear",
+      "hex": "#65564d",
+      "sku": "YS.WOOLLYWOOL.6070"
+    },
+    {
+      "code": "6074",
+      "name": "Rust",
+      "hex": "#633f22",
+      "sku": "YS.WOOLLYWOOL.6074"
+    },
+    {
+      "code": "6076",
+      "name": "Copper",
+      "hex": "#763122",
+      "sku": "YS.WOOLLYWOOL.6076"
+    },
+    {
+      "code": "6080",
+      "name": "Chocolate Brown",
+      "hex": "#211813",
+      "sku": "YS.WOOLLYWOOL.6080"
+    },
+    {
+      "code": "6085",
+      "name": "Burgundy",
+      "hex": "#350b1d",
+      "sku": "YS.WOOLLYWOOL.6085"
+    },
+    {
+      "code": "6090",
+      "name": "Claret Red",
+      "hex": "#580d20",
+      "sku": "YS.WOOLLYWOOL.6090"
+    },
+    {
+      "code": "6100",
+      "name": "Scarlet Red",
+      "hex": "#6f050f",
+      "sku": "YS.WOOLLYWOOL.6100"
+    },
+    {
+      "code": "6110",
+      "name": "Bright Red",
+      "hex": "#950a0c",
+      "sku": "YS.WOOLLYWOOL.6110"
+    },
+    {
+      "code": "6124",
+      "name": "Ginger",
+      "hex": "#8e370c",
+      "sku": "YS.WOOLLYWOOL.6124"
+    },
+    {
+      "code": "6126",
+      "name": "Carrot",
+      "hex": "#c64216",
+      "sku": "YS.WOOLLYWOOL.6126"
+    },
+    {
+      "code": "6140",
+      "name": "Mustard Yellow",
+      "hex": "#d19b3b",
+      "sku": "YS.WOOLLYWOOL.6140"
+    },
+    {
+      "code": "6145",
+      "name": "Antique Gold",
+      "hex": "#a26116",
+      "sku": "YS.WOOLLYWOOL.6145"
+    },
+    {
+      "code": "6160",
+      "name": "Primrose Yellow",
+      "hex": "#dec14b",
+      "sku": "YS.WOOLLYWOOL.6160"
+    },
+    {
+      "code": "6170",
+      "name": "Lemon Yellow",
+      "hex": "#d2c07f",
+      "sku": "YS.WOOLLYWOOL.6170"
+    },
+    {
+      "code": "6185",
+      "name": "Light Sage",
+      "hex": "#8abba4",
+      "sku": "YS.WOOLLYWOOL.6185"
+    },
+    {
+      "code": "6186",
+      "name": "Celery",
+      "hex": "#a9b45a",
+      "sku": "YS.WOOLLYWOOL.6186"
+    },
+    {
+      "code": "6187",
+      "name": "Olive Green",
+      "hex": "#958b2c",
+      "sku": "YS.WOOLLYWOOL.6187"
+    },
+    {
+      "code": "6188",
+      "name": "Apple Green",
+      "hex": "#667b23",
+      "sku": "YS.WOOLLYWOOL.6188"
+    },
+    {
+      "code": "6202",
+      "name": "Dark Sage",
+      "hex": "#5a856a",
+      "sku": "YS.WOOLLYWOOL.6202"
+    },
+    {
+      "code": "6204",
+      "name": "Country Green",
+      "hex": "#40412c",
+      "sku": "YS.WOOLLYWOOL.6204"
+    },
+    {
+      "code": "6206",
+      "name": "Khaki",
+      "hex": "#5a5937",
+      "sku": "YS.WOOLLYWOOL.6206"
+    },
+    {
+      "code": "6208",
+      "name": "Bottle Green",
+      "hex": "#10271f",
+      "sku": "YS.WOOLLYWOOL.6208"
+    },
+    {
+      "code": "6210",
+      "name": "Christmas Green",
+      "hex": "#084c2d",
+      "sku": "YS.WOOLLYWOOL.6210"
+    },
+    {
+      "code": "6220",
+      "name": "Opal Green",
+      "hex": "#075d51",
+      "sku": "YS.WOOLLYWOOL.6220"
+    },
+    {
+      "code": "6222",
+      "name": "Spearmint Green",
+      "hex": "#49847e",
+      "sku": "YS.WOOLLYWOOL.6222"
+    },
+    {
+      "code": "6228",
+      "name": "Vintage Teal",
+      "hex": "#4995a8",
+      "sku": "YS.WOOLLYWOOL.6228"
+    },
+    {
+      "code": "6229",
+      "name": "Tropical Teal",
+      "hex": "#0a8ca7",
+      "sku": "YS.WOOLLYWOOL.6229"
+    },
+    {
+      "code": "6230",
+      "name": "Teal",
+      "hex": "#105767",
+      "sku": "YS.WOOLLYWOOL.6230"
+    },
+    {
+      "code": "6234",
+      "name": "Petrol",
+      "hex": "#194464",
+      "sku": "YS.WOOLLYWOOL.6234"
+    },
+    {
+      "code": "6252",
+      "name": "Fjord Blue",
+      "hex": "#3d566c",
+      "sku": "YS.WOOLLYWOOL.6252"
+    },
+    {
+      "code": "6254",
+      "name": "Robin Egg",
+      "hex": "#69a8b2",
+      "sku": "YS.WOOLLYWOOL.6254"
+    },
+    {
+      "code": "6256",
+      "name": "Duck Egg",
+      "hex": "#94b3c4",
+      "sku": "YS.WOOLLYWOOL.6256"
+    },
+    {
+      "code": "6262",
+      "name": "Powder Blue",
+      "hex": "#74a6cc",
+      "sku": "YS.WOOLLYWOOL.6262"
+    },
+    {
+      "code": "6266",
+      "name": "Hydrangea Blue",
+      "hex": "#5678ac",
+      "sku": "YS.WOOLLYWOOL.6266"
+    },
+    {
+      "code": "6270",
+      "name": "Cornflower Blue",
+      "hex": "#3965b1",
+      "sku": "YS.WOOLLYWOOL.6270"
+    },
+    {
+      "code": "6274",
+      "name": "Strong Blue",
+      "hex": "#1c419b",
+      "sku": "YS.WOOLLYWOOL.6274"
+    },
+    {
+      "code": "6290",
+      "name": "Deep Denim Blue",
+      "hex": "#232e4c",
+      "sku": "YS.WOOLLYWOOL.6290"
+    },
+    {
+      "code": "6305",
+      "name": "Sapphire Blue",
+      "hex": "#233a7c",
+      "sku": "YS.WOOLLYWOOL.6305"
+    },
+    {
+      "code": "6310",
+      "name": "Navy Blue",
+      "hex": "#1a1b29",
+      "sku": "YS.WOOLLYWOOL.6310"
+    },
+    {
+      "code": "6320",
+      "name": "Deep Purple",
+      "hex": "#2a1147",
+      "sku": "YS.WOOLLYWOOL.6320"
+    },
+    {
+      "code": "6322",
+      "name": "Amethyst",
+      "hex": "#472f7b",
+      "sku": "YS.WOOLLYWOOL.6322"
+    },
+    {
+      "code": "6324",
+      "name": "Just Purple",
+      "hex": "#3d1452",
+      "sku": "YS.WOOLLYWOOL.6324"
+    },
+    {
+      "code": "6335",
+      "name": "Sugar Plum",
+      "hex": "#774a86",
+      "sku": "YS.WOOLLYWOOL.6335"
+    },
+    {
+      "code": "6350",
+      "name": "Lilac",
+      "hex": "#8571b7",
+      "sku": "YS.WOOLLYWOOL.6350"
+    },
+    {
+      "code": "6370",
+      "name": "Fuchsia Pink",
+      "hex": "#850551",
+      "sku": "YS.WOOLLYWOOL.6370"
+    },
+    {
+      "code": "6374",
+      "name": "Pinkberry",
+      "hex": "#892967",
+      "sku": "YS.WOOLLYWOOL.6374"
+    },
+    {
+      "code": "6376",
+      "name": "Vintage Pink",
+      "hex": "#8b365f",
+      "sku": "YS.WOOLLYWOOL.6376"
+    },
+    {
+      "code": "6380",
+      "name": "Rose Pink",
+      "hex": "#9b5278",
+      "sku": "YS.WOOLLYWOOL.6380"
+    },
+    {
+      "code": "6385",
+      "name": "Bubblegum",
+      "hex": "#b33681",
+      "sku": "YS.WOOLLYWOOL.6385"
+    },
+    {
+      "code": "6390",
+      "name": "Fondant Pink",
+      "hex": "#c0679c",
+      "sku": "YS.WOOLLYWOOL.6390"
+    },
+    {
+      "code": "6410",
+      "name": "Light Pink",
+      "hex": "#d6b0c1",
+      "sku": "YS.WOOLLYWOOL.6410"
+    },
+    {
+      "code": "6422",
+      "name": "Peach",
+      "hex": "#e1bab1",
+      "sku": "YS.WOOLLYWOOL.6422"
+    },
+    {
+      "code": "6426",
+      "name": "Dusky Peach",
+      "hex": "#c6776b",
+      "sku": "YS.WOOLLYWOOL.6426"
+    },
+    {
+      "code": "6428",
+      "name": "Vintage Peach",
+      "hex": "#943d3a",
+      "sku": "YS.WOOLLYWOOL.6428"
+    },
+    {
+      "code": "H6510",
+      "name": "Stormy Sky Heather",
+      "hex": "#242b2e",
+      "sku": "YS.WOOLLYWOOL.H6510"
+    },
+    {
+      "code": "H6520",
+      "name": "Silver Mist Heather",
+      "hex": "#9ba3a0",
+      "sku": "YS.WOOLLYWOOL.H6520"
+    },
+    {
+      "code": "H6530",
+      "name": "Aged Ivory Heather",
+      "hex": "#a5a29a",
+      "sku": "YS.WOOLLYWOOL.H6530"
+    },
+    {
+      "code": "H6540",
+      "name": "Fawn Whisper Heather",
+      "hex": "#7c796c",
+      "sku": "YS.WOOLLYWOOL.H6540"
+    },
+    {
+      "code": "H6550",
+      "name": "Rustic Oak Heather",
+      "hex": "#504738",
+      "sku": "YS.WOOLLYWOOL.H6550"
+    }
+  ]
+}

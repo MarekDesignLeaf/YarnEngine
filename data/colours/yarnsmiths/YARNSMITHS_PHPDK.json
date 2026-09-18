@@ -1,0 +1,132 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PHPDK",
+  "brand": "Yarnsmiths",
+  "product": "Pebble Haze DK Prints",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-pebble-haze-dk-prints-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2D010",
+      "name": "Salterton",
+      "hex": "#ab8c77",
+      "sku": "YS.PHPRINTDK.2D010"
+    },
+    {
+      "code": "2D020",
+      "name": "Aldeburgh",
+      "hex": "#677363",
+      "sku": "YS.PHPRINTDK.2D020"
+    },
+    {
+      "code": "2D030",
+      "name": "Peppercombe",
+      "hex": "#7e5a58",
+      "sku": "YS.PHPRINTDK.2D030"
+    },
+    {
+      "code": "2D040",
+      "name": "Seaham",
+      "hex": "#8d7666",
+      "sku": "YS.PHPRINTDK.2D040"
+    },
+    {
+      "code": "2D050",
+      "name": "Chesil",
+      "hex": "#555769",
+      "sku": "YS.PHPRINTDK.2D050"
+    },
+    {
+      "code": "2D060",
+      "name": "Blakeney",
+      "hex": "#74857f",
+      "sku": "YS.PHPRINTDK.2D060"
+    },
+    {
+      "code": "2D070",
+      "name": "Elgol",
+      "hex": "#c56855",
+      "sku": "YS.PHPRINTDK.2D070"
+    },
+    {
+      "code": "2D080",
+      "name": "Birling",
+      "hex": "#8c8276",
+      "sku": "YS.PHPRINTDK.2D080"
+    },
+    {
+      "code": "2D090",
+      "name": "Lulworth",
+      "hex": "#8d9da7",
+      "sku": "YS.PHPRINTDK.2D090"
+    },
+    {
+      "code": "2D100",
+      "name": "Saltburn",
+      "hex": "#c68784",
+      "sku": "YS.PHPRINTDK.2D100"
+    },
+    {
+      "code": "2D110",
+      "name": "Charmouth",
+      "hex": "#b3ac9d",
+      "sku": "YS.PHPRINTDK.2D110"
+    },
+    {
+      "code": "2D120",
+      "name": "Marloes Sands",
+      "hex": "#a67a8c",
+      "sku": "YS.PHPRINTDK.2D120"
+    },
+    {
+      "code": "2D130",
+      "name": "Amble",
+      "hex": "#8b9371",
+      "sku": "YS.PHPRINTDK.2D130"
+    },
+    {
+      "code": "2D140",
+      "name": "Cleethorpes",
+      "hex": "#8f7d78",
+      "sku": "YS.PHPRINTDK.2D140"
+    },
+    {
+      "code": "2D300",
+      "name": "Cold Knap",
+      "hex": "#6d636c",
+      "sku": "YS.PHPRINTDK.2D300"
+    },
+    {
+      "code": "2D310",
+      "name": "Ryhope",
+      "hex": "#9e6f60",
+      "sku": "YS.PHPRINTDK.2D310"
+    },
+    {
+      "code": "2D320",
+      "name": "Monmouth",
+      "hex": "#969a97",
+      "sku": "YS.PHPRINTDK.2D320"
+    },
+    {
+      "code": "2D330",
+      "name": "Sidmouth",
+      "hex": "#954658",
+      "sku": "YS.PHPRINTDK.2D330"
+    },
+    {
+      "code": "2D340",
+      "name": "Penmouth",
+      "hex": "#baa691",
+      "sku": "YS.PHPRINTDK.2D340"
+    },
+    {
+      "code": "2D350",
+      "name": "Llanbedrog",
+      "hex": "#9c705a",
+      "sku": "YS.PHPRINTDK.2D350"
+    }
+  ]
+}

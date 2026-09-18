@@ -1,0 +1,132 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SNUGRRB300",
+  "brand": "Yarnsmiths",
+  "product": "Snug as a Bug Really Really BIG 300g",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-snug-as-a-bug-really-really-big-300g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3J010",
+      "name": "Black",
+      "hex": "#080a09",
+      "sku": "YS.SNUGRRB300.3J010"
+    },
+    {
+      "code": "3J020",
+      "name": "Storm Grey",
+      "hex": "#324248",
+      "sku": "YS.SNUGRRB300.3J020"
+    },
+    {
+      "code": "3J030",
+      "name": "Warm Grey",
+      "hex": "#7c827c",
+      "sku": "YS.SNUGRRB300.3J030"
+    },
+    {
+      "code": "3J040",
+      "name": "Soft Grey",
+      "hex": "#9a9fa3",
+      "sku": "YS.SNUGRRB300.3J040"
+    },
+    {
+      "code": "3J050",
+      "name": "Snow White",
+      "hex": "#e2e7eb",
+      "sku": "YS.SNUGRRB300.3J050"
+    },
+    {
+      "code": "3J060",
+      "name": "Teddy Bear",
+      "hex": "#5b412f",
+      "sku": "YS.SNUGRRB300.3J060"
+    },
+    {
+      "code": "3J070",
+      "name": "Cookie",
+      "hex": "#7a6e57",
+      "sku": "YS.SNUGRRB300.3J070"
+    },
+    {
+      "code": "3J080",
+      "name": "Oatmilk",
+      "hex": "#beb49b",
+      "sku": "YS.SNUGRRB300.3J080"
+    },
+    {
+      "code": "3J090",
+      "name": "Duckling",
+      "hex": "#d7ca82",
+      "sku": "YS.SNUGRRB300.3J090"
+    },
+    {
+      "code": "3J100",
+      "name": "Porcelain",
+      "hex": "#d9dad5",
+      "sku": "YS.SNUGRRB300.3J100"
+    },
+    {
+      "code": "3J103",
+      "name": "Elephant Grey",
+      "hex": "#a5a59b",
+      "sku": "YS.SNUGRRB300.3J103"
+    },
+    {
+      "code": "3J104",
+      "name": "Hint of Grey",
+      "hex": "#cfd4db",
+      "sku": "YS.SNUGRRB300.3J104"
+    },
+    {
+      "code": "3J110",
+      "name": "Soft Sage",
+      "hex": "#3e8371",
+      "sku": "YS.SNUGRRB300.3J110"
+    },
+    {
+      "code": "3J120",
+      "name": "Seaglass",
+      "hex": "#79b2ac",
+      "sku": "YS.SNUGRRB300.3J120"
+    },
+    {
+      "code": "3J130",
+      "name": "Lagoon",
+      "hex": "#348395",
+      "sku": "YS.SNUGRRB300.3J130"
+    },
+    {
+      "code": "3J140",
+      "name": "Baby Blue",
+      "hex": "#8ab3da",
+      "sku": "YS.SNUGRRB300.3J140"
+    },
+    {
+      "code": "3J150",
+      "name": "Nautical",
+      "hex": "#122541",
+      "sku": "YS.SNUGRRB300.3J150"
+    },
+    {
+      "code": "3J170",
+      "name": "Grape",
+      "hex": "#69536e",
+      "sku": "YS.SNUGRRB300.3J170"
+    },
+    {
+      "code": "3J190",
+      "name": "Baby Pink",
+      "hex": "#e1a1bc",
+      "sku": "YS.SNUGRRB300.3J190"
+    },
+    {
+      "code": "3J200",
+      "name": "Piglet",
+      "hex": "#c08f91",
+      "sku": "YS.SNUGRRB300.3J200"
+    }
+  ]
+}

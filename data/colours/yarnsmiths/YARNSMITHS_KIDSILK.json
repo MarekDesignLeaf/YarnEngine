@@ -1,0 +1,252 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_KIDSILK",
+  "brand": "Yarnsmiths",
+  "product": "Kid Mohair Silk",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-kid-mohair-silk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "3000",
+      "name": "Black",
+      "hex": "#0e0e0e",
+      "sku": "YS.KIDSILK.3000"
+    },
+    {
+      "code": "3002",
+      "name": "Anthracite Grey",
+      "hex": "#23252a",
+      "sku": "YS.KIDSILK.3002"
+    },
+    {
+      "code": "3008",
+      "name": "Storm Grey",
+      "hex": "#484c51",
+      "sku": "YS.KIDSILK.3008"
+    },
+    {
+      "code": "3015",
+      "name": "Stone Grey",
+      "hex": "#7c807b",
+      "sku": "YS.KIDSILK.3015"
+    },
+    {
+      "code": "3025",
+      "name": "Platinum Grey",
+      "hex": "#9197a6",
+      "sku": "YS.KIDSILK.3025"
+    },
+    {
+      "code": "3030",
+      "name": "Silver",
+      "hex": "#aeb1b5",
+      "sku": "YS.KIDSILK.3030"
+    },
+    {
+      "code": "3035",
+      "name": "Pale Silver",
+      "hex": "#c4c4c7",
+      "sku": "YS.KIDSILK.3035"
+    },
+    {
+      "code": "3040",
+      "name": "White",
+      "hex": "#e4e2dc",
+      "sku": "YS.KIDSILK.3040"
+    },
+    {
+      "code": "3045",
+      "name": "Off White",
+      "hex": "#d9d9cc",
+      "sku": "YS.KIDSILK.3045"
+    },
+    {
+      "code": "3050",
+      "name": "Cream",
+      "hex": "#d8d6c6",
+      "sku": "YS.KIDSILK.3050"
+    },
+    {
+      "code": "3060",
+      "name": "Parchment",
+      "hex": "#c1b9b4",
+      "sku": "YS.KIDSILK.3060"
+    },
+    {
+      "code": "3063",
+      "name": "Champagne",
+      "hex": "#d6c4b1",
+      "sku": "YS.KIDSILK.3063"
+    },
+    {
+      "code": "3065",
+      "name": "Taupe",
+      "hex": "#b29a90",
+      "sku": "YS.KIDSILK.3065"
+    },
+    {
+      "code": "3066",
+      "name": "Sand",
+      "hex": "#c1a88a",
+      "sku": "YS.KIDSILK.3066"
+    },
+    {
+      "code": "3069",
+      "name": "Latte",
+      "hex": "#7f6c5d",
+      "sku": "YS.KIDSILK.3069"
+    },
+    {
+      "code": "3074",
+      "name": "Rust",
+      "hex": "#4d2e15",
+      "sku": "YS.KIDSILK.3074"
+    },
+    {
+      "code": "3080",
+      "name": "Chocolate Brown",
+      "hex": "#281c17",
+      "sku": "YS.KIDSILK.3080"
+    },
+    {
+      "code": "3090",
+      "name": "Claret Red",
+      "hex": "#4d0e1a",
+      "sku": "YS.KIDSILK.3090"
+    },
+    {
+      "code": "3100",
+      "name": "Scarlet Red",
+      "hex": "#6d1217",
+      "sku": "YS.KIDSILK.3100"
+    },
+    {
+      "code": "3124",
+      "name": "Ginger",
+      "hex": "#9b4a22",
+      "sku": "YS.KIDSILK.3124"
+    },
+    {
+      "code": "3140",
+      "name": "Mustard Yellow",
+      "hex": "#d3a53e",
+      "sku": "YS.KIDSILK.3140"
+    },
+    {
+      "code": "3185",
+      "name": "Light Sage",
+      "hex": "#8bae95",
+      "sku": "YS.KIDSILK.3185"
+    },
+    {
+      "code": "3202",
+      "name": "Dark Sage",
+      "hex": "#4f755a",
+      "sku": "YS.KIDSILK.3202"
+    },
+    {
+      "code": "3204",
+      "name": "Country Green",
+      "hex": "#3c3f29",
+      "sku": "YS.KIDSILK.3204"
+    },
+    {
+      "code": "3208",
+      "name": "Bottle Green",
+      "hex": "#10291c",
+      "sku": "YS.KIDSILK.3208"
+    },
+    {
+      "code": "3228",
+      "name": "Vintage Teal",
+      "hex": "#579eaa",
+      "sku": "YS.KIDSILK.3228"
+    },
+    {
+      "code": "3252",
+      "name": "Fjord Blue",
+      "hex": "#375c79",
+      "sku": "YS.KIDSILK.3252"
+    },
+    {
+      "code": "3256",
+      "name": "Duck Egg",
+      "hex": "#93aab7",
+      "sku": "YS.KIDSILK.3256"
+    },
+    {
+      "code": "3260",
+      "name": "Sky Blue",
+      "hex": "#92a9bf",
+      "sku": "YS.KIDSILK.3260"
+    },
+    {
+      "code": "3285",
+      "name": "Delft Blue",
+      "hex": "#445c84",
+      "sku": "YS.KIDSILK.3285"
+    },
+    {
+      "code": "3290",
+      "name": "Deep Denim Blue",
+      "hex": "#1b2942",
+      "sku": "YS.KIDSILK.3290"
+    },
+    {
+      "code": "3310",
+      "name": "Navy Blue",
+      "hex": "#131829",
+      "sku": "YS.KIDSILK.3310"
+    },
+    {
+      "code": "3320",
+      "name": "Deep Purple",
+      "hex": "#20173e",
+      "sku": "YS.KIDSILK.3320"
+    },
+    {
+      "code": "3335",
+      "name": "Sugar Plum",
+      "hex": "#79587c",
+      "sku": "YS.KIDSILK.3335"
+    },
+    {
+      "code": "3340",
+      "name": "Pale Lilac",
+      "hex": "#ada9c1",
+      "sku": "YS.KIDSILK.3340"
+    },
+    {
+      "code": "3360",
+      "name": "Lavender",
+      "hex": "#7177bc",
+      "sku": "YS.KIDSILK.3360"
+    },
+    {
+      "code": "3376",
+      "name": "Vintage Pink",
+      "hex": "#8f415a",
+      "sku": "YS.KIDSILK.3376"
+    },
+    {
+      "code": "3380",
+      "name": "Rose Pink",
+      "hex": "#ae788d",
+      "sku": "YS.KIDSILK.3380"
+    },
+    {
+      "code": "3410",
+      "name": "Light Pink",
+      "hex": "#d2b3c3",
+      "sku": "YS.KIDSILK.3410"
+    },
+    {
+      "code": "3428",
+      "name": "Vintage Peach",
+      "hex": "#985151",
+      "sku": "YS.KIDSILK.3428"
+    }
+  ]
+}

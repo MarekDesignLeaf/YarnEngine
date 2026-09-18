@@ -1,0 +1,102 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_MERINODKTWEED",
+  "brand": "Yarnsmiths",
+  "product": "Merino DK Superwash Tweeds",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-merino-dk-superwash-tweeds-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "T3800",
+      "name": "Stormy Sky Tweed",
+      "hex": "#2c3330",
+      "sku": "YS.MERINODKTWEED.T3800"
+    },
+    {
+      "code": "T3810",
+      "name": "Silver Mist Tweed",
+      "hex": "#8c9395",
+      "sku": "YS.MERINODKTWEED.T3810"
+    },
+    {
+      "code": "T3820",
+      "name": "Multi Tweed",
+      "hex": "#cac1b7",
+      "sku": "YS.MERINODKTWEED.T3820"
+    },
+    {
+      "code": "T3830",
+      "name": "Natural Tweed",
+      "hex": "#b1b7af",
+      "sku": "YS.MERINODKTWEED.T3830"
+    },
+    {
+      "code": "T3840",
+      "name": "Linen Tweed",
+      "hex": "#a19d96",
+      "sku": "YS.MERINODKTWEED.T3840"
+    },
+    {
+      "code": "T3850",
+      "name": "Claret Tweed",
+      "hex": "#520b1c",
+      "sku": "YS.MERINODKTWEED.T3850"
+    },
+    {
+      "code": "T3860",
+      "name": "Ginger Tweed",
+      "hex": "#813a1e",
+      "sku": "YS.MERINODKTWEED.T3860"
+    },
+    {
+      "code": "T3870",
+      "name": "Antique Gold Tweed",
+      "hex": "#885a21",
+      "sku": "YS.MERINODKTWEED.T3870"
+    },
+    {
+      "code": "T3880",
+      "name": "Country Green Tweed",
+      "hex": "#424433",
+      "sku": "YS.MERINODKTWEED.T3880"
+    },
+    {
+      "code": "T3890",
+      "name": "Petrol Tweed",
+      "hex": "#1d4560",
+      "sku": "YS.MERINODKTWEED.T3890"
+    },
+    {
+      "code": "T3900",
+      "name": "Robin Egg Tweed",
+      "hex": "#679ca2",
+      "sku": "YS.MERINODKTWEED.T3900"
+    },
+    {
+      "code": "T3910",
+      "name": "Delft Blue Tweed",
+      "hex": "#324c6c",
+      "sku": "YS.MERINODKTWEED.T3910"
+    },
+    {
+      "code": "T3920",
+      "name": "Navy Blue Tweed",
+      "hex": "#111520",
+      "sku": "YS.MERINODKTWEED.T3920"
+    },
+    {
+      "code": "T3930",
+      "name": "Plum Purple Tweed",
+      "hex": "#3a1e3f",
+      "sku": "YS.MERINODKTWEED.T3930"
+    },
+    {
+      "code": "T3940",
+      "name": "Vintage Pink Tweed",
+      "hex": "#762d4a",
+      "sku": "YS.MERINODKTWEED.T3940"
+    }
+  ]
+}

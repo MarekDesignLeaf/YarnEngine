@@ -1,0 +1,222 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_BLEND_SUPP",
+  "brand": "Yarnsmiths",
+  "product": "Support Act - The Blended One",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-support-act-the-blended-one-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2T000",
+      "name": "Black",
+      "hex": "#101010",
+      "sku": "YS.BLEND-SUPP.2T000"
+    },
+    {
+      "code": "2T005",
+      "name": "Gunmetal Grey",
+      "hex": "#475155",
+      "sku": "YS.BLEND-SUPP.2T005"
+    },
+    {
+      "code": "2T030",
+      "name": "Silver",
+      "hex": "#ababab",
+      "sku": "YS.BLEND-SUPP.2T030"
+    },
+    {
+      "code": "2T040",
+      "name": "White",
+      "hex": "#e3e3e3",
+      "sku": "YS.BLEND-SUPP.2T040"
+    },
+    {
+      "code": "2T045",
+      "name": "Off White",
+      "hex": "#d4d4c1",
+      "sku": "YS.BLEND-SUPP.2T045"
+    },
+    {
+      "code": "2T060",
+      "name": "Parchment",
+      "hex": "#a8a4a0",
+      "sku": "YS.BLEND-SUPP.2T060"
+    },
+    {
+      "code": "2T063",
+      "name": "Champagne",
+      "hex": "#c9bb9e",
+      "sku": "YS.BLEND-SUPP.2T063"
+    },
+    {
+      "code": "2T070",
+      "name": "Brown Bear",
+      "hex": "#5b5047",
+      "sku": "YS.BLEND-SUPP.2T070"
+    },
+    {
+      "code": "2T074",
+      "name": "Rust",
+      "hex": "#623a1f",
+      "sku": "YS.BLEND-SUPP.2T074"
+    },
+    {
+      "code": "2T090",
+      "name": "Claret Red",
+      "hex": "#4e0d19",
+      "sku": "YS.BLEND-SUPP.2T090"
+    },
+    {
+      "code": "2T100",
+      "name": "Scarlet Red",
+      "hex": "#911123",
+      "sku": "YS.BLEND-SUPP.2T100"
+    },
+    {
+      "code": "2T126",
+      "name": "Carrot",
+      "hex": "#e0452b",
+      "sku": "YS.BLEND-SUPP.2T126"
+    },
+    {
+      "code": "2T140",
+      "name": "Mustard Yellow",
+      "hex": "#ba8528",
+      "sku": "YS.BLEND-SUPP.2T140"
+    },
+    {
+      "code": "2T160",
+      "name": "Primrose Yellow",
+      "hex": "#e1bc33",
+      "sku": "YS.BLEND-SUPP.2T160"
+    },
+    {
+      "code": "2T180",
+      "name": "Pale Lemon Yellow",
+      "hex": "#cecd9b",
+      "sku": "YS.BLEND-SUPP.2T180"
+    },
+    {
+      "code": "2T185",
+      "name": "Light Sage",
+      "hex": "#739877",
+      "sku": "YS.BLEND-SUPP.2T185"
+    },
+    {
+      "code": "2T188",
+      "name": "Apple Green",
+      "hex": "#667d27",
+      "sku": "YS.BLEND-SUPP.2T188"
+    },
+    {
+      "code": "2T202",
+      "name": "Dark Sage",
+      "hex": "#476f52",
+      "sku": "YS.BLEND-SUPP.2T202"
+    },
+    {
+      "code": "2T204",
+      "name": "Country Green",
+      "hex": "#2c2e1a",
+      "sku": "YS.BLEND-SUPP.2T204"
+    },
+    {
+      "code": "2T210",
+      "name": "Christmas Green",
+      "hex": "#0e4a35",
+      "sku": "YS.BLEND-SUPP.2T210"
+    },
+    {
+      "code": "2T224",
+      "name": "Aqua",
+      "hex": "#58a6a1",
+      "sku": "YS.BLEND-SUPP.2T224"
+    },
+    {
+      "code": "2T230",
+      "name": "Teal",
+      "hex": "#0f5768",
+      "sku": "YS.BLEND-SUPP.2T230"
+    },
+    {
+      "code": "2T251",
+      "name": "Steel Blue",
+      "hex": "#3d6a7a",
+      "sku": "YS.BLEND-SUPP.2T251"
+    },
+    {
+      "code": "2T256",
+      "name": "Duck Egg",
+      "hex": "#8da3a1",
+      "sku": "YS.BLEND-SUPP.2T256"
+    },
+    {
+      "code": "2T262",
+      "name": "Powder Blue",
+      "hex": "#91b0c6",
+      "sku": "YS.BLEND-SUPP.2T262"
+    },
+    {
+      "code": "2T274",
+      "name": "Strong Blue",
+      "hex": "#1e5696",
+      "sku": "YS.BLEND-SUPP.2T274"
+    },
+    {
+      "code": "2T290",
+      "name": "Deep Denim Blue",
+      "hex": "#1b2435",
+      "sku": "YS.BLEND-SUPP.2T290"
+    },
+    {
+      "code": "2T322",
+      "name": "Amethyst",
+      "hex": "#4a3368",
+      "sku": "YS.BLEND-SUPP.2T322"
+    },
+    {
+      "code": "2T330",
+      "name": "Plum Purple",
+      "hex": "#401b43",
+      "sku": "YS.BLEND-SUPP.2T330"
+    },
+    {
+      "code": "2T335",
+      "name": "Sugar Plum",
+      "hex": "#794e7d",
+      "sku": "YS.BLEND-SUPP.2T335"
+    },
+    {
+      "code": "2T340",
+      "name": "Pale Lilac",
+      "hex": "#b1a5ca",
+      "sku": "YS.BLEND-SUPP.2T340"
+    },
+    {
+      "code": "2T364",
+      "name": "Petal Pink",
+      "hex": "#c473a3",
+      "sku": "YS.BLEND-SUPP.2T364"
+    },
+    {
+      "code": "2T374",
+      "name": "Pinkberry",
+      "hex": "#70144c",
+      "sku": "YS.BLEND-SUPP.2T374"
+    },
+    {
+      "code": "2T410",
+      "name": "Light Pink",
+      "hex": "#d7bacb",
+      "sku": "YS.BLEND-SUPP.2T410"
+    },
+    {
+      "code": "2T420",
+      "name": "Peachy Pink",
+      "hex": "#d9c4c1",
+      "sku": "YS.BLEND-SUPP.2T420"
+    }
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_PHDK",
+  "brand": "Yarnsmiths",
+  "product": "Pebble Haze DK",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-pebble-haze-dk-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2C010",
+      "name": "Jet",
+      "hex": "#2c3230",
+      "sku": "YS.PHDK.2C010"
+    },
+    {
+      "code": "2C020",
+      "name": "Basalt",
+      "hex": "#808486",
+      "sku": "YS.PHDK.2C020"
+    },
+    {
+      "code": "2C030",
+      "name": "Flint",
+      "hex": "#bdbfbe",
+      "sku": "YS.PHDK.2C030"
+    },
+    {
+      "code": "2C040",
+      "name": "Marble",
+      "hex": "#e6e0ce",
+      "sku": "YS.PHDK.2C040"
+    },
+    {
+      "code": "2C050",
+      "name": "Limestone",
+      "hex": "#e5d8bc",
+      "sku": "YS.PHDK.2C050"
+    },
+    {
+      "code": "2C060",
+      "name": "Pumice",
+      "hex": "#b8ac91",
+      "sku": "YS.PHDK.2C060"
+    },
+    {
+      "code": "2C070",
+      "name": "Dolomite",
+      "hex": "#9d9589",
+      "sku": "YS.PHDK.2C070"
+    },
+    {
+      "code": "2C080",
+      "name": "Syenite",
+      "hex": "#b79d89",
+      "sku": "YS.PHDK.2C080"
+    },
+    {
+      "code": "2C082",
+      "name": "Tiger's Eye",
+      "hex": "#80684c",
+      "sku": "YS.PHDK.2C082"
+    },
+    {
+      "code": "2C084",
+      "name": "Mudstone",
+      "hex": "#453a34",
+      "sku": "YS.PHDK.2C084"
+    },
+    {
+      "code": "2C086",
+      "name": "Ruby",
+      "hex": "#5a363e",
+      "sku": "YS.PHDK.2C086"
+    },
+    {
+      "code": "2C090",
+      "name": "Red Serpentine",
+      "hex": "#a22d37",
+      "sku": "YS.PHDK.2C090"
+    },
+    {
+      "code": "2C100",
+      "name": "Wulfenite",
+      "hex": "#b3573b",
+      "sku": "YS.PHDK.2C100"
+    },
+    {
+      "code": "2C104",
+      "name": "Orange Topaz",
+      "hex": "#b06f4a",
+      "sku": "YS.PHDK.2C104"
+    },
+    {
+      "code": "2C110",
+      "name": "Yellow Amber",
+      "hex": "#d8aa46",
+      "sku": "YS.PHDK.2C110"
+    },
+    {
+      "code": "2C112",
+      "name": "Citrine",
+      "hex": "#cbc34c",
+      "sku": "YS.PHDK.2C112"
+    },
+    {
+      "code": "2C114",
+      "name": "Yellow Topaz",
+      "hex": "#cfca9d",
+      "sku": "YS.PHDK.2C114"
+    },
+    {
+      "code": "2C116",
+      "name": "Ludlamite",
+      "hex": "#b0c8b7",
+      "sku": "YS.PHDK.2C116"
+    },
+    {
+      "code": "2C120",
+      "name": "Titanite",
+      "hex": "#89a782",
+      "sku": "YS.PHDK.2C120"
+    },
+    {
+      "code": "2C124",
+      "name": "Green Serpentine",
+      "hex": "#327f69",
+      "sku": "YS.PHDK.2C124"
+    },
+    {
+      "code": "2C130",
+      "name": "Olivine",
+      "hex": "#6a8581",
+      "sku": "YS.PHDK.2C130"
+    },
+    {
+      "code": "2C140",
+      "name": "Chrysocolla",
+      "hex": "#50938c",
+      "sku": "YS.PHDK.2C140"
+    },
+    {
+      "code": "2C146",
+      "name": "Sodalite",
+      "hex": "#36566d",
+      "sku": "YS.PHDK.2C146"
+    },
+    {
+      "code": "2C150",
+      "name": "Blue Slate",
+      "hex": "#6b7b96",
+      "sku": "YS.PHDK.2C150"
+    },
+    {
+      "code": "2C156",
+      "name": "Lapis Lazuli",
+      "hex": "#557cc1",
+      "sku": "YS.PHDK.2C156"
+    },
+    {
+      "code": "2C160",
+      "name": "Chalcedony",
+      "hex": "#849db1",
+      "sku": "YS.PHDK.2C160"
+    },
+    {
+      "code": "2C164",
+      "name": "Blue Beryl",
+      "hex": "#8faac7",
+      "sku": "YS.PHDK.2C164"
+    },
+    {
+      "code": "2C166",
+      "name": "Lavender Quartz",
+      "hex": "#9c9eba",
+      "sku": "YS.PHDK.2C166"
+    },
+    {
+      "code": "2C170",
+      "name": "Fluorite",
+      "hex": "#9c9bbc",
+      "sku": "YS.PHDK.2C170"
+    },
+    {
+      "code": "2C180",
+      "name": "Iolite",
+      "hex": "#6c66aa",
+      "sku": "YS.PHDK.2C180"
+    },
+    {
+      "code": "2C190",
+      "name": "Porphyry",
+      "hex": "#855d78",
+      "sku": "YS.PHDK.2C190"
+    },
+    {
+      "code": "2C194",
+      "name": "Pink Tourmaline",
+      "hex": "#ad5393",
+      "sku": "YS.PHDK.2C194"
+    },
+    {
+      "code": "2C198",
+      "name": "Pink Smithsonite",
+      "hex": "#9a6a71",
+      "sku": "YS.PHDK.2C198"
+    },
+    {
+      "code": "2C200",
+      "name": "Petalite",
+      "hex": "#e9cad4",
+      "sku": "YS.PHDK.2C200"
+    },
+    {
+      "code": "2C210",
+      "name": "Coral",
+      "hex": "#bc817a",
+      "sku": "YS.PHDK.2C210"
+    }
+  ]
+}

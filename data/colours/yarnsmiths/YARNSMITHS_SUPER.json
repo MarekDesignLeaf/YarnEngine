@@ -1,0 +1,192 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_SUPER",
+  "brand": "Yarnsmiths",
+  "product": "Create Super Chunky",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-create-super-chunky-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "6000",
+      "name": "Black",
+      "hex": "#090a05",
+      "sku": "YS.SUPER.6000"
+    },
+    {
+      "code": "6010",
+      "name": "Dark Grey Heather",
+      "hex": "#5b5b59",
+      "sku": "YS.SUPER.6010"
+    },
+    {
+      "code": "6020",
+      "name": "Light Grey Heather",
+      "hex": "#94938f",
+      "sku": "YS.SUPER.6020"
+    },
+    {
+      "code": "6030",
+      "name": "Silver",
+      "hex": "#b9b5a9",
+      "sku": "YS.SUPER.6030"
+    },
+    {
+      "code": "6040",
+      "name": "White",
+      "hex": "#e5e0d4",
+      "sku": "YS.SUPER.6040"
+    },
+    {
+      "code": "6050",
+      "name": "Cream",
+      "hex": "#e2d9b7",
+      "sku": "YS.SUPER.6050"
+    },
+    {
+      "code": "6060",
+      "name": "Parchment",
+      "hex": "#b5a996",
+      "sku": "YS.SUPER.6060"
+    },
+    {
+      "code": "6070",
+      "name": "Brown Bear",
+      "hex": "#645443",
+      "sku": "YS.SUPER.6070"
+    },
+    {
+      "code": "6076",
+      "name": "Copper",
+      "hex": "#702413",
+      "sku": "YS.SUPER.6076"
+    },
+    {
+      "code": "6090",
+      "name": "Claret Red",
+      "hex": "#5b0619",
+      "sku": "YS.SUPER.6090"
+    },
+    {
+      "code": "6100",
+      "name": "Scarlet Red",
+      "hex": "#800310",
+      "sku": "YS.SUPER.6100"
+    },
+    {
+      "code": "6120",
+      "name": "Burnt Orange",
+      "hex": "#b02713",
+      "sku": "YS.SUPER.6120"
+    },
+    {
+      "code": "6140",
+      "name": "Mustard Yellow",
+      "hex": "#cc9a1c",
+      "sku": "YS.SUPER.6140"
+    },
+    {
+      "code": "6145",
+      "name": "Antique Gold",
+      "hex": "#a76b1a",
+      "sku": "YS.SUPER.6145"
+    },
+    {
+      "code": "6200",
+      "name": "Grass Green",
+      "hex": "#6c8e31",
+      "sku": "YS.SUPER.6200"
+    },
+    {
+      "code": "6210",
+      "name": "Christmas Green",
+      "hex": "#0b4428",
+      "sku": "YS.SUPER.6210"
+    },
+    {
+      "code": "6220",
+      "name": "Opal Green",
+      "hex": "#166e51",
+      "sku": "YS.SUPER.6220"
+    },
+    {
+      "code": "6230",
+      "name": "Teal",
+      "hex": "#0d6569",
+      "sku": "YS.SUPER.6230"
+    },
+    {
+      "code": "6236",
+      "name": "Deep Ocean",
+      "hex": "#194268",
+      "sku": "YS.SUPER.6236"
+    },
+    {
+      "code": "6240",
+      "name": "Dark Turquoise",
+      "hex": "#116faf",
+      "sku": "YS.SUPER.6240"
+    },
+    {
+      "code": "6270",
+      "name": "Cornflower Blue",
+      "hex": "#5479a9",
+      "sku": "YS.SUPER.6270"
+    },
+    {
+      "code": "6280",
+      "name": "Denim Blue",
+      "hex": "#5e6376",
+      "sku": "YS.SUPER.6280"
+    },
+    {
+      "code": "6290",
+      "name": "Deep Denim Blue",
+      "hex": "#1f2e41",
+      "sku": "YS.SUPER.6290"
+    },
+    {
+      "code": "6326",
+      "name": "Purple Orchid",
+      "hex": "#7d278a",
+      "sku": "YS.SUPER.6326"
+    },
+    {
+      "code": "6330",
+      "name": "Plum Purple",
+      "hex": "#4f1f3f",
+      "sku": "YS.SUPER.6330"
+    },
+    {
+      "code": "6335",
+      "name": "Sugar Plum",
+      "hex": "#8d5f91",
+      "sku": "YS.SUPER.6335"
+    },
+    {
+      "code": "6350",
+      "name": "Lilac",
+      "hex": "#aa8ab7",
+      "sku": "YS.SUPER.6350"
+    },
+    {
+      "code": "6360",
+      "name": "Lavender",
+      "hex": "#8277a2",
+      "sku": "YS.SUPER.6360"
+    },
+    {
+      "code": "6374",
+      "name": "Pinkberry",
+      "hex": "#8a225a",
+      "sku": "YS.SUPER.6374"
+    },
+    {
+      "code": "6380",
+      "name": "Rose Pink",
+      "hex": "#a5667e",
+      "sku": "YS.SUPER.6380"
+    }
+  ]
+}

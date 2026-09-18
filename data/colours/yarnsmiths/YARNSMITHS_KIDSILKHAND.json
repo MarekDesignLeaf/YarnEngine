@@ -1,0 +1,72 @@
+{
+  "record_type": "yarn_shade_card",
+  "yarn_id": "YARNSMITHS_KIDSILKHAND",
+  "brand": "Yarnsmiths",
+  "product": "Kid Mohair Silk Prints",
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-kid-mohair-silk-hand-dye-25g-all-colours",
+  "captured": "2026-09-18",
+  "method": "shade name and code as listed on the range's own page; hex sampled from that shade's ball photo on the same page",
+  "shades": [
+    {
+      "code": "2W010",
+      "name": "Sand Dollar",
+      "hex": "#6b4a11",
+      "sku": "YS.KIDSILKHAND.2W010"
+    },
+    {
+      "code": "2W020",
+      "name": "Rock Lobster",
+      "hex": "#52593d",
+      "sku": "YS.KIDSILKHAND.2W020"
+    },
+    {
+      "code": "2W030",
+      "name": "Kelp",
+      "hex": "#602129",
+      "sku": "YS.KIDSILKHAND.2W030"
+    },
+    {
+      "code": "2W040",
+      "name": "Abalone",
+      "hex": "#5c6672",
+      "sku": "YS.KIDSILKHAND.2W040"
+    },
+    {
+      "code": "2W050",
+      "name": "Sea Urchin",
+      "hex": "#665448",
+      "sku": "YS.KIDSILKHAND.2W050"
+    },
+    {
+      "code": "2W060",
+      "name": "Anemone",
+      "hex": "#6c333a",
+      "sku": "YS.KIDSILKHAND.2W060"
+    },
+    {
+      "code": "2W070",
+      "name": "Sea Holly",
+      "hex": "#233037",
+      "sku": "YS.KIDSILKHAND.2W070"
+    },
+    {
+      "code": "2W080",
+      "name": "Tidal Pool",
+      "hex": "#274c60",
+      "sku": "YS.KIDSILKHAND.2W080"
+    },
+    {
+      "code": "2W090",
+      "name": "Starfish",
+      "hex": "#452918",
+      "sku": "YS.KIDSILKHAND.2W090"
+    },
+    {
+      "code": "2W100",
+      "name": "Seal Pup",
+      "hex": "#4d534f",
+      "sku": "YS.KIDSILKHAND.2W100"
+    }
+  ]
+}
