@@ -20,9 +20,15 @@ def source():
 
 def test_registry_contains_full_original_seed_list():
     sources = load_registry(ROOT / "data" / "ingestion" / "sources.json")
-    assert len(sources) == 232
-    assert sum(1 for s in sources if s.enabled) == 5
-    assert {s.display_name for s in sources if s.enabled} == {"DROPS", "Scheepjes", "Sirdar", "King Cole", "Malabrigo"}
+    # The original 232-entry seed list, plus sources verified since.
+    assert len(sources) == 233
+    assert sum(1 for s in sources if s.enabled) == 6
+    assert {s.display_name for s in sources if s.enabled} == {
+        "DROPS", "Scheepjes", "Sirdar", "King Cole", "Malabrigo", "Yarnsmiths"}
+    # An enabled source must actually be pointable at something.
+    for s in sources:
+        if s.enabled:
+            assert s.base_url and s.catalogue_urls, s.source_id
 
 
 def test_composition_parser():

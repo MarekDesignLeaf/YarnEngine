@@ -4184,5 +4184,26 @@
     "delay_seconds": 0.7,
     "robots_policy": "respect",
     "notes": "Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling."
+  },
+  {
+    "source_id": "SRC_YARNSMITHS",
+    "display_name": "Yarnsmiths",
+    "manufacturer_name": "Yarnsmiths (Wool Warehouse Direct Ltd)",
+    "country": "UK and Ireland",
+    "base_url": "https://www.woolwarehouse.co.uk",
+    "catalogue_urls": [
+      "https://www.woolwarehouse.co.uk/yarn/brand/yarnsmiths",
+      "https://www.woolwarehouse.co.uk/yarn?brand_nav=49231&p=2"
+    ],
+    "product_url_regex": "^https://www\\.woolwarehouse\\.co\\.uk/yarn/yarnsmiths-[a-z0-9\\-]+-all-colours$",
+    "exclude_url_regex": "(catalogsearch|/patterns-and-books/)",
+    "adapter": "generic",
+    "enabled": true,
+    "domain_status": "verified",
+    "max_catalogue_pages": 5,
+    "max_product_pages": 120,
+    "delay_seconds": 1.0,
+    "robots_policy": "respect",
+    "notes": "Own brand of the UK retailer Wool Warehouse, so its product pages are the brand's own source. Each '...-all-colours' page carries a Specification table (ball weight, length, blend, needle size, tension) which is what the 53 records imported on 2026-09-18 were built from; the raw capture is kept in data/ingestion/yarnsmiths_capture_2026-09-18.json."
   }
 ]

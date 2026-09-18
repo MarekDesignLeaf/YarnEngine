@@ -1,0 +1,23 @@
+{
+  "record_type": "yarn",
+  "yarn_id": "YARNSMITHS_KIDSILK",
+  "brand": "Yarnsmiths",
+  "product": "Kid Mohair Silk",
+  "variant": null,
+  "cyc_weight": 0,
+  "package_mass_g": 25.0,
+  "package_length_m": 210.0,
+  "fibre_composition": {
+    "Silk": 25.0,
+    "Mohair": 75.0
+  },
+  "tex": 119.04761904761904,
+  "nominal_diameter_mm": null,
+  "wpi": null,
+  "recommended_needle_min_mm": 3.5,
+  "recommended_needle_max_mm": 3.5,
+  "source_type": "manufacturer_web",
+  "source_reference": "https://www.woolwarehouse.co.uk/yarn/yarnsmiths-kid-mohair-silk-all-colours",
+  "evidence_level": "manufacturer_declared",
+  "description": "Lace weight. 23 stitches and 30 rows for a 10x10cm tension square using 3.5mm needles. Hook 4.5mm. 40 shades."
+}
