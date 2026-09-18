@@ -270,6 +270,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
   <button data-tab="stash">My stash</button>
   <button data-tab="lines">Products</button>
   <button data-tab="projects">Projects</button>
+  <button data-tab="worklog">Work log</button>
   <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
 </nav>
 
@@ -381,6 +382,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <label><span>Rows/rounds per 10 cm</span><input id="gaugeRows" type="number" step="0.5" min="1" value="22"></label>
       <label><span>Yarn diameter (mm, optional)</span><input id="diam" type="number" step="0.1" min="0.1" placeholder="auto"></label>
       <label><span>Allowance (%)</span><input id="allowance" type="number" step="1" min="0" max="50" value="10"></label>
+      <label><span>Piece name (for your log)</span><input id="pieceName" placeholder="e.g. Bear head, order 214"></label>
     </div>
     <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650">Calibrate with a measured swatch (optional supplement)</summary>
       <p class="muted small">Crochet a small swatch in the same pattern, yarn and hook, unravel it and measure the yarn used. The estimate is then replaced by your measurement.</p>
@@ -519,6 +521,40 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 <!-- ---------- PROJECTS ---------- -->
 <section id="tab-projects" class="hidden">
   <div class="card"><h2>Saved projects</h2><div id="projectList"></div></div>
+</section>
+
+<!-- ---------- WORK LOG ---------- -->
+<section id="tab-worklog" class="hidden">
+  <div class="card">
+    <div class="toolbar" style="margin-top:0;justify-content:space-between">
+      <h2 style="margin:0">Work log</h2>
+      <div class="toolbar" style="margin:0">
+        <select id="wlOwner" style="width:auto" title="Whose log to read"></select>
+        <button id="wlRefresh" class="alt">Refresh</button>
+        <button id="wlCsv" class="alt">Download CSV</button>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:0">Every calculation is written down here by itself — nothing to press. Your log is yours alone until you name someone to share it with, below.</p>
+    <div class="fields three">
+      <label><span>Search</span><input id="wlQuery" placeholder="piece, yarn, shade or note"></label>
+      <label><span>Kind</span><select id="wlKind"><option value="">all</option><option value="flat">flat piece</option><option value="amigurumi">amigurumi</option><option value="design">design from a photo</option><option value="branch">branch</option></select></label>
+      <label><span>Yarn</span><select id="wlYarn"><option value="">any</option></select></label>
+    </div>
+    <div id="wlTotals" class="metrics" style="margin-top:10px"></div>
+    <div id="wlStatus" class="status hidden"></div>
+    <div style="overflow:auto;margin-top:10px">
+      <table id="wlTable"><thead><tr>
+        <th>When</th><th>Piece</th><th>Yarn / shade</th><th>Yarn</th><th>Weight</th><th>Balls</th><th>Stitches</th><th>Note</th><th></th>
+      </tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Sharing</h2>
+    <p class="small muted" style="margin-top:0">Pick the people who may read your log. One at a time, and you can stop at any moment — they see it as read-only, and never the entries you mark private.</p>
+    <div id="wlShareList" style="display:grid;gap:6px;max-height:260px;overflow:auto"></div>
+    <div id="wlShareStatus" class="status hidden"></div>
+    <div id="wlSharedWithMe" class="small muted" style="margin-top:10px"></div>
+  </div>
 </section>
 
 <!-- ---------- ADMIN ---------- -->
@@ -775,7 +811,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns')renderGallery();if(b.dataset.tab==='stash')loadStash();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -1391,19 +1427,20 @@ $('btnDsgCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('dsg
 $('btnDsgPrint').onclick=()=>{const w=window.open('','_blank');if(!w)return;w.document.write('<pre style="font:13px/1.45 system-ui;white-space:pre-wrap">'+esc($('dsgWritten').textContent)+'</pre>');w.document.close();w.print();};
 
 /* ============================ calculation ============================ */
-function commonInputs(){return {yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
+function commonInputs(){return {yarn_id:$('yarn').value||null,colour_id:$('yarnColour').value||null,hook_mm:Number($('hook').value)||null,gauge_stitches_per_10cm:Number($('gaugeSt').value),gauge_rows_per_10cm:Number($('gaugeRows').value),allowance_percent:Number($('allowance').value)||0,yarn_diameter_mm:$('diam').value?Number($('diam').value):null};}
 function swatchInput(){const s=Number($('swSt').value),r=Number($('swRows').value),l=Number($('swLen').value);return (s>0&&r>0&&l>0)?{stitches:s,rows:r,yarn_length_m:l}:null;}
 $('btnCalc').onclick=async()=>{
  $('calcStatus').classList.add('hidden');const c=commonInputs();if(!c.yarn_id&&!c.yarn_diameter_mm){status($('calcStatus'),t('msg.yarnMissing'),'bad');return;}
  try{
   if(calcMode==='flat'){
    const [pattern_id,pattern_version]=$('pattern').value.split('|');
-   const body={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn'};
+   const body={pattern_id,pattern_version,...c,width_cm:Number($('widthCm').value),height_cm:Number($('heightCm').value),partial_repeat_mode:$('partial').value,edges:{left_stitches:0,right_stitches:0,left_operation:'SC',right_operation:'SC'},calculation_mode:'auto',swatch:swatchInput(),domain_policy:'warn',title:$('pieceName').value.trim()||null};
    const d=await api('/api/calculate',{method:'POST',body});lastResult={kind:'flat',request:body,response:d};
    showResult({len:d.consumption.recommended_length_m,lower:d.confidence.lower_m,upper:d.confidence.upper_m,mass:d.consumption.mass_g,packs:d.consumption.packages,st:d.project.stitches*d.project.rows,size:`${fmt(d.project.achieved_width_cm)} × ${fmt(d.project.achieved_height_cm)} cm`,ops:d.project.operation_counts,warnings:d.warnings,level:d.confidence.level,copies:1,cost:d.cost_estimate,stash:d.stash_status});
   }else{
    const copies=Math.max(1,Number($('amiCopies').value)||1);
-   const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn'};
+   const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn',colour_id:c.colour_id,copies,
+    title:$('pieceName').value.trim()||($('amiTemplate').value&&$('amiTemplate').value!=='custom'?$('amiTemplate').selectedOptions[0].text:null)};
    const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
    showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} rounds × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
@@ -1431,7 +1468,12 @@ function showResult(r){
  $('resultEmpty').classList.add('hidden');$('resultBody').classList.remove('hidden');
  const lvl=r.level;const badge=lvl==='calibrated'?['good',t('msg.calibrated')]:lvl?.startsWith('production_model')?['good',t('msg.model')]:['warn',t('msg.baseline')];
  $('resultBadge').innerHTML=`<span class="badge ${badge[0]}">${esc(badge[1])}</span>`;
- $('rLen').textContent=r.len!=null?fmt(toLen(r.len),1)+' '+unitLenLabel():'–';
+ /* Round once, here, to the precision the work log stores: otherwise the same
+    piece reads 26.0 m on this panel and 25.9 m in the log, and the figures
+    stop being believable. */
+ const shownLen=r.len!=null?Number(Number(r.len).toFixed(2)):null;
+ const shownMass=r.mass!=null?Number(Number(r.mass).toFixed(1)):null;
+ $('rLen').textContent=shownLen!=null?fmt(toLen(shownLen),1)+' '+unitLenLabel():'–';
  $('rRange').textContent=(r.lower!=null&&r.upper!=null)?`${fmt(toLen(r.lower),0)}–${fmt(toLen(r.upper),0)} ${unitLenLabel()}`:'–';
  /* Weight is the figure people came for, so it never just goes blank: if it
     cannot be worked out, the tile says what is missing instead of a dash, and
@@ -1440,10 +1482,10 @@ function showResult(r){
  const copies=Math.max(1,r.copies||1);
  $('rMassLabel').textContent=copies>1?`Weight (all ${copies})`:'Weight';
  if(r.mass!=null){
-  $('rMass').textContent=fmt(toMass(r.mass),UNIT==='imperial'?1:0)+' '+unitMassLabel();
+  $('rMass').textContent=fmt(toMass(shownMass),UNIT==='imperial'?1:0)+' '+unitMassLabel();
   const y=yarnById($('yarn').value);
   // one decimal per piece, so three of them visibly add up to the total
-  const each=copies>1?`${fmt(toMass(r.mass/copies),1)} ${unitMassLabel()} per piece · `:'';
+  const each=copies>1?`${fmt(toMass(shownMass/copies),1)} ${unitMassLabel()} per piece · `:'';
   $('rMassNote').textContent=y?`${each}${fmt((y.tex||y.package_mass_g/y.package_length_m*1000)/1000,3)} ${unitMassLabel()} per ${unitLenLabel()} (${y.brand} ${y.product}, ${y.package_mass_g} g / ${y.package_length_m} m)`:'';
  } else {
   $('rMass').textContent='needs a yarn';
@@ -1451,7 +1493,7 @@ function showResult(r){
   $('rMassNote').textContent='Weight and ball count need a yarn from the library — a diameter on its own gives length only. Choose one in “Yarn, hook and gauge”; it then shows in the bar at the top of the page.';
  }
  if(r.mass!=null)$('rMass').style.fontSize='';
- let packs=r.packs;if(packs==null&&r.packLen&&r.len)packs=Math.ceil(r.len/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
+ let packs=r.packs;if(packs==null&&r.packLen&&shownLen)packs=Math.ceil(shownLen/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
  $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
  $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} × ${n}</span>`).join('');
  $('rWarn').innerHTML=(r.warnings||[]).map(w=>`<li>${esc(w)}</li>`).join('');
@@ -1912,6 +1954,167 @@ function renderExplode(d){
   `${fmt(totalLen)} m`+(known&&totalMass?` · ${fmt(totalMass)} g in total`:'')
   +(gpm?` · ${fmt(gpm,3)} g per m`:'');
 }
+
+/* ============================ work log ==================================
+   Written by the server as each calculation succeeds, so this tab only reads
+   and organises. A log belongs to one person; the picker at the top switches
+   between mine and any colleague who has shared theirs. */
+let WL={owner:null,entries:[],me:null,shares:{shared_with:[],shared_with_me:[]},colleagues:[]};
+let wlTimer=null;
+
+async function loadWorkLog(){
+ try{
+  const [shares,colleagues]=await Promise.all([api('/api/worklog/shares'),api('/api/colleagues')]);
+  WL.shares=shares;WL.me=shares.me;WL.colleagues=colleagues.colleagues||[];
+  renderOwnerPicker();renderShareList();
+  await loadWorkLogEntries();
+ }catch(e){status($('wlStatus'),e.message,'bad');}
+}
+function renderOwnerPicker(){
+ const keep=$('wlOwner').value;
+ const mine=`<option value="">My log</option>`;
+ const others=(WL.shares.shared_with_me||[]).map(o=>`<option value="${o.user_id}">${esc(o.username)}’s log</option>`).join('');
+ $('wlOwner').innerHTML=mine+others;
+ if(keep&&[...$('wlOwner').options].some(o=>o.value===keep))$('wlOwner').value=keep;
+ $('wlOwner').classList.toggle('hidden',!others);
+}
+function renderShareList(){
+ if(!WL.colleagues.length){
+  $('wlShareList').innerHTML='<span class="small muted">No one else has an account on this server yet.</span>';
+ }else{
+  const shared=new Set((WL.shares.shared_with||[]).map(s=>s.user_id));
+  $('wlShareList').innerHTML=WL.colleagues.map(c=>`<label style="display:flex;align-items:center;gap:8px;font-weight:500">
+   <input type="checkbox" class="wlShare" data-id="${c.user_id}" ${shared.has(c.user_id)?'checked':''} style="width:auto">
+   ${esc(c.username)}${c.role==='admin'?' <span class="pill">admin</span>':''}</label>`).join('');
+  $('wlShareList').querySelectorAll('.wlShare').forEach(cb=>cb.onchange=()=>toggleShare(cb));
+ }
+ const mine=WL.shares.shared_with_me||[];
+ $('wlSharedWithMe').textContent=mine.length
+  ? 'Shared with you: '+mine.map(o=>o.username).join(', ')+'. Pick one at the top to read it.'
+  : 'No one has shared their log with you yet.';
+}
+async function toggleShare(cb){
+ const id=Number(cb.dataset.id);
+ try{
+  if(cb.checked){const r=await api('/api/worklog/shares',{method:'POST',body:{user_id:id}});
+   status($('wlShareStatus'),`${r.shared_with} can now read your log.`,'good');}
+  else{const r=await api('/api/worklog/shares/'+id,{method:'DELETE'});
+   status($('wlShareStatus'),`${r.with} can no longer read your log.`,'good');}
+  WL.shares=await api('/api/worklog/shares');renderOwnerPicker();
+ }catch(e){cb.checked=!cb.checked;status($('wlShareStatus'),e.message,'bad');}
+}
+async function loadWorkLogEntries(){
+ const owner=$('wlOwner').value;
+ const p=new URLSearchParams();
+ if(owner)p.set('owner',owner);
+ if($('wlQuery').value.trim())p.set('q',$('wlQuery').value.trim());
+ if($('wlKind').value)p.set('kind',$('wlKind').value);
+ if($('wlYarn').value)p.set('yarn_id',$('wlYarn').value);
+ try{
+  const d=await api('/api/worklog'+(p.toString()?'?'+p:''));
+  WL.owner=d.owner;WL.entries=d.entries;
+  // the yarn filter offers what is actually in this log, not the whole library
+  if(!$('wlYarn').value){
+   const seen=new Map();d.entries.forEach(e=>{if(e.yarn_id&&!seen.has(e.yarn_id))seen.set(e.yarn_id,e.yarn_name||e.yarn_id);});
+   $('wlYarn').innerHTML='<option value="">any</option>'+[...seen].sort((a,b)=>a[1].localeCompare(b[1]))
+    .map(([id,name])=>`<option value="${esc(id)}">${esc(name)}</option>`).join('');
+  }
+  renderWorkLogTotals(d.totals,d.owner);
+  renderWorkLog(d.entries,d.owner);
+  $('wlStatus').classList.add('hidden');
+ }catch(e){status($('wlStatus'),e.message,'bad');}
+}
+function renderWorkLogTotals(tot,owner){
+ if(!tot){$('wlTotals').innerHTML='';return;}
+ const tiles=[['Pieces',tot.entries],['Yarn',fmt(toLen(tot.length_m))+' '+unitLenLabel()],
+  ['Weight',fmt(toMass(tot.mass_g),0)+' '+unitMassLabel()],['Stitches',(tot.stitches||0).toLocaleString()]];
+ $('wlTotals').innerHTML=tiles.map(([k,v])=>`<div class="metric"><strong>${esc(String(v))}</strong><span>${esc(k)}${owner&&!owner.is_me?' · '+esc(owner.username):''}</span></div>`).join('');
+}
+function renderWorkLog(rows,owner){
+ const tb=$('wlTable').querySelector('tbody');
+ if(!rows.length){tb.innerHTML='<tr><td colspan="9" class="muted">Nothing logged yet — calculate a piece and it appears here.</td></tr>';return;}
+ const mine=owner&&owner.is_me;
+ tb.innerHTML=rows.map(e=>{
+  const sw=e.colour_hex?`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;background:${esc(e.colour_hex)};border:1px solid rgba(0,0,0,.25)"></span> `:'';
+  return `<tr data-id="${e.entry_id}">
+   <td class="small">${esc(new Date(e.updated_at).toLocaleString())}${e.repeat_count>1?`<br><span class="muted">recalculated ×${e.repeat_count}</span>`:''}</td>
+   <td>${esc(e.title)}<br><span class="small muted">${esc(e.kind)}${e.pieces>1?' · '+e.pieces+' pieces':''}${e.gauge_stitches?' · '+fmt(e.gauge_stitches,0)+'×'+fmt(e.gauge_rows,0)+' per 10 cm':''}${e.hook_mm?' · hook '+fmt(e.hook_mm,2)+' mm':''}</span></td>
+   <td class="small">${esc(e.yarn_name||'—')}<br>${sw}${esc(e.colour_name||'')}</td>
+   <td>${e.length_m!=null?fmt(toLen(e.length_m))+' '+unitLenLabel():'–'}</td>
+   <td>${e.mass_g!=null?fmt(toMass(e.mass_g),0)+' '+unitMassLabel():'–'}</td>
+   <td>${e.packages??'–'}</td>
+   <td class="small">${e.stitches!=null?e.stitches.toLocaleString():'–'}</td>
+   <td>${mine?`<input class="wlNote" data-id="${e.entry_id}" value="${esc(e.note||'')}" placeholder="note" style="min-width:120px">`:esc(e.note||'')}</td>
+   <td class="small" style="white-space:nowrap">
+    <button class="link wlOpen" data-id="${e.entry_id}">open</button>
+    ${mine?`<label title="Hide this one from the people you share with" style="font-weight:500"><input type="checkbox" class="wlPriv" data-id="${e.entry_id}" ${e.private?'checked':''} style="width:auto"> private</label>
+    <button class="link wlDel" data-id="${e.entry_id}">delete</button>`:''}
+   </td></tr>`;}).join('');
+ tb.querySelectorAll('.wlNote').forEach(i=>i.onchange=()=>patchEntry(i.dataset.id,{note:i.value}));
+ tb.querySelectorAll('.wlPriv').forEach(cb=>cb.onchange=()=>patchEntry(cb.dataset.id,{private:cb.checked}));
+ tb.querySelectorAll('.wlDel').forEach(b=>b.onclick=()=>deleteEntry(b.dataset.id));
+ tb.querySelectorAll('.wlOpen').forEach(b=>b.onclick=()=>openEntry(b.dataset.id));
+}
+async function patchEntry(id,body){
+ try{await api('/api/worklog/'+id,{method:'PATCH',body});status($('wlStatus'),'Saved.','good');}
+ catch(e){status($('wlStatus'),e.message,'bad');}
+}
+async function deleteEntry(id){
+ try{await api('/api/worklog/'+id,{method:'DELETE'});await loadWorkLogEntries();status($('wlStatus'),'Entry removed.','good');}
+ catch(e){status($('wlStatus'),e.message,'bad');}
+}
+/* Reopening puts the piece back in front of you: the inputs it was calculated
+   from, and for a shaped piece the rounds themselves, so it can be adjusted
+   and run again rather than retyped. */
+async function openEntry(id){
+ try{
+  const e=await api('/api/worklog/'+id);
+  const r=e.request||{};
+  if(r.yarn_id){$('yarn').value=r.yarn_id;await loadColours();}
+  if(r.colour_id){$('yarnColour').value=r.colour_id;syncColour();}
+  if(r.hook_mm)$('hook').value=r.hook_mm;
+  if(r.gauge_stitches_per_10cm)$('gaugeSt').value=r.gauge_stitches_per_10cm;
+  if(r.gauge_rows_per_10cm)$('gaugeRows').value=r.gauge_rows_per_10cm;
+  if(r.allowance_percent!=null)$('allowance').value=r.allowance_percent;
+  $('pieceName').value=e.title||'';
+  renderYarnBar();
+  document.querySelector('nav.tabs button[data-tab=calc]').click();
+  if(e.kind==='amigurumi'&&r.program){
+   calcSetMode('ami');
+   $('amiInitial').value=r.program.initial_stitches;lastInitial=r.program.initial_stitches;
+   $('amiTemplate').value='custom';
+   if(r.copies)$('amiCopies').value=r.copies;
+   writeRounds(r.program.rounds||[]);
+   status($('amiStatus'),`Reopened “${e.title}” from your log — calculate again to refresh the figures.`,'good');
+  }else if(e.kind==='design'){
+   calcSetMode('design');
+   if(e.result&&e.result.parts)showDesign(e.result);
+   status($('dsgStatus'),`Reopened “${e.title}” from your log.`,'good');
+  }else{
+   calcSetMode('flat');
+   if(r.width_cm)$('widthCm').value=r.width_cm;
+   if(r.height_cm)$('heightCm').value=r.height_cm;
+   if(r.pattern_id)selectPattern(`${r.pattern_id}|${r.pattern_version||'1.0.0'}`);
+   status($('calcStatus'),`Reopened “${e.title}” from your log.`,'good');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+ }catch(err){status($('wlStatus'),err.message,'bad');}
+}
+$('wlRefresh').onclick=loadWorkLog;
+$('wlOwner').onchange=loadWorkLogEntries;
+$('wlKind').onchange=loadWorkLogEntries;
+$('wlYarn').onchange=loadWorkLogEntries;
+$('wlQuery').addEventListener('input',()=>{clearTimeout(wlTimer);wlTimer=setTimeout(loadWorkLogEntries,250);});
+$('wlCsv').onclick=()=>{
+ const head=['when','piece','kind','yarn','shade','length_m','mass_g','balls','stitches','pieces','note'];
+ const esc2=v=>`"${String(v==null?'':v).replace(/"/g,'""')}"`;
+ const body=WL.entries.map(e=>[e.updated_at,e.title,e.kind,e.yarn_name||'',e.colour_name||'',
+  e.length_m??'',e.mass_g??'',e.packages??'',e.stitches??'',e.pieces??'',e.note||''].map(esc2).join(','));
+ const blob=new Blob([[head.join(','),...body].join('\n')],{type:'text/csv'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+ a.download=`yarnengine-worklog-${new Date().toISOString().slice(0,10)}.csv`;
+ document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
+};
 
 history.replaceState({ye:{tab:'calc',mode:calcMode}},'',location.pathname);
 apply3dToggle();updateBackButton();renderYarnBar();

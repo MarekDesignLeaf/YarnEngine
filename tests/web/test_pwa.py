@@ -62,3 +62,10 @@ def test_weight_says_what_is_missing_rather_than_showing_a_dash():
     html = c.get("/").text
     assert 'id="rMassNote"' in html and 'id="rMassLabel"' in html
     assert "needs a yarn" in html
+
+
+def test_the_work_log_tab_and_sharing_are_in_the_shell():
+    html = c.get("/").text
+    for needle in ('data-tab="worklog"', 'id="tab-worklog"', 'id="wlTable"',
+                   'id="wlShareList"', 'id="wlOwner"', 'id="pieceName"'):
+        assert needle in html, needle

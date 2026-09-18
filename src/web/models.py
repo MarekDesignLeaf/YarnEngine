@@ -33,6 +33,10 @@ class CalculationRequest(BaseModel):
     swatch: SwatchInput | None = None
     yarn_diameter_mm: float | None = Field(None, gt=0)
     hook_mm: float | None = Field(None, gt=0)
+    # The shade being made in. It changes nothing about the arithmetic; it is
+    # carried so the work log records which colour the piece was for.
+    colour_id: str | None = None
+    title: str | None = None
 
     @model_validator(mode="after")
     def validate_mode(self):

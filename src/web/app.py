@@ -59,6 +59,7 @@ from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
 from src.library.colours import match_colour
+from src.worklog.store import WorkLogStore
 import datetime, os, sqlite3, time
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -107,6 +108,7 @@ model_registry = ModelRegistry(DATA_DIR / 'model_registry.sqlite')
 service = WebService(ROOT, DB_PATH, model_registry=model_registry)
 project_store = ProjectStore(DATA_DIR / 'projects.sqlite')
 swatch_store = SwatchStore(DATA_DIR / 'swatches.sqlite')
+worklog_store = WorkLogStore(DATA_DIR / 'worklog.sqlite')
 crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
@@ -702,8 +704,174 @@ def _assign_colours(design: dict, payload: dict, described: dict | None = None) 
     design["colour_catalogue_size"] = len(catalogue)
 
 
+# --------------------------------------------------------------- work log ----
+def _log_calculation(http_request, kind, title, payload, result, **fields):
+    """Write a finished calculation into the person's log.
+
+    Recording must never cost someone the result they just waited for, so every
+    failure here is swallowed: a missing log entry is a nuisance, a 500 on a
+    calculation that actually succeeded is not.
+    """
+    try:
+        return worklog_store.record(
+            user_id=_current_user_id(http_request), kind=kind, title=title,
+            request=payload, result=result, **fields)
+    except Exception:            # noqa: BLE001 - see the docstring
+        return None
+
+
+def _colour_fields(colour: dict | None) -> dict:
+    if not colour:
+        return {}
+    return {"colour_id": colour.get("colour_id"), "colour_name": colour.get("name"),
+            "colour_hex": colour.get("hex")}
+
+
+def _yarn_fields(yarn_id: str | None) -> dict:
+    if not yarn_id:
+        return {}
+    yarn = service._yarn(yarn_id)
+    if not yarn:
+        return {"yarn_id": yarn_id}
+    return {"yarn_id": yarn_id,
+            "yarn_name": " ".join(x for x in [yarn.get("brand"), yarn.get("product")] if x)}
+
+
+def _gauge_fields(payload: dict) -> dict:
+    def number(key):
+        try:
+            return float(payload[key]) if payload.get(key) is not None else None
+        except (TypeError, ValueError):
+            return None
+    return {"hook_mm": number("hook_mm"),
+            "gauge_stitches": number("gauge_stitches_per_10cm"),
+            "gauge_rows": number("gauge_rows_per_10cm")}
+
+
+def _user_label(user_id: int | None) -> str:
+    if user_id is None:
+        return "this device"
+    row = user_store.get(user_id)
+    return (row or {}).get("username") or f"user {user_id}"
+
+
+@app.get("/api/colleagues")
+def colleagues(http_request: Request):
+    """Who a log can be shared with: the other active people on this server.
+
+    Names only -- picking someone to share with should not hand out their email
+    address or anything else about them.
+    """
+    me = _current_user_id(http_request)
+    rows = [{"user_id": u["id"], "username": u["username"], "role": u["role"]}
+            for u in user_store.list() if u["active"] and u["id"] != me]
+    rows.sort(key=lambda r: r["username"].lower())
+    return {"colleagues": rows, "me": me}
+
+
+@app.get("/api/worklog")
+def worklog_list(http_request: Request, owner: int | None = None, q: str | None = None,
+                 kind: str | None = None, yarn_id: str | None = None,
+                 limit: int = 200, offset: int = 0):
+    """A log: mine by default, or a colleague's when they have shared it."""
+    me = _current_user_id(http_request)
+    owner_id = me if owner is None else int(owner)
+    entries = worklog_store.list(owner_id=owner_id, viewer_id=me, query=q, kind=kind,
+                                 yarn_id=yarn_id, limit=limit, offset=offset)
+    if entries is None:
+        raise HTTPException(status_code=403, detail="this log has not been shared with you")
+    return {"owner": {"user_id": owner_id, "username": _user_label(owner_id),
+                      "is_me": owner_id == me},
+            "entries": entries,
+            "totals": worklog_store.totals(owner_id=owner_id, viewer_id=me)}
+
+
+@app.get("/api/worklog/shares")
+def worklog_shares(http_request: Request):
+    """Who I share my log with, and whose logs I can read."""
+    me = _current_user_id(http_request)
+    return {
+        "me": me,
+        "shared_with": [{"user_id": u, "username": _user_label(u)}
+                        for u in worklog_store.viewers_of(me)],
+        "shared_with_me": [{"user_id": u, "username": _user_label(u)}
+                           for u in worklog_store.owners_for(me)],
+    }
+
+
+@app.post("/api/worklog/shares")
+def worklog_share(payload: dict, http_request: Request):
+    me = _current_user_id(http_request)
+    if me is None:
+        raise HTTPException(status_code=403, detail="sign in to share your log")
+    try:
+        viewer = int(payload.get("user_id"))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=422, detail="user_id is required")
+    target = user_store.get(viewer)
+    if target is None or not target["active"]:
+        raise HTTPException(status_code=404, detail="no such person")
+    if not worklog_store.share(me, viewer):
+        raise HTTPException(status_code=422, detail="that is your own log")
+    return {"shared_with": _user_label(viewer)}
+
+
+@app.delete("/api/worklog/shares/{viewer_id}")
+def worklog_unshare(viewer_id: int, http_request: Request):
+    me = _current_user_id(http_request)
+    worklog_store.unshare(me, viewer_id)
+    return {"status": "stopped sharing", "with": _user_label(viewer_id)}
+
+
+@app.get("/api/worklog/{entry_id}")
+def worklog_entry(entry_id: int, http_request: Request):
+    """One entry in full, including the request it can be recalculated from."""
+    row = worklog_store.visible_entry(entry_id, _current_user_id(http_request))
+    if row is None:
+        raise HTTPException(status_code=404, detail="entry not found")
+    row["request"] = json.loads(row.pop("request_json"))
+    row["result"] = json.loads(row.pop("result_json"))
+    row["owner_username"] = _user_label(row["user_id"])
+    return row
+
+
+@app.patch("/api/worklog/{entry_id}")
+def worklog_update(entry_id: int, payload: dict, http_request: Request):
+    row = worklog_store.update(entry_id, _current_user_id(http_request),
+                               note=payload.get("note"), private=payload.get("private"),
+                               title=payload.get("title"))
+    if row is None:
+        raise HTTPException(status_code=404, detail="entry not found")
+    row.pop("request_json", None)
+    row.pop("result_json", None)
+    return row
+
+
+@app.delete("/api/worklog/{entry_id}")
+def worklog_delete(entry_id: int, http_request: Request):
+    if not worklog_store.delete(entry_id, _current_user_id(http_request)):
+        raise HTTPException(status_code=404, detail="entry not found")
+    return {"status": "deleted"}
+
+
+
+def _log_design(http_request, design: dict, payload: dict) -> None:
+    yarn = design.get("yarn") or {}
+    _log_calculation(
+        http_request, "design",
+        f"{design.get('object') or 'Design'} — {design.get('total_height_cm')} cm, "
+        f"{len(design.get('parts') or [])} parts",
+        payload, design,
+        **_yarn_fields(payload.get("yarn_id")),
+        **_colour_fields(design.get("colour")),
+        **_gauge_fields(payload),
+        length_m=yarn.get("length_m"), mass_g=yarn.get("mass_g"),
+        packages=yarn.get("packages"), stitches=design.get("total_stitches"),
+        pieces=design.get("piece_count"))
+
+
 @app.post("/api/design/generate")
-def design_generate(payload: dict):
+def design_generate(payload: dict, http_request: Request):
     """Parts + a stated height -> the pattern for every part.
 
     Deterministic and offline: no photo, no API key. This is the step that
@@ -716,6 +884,7 @@ def design_generate(payload: dict):
     _cost_design_in_yarn(design, payload)
     _assign_colours(design, payload)
     design["written"] = written_pattern(design)
+    _log_design(http_request, design, payload)
     return design
 
 
@@ -787,6 +956,7 @@ def design_from_photo(payload: dict, http_request: Request):
         "dropped": described["dropped"],
         "model": described.get("model"),
     }
+    _log_design(http_request, design, payload)
     return design
 
 
@@ -930,7 +1100,7 @@ def crochet_calibration_status(payload:dict):
         raise HTTPException(status_code=422,detail=str(e))
 
 @app.post("/api/complex-consumption/calculate")
-def complex_consumption_calculate(payload:dict):
+def complex_consumption_calculate(payload:dict, http_request:Request):
     kind=payload.get("program_type")
     program=payload.get("program",{})
     if kind=="amigurumi":
@@ -957,10 +1127,25 @@ def complex_consumption_calculate(payload:dict):
             cyc_weight=(yarn.get("cyc_weight") if yarn else None))
     except ValueError as e:
         raise HTTPException(status_code=422,detail=str(e))
-    return {"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
+    result={"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
             "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
             "audit":{**audit,"yarn_diameter_mm":diameter,"yarn_diameter_source":diameter_source,"yarn_diameter_warnings":list(diameter_warnings)},
             "model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
+    copies=max(1,int(payload.get("copies") or 1))
+    stitches=sum(int(v) for v in analysed["operation_counts"].values())
+    rounds=len(analysed.get("trace") or [])
+    _log_calculation(
+        http_request, kind,
+        payload.get("title") or (f"Amigurumi piece — {rounds} rounds" if kind=="amigurumi"
+                                 else "Branch piece"),
+        payload, result,
+        **_yarn_fields(payload.get("yarn_id")),
+        **_colour_fields(_public_colour(_colour(payload.get("colour_id")))),
+        **_gauge_fields(payload),
+        length_m=(calc.recommended_length_m*copies if calc.recommended_length_m is not None else None),
+        mass_g=(calc.mass_g*copies if calc.mass_g is not None else None),
+        packages=calc.packages, stitches=stitches*copies, pieces=copies)
+    return result
 
 @app.post("/api/crochet/amigurumi/analyse")
 def crochet_amigurumi_analyse(payload:dict):
@@ -1579,8 +1764,24 @@ def update_company_settings(request:CompanySettingsRequest):
 @app.post("/api/calculate")
 def calculate(request: CalculationRequest, http_request: Request):
     try:
-        return service.calculate(request, user_id=_current_user_id(http_request))
+        result = service.calculate(request, user_id=_current_user_id(http_request))
     except KeyError as e:
         raise HTTPException(status_code=404, detail=str(e)) from e
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
+    payload = request.model_dump() if hasattr(request, "model_dump") else request.dict()
+    consumption = result.get("consumption") or {}
+    project = result.get("project") or {}
+    pattern = result.get("pattern") or {}
+    _log_calculation(
+        http_request, "flat",
+        f"{pattern.get('name') or 'Flat piece'} — {payload.get('width_cm')}×{payload.get('height_cm')} cm",
+        payload, result,
+        **_yarn_fields(payload.get("yarn_id")),
+        **_colour_fields(_public_colour(_colour(payload.get("colour_id")))),
+        **_gauge_fields(payload),
+        length_m=consumption.get("recommended_length_m"), mass_g=consumption.get("mass_g"),
+        packages=consumption.get("packages"),
+        stitches=(project.get("stitches") or 0) * (project.get("rows") or 0) or None,
+        pieces=1)
+    return result
