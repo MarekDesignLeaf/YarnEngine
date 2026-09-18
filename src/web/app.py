@@ -58,6 +58,7 @@ from src.crochet_calibration.quality import replicate_quality as crochet_replica
 from src.crochet_calibration.audit import dataset_snapshot, calibration_audit
 from src.multiyarn.engine import calculate_multiyarn
 from src.toy_assembly.bom import aggregate_toy_bom
+from src.library.colours import match_colour
 import datetime, os, sqlite3, time
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -512,21 +513,24 @@ def _cost_design_in_yarn(design: dict, payload: dict) -> None:
                 cyc_weight=(yarn.get("cyc_weight") if yarn else None))
         except ValueError as e:
             raise HTTPException(status_code=422, detail=str(e))
-        each_len = float(calc.recommended_length_m)
-        each_mass = float(calc.mass_g) if calc.mass_g is not None else None
+        # Round once, at the figure a person reads, and build every larger
+        # figure out of those -- otherwise "1.9 g each" for two pieces sits
+        # next to a 3.9 g total and the whole table stops being believable.
+        each_len = round(float(calc.recommended_length_m), 2)
+        each_mass = round(float(calc.mass_g), 1) if calc.mass_g is not None else None
         if each_mass is None:
             mass_known = False
         part["yarn"] = {
-            "length_m_each": round(each_len, 2),
+            "length_m_each": each_len,
             "length_m_total": round(each_len * part["copies"], 2),
-            "mass_g_each": round(each_mass, 1) if each_mass is not None else None,
+            "mass_g_each": each_mass,
             "mass_g_total": round(each_mass * part["copies"], 1) if each_mass is not None else None,
             "lower_95_m_each": round(float(pred.lower_95_m), 2),
             "upper_95_m_each": round(float(pred.upper_95_m), 2),
         }
-        total_len += each_len * part["copies"]
+        total_len += part["yarn"]["length_m_total"]
         if each_mass is not None:
-            total_mass += each_mass * part["copies"]
+            total_mass += part["yarn"]["mass_g_total"]
         for w in (pred.warnings or []):
             if w not in warnings:
                 warnings.append(w)
@@ -543,6 +547,12 @@ def _cost_design_in_yarn(design: dict, payload: dict) -> None:
         "allowance_percent": float(payload.get("allowance_percent", 10) or 0),
         "yarn_diameter_mm": diameter,
         "yarn_diameter_source": diameter_source,
+        # Shown on screen so a weight that looks wrong can be checked by hand:
+        # grams = metres x g_per_m, and nothing else.
+        "tex": (yarn.get("tex") if yarn else None),
+        "g_per_m": (round(float(yarn["tex"]) / 1000.0, 4)
+                    if yarn and yarn.get("tex") else None),
+        "package_mass_g": (yarn.get("package_mass_g") if yarn else None),
         "model_id": production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID,
         "warnings": warnings,
     }
@@ -625,6 +635,73 @@ def test_vision_settings():
             "model": vision_model_name(model)}
 
 
+# ---------------------------------------------------------------- colours ----
+def _colours(yarn_id: str | None = None) -> list[dict]:
+    store = service._store()
+    try:
+        return store.list_colours(yarn_id)
+    finally:
+        store.close()
+
+
+def _colour(colour_id: str | None) -> dict | None:
+    if not colour_id:
+        return None
+    store = service._store()
+    try:
+        return store.get_colour(colour_id)
+    finally:
+        store.close()
+
+
+def _public_colour(row: dict | None) -> dict | None:
+    if not row:
+        return None
+    return {"colour_id": row["colour_id"], "name": row["name"], "hex": row["hex"],
+            "code": row["code"], "family": row.get("family"),
+            "yarn_specific": row.get("yarn_id") is not None,
+            "source_type": row.get("source_type")}
+
+
+@app.get("/api/colours")
+def list_colours(yarn_id: str | None = None):
+    """Every shade that may be chosen, for this yarn or in general.
+
+    Colour is never typed in anywhere in the app: a pattern's colour is one of
+    these rows. A yarn whose own shade card has been captured lists those first
+    (``yarn_specific``); everything else falls back to the generic palette.
+    """
+    rows = [_public_colour(r) for r in _colours(yarn_id)]
+    return {"yarn_id": yarn_id, "colours": rows,
+            "yarn_specific_count": sum(1 for r in rows if r["yarn_specific"])}
+
+
+def _assign_colours(design: dict, payload: dict, described: dict | None = None) -> None:
+    """Give the design, and every part, a colour that is a catalogue row.
+
+    A colour the user picked wins outright. Otherwise the description read from
+    the photo is *matched* against the catalogue -- the app never stores a
+    colour that is not one of these rows, so the picker can always show it
+    selected and the user can always change it to another catalogue entry.
+    """
+    catalogue = _colours(payload.get("yarn_id"))
+    chosen = _colour(payload.get("colour_id"))
+    if payload.get("colour_id") and chosen is None:
+        raise HTTPException(status_code=422, detail="unknown colour_id")
+    by_part = {p.get("name"): p.get("colour") for p in ((described or {}).get("parts") or [])}
+    for part in design["parts"]:
+        matched = chosen or match_colour(by_part.get(part["name"]), catalogue)
+        part["colour"] = _public_colour(matched)
+        part["colour_source"] = ("chosen" if chosen else
+                                 ("matched from the photo" if matched else None))
+    main = chosen or next((_colour(p["colour"]["colour_id"]) for p in design["parts"]
+                           if p.get("colour")), None)
+    design["colour"] = _public_colour(main)
+    design["colour_source"] = ("chosen" if chosen else
+                               ("matched from the photo" if main else "not set"))
+    design["colour_catalogue_size"] = len(catalogue)
+
+
 @app.post("/api/design/generate")
 def design_generate(payload: dict):
     """Parts + a stated height -> the pattern for every part.
@@ -637,6 +714,7 @@ def design_generate(payload: dict):
     except (KeyError, TypeError, ValueError) as e:
         raise HTTPException(status_code=422, detail=str(e))
     _cost_design_in_yarn(design, payload)
+    _assign_colours(design, payload)
     design["written"] = written_pattern(design)
     return design
 
@@ -701,6 +779,7 @@ def design_from_photo(payload: dict, http_request: Request):
     except (KeyError, TypeError, ValueError) as e:
         raise HTTPException(status_code=422, detail=str(e))
     _cost_design_in_yarn(design, payload)
+    _assign_colours(design, payload, described)
     design["written"] = written_pattern(design)
     design["photo_reading"] = {
         "confidence": described["confidence"],

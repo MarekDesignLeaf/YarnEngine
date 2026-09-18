@@ -29,8 +29,12 @@ vertically would jump straight to a wide round and generate a pattern that
 opens with a decrease. Walking by arc length is what the hook does, and the
 familiar 6 / 12 / 18 / 24 crown falls out of the geometry by itself.
 
-Each archetype's profile starts (t = 0) at the magic ring, in the order the
-piece is worked — an ear starts at its tip and widens. Closed pieces stop at 6
+Radius alone does not make a shape round: the height has to follow the same
+angle. A ball whose radius follows sin(theta) while its height rises linearly
+is a lemon with pointed ends, and it was generating heads with visibly too
+little fabric at the crown -- pairing it with h = 1 - cos(theta) makes the
+profile an actual circle. Each archetype's profile starts (t = 0) at the magic
+ring, in the order the piece is worked — an ear starts at its tip and widens. Closed pieces stop at 6
 stitches to be cinched shut; open pieces (limbs, ears, domes) end at the rim to
 be stuffed and sewn on.
 
@@ -84,6 +88,29 @@ Weight and ball count need a yarn record with a known tex and package length;
 with only a diameter, length alone is reported and the app says why rather than
 estimating grams from nothing. The totals, per-part figures and the allowance
 also appear at the top of the written pattern.
+
+## Colour
+
+Colour is never typed in. A shade is a row in the `yarn_colours` table, which
+holds a yarn's own shade card where one has been captured and the generic craft
+palette (`data/colours/standard_palette.json`) everywhere else, and
+`GET /api/colours?yarn_id=` is what fills the picker. When a photo is read, the
+colour the model describes ("light brown") is *matched* onto that catalogue by
+`src/library/colours.py` rather than stored as written -- so the app always
+shows a real catalogue entry, already selected, which can then be changed to a
+different catalogue entry. A description that matches nothing leaves the colour
+unset instead of inventing one. The chosen shade is what the header shows, what
+the exploded piece drawings are filled with, and what the 3D preview is
+rendered in.
+
+## Reading the figures back
+
+Every part lists its stitches, its metres and its grams, and the yarn bar shows
+the grams per metre those grams came from, so a weight can be checked by hand:
+grams = metres x g/m, and nothing else. Rounding happens once, at the figure a
+person reads, and the totals are built from those rounded figures -- otherwise
+"1.9 g each" for two pieces sits next to a 3.9 g total and the table stops
+being believable. `tests/web/test_design_weights.py` pins all of that down.
 
 ## What it cannot do
 

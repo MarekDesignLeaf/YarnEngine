@@ -138,6 +138,37 @@ button.cant{opacity:.4;box-shadow:none}
 #iosInstall button{flex:0 0 auto;padding:6px 12px;font-size:12.5px}
 /* 3D preview docked to the bottom of the screen, so the shape stays in view
    while scrolling a long list of rounds */
+/* The yarn bar: which yarn, which shade and the figures that follow from
+   them stay on screen on every tab, because every number in the app depends
+   on them. It carries the back and 3D controls too. */
+.yarnbar{position:sticky;top:0;z-index:48;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+ padding:8px 12px;margin:0 0 12px;border-radius:12px;border:1px solid var(--line);
+ background:var(--card);box-shadow:0 2px 10px rgba(38,49,58,.07)}
+.yarnbar .swatch{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.18);flex:0 0 auto;
+ box-shadow:inset 0 -3px 6px rgba(0,0,0,.12)}
+.yarnbar .yb-name{font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.15}
+.yarnbar .yb-sub{font-size:11.5px;color:var(--muted);line-height:1.2}
+.yarnbar .yb-specs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.yarnbar .yb-specs .pill{font-size:11px;padding:2px 8px}
+.yarnbar .yb-actions{display:flex;gap:6px;margin-left:8px}
+.yarnbar button{min-height:30px;padding:4px 10px;font-size:12.5px}
+.yarnbar button.on{background:var(--accent2);color:#fff}
+@media(max-width:600px){.yarnbar .yb-specs{margin-left:0;width:100%}.yarnbar .yb-actions{margin-left:auto}}
+/* Full-screen photo: a reference photo is worth looking at properly. */
+#photoOverlay{position:fixed;inset:0;z-index:120;background:rgba(20,24,28,.94);display:flex;
+ align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px}
+#photoOverlay img{max-width:100%;max-height:calc(100vh - 90px);object-fit:contain;border-radius:10px}
+#photoOverlay .toolbar{margin:0}
+.thumb-sm{cursor:zoom-in}
+/* Exploded view: every piece drawn to the same scale, numbered in the order
+   they are made, with the yarn each one takes. */
+.explodeGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px;margin-top:10px}
+.explodeCard{border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card);text-align:center;position:relative}
+.explodeCard .num{position:absolute;top:6px;left:6px;width:20px;height:20px;border-radius:50%;
+ background:var(--accent2);color:#fff;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.explodeCard svg{display:block;margin:0 auto}
+.explodeCard .en{font-weight:650;font-size:12.5px;margin-top:4px}
+.explodeCard .ed{font-size:11px;color:var(--muted);line-height:1.35}
 #ami3dBlock.pinned{position:fixed;left:0;right:0;bottom:0;z-index:45;margin:0;
  background:var(--card);border-top:1px solid var(--line);border-radius:16px 16px 0 0;
  padding:8px 14px calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 30px -12px rgba(38,49,58,.4)}
@@ -223,6 +254,15 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
     <button id="btnLogout" class="alt">Sign out</button>
   </div>
 </div>
+<div id="yarnBar" class="yarnbar">
+  <span class="swatch" id="ybSwatch" style="background:#D8CCB4"></span>
+  <div><div class="yb-name" id="ybName">No yarn chosen</div><div class="yb-sub" id="ybSub">Pick a yarn and a shade below</div></div>
+  <div class="yb-specs" id="ybSpecs"></div>
+  <div class="yb-actions">
+    <button type="button" id="btnBack" class="alt" title="Back to the previous screen">&larr; Back</button>
+    <button type="button" id="btn3d" class="alt" title="Show or hide the 3D shape preview">3D</button>
+  </div>
+</div>
 <nav class="tabs">
   <button data-tab="calc" class="active">Calculator</button>
   <button data-tab="patterns">Pattern library</button>
@@ -271,6 +311,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <div id="dsgSummary" class="metrics"></div>
         <div id="dsgYarnNote" class="hidden" style="margin-top:6px"></div>
         <div id="dsgPartList" style="display:grid;gap:8px;margin-top:10px"></div>
+        <div id="dsgExplodeBox" class="hidden" style="margin-top:12px"><div class="toolbar" style="justify-content:space-between;margin:0"><h3 style="margin:0">The pieces</h3><span class="small muted" id="dsgExplodeTotal"></span></div><div id="dsgExplode" class="explodeGrid"></div></div>
         <pre id="dsgWritten" class="chartbox" style="white-space:pre-wrap;font-size:12.5px;margin-top:10px;max-height:340px;overflow:auto"></pre>
       </div>
     </div>
@@ -334,6 +375,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
     <h2>Yarn, hook and gauge</h2>
     <div class="fields">
       <label><span>Yarn</span><select id="yarn"></select></label>
+      <label><span>Colour</span><select id="yarnColour"></select></label>
       <label><span>Hook (mm)</span><input id="hook" type="number" step="0.25" min="0.5" value="3.5"></label>
       <label><span>Stitches per 10 cm</span><input id="gaugeSt" type="number" step="0.5" min="1" value="20"></label>
       <label><span>Rows/rounds per 10 cm</span><input id="gaugeRows" type="number" step="0.5" min="1" value="22"></label>
@@ -590,6 +632,10 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 </div></div>
 
 </main>
+<div id="photoOverlay" class="hidden">
+  <img id="photoOverlayImg" alt="Reference photo">
+  <div class="toolbar"><button type="button" id="photoOverlayClose" class="alt">Close</button></div>
+</div>
 <script>
 /* ============================ strings ============================ */
 const MSG={"msg.calibrated": "Calibrated estimate (measured swatch)", "msg.model": "Calibrated estimate (approved model)", "msg.baseline": "Uncalibrated estimate – stitch geometry baseline", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter.", "msg.resetSent": "If that account exists and has an email on file, we've sent a reset link."};
@@ -740,7 +786,7 @@ async function loadData(){
 }
 $('sizePreset').onchange=e=>{if(!e.target.value)return;const [w,h]=e.target.value.split(',');$('widthCm').value=w;$('heightCm').value=h;};
 function renderPatternSelect(){const sel=$('pattern');const cur=sel.value;sel.innerHTML=PATTERNS.map(p=>`<option value="${esc(KEY(p))}">${esc(p.name)} · ${esc(p.family_id)}</option>`).join('');if(cur)sel.value=cur;}
-function renderYarnSelect(){$('yarn').innerHTML=`<option value="">— custom (enter diameter) —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
+function renderYarnSelect(){if(typeof loadColours==='function')setTimeout(()=>{loadColours();renderYarnBar();},0);$('yarn').innerHTML=`<option value="">— custom (enter diameter) —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
 function selectPattern(key){$('pattern').value=key;const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('patternPreview').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(12/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(8/(p.rows||[]).length)),cell:22,maxCells:16});}
 $('pattern').onchange=e=>selectPattern(e.target.value);
 $('btnPickPattern').onclick=()=>document.querySelector('nav.tabs button[data-tab=patterns]').click();
@@ -770,7 +816,7 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);if(typeof pushView==='function')setTimeout(pushView,0);}
 $('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');$('modeDesign').onclick=()=>calcSetMode('design');
 let ami3dTimer=null;
 function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
@@ -799,7 +845,7 @@ try{const v=localStorage.getItem('ye_pin3d');if(v!==null)pin3d=v==='1';}catch(_)
 function ami3dVisible(){return calcMode==='ami'&&!$('tab-calc').classList.contains('hidden');}
 function applyPin3d(){
  const b=$('ami3dBlock');if(!b)return;
- const on=pin3d&&ami3dVisible();
+ const on=pin3d&&ami3dVisible()&&(typeof show3d==='undefined'||show3d);
  b.classList.toggle('pinned',on);
  b.classList.toggle('collapsed',on&&collapsed3d);
  $('ami3dCollapse').textContent=(on&&collapsed3d)?'Show':'Hide';
@@ -1240,7 +1286,7 @@ $('dsgPhotos').addEventListener('change',async()=>{
    the "Yarn, hook and gauge" card below, so the figures match what the
    calculator would say for the same piece. */
 function dsgGauge(){return {gauge_stitches_per_10cm:Number($('gaugeSt').value)||20,gauge_rows_per_10cm:Number($('gaugeRows').value)||22,initial_stitches:Math.max(3,Number($('dsgInitial').value)||6),
- yarn_id:$('yarn').value||null,hook_mm:Number($('hook').value)||null,
+ yarn_id:$('yarn').value||null,colour_id:$('yarnColour').value||null,hook_mm:Number($('hook').value)||null,
  yarn_diameter_mm:$('diam').value?Number($('diam').value):null,
  allowance_percent:Number($('allowance').value)||0};}
 
@@ -1319,12 +1365,13 @@ function showDesign(d){
  }
  $('dsgPartList').innerHTML=d.parts.map((p,i)=>{
   const py=p.yarn;
-  const yarnLine=py?`<div class="small">${fmt(py.length_m_total)} m${py.mass_g_total!=null?' · '+fmt(py.mass_g_total)+' g':''}${p.copies>1?` (${fmt(py.length_m_each)} m each)`:''}</div>`:'';
+  const yarnLine=py?`<div class="small">${fmt(py.length_m_total)} m${py.mass_g_total!=null?' · <strong>'+fmt(py.mass_g_total)+' g</strong>':''}${p.copies>1?` (${fmt(py.length_m_each)} m · ${py.mass_g_each!=null?fmt(py.mass_g_each)+' g':'–'} each)`:''} · ${p.total_stitches*p.copies} sts</div>`:'';
+  const colourLine=p.colour?`<div class="small muted"><span class="swatch" style="display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;background:${esc(p.colour.hex)};border:1px solid rgba(0,0,0,.25)"></span> ${esc(p.colour.name)}${p.colour_source?` (${esc(p.colour_source)})`:''}</div>`:'';
   return `<div class="lineCard" style="padding:10px">
    <div class="toolbar" style="margin:0;justify-content:space-between">
     <div><strong>${esc(p.name)}</strong> <span class="pill">make ${p.copies}</span>
      <div class="small muted">${esc(p.archetype)} · ${p.round_count} rounds · up to ${Math.max(...p.stitch_counts)} sts · ${p.height_cm}×${p.width_cm} cm</div>
-     ${yarnLine}</div>
+     ${yarnLine}${colourLine}</div>
     <button class="alt dsgUse" data-i="${i}" type="button">Open in the rounds editor</button>
    </div></div>`;}).join('');
  $('dsgPartList').querySelectorAll('.dsgUse').forEach(b=>b.onclick=()=>{
@@ -1335,6 +1382,8 @@ function showDesign(d){
   status($('amiStatus'),`Loaded “${p.name}” — ${p.rounds.length+1} rounds. Calculate the yarn below, or adjust the rounds first.`,'good');
   window.scrollTo({top:0,behavior:'smooth'});
  });
+ renderExplode(d);
+ if(d.colour&&window.YE3D&&window.YE3D.setColour)window.YE3D.setColour(d.colour.hex);
  $('dsgWritten').textContent=d.written;
 }
 $('btnDsgCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('dsgWritten').textContent);status($('dsgStatus'),'Pattern copied.','good');}catch(e){status($('dsgStatus'),'Could not copy — select the text and copy it manually.','warn');}};
@@ -1671,6 +1720,174 @@ $('btnTestVision').onclick=async()=>{
  finally{$('btnTestVision').disabled=false;}
 };
 
+/* =================== yarn bar, colours, back, 3D, photos =================
+   Everything the app calculates depends on which yarn and which shade is
+   chosen, so both stay on screen on every tab. Colour is never typed: the
+   list comes from /api/colours, which is the yarn's own shade card when one
+   has been captured and the standard craft palette otherwise. */
+let COLOURS=[],currentColour=null;
+
+async function loadColours(){
+ const yid=$('yarn').value||'';
+ try{
+  const r=await api('/api/colours'+(yid?('?yarn_id='+encodeURIComponent(yid)):''));
+  COLOURS=r.colours||[];
+ }catch(e){COLOURS=[];}
+ const keep=$('yarnColour').value;
+ const own=COLOURS.filter(c=>c.yarn_specific),gen=COLOURS.filter(c=>!c.yarn_specific);
+ const group=(label,list)=>list.length?`<optgroup label="${esc(label)}">`+list.map(c=>`<option value="${esc(c.colour_id)}">${esc(c.name)}</option>`).join('')+'</optgroup>':'';
+ $('yarnColour').innerHTML='<option value="">— no shade chosen —</option>'
+  +group('This yarn’s shades',own)+group(own.length?'Standard palette':'Shades',gen);
+ if(keep&&COLOURS.some(c=>c.colour_id===keep))$('yarnColour').value=keep;
+ syncColour();
+}
+function colourById(id){return COLOURS.find(c=>c.colour_id===id)||null;}
+function syncColour(){
+ currentColour=colourById($('yarnColour').value);
+ if(window.YE3D&&window.YE3D.setColour)window.YE3D.setColour(currentColour?currentColour.hex:null);
+ renderYarnBar();
+}
+/* The header. Name, maker, shade and every figure the calculation uses, so a
+   result can be checked against the yarn it was made from without scrolling. */
+function renderYarnBar(){
+ const y=yarnById($('yarn').value);
+ $('ybSwatch').style.background=currentColour?currentColour.hex:'#D8CCB4';
+ $('ybSwatch').title=currentColour?`${currentColour.name} (${currentColour.hex})`:'No shade chosen';
+ if(!y){
+  $('ybName').textContent=$('diam').value?`Custom yarn · ${$('diam').value} mm`:'No yarn chosen';
+  $('ybSub').textContent=currentColour?currentColour.name:'Pick a yarn and a shade in “Yarn, hook and gauge”';
+  $('ybSpecs').innerHTML='';return;
+ }
+ $('ybName').textContent=`${y.brand} ${y.product}${y.variant?' '+y.variant:''}`;
+ $('ybSub').textContent=(currentColour?currentColour.name+' · ':'')
+  +(y.cyc_weight!=null?`CYC ${y.cyc_weight} · `:'')
+  +Object.entries(y.fibre_composition||{}).map(([k,v])=>`${v}% ${k}`).join(', ');
+ const gpm=y.tex?(y.tex/1000):(y.package_mass_g/y.package_length_m);
+ const bits=[`${y.package_mass_g} g / ${y.package_length_m} m`,`${fmt(gpm,3)} g per m`];
+ if(y.recommended_needle_min_mm)bits.push(`needle ${y.recommended_needle_min_mm}–${y.recommended_needle_max_mm} mm`);
+ bits.push(`hook ${$('hook').value||'—'} mm`,`${$('gaugeSt').value}×${$('gaugeRows').value} per 10 cm`);
+ $('ybSpecs').innerHTML=bits.map(b=>`<span class="pill">${esc(b)}</span>`).join('');
+}
+$('yarn').addEventListener('change',()=>{loadColours();renderYarnBar();});
+$('yarnColour').addEventListener('change',syncColour);
+['hook','gaugeSt','gaugeRows','diam'].forEach(id=>$(id).addEventListener('input',renderYarnBar));
+
+/* Back. Each tab and each calculator mode is a real history entry, so the
+   button and the phone's own back gesture do the same thing. */
+let navLock=false;
+function currentView(){
+ const tab=(document.querySelector('nav.tabs button.active')||{}).dataset;
+ return {tab:(tab&&tab.tab)||'calc',mode:calcMode};
+}
+function applyView(v,push){
+ navLock=!push;
+ const btn=document.querySelector(`nav.tabs button[data-tab=${v.tab}]`);
+ if(btn&&!btn.classList.contains('active'))btn.click();
+ if(v.mode&&v.mode!==calcMode)calcSetMode(v.mode);
+ // the click and mode handlers queue their pushView on a 0 ms timer, so the
+ // lock has to outlive this turn of the event loop or going back would push
+ // a new entry and strand the user on the same screen.
+ setTimeout(()=>{navLock=false;},0);
+}
+function pushView(){
+ if(navLock)return;
+ const v=currentView();
+ const last=history.state&&history.state.ye;
+ if(last&&last.tab===v.tab&&last.mode===v.mode)return;
+ history.pushState({ye:v},'',location.pathname);
+ updateBackButton();
+}
+function updateBackButton(){
+ $('btnBack').disabled=!(history.state&&history.state.ye&&history.length>1);
+}
+window.addEventListener('popstate',e=>{
+ if($('photoOverlay')&&!$('photoOverlay').classList.contains('hidden')){closePhoto();return;}
+ const v=(e.state&&e.state.ye)||{tab:'calc',mode:calcMode};
+ applyView(v,false);updateBackButton();
+});
+$('btnBack').onclick=()=>history.back();
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(pushView,0)));
+
+/* The 3D preview is a header control now: it can be turned off anywhere and
+   stays off until it is turned back on. */
+let show3d=true;
+try{const v=localStorage.getItem('ye_show3d');if(v!==null)show3d=v==='1';}catch(_){}
+function apply3dToggle(){
+ $('btn3d').classList.toggle('on',show3d);
+ $('btn3d').textContent=show3d?'3D on':'3D off';
+ $('ami3dBlock').classList.toggle('hidden',!show3d);
+ applyPin3d();
+}
+$('btn3d').onclick=()=>{show3d=!show3d;try{localStorage.setItem('ye_show3d',show3d?'1':'0');}catch(_){}apply3dToggle();
+ if(show3d)setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},60);};
+
+/* Photos full screen. */
+function openPhoto(src){
+ $('photoOverlayImg').src=src;$('photoOverlay').classList.remove('hidden');
+ // its own history entry, so Back (and the phone's back gesture) closes the
+ // photo rather than leaving the screen
+ history.pushState({ye:currentView(),photo:true},'',location.pathname);
+ updateBackButton();
+}
+function closePhoto(){$('photoOverlay').classList.add('hidden');$('photoOverlayImg').removeAttribute('src');}
+$('photoOverlayClose').onclick=()=>{
+ if(history.state&&history.state.photo)history.back();else closePhoto();
+};
+$('photoOverlay').addEventListener('click',e=>{if(e.target===$('photoOverlay'))closePhoto();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePhoto();});
+document.addEventListener('click',e=>{
+ const t=e.target;
+ if(t&&t.tagName==='IMG'&&t.classList.contains('thumb-sm')&&t.src)openPhoto(t.src);
+});
+
+/* The pieces, drawn. Each part's own profile (radius against height, in cm)
+   revolved back into a silhouette, all to one scale so the sizes can be
+   compared by eye, numbered in the order the pattern makes them. */
+function explodeSvg(profile,scale,colour){
+ // profile points are [height_cm, radius_cm], bottom of the piece first, the
+ // same points the 3D preview revolves. Mirroring the radius about the centre
+ // line gives the silhouette of the finished piece.
+ if(!profile||profile.length<2)return '';
+ const pts=profile.slice().sort((a,b)=>a[0]-b[0]);
+ const h0=pts[0][0],h1=pts[pts.length-1][0];
+ const maxR=Math.max(...pts.map(p=>p[1]),0.1);
+ const h=Math.max(h1-h0,maxR*0.35);           // a flat disc still needs a body
+ const w=Math.round(maxR*2*scale)+8,hh=Math.round(h*scale)+8;
+ const x=r=>(w/2+r*scale).toFixed(1),y=v=>(hh-4-(v-h0)*scale).toFixed(1);
+ const right=pts.map(p=>`${x(p[1])},${y(p[0])}`).join(' ');
+ const left=pts.slice().reverse().map(p=>`${x(-p[1])},${y(p[0])}`).join(' ');
+ return `<svg width="${w}" height="${hh}" viewBox="0 0 ${w} ${hh}" role="img" aria-hidden="true">
+  <polygon points="${right} ${left}" fill="${esc(colour)}" fill-rule="nonzero"
+   stroke="rgba(0,0,0,.28)" stroke-width="1" stroke-linejoin="round"/></svg>`;
+}
+function renderExplode(d){
+ const parts=d.parts||[];
+ if(!parts.length){$('dsgExplodeBox').classList.add('hidden');return;}
+ $('dsgExplodeBox').classList.remove('hidden');
+ const tallest=Math.max(...parts.map(p=>p.height_cm||1));
+ const scale=Math.max(2,Math.min(9,104/Math.max(tallest,0.1)));
+ let totalMass=0,totalLen=0,known=true;
+ $('dsgExplode').innerHTML=parts.map((p,i)=>{
+  const py=p.yarn||null;
+  if(py){totalLen+=py.length_m_total||0;if(py.mass_g_total==null)known=false;else totalMass+=py.mass_g_total;}
+  const col=(p.colour&&p.colour.hex)||(currentColour&&currentColour.hex)||'#D8CCB4';
+  const lines=[`${p.height_cm}×${p.width_cm} cm`,`${p.round_count} rounds · ${p.total_stitches*p.copies} sts`];
+  if(py)lines.push(`${fmt(py.length_m_total)} m${py.mass_g_total!=null?' · '+fmt(py.mass_g_total)+' g':''}`);
+  if(py&&p.copies>1&&py.mass_g_each!=null)lines.push(`${fmt(py.mass_g_each)} g each`);
+  if(p.colour)lines.push(esc(p.colour.name));
+  return `<div class="explodeCard"><span class="num">${i+1}</span>
+   ${explodeSvg(p.profile,scale,col)}
+   <div class="en">${esc(p.name)}${p.copies>1?` ×${p.copies}`:''}</div>
+   <div class="ed">${lines.join('<br>')}</div></div>`;
+ }).join('');
+ const gpm=(d.yarn&&d.yarn.g_per_m)||null;
+ $('dsgExplodeTotal').textContent=
+  `${fmt(totalLen)} m`+(known&&totalMass?` · ${fmt(totalMass)} g in total`:'')
+  +(gpm?` · ${fmt(gpm,3)} g per m`:'');
+}
+
+history.replaceState({ye:{tab:'calc',mode:calcMode}},'',location.pathname);
+apply3dToggle();updateBackButton();renderYarnBar();
 boot();
 if('serviceWorker' in navigator){
  window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
@@ -1738,6 +1955,8 @@ import * as THREE from 'three';
 import { OrbitControls } from '/static/vendor/three/OrbitControls.js';
 
 let scene, camera, renderer, controls, mesh, container, spinning = true, ready = false;
+// The preview is drawn in the shade the piece will actually be made in.
+let yarnColour = 0xef8a6c;
 
 function initAmi3D() {
   container = document.getElementById('ami3dCanvas');
@@ -1790,7 +2009,7 @@ function buildLatheMesh(pts) {
   if (mesh) { scene.remove(mesh); mesh.geometry.dispose(); mesh.material.dispose(); mesh = null; }
   const geo = new THREE.LatheGeometry(pts, 48);
   geo.computeVertexNormals();
-  const mat = new THREE.MeshStandardMaterial({ color: 0xef8a6c, roughness: 0.95, metalness: 0.02, side: THREE.DoubleSide });
+  const mat = new THREE.MeshStandardMaterial({ color: yarnColour, roughness: 0.95, metalness: 0.02, side: THREE.DoubleSide });
   mesh = new THREE.Mesh(geo, mat);
 
   geo.computeBoundingBox();
@@ -1852,6 +2071,10 @@ window.YE3D = {
   previewProfile,
   resize,
   setSpin: (on) => { spinning = !!on; },
+  setColour: (hex) => {
+    yarnColour = hex ? parseInt(String(hex).replace('#', ''), 16) : 0xef8a6c;
+    if (mesh) mesh.material.color.setHex(yarnColour);
+  },
 };
 </script>
 </body></html>

@@ -41,3 +41,18 @@ def test_head_root_serves_etag_for_the_in_page_version_check():
  assert r.status_code==200
  assert r.headers.get("etag")
  assert r.headers.get("cache-control")=="no-cache"
+
+
+def test_the_yarn_bar_back_button_and_3d_toggle_are_in_the_shell():
+    html = c.get("/").text
+    for needle in ('id="yarnBar"', 'id="ybSwatch"', 'id="ybSpecs"',
+                   'id="btnBack"', 'id="btn3d"', 'id="yarnColour"',
+                   'id="photoOverlay"', 'id="dsgExplode"'):
+        assert needle in html, needle
+
+
+def test_colour_is_chosen_from_a_list_and_never_typed_in():
+    html = c.get("/").text
+    # the picker is a <select> fed from /api/colours; no free-text colour field
+    assert '<select id="yarnColour">' in html
+    assert "/api/colours" in html

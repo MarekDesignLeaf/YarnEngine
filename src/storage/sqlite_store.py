@@ -117,6 +117,21 @@ CREATE TABLE IF NOT EXISTS product_line_materials(
   created_at TEXT NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS yarn_colours(
+  colour_id TEXT PRIMARY KEY,
+  yarn_id TEXT,
+  code TEXT NOT NULL,
+  name TEXT NOT NULL,
+  hex TEXT NOT NULL,
+  family TEXT,
+  source_type TEXT NOT NULL,
+  source_reference TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_yarn_colours_yarn ON yarn_colours(yarn_id);
+
 CREATE INDEX IF NOT EXISTS idx_yarns_brand_product ON yarns(brand,product);
 CREATE INDEX IF NOT EXISTS idx_yarns_weight ON yarns(cyc_weight);
 CREATE INDEX IF NOT EXISTS idx_yarn_suppliers_yarn ON yarn_suppliers(yarn_id);
@@ -251,6 +266,39 @@ class SQLiteStore:
         c.execute("DELETE FROM yarn_suppliers WHERE id=? AND yarn_id=?",(supplier_id,yarn_id))
         self.conn.commit()
         return c.rowcount>0
+
+    # ---- yarn colours -------------------------------------------------
+    # A shade is always picked from this table; nothing in the app accepts a
+    # typed-in colour. Rows with yarn_id set are that yarn's own shade card;
+    # rows with yarn_id NULL are the generic palette every yarn falls back to.
+    def upsert_colour(self, colour, now):
+        self.conn.execute("""
+        INSERT INTO yarn_colours(colour_id,yarn_id,code,name,hex,family,source_type,source_reference,created_at,updated_at)
+        VALUES(:colour_id,:yarn_id,:code,:name,:hex,:family,:source_type,:source_reference,:now,:now)
+        ON CONFLICT(colour_id) DO UPDATE SET
+          yarn_id=excluded.yarn_id, code=excluded.code, name=excluded.name, hex=excluded.hex,
+          family=excluded.family, source_type=excluded.source_type,
+          source_reference=excluded.source_reference, updated_at=excluded.updated_at
+        """, {**colour, "now": now})
+        self.conn.commit()
+
+    def list_colours(self, yarn_id=None):
+        """The shades on offer for a yarn: its own card first, then the palette."""
+        if yarn_id is None:
+            rows = self.conn.execute(
+                "SELECT * FROM yarn_colours WHERE yarn_id IS NULL ORDER BY family,name").fetchall()
+        else:
+            rows = self.conn.execute(
+                "SELECT * FROM yarn_colours WHERE yarn_id=? OR yarn_id IS NULL "
+                "ORDER BY yarn_id IS NULL, family, name", (yarn_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_colour(self, colour_id):
+        r = self.conn.execute("SELECT * FROM yarn_colours WHERE colour_id=?", (colour_id,)).fetchone()
+        return dict(r) if r is not None else None
+
+    def count_colours(self):
+        return self.conn.execute("SELECT COUNT(*) AS n FROM yarn_colours").fetchone()["n"]
 
     def get_setting(self,key,default=None):
         r=self.conn.execute("SELECT value FROM app_settings WHERE key=?",(key,)).fetchone()

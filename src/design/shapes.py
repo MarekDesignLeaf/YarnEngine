@@ -59,6 +59,27 @@ def _radius_factor(archetype: str, t: float) -> float:
     return math.sin(math.pi * t)
 
 
+def _height_factor(archetype: str, t: float) -> float:
+    """How far up the part is at t, as a fraction of its height.
+
+    Radius alone does not make a shape round. A ball whose radius follows
+    sin(pi t) while its height rises linearly is a lemon with pointed ends, and
+    it was generating heads with too little fabric at the crown. Pairing
+    r = sin(theta) with h = 1 - cos(theta) is what makes the profile an actual
+    circle, and the familiar 6 / 12 / 18 / 24 crown then falls out of it.
+    """
+    t = min(1.0, max(0.0, t))
+    if archetype in ("sphere", "egg"):
+        return (1 - math.cos(math.pi * t)) / 2.0
+    if archetype == "dome":
+        return 1 - math.cos(math.pi * t / 2)
+    if archetype == "limb":                           # hemispherical tip, then straight
+        return 0.12 * (1 - math.cos(math.pi * t / 0.24)) if t < 0.12 else t
+    if archetype == "cylinder":
+        return 0.10 * (1 - math.cos(math.pi * t / 0.20)) if t < 0.10 else t
+    return t                                          # cone, disc: an even rise
+
+
 def profile_points(archetype: str, height_cm: float, width_cm: float, samples: int = 160):
     """(height_cm, radius_cm) points, bottom to top, for one part."""
     if height_cm <= 0 or width_cm <= 0:
@@ -68,7 +89,7 @@ def profile_points(archetype: str, height_cm: float, width_cm: float, samples: i
     # distance the hook travels is the radius, not a rise.
     rise = 0.0 if archetype == "disc" else height_cm
     return [
-        (round(rise * (i / (samples - 1)), 4),
+        (round(rise * _height_factor(archetype, i / (samples - 1)), 4),
          round(r_max * _radius_factor(archetype, i / (samples - 1)), 4))
         for i in range(samples)
     ]
