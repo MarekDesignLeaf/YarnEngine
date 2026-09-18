@@ -146,6 +146,8 @@ button.cant{opacity:.4;box-shadow:none}
  background:var(--card);box-shadow:0 2px 10px rgba(38,49,58,.07)}
 .yarnbar .swatch{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.18);flex:0 0 auto;
  box-shadow:inset 0 -3px 6px rgba(0,0,0,.12)}
+.yarnbar .swatch.empty{border:1px dashed var(--muted);box-shadow:none;
+ background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 6px)}
 .yarnbar .yb-name{font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.15}
 .yarnbar .yb-sub{font-size:11.5px;color:var(--muted);line-height:1.2}
 .yarnbar .yb-specs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
@@ -153,7 +155,22 @@ button.cant{opacity:.4;box-shadow:none}
 .yarnbar .yb-actions{display:flex;gap:6px;margin-left:8px}
 .yarnbar button{min-height:30px;padding:4px 10px;font-size:12.5px}
 .yarnbar button.on{background:var(--accent2);color:#fff}
-@media(max-width:600px){.yarnbar .yb-specs{margin-left:0;width:100%}.yarnbar .yb-actions{margin-left:auto}}
+@media(max-width:700px){
+ /* One line of facts that scrolls sideways, not five rows of wrapped pills:
+    the bar is stuck to the top of every screen, so its height is a tax on
+    everything below it. */
+ .yarnbar{padding:6px 10px;gap:8px}
+ .yarnbar .yb-specs{margin-left:0;width:100%;flex-wrap:nowrap;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;order:3;padding-bottom:1px}
+ .yarnbar .yb-specs::-webkit-scrollbar{display:none}
+ .yarnbar .yb-specs .pill{white-space:nowrap;flex:0 0 auto}
+ .yarnbar .yb-actions{margin-left:auto;order:2}
+ /* name and buttons share the first line; the name gives way, not the buttons */
+ .yarnbar>div:not(.yb-specs):not(.yb-actions){flex:1 1 0;min-width:0;order:1}
+ .yarnbar .yb-name{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .yarnbar .yb-sub{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .yarnbar button{min-height:28px;padding:3px 8px;font-size:12px}
+}
 /* Full-screen photo: a reference photo is worth looking at properly. */
 #photoOverlay{position:fixed;inset:0;z-index:120;background:rgba(20,24,28,.94);display:flex;
  align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:16px}
@@ -853,7 +870,7 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);if(typeof pushView==='function')setTimeout(pushView,0);}
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(typeof apply3dToggle==='function')apply3dToggle();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);if(typeof pushView==='function')setTimeout(pushView,0);}
 $('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');$('modeDesign').onclick=()=>calcSetMode('design');
 let ami3dTimer=null;
 function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
@@ -897,7 +914,7 @@ $('ami3dPin').checked=pin3d;
 $('ami3dPin').addEventListener('change',()=>{pin3d=$('ami3dPin').checked;try{localStorage.setItem('ye_pin3d',pin3d?'1':'0');}catch(_){}applyPin3d();});
 $('ami3dCollapse').onclick=()=>{collapsed3d=!collapsed3d;applyPin3d();};
 window.addEventListener('resize',applyPin3d);
-document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(applyPin3d,60)));
+document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>{applyPin3d();if(typeof apply3dToggle==='function')apply3dToggle();},60)));
 
 /* ---- consistency engine: every edit keeps consumed==input for every round ----
    Any change to a round is absorbed by that round's plain filler stitches, and
@@ -1420,6 +1437,12 @@ function showDesign(d){
   window.scrollTo({top:0,behavior:'smooth'});
  });
  renderExplode(d);
+ /* A shade the system found from the photo is a catalogue row like any other,
+    so it goes into the picker — that is what makes it "found and assigned, and
+    still changeable" rather than a colour that only exists in the result. */
+ if(d.colour&&!$('yarnColour').value&&[...$('yarnColour').options].some(o=>o.value===d.colour.colour_id)){
+  $('yarnColour').value=d.colour.colour_id;syncColour();
+ }
  if(d.colour&&window.YE3D&&window.YE3D.setColour)window.YE3D.setColour(d.colour.hex);
  $('dsgWritten').textContent=d.written;
 }
@@ -1443,7 +1466,7 @@ $('btnCalc').onclick=async()=>{
     title:$('pieceName').value.trim()||($('amiTemplate').value&&$('amiTemplate').value!=='custom'?$('amiTemplate').selectedOptions[0].text:null)};
    const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
-   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:`${d.program_analysis.trace.length} rounds × ${copies}`,ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
+   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:amiFinishedSize(d.program_analysis.trace,c,copies),ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m});
   }
  }catch(e){
   // The server's own wording here is for API callers; on screen it has to say
@@ -1454,6 +1477,17 @@ $('btnCalc').onclick=async()=>{
   status($('calcStatus'),msg,'bad');
  }
 };
+/* The finished piece, in centimetres — the same arithmetic the 3D preview
+   uses: a round's circumference is its stitch count times the stitch width, and
+   each round adds one row height. "Achieved size" promised a size and was
+   handing back a round count. */
+function amiFinishedSize(trace,c,copies){
+ if(!trace||!trace.length)return '–';
+ const stW=10/(Number(c.gauge_stitches_per_10cm)||20),rowH=10/(Number(c.gauge_rows_per_10cm)||22);
+ const maxSt=Math.max(...trace.map(r=>r.output_stitches||0));
+ const h=trace.length*rowH,d=maxSt*stW/Math.PI;
+ return `≈ ${fmt(h)} × ${fmt(d)} cm · ${trace.length} rounds${copies>1?` · ${copies}×`:''}`;
+}
 function yarnById(id){return YARNS.find(y=>y.yarn_id===id);}
 /* ============================ units ============================ */
 let UNIT='metric',lastShownResult=null;
@@ -1820,7 +1854,10 @@ function syncColour(){
    result can be checked against the yarn it was made from without scrolling. */
 function renderYarnBar(){
  const y=yarnById($('yarn').value);
- $('ybSwatch').style.background=currentColour?currentColour.hex:'#D8CCB4';
+ // An empty swatch has to read as empty: a beige square is indistinguishable
+ // from having picked a beige shade.
+ $('ybSwatch').style.background=currentColour?currentColour.hex:'';
+ $('ybSwatch').classList.toggle('empty',!currentColour);
  $('ybSwatch').title=currentColour?`${currentColour.name} (${currentColour.hex})`:'No shade chosen';
  if(!y){
   $('ybName').textContent=$('diam').value?`Custom yarn · ${$('diam').value} mm`:'No yarn chosen';
@@ -1833,7 +1870,11 @@ function renderYarnBar(){
   +Object.entries(y.fibre_composition||{}).map(([k,v])=>`${v}% ${k}`).join(', ');
  const gpm=y.tex?(y.tex/1000):(y.package_mass_g/y.package_length_m);
  const bits=[`${y.package_mass_g} g / ${y.package_length_m} m`,`${fmt(gpm,3)} g per m`];
- if(y.recommended_needle_min_mm)bits.push(`needle ${y.recommended_needle_min_mm}–${y.recommended_needle_max_mm} mm`);
+ if(y.recommended_needle_min_mm){
+  const lo=y.recommended_needle_min_mm,hi=y.recommended_needle_max_mm;
+  // a maker who states one size gets one size, not "5–5 mm"
+  bits.push(`needle ${lo===hi||hi==null?lo:lo+'–'+hi} mm`);
+ }
  bits.push(`hook ${$('hook').value||'—'} mm`,`${$('gaugeSt').value}×${$('gaugeRows').value} per 10 cm`);
  $('ybSpecs').innerHTML=bits.map(b=>`<span class="pill">${esc(b)}</span>`).join('');
 }
@@ -1882,6 +1923,11 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('clic
 let show3d=true;
 try{const v=localStorage.getItem('ye_show3d');if(v!==null)show3d=v==='1';}catch(_){}
 function apply3dToggle(){
+ // The preview only exists in the amigurumi calculator, so the switch that
+ // turns it on and off only belongs there — "3D on" over a screen with no 3D
+ // on it is just a wrong statement.
+ const applies=(typeof calcMode!=='undefined'&&calcMode==='ami'&&!$('tab-calc').classList.contains('hidden'));
+ $('btn3d').classList.toggle('hidden',!applies);
  $('btn3d').classList.toggle('on',show3d);
  $('btn3d').textContent=show3d?'3D on':'3D off';
  $('ami3dBlock').classList.toggle('hidden',!show3d);

@@ -69,3 +69,14 @@ def test_the_work_log_tab_and_sharing_are_in_the_shell():
     for needle in ('data-tab="worklog"', 'id="tab-worklog"', 'id="wlTable"',
                    'id="wlShareList"', 'id="wlOwner"', 'id="pieceName"'):
         assert needle in html, needle
+
+
+def test_the_yarn_bar_does_not_claim_things_that_are_not_true():
+    html = c.get("/").text
+    # one stated needle size is not a range, an empty swatch reads as empty,
+    # the 3D switch only exists where the preview does, and "achieved size"
+    # is a size rather than a round count
+    assert "needle ${lo===hi||hi==null?lo:lo+'–'+hi} mm" in html
+    assert ".yarnbar .swatch.empty" in html and "classList.toggle('empty'" in html
+    assert "function amiFinishedSize(" in html
+    assert "$('btn3d').classList.toggle('hidden',!applies)" in html
