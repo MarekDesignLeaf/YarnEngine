@@ -62,6 +62,9 @@ from src.toy_assembly.bom import aggregate_toy_bom
 from src.crochet_geometry.stitch_loop import (operation_length_mm, OPERATION_WRAPS,
                                               OPERATION_WRAP_RATIO)
 from src.library.colours import match_colour
+from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
+from src.tools import maths as tool_maths
+from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
 import datetime, os, sqlite3, time
 from collections import defaultdict
@@ -679,6 +682,65 @@ def list_colours(yarn_id: str | None = None):
     rows = [_public_colour(r) for r in _colours(yarn_id)]
     return {"yarn_id": yarn_id, "colours": rows,
             "yarn_specific_count": sum(1 for r in rows if r["yarn_specific"])}
+
+
+@app.get("/api/colours/schemes")
+def colour_schemes():
+    """The schemes on offer, and what each one is for."""
+    return {"schemes": [{"id": key, "name": spec["name"], "about": spec["about"]}
+                        for key, spec in COLOUR_SCHEMES.items()],
+            "scopes": [
+                {"id": "yarn", "name": "This yarn's own shade card",
+                 "about": "One yarn line, so every colour behaves the same in the piece."},
+                {"id": "brand", "name": "Anything by this maker",
+                 "about": "Wider choice, but check the weights match before mixing."},
+                {"id": "stash", "name": "Only yarns in my stash",
+                 "about": "Schemes you can start today without ordering anything."},
+                {"id": "library", "name": "Every shade card in the library",
+                 "about": "The widest choice; the yarns may be very different from each other."}]}
+
+
+@app.get("/api/colours/palette")
+def colour_palette(colour_id: str, scheme: str = "complementary", scope: str = "yarn",
+                   count: int = 3, http_request: Request = None):
+    """A colour scheme around one real shade, made only of other real shades.
+
+    Nothing here is invented: the wheel decides where a companion should sit,
+    and the nearest shade from a manufacturer's own card is what comes back,
+    with how far it falls from that ideal. A scheme that cannot be bought is
+    worse than no scheme.
+    """
+    if scheme not in COLOUR_SCHEMES:
+        raise HTTPException(status_code=422, detail=f"scheme must be one of {sorted(COLOUR_SCHEMES)}")
+    if scope not in ("yarn", "brand", "stash", "library"):
+        raise HTTPException(status_code=422, detail="scope must be yarn, brand, stash or library")
+    store = service._store()
+    try:
+        base = store.get_colour(colour_id)
+        if base is None:
+            raise HTTPException(status_code=404, detail="no such shade")
+        if not base.get("yarn_id"):
+            raise HTTPException(status_code=422, detail=(
+                "that is a shade from the generic palette, not a manufacturer's card — "
+                "pick a yarn whose shade card has been captured, so the scheme is made of "
+                "colours that can actually be bought"))
+        yarn = store.get_yarn(base["yarn_id"]) or {}
+        candidates = store.shade_candidates(
+            scope=scope, yarn_id=base["yarn_id"], brand=yarn.get("brand"),
+            user_id=_current_user_id(http_request) if http_request is not None else None)
+        base = {**base, "brand": yarn.get("brand"), "product": yarn.get("product")}
+    finally:
+        store.close()
+    if not candidates:
+        raise HTTPException(status_code=422, detail=(
+            "there are no shade cards to choose from in that scope — with “only yarns in my "
+            "stash”, add a yarn whose shades are known to your stash first"))
+    result = build_palette(base, candidates, scheme=scheme, count=count)
+    result["scope"] = scope
+    result["candidate_count"] = len(candidates)
+    result["from"] = ("this yarn's card" if scope == "yarn"
+                      else f"{len(candidates)} real shades in scope")
+    return result
 
 
 def _assign_colours(design: dict, payload: dict, described: dict | None = None) -> None:
@@ -1922,6 +1984,201 @@ def delete_stash(yarn_id:str, http_request:Request):
             raise HTTPException(status_code=404,detail="stash entry not found")
     finally: store.close()
     return {"status":"deleted","yarn_id":yarn_id}
+
+
+# ------------------------------------------------------------------ tools ----
+def _bad(exc: Exception):
+    return HTTPException(status_code=422, detail=str(exc))
+
+
+@app.post("/api/tools/spread")
+def tools_spread(payload: dict):
+    """Increases or decreases spaced evenly round a piece."""
+    try:
+        if payload.get("target") not in (None, ""):
+            return tool_maths.change_to_target(
+                int(payload["stitches"]), int(payload["target"]),
+                str(payload.get("stitch") or "SC").upper())
+        return tool_maths.spread_evenly(
+            int(payload["stitches"]), int(payload.get("change") or 0),
+            str(payload.get("stitch") or "SC").upper())
+    except (ValueError, TypeError, KeyError) as e:
+        raise _bad(e)
+
+
+@app.post("/api/tools/size")
+def tools_size(payload: dict):
+    """Stitches and rows to centimetres, or centimetres to stitches and rows."""
+    def maybe(key):
+        value = payload.get(key)
+        return None if value in (None, "") else float(value)
+    try:
+        return tool_maths.size_from_gauge(
+            float(payload.get("gauge_stitches_per_10cm") or 0),
+            float(payload.get("gauge_rows_per_10cm") or 0),
+            stitches=(int(payload["stitches"]) if payload.get("stitches") else None),
+            rows=(int(payload["rows"]) if payload.get("rows") else None),
+            width_cm=maybe("width_cm"), height_cm=maybe("height_cm"))
+    except (ValueError, TypeError) as e:
+        raise _bad(e)
+
+
+@app.get("/api/tools/sizes")
+def tools_sizes(kind: str = "hook"):
+    """The whole published conversion chart, with where it comes from."""
+    if kind not in ("hook", "needle"):
+        raise HTTPException(status_code=422, detail="kind must be hook or needle")
+    tables = tool_maths.size_tables(ROOT)
+    return {"kind": kind, "sources": tables["sources"],
+            "sizes": tables["crochet_hooks" if kind == "hook" else "knitting_needles"]}
+
+
+@app.get("/api/tools/size-convert")
+def tools_size_convert(kind: str = "hook", mm: float | None = None,
+                       us: str | None = None, uk: str | None = None):
+    try:
+        return tool_maths.convert_size(ROOT, kind, mm=mm, us=us, uk=uk)
+    except (ValueError, TypeError) as e:
+        raise _bad(e)
+
+
+@app.post("/api/tools/units")
+def tools_units(payload: dict):
+    """Plain units, and -- for one stated ball -- length against weight."""
+    try:
+        if payload.get("yarn_id"):
+            yarn = service._yarn(payload["yarn_id"])
+            if yarn is None:
+                raise HTTPException(status_code=404, detail="no such yarn")
+            out = tool_maths.yarn_amount(
+                float(yarn["package_mass_g"]), float(yarn["package_length_m"]),
+                length_m=(float(payload["length_m"]) if payload.get("length_m") else None),
+                mass_g=(float(payload["mass_g"]) if payload.get("mass_g") else None))
+            out["yarn"] = f"{yarn['brand']} {yarn['product']}"
+            out["package"] = f"{yarn['package_mass_g']} g / {yarn['package_length_m']} m"
+            return out
+        return tool_maths.convert_units(float(payload["value"]), str(payload["unit"]))
+    except (ValueError, TypeError, KeyError) as e:
+        raise _bad(e)
+
+
+@app.post("/api/tools/squares")
+def tools_squares(payload: dict):
+    """A blanket of granny squares: the layout, and what it really measures."""
+    try:
+        return tool_maths.plan_squares(
+            float(payload.get("width_cm") or 0), float(payload.get("height_cm") or 0),
+            float(payload.get("square_cm") or 0),
+            join_cm=float(payload.get("join_cm") or 0),
+            border_cm=float(payload.get("border_cm") or 0),
+            gauge_rows_per_10cm=(float(payload["gauge_rows_per_10cm"])
+                                 if payload.get("gauge_rows_per_10cm") else None))
+    except (ValueError, TypeError) as e:
+        raise _bad(e)
+
+
+@app.post("/api/tools/price")
+def tools_price(payload: dict, http_request: Request):
+    """What a piece costs to make, and what it might sell for.
+
+    The yarn and the hours are taken from the work log where they exist, so the
+    price is built on what the piece actually took rather than on a guess.
+    """
+    length_m = payload.get("length_m")
+    pieces = int(payload.get("pieces") or 1)
+    hours = payload.get("hours")
+    yarn_id = payload.get("yarn_id")
+    source = "typed in"
+    if payload.get("entry_id"):
+        me = _current_user_id(http_request)
+        entry = worklog_store.get(int(payload["entry_id"]))
+        if entry is None or entry["user_id"] != me:
+            raise HTTPException(status_code=404, detail="entry not found")
+        length_m = entry.get("length_m")
+        pieces = int(entry.get("pieces") or 1)
+        yarn_id = entry.get("yarn_id") or yarn_id
+        progress = worklog_store.progress(int(payload["entry_id"]), me)
+        if hours in (None, "") and progress:
+            hours = progress["elapsed_seconds"] / 3600
+        source = entry.get("title") or "work log entry"
+    if length_m in (None, ""):
+        raise HTTPException(status_code=422, detail="calculate the piece first, or type in how much yarn it takes")
+    yarn = service._yarn(yarn_id) if yarn_id else None
+    price_per_package = payload.get("price_per_package")
+    if price_per_package in (None, ""):
+        price_per_package = (yarn or {}).get("price_amount")
+    currency = (payload.get("currency") or (yarn or {}).get("price_currency") or "GBP")
+    try:
+        out = price_piece(
+            length_m=float(length_m),
+            package_length_m=((yarn or {}).get("package_length_m")
+                              or (float(payload["package_length_m"])
+                                  if payload.get("package_length_m") else None)),
+            price_per_package=(float(price_per_package) if price_per_package not in (None, "") else None),
+            currency=str(currency)[:3].upper(),
+            hours=float(hours or 0), hourly_rate=float(payload.get("hourly_rate") or 0),
+            extras=payload.get("extras") or [],
+            overhead_percent=float(payload.get("overhead_percent") or 0),
+            margin_percent=float(payload.get("margin_percent") or 0),
+            vat_percent=float(payload.get("vat_percent") or 0),
+            whole_packages=bool(payload.get("whole_packages")),
+            pieces=pieces)
+    except (ValueError, TypeError) as e:
+        raise _bad(e)
+    out["from"] = source
+    out["yarn"] = f"{yarn['brand']} {yarn['product']}" if yarn else None
+    out["time_from_log"] = bool(payload.get("entry_id") and payload.get("hours") in (None, ""))
+    return out
+
+
+@app.get("/api/tools/gauges")
+def list_gauges(http_request: Request):
+    """Swatches already measured, ready to use again."""
+    store = service._store()
+    try:
+        return {"gauges": store.list_gauges(_current_user_id(http_request))}
+    finally:
+        store.close()
+
+
+@app.post("/api/tools/gauges")
+def save_gauge(payload: dict, http_request: Request):
+    name = str(payload.get("name") or "").strip()
+    if not name:
+        raise HTTPException(status_code=422, detail="give the swatch a name")
+    def positive(key):
+        try:
+            value = float(payload.get(key))
+        except (TypeError, ValueError):
+            raise HTTPException(status_code=422, detail=f"{key} must be a number")
+        if not 0 < value <= 200:
+            raise HTTPException(status_code=422, detail=f"{key} is outside anything a swatch measures")
+        return value
+    swatch = {"id": payload.get("id"), "name": name[:80],
+              "yarn_id": payload.get("yarn_id") or None,
+              "hook_mm": (float(payload["hook_mm"]) if payload.get("hook_mm") else None),
+              "stitch": (str(payload.get("stitch") or "SC").upper()[:12]),
+              "stitches_per_10cm": positive("stitches_per_10cm"),
+              "rows_per_10cm": positive("rows_per_10cm"),
+              "notes": (str(payload.get("notes") or "").strip()[:300] or None)}
+    store = service._store()
+    try:
+        store.save_gauge(_current_user_id(http_request), swatch,
+                         datetime.datetime.now(datetime.timezone.utc).isoformat())
+        return {"status": "saved", "gauge": swatch}
+    finally:
+        store.close()
+
+
+@app.delete("/api/tools/gauges/{gauge_id}")
+def delete_gauge(gauge_id: int, http_request: Request):
+    store = service._store()
+    try:
+        if not store.delete_gauge(_current_user_id(http_request), gauge_id):
+            raise HTTPException(status_code=404, detail="not one of your swatches")
+    finally:
+        store.close()
+    return {"status": "deleted"}
 
 
 # ------------------------------------------------------------- the stitches ---

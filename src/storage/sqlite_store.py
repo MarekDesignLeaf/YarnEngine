@@ -97,6 +97,25 @@ CREATE TABLE IF NOT EXISTS stash(
   UNIQUE(user_id,yarn_id)
 );
 
+-- A swatch, once measured, is worth keeping: the same yarn on the same hook
+-- gives the same gauge next time, and retyping it is how a piece ends up the
+-- wrong size.
+CREATE TABLE IF NOT EXISTS gauge_swatches(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  name TEXT NOT NULL,
+  yarn_id TEXT,
+  hook_mm REAL,
+  stitch TEXT,
+  stitches_per_10cm REAL NOT NULL,
+  rows_per_10cm REAL NOT NULL,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_gauge_swatches_user ON gauge_swatches(user_id, name);
+
 -- The rest of the kit. Yarn lives in `stash` because it points at a library
 -- record with a tex and a length; a hook is just a hook, so it is described
 -- here rather than being forced into the yarn table.
@@ -316,12 +335,65 @@ class SQLiteStore:
                 "CASE WHEN yarn_id IS NULL THEN name ELSE code END", (yarn_id,)).fetchall()
         return [dict(r) for r in rows]
 
+    def shade_candidates(self, scope="yarn", yarn_id=None, brand=None, user_id=None):
+        """Real shades a scheme may be built from, with the yarn they belong to.
+
+        Only shades from a manufacturer's own card: the generic palette is for
+        naming a colour when no card has been captured, not for telling someone
+        a colour they can buy.
+        """
+        sql = ("SELECT c.*, y.brand, y.product, y.cyc_weight FROM yarn_colours c "
+               "JOIN yarns y ON y.yarn_id = c.yarn_id WHERE c.yarn_id IS NOT NULL")
+        params: list = []
+        if scope == "yarn" and yarn_id:
+            sql += " AND c.yarn_id = ?"
+            params.append(yarn_id)
+        elif scope == "brand" and brand:
+            sql += " AND y.brand = ?"
+            params.append(brand)
+        elif scope == "stash":
+            sql += " AND c.yarn_id IN (SELECT yarn_id FROM stash WHERE user_id IS ?)"
+            params.append(user_id)
+        return [dict(r) for r in self.conn.execute(sql + " ORDER BY c.yarn_id, c.code", params)]
+
     def get_colour(self, colour_id):
         r = self.conn.execute("SELECT * FROM yarn_colours WHERE colour_id=?", (colour_id,)).fetchone()
         return dict(r) if r is not None else None
 
     def count_colours(self):
         return self.conn.execute("SELECT COUNT(*) AS n FROM yarn_colours").fetchone()["n"]
+
+    # ---- swatches -----------------------------------------------------
+    def list_gauges(self, user_id):
+        return [dict(r) for r in self.conn.execute(
+            "SELECT g.*, y.brand, y.product FROM gauge_swatches g "
+            "LEFT JOIN yarns y ON y.yarn_id = g.yarn_id "
+            "WHERE g.user_id IS ? ORDER BY g.name", (user_id,))]
+
+    def save_gauge(self, user_id, swatch, now):
+        if swatch.get("id"):
+            self.conn.execute(
+                "UPDATE gauge_swatches SET name=?,yarn_id=?,hook_mm=?,stitch=?,"
+                "stitches_per_10cm=?,rows_per_10cm=?,notes=?,updated_at=? "
+                "WHERE id=? AND user_id IS ?",
+                (swatch["name"], swatch.get("yarn_id"), swatch.get("hook_mm"),
+                 swatch.get("stitch"), swatch["stitches_per_10cm"], swatch["rows_per_10cm"],
+                 swatch.get("notes"), now, swatch["id"], user_id))
+        else:
+            self.conn.execute(
+                "INSERT INTO gauge_swatches(user_id,name,yarn_id,hook_mm,stitch,"
+                "stitches_per_10cm,rows_per_10cm,notes,created_at,updated_at) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?)",
+                (user_id, swatch["name"], swatch.get("yarn_id"), swatch.get("hook_mm"),
+                 swatch.get("stitch"), swatch["stitches_per_10cm"], swatch["rows_per_10cm"],
+                 swatch.get("notes"), now, now))
+        self.conn.commit()
+
+    def delete_gauge(self, user_id, gauge_id):
+        c = self.conn.cursor()
+        c.execute("DELETE FROM gauge_swatches WHERE id=? AND user_id IS ?", (gauge_id, user_id))
+        self.conn.commit()
+        return c.rowcount > 0
 
     # ---- the rest of the kit ------------------------------------------
     def list_stash_items(self, user_id, kind=None, query=None):

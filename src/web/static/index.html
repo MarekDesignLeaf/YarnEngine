@@ -148,6 +148,24 @@ button.cant{opacity:.4;box-shadow:none}
 .stitchCard .sAbbr{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted)}
 .stitchCard .sUse{font-size:12px;line-height:1.4;margin-top:3px}
 .stitchCard .sFacts{font-size:11px;color:var(--muted);margin-top:4px}
+/* Tools: the small sums a maker does on the back of an envelope, each one
+   showing its working rather than just a number. */
+.toolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
+.toolCard h3{margin:0 0 2px;font-family:var(--font-display);font-size:15px}
+.toolCard .toolWhy{font-size:12px;color:var(--muted);margin:0 0 8px;line-height:1.45}
+.toolOut{margin-top:8px;font-size:13px;line-height:1.5}
+.toolOut .big{font-family:var(--font-display);font-weight:700;font-size:19px}
+.toolOut code{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+/* A palette is judged by looking at it, so the shades get room. */
+.palStrip{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.palChip{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.palChip .sw{height:64px}
+.palChip .meta{padding:6px 8px;font-size:11.5px;line-height:1.35}
+.palChip .meta b{font-size:12.5px;display:block}
+.palChip .ideal{display:flex;align-items:center;gap:5px;margin-top:4px;color:var(--muted)}
+.palChip .ideal i{width:11px;height:11px;border-radius:3px;border:1px solid rgba(0,0,0,.2);display:inline-block}
+.palNote{font-size:12px;line-height:1.45;margin-top:8px;padding-left:16px}
+table.sizes td,table.sizes th{padding:3px 8px;font-size:12.5px}
 /* Make mode: the pattern as a tick-off list, with the counters and the clock
    always in reach at the bottom. Full screen, because this is what you look at
    with a hook in your hand rather than a mouse. */
@@ -336,6 +354,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
   <button data-tab="lines">Products</button>
   <button data-tab="projects">Projects</button>
   <button data-tab="worklog">Work log</button>
+  <button data-tab="tools">Tools</button>
   <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
 </nav>
 
@@ -646,6 +665,129 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 </section>
 
 <!-- ---------- WORK LOG ---------- -->
+<section id="tab-tools" class="hidden">
+  <div class="card">
+    <h2>Colour schemes</h2>
+    <p class="small muted" style="margin-top:0">Built only from shades on real shade cards, so every colour here can be ordered. The wheel decides where a companion belongs; the card decides what actually goes there, and the gap between the two is shown rather than hidden.</p>
+    <div class="fields three">
+      <label><span>Yarn</span><select id="palYarn"></select></label>
+      <label><span>Starting shade</span><select id="palColour"></select></label>
+      <label><span>Scheme</span><select id="palScheme"></select></label>
+      <label><span>Choose shades from</span><select id="palScope"></select></label>
+      <label><span>How many colours</span><input id="palCount" type="number" min="2" max="6" value="3"></label>
+    </div>
+    <div class="toolbar"><button id="btnPalette" class="accent">Build the scheme</button>
+      <span class="small muted" id="palAbout"></span></div>
+    <div id="palStatus" class="status hidden"></div>
+    <div id="palStrip" class="palStrip"></div>
+    <div id="palNotes"></div>
+  </div>
+
+  <div class="toolGrid" style="margin-top:12px">
+    <div class="card toolCard">
+      <h3>What to charge</h3>
+      <p class="toolWhy">The yarn a piece actually takes, the hours the work log recorded, and what is left over once both are paid for.</p>
+      <div class="fields">
+        <label style="grid-column:1/-1"><span>Piece</span><select id="prEntry"></select></label>
+        <label><span>Your hourly rate</span><input id="prRate" type="number" step="0.5" min="0" value="12"></label>
+        <label><span>Hours (blank = from the log)</span><input id="prHours" type="number" step="0.25" min="0"></label>
+        <label><span>Extras (eyes, stuffing…)</span><input id="prExtras" type="number" step="0.1" min="0" value="0"></label>
+        <label><span>A ball costs</span><input id="prBall" type="number" step="0.05" min="0" placeholder="from the library"></label>
+        <label><span>Currency</span><input id="prCurrency" maxlength="3" value="GBP"></label>
+        <label><span>Overhead %</span><input id="prOverhead" type="number" step="1" min="0" value="10"></label>
+        <label><span>Margin %</span><input id="prMargin" type="number" step="1" min="0" max="95" value="50"></label>
+        <label><span>VAT %</span><input id="prVat" type="number" step="1" min="0" value="0"></label>
+        <label style="grid-column:1/-1"><span><input id="prWhole" type="checkbox"> Charge for whole balls</span></label>
+      </div>
+      <div class="toolbar"><button id="btnPrice">Work it out</button></div>
+      <div id="prOut" class="toolOut"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Spread increases or decreases</h3>
+      <p class="toolWhy">Rarely divides evenly, which is where people go wrong. The groups are worked out exactly and written the way a pattern writes them.</p>
+      <div class="fields">
+        <label><span>Stitches now</span><input id="spNow" type="number" min="1" value="48"></label>
+        <label><span>Add (+) or remove (−)</span><input id="spChange" type="number" value="6"></label>
+        <label><span>…or go to this count</span><input id="spTarget" type="number" min="1"></label>
+        <label><span>Worked in</span><select id="spStitch"><option value="SC">sc</option><option value="HDC">hdc</option><option value="DC">dc</option></select></label>
+      </div>
+      <div class="toolbar"><button id="btnSpread">Work it out</button>
+        <button id="btnSpreadUse" class="alt hidden">Add as a round</button></div>
+      <div id="spOut" class="toolOut"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Stitches and centimetres</h3>
+      <p class="toolWhy">Both directions. Counts are whole stitches, so what comes back is what the rounded count really measures.</p>
+      <div class="fields">
+        <label><span>Stitches / 10 cm</span><input id="szSt" type="number" step="0.5" value="20"></label>
+        <label><span>Rows / 10 cm</span><input id="szRow" type="number" step="0.5" value="22"></label>
+        <label><span>Width (cm)</span><input id="szW" type="number" step="0.5" value="25"></label>
+        <label><span>Height (cm)</span><input id="szH" type="number" step="0.5" value="30"></label>
+      </div>
+      <div class="toolbar"><button id="btnSize">Work it out</button>
+        <button id="btnSizeFromCalc" class="link">use the calculator's gauge</button></div>
+      <div id="szOut" class="toolOut"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Hook and needle sizes</h3>
+      <p class="toolWhy">The Craft Yarn Council table for millimetres and US sizes; the old UK numbers alongside, with the warning they deserve.</p>
+      <div class="fields">
+        <label><span>Chart</span><select id="szKind"><option value="hook">Crochet hooks</option><option value="needle">Knitting needles</option></select></label>
+        <label><span>Find a size</span><input id="szFind" placeholder="4, H-8, 8…"></label>
+      </div>
+      <div id="szTable" style="max-height:230px;overflow:auto;margin-top:8px"></div>
+      <div id="szSources" class="small muted" style="margin-top:6px"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Units</h3>
+      <p class="toolWhy">Metres and yards, grams and ounces — and, for one stated ball, length against weight, because a metre of chunky weighs nothing like a metre of 4-ply.</p>
+      <div class="fields">
+        <label><span>Amount</span><input id="unVal" type="number" step="0.1" value="100"></label>
+        <label><span>Unit</span><select id="unUnit"><option value="m">metres</option><option value="yd">yards</option><option value="g">grams</option><option value="oz">ounces</option></select></label>
+        <label style="grid-column:1/-1"><span>Or, for a yarn</span><select id="unYarn"></select></label>
+      </div>
+      <div class="toolbar"><button id="btnUnits">Convert</button></div>
+      <div id="unOut" class="toolOut"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Saved swatches</h3>
+      <p class="toolWhy">The same yarn on the same hook gives the same gauge next time. Retyping it is how a piece ends up the wrong size.</p>
+      <div class="fields">
+        <label style="grid-column:1/-1"><span>Name</span><input id="gwName" placeholder="Cotton Aran, 3 mm, firm"></label>
+        <label><span>Stitches / 10 cm</span><input id="gwSt" type="number" step="0.5"></label>
+        <label><span>Rows / 10 cm</span><input id="gwRow" type="number" step="0.5"></label>
+        <label><span>Hook (mm)</span><input id="gwHook" type="number" step="0.25"></label>
+        <label><span>Notes</span><input id="gwNotes"></label>
+      </div>
+      <div class="toolbar"><button id="btnGaugeSave">Save swatch</button>
+        <button id="btnGaugeFromCalc" class="link">take it from the calculator</button></div>
+      <div id="gwStatus" class="status hidden"></div>
+      <div id="gwList" class="toolOut"></div>
+    </div>
+
+    <div class="card toolCard">
+      <h3>Granny square blanket</h3>
+      <p class="toolWhy">A blanket is a whole number of squares plus seams plus border, so it is never quite the size you asked for. This says what it will be.</p>
+      <div class="fields">
+        <label><span>Blanket width (cm)</span><input id="sqW" type="number" value="120"></label>
+        <label><span>Blanket height (cm)</span><input id="sqH" type="number" value="160"></label>
+        <label><span>Square (cm)</span><input id="sqSize" type="number" value="15"></label>
+        <label><span>Seam (cm)</span><input id="sqJoin" type="number" step="0.5" value="0"></label>
+        <label><span>Border (cm)</span><input id="sqBorder" type="number" step="0.5" value="5"></label>
+        <label><span>Rows / 10 cm</span><input id="sqRows" type="number" step="0.5" value="14"></label>
+      </div>
+      <div class="toolbar"><button id="btnSquares">Plan it</button>
+        <button id="btnSquaresCost" class="alt hidden">Cost the yarn</button></div>
+      <div id="sqOut" class="toolOut"></div>
+    </div>
+  </div>
+</section>
+
 <section id="tab-worklog" class="hidden">
   <div class="card">
     <div class="toolbar" style="margin-top:0;justify-content:space-between">
@@ -956,7 +1098,8 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
+ if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
 async function loadData(){
@@ -2578,6 +2721,257 @@ function renderStitches(){
 }
 $('btnStitches').onclick=loadStitches;
 $('stFamily').onchange=renderStitches;
+
+/* =============================== tools =================================
+   Each one shows its working. The colour tool is the one with a rule behind
+   it: every shade it offers is a row on a manufacturer's card, so a scheme
+   can be ordered rather than only admired. */
+let TOOLS={schemes:null,gauges:[],lastSquares:null,lastSpread:null};
+
+function toolYarnOptions(select,{blank}={}){
+ const opts=(blank?`<option value="">${esc(blank)}</option>`:'')+
+  YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}</option>`).join('');
+ const keep=select.value;select.innerHTML=opts;if(keep)select.value=keep;
+}
+
+async function initTools(){
+ toolYarnOptions($('palYarn'));
+ toolYarnOptions($('unYarn'),{blank:'— plain units —'});
+ if(!TOOLS.schemes){
+  const d=await api('/api/colours/schemes');
+  TOOLS.schemes=d;
+  $('palScheme').innerHTML=d.schemes.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  $('palScope').innerHTML=d.scopes.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join('');
+  showSchemeAbout();
+ }
+ if(!$('palYarn').value&&$('yarn').value)$('palYarn').value=$('yarn').value;
+ await loadPaletteColours();
+ loadGauges();
+ loadPriceEntries();
+ loadSizeTable();
+}
+function showSchemeAbout(){
+ const s=(TOOLS.schemes?.schemes||[]).find(x=>x.id===$('palScheme').value);
+ const scope=(TOOLS.schemes?.scopes||[]).find(x=>x.id===$('palScope').value);
+ $('palAbout').textContent=[s?.about,scope?.about].filter(Boolean).join(' ');
+}
+async function loadPaletteColours(){
+ const yarnId=$('palYarn').value;
+ if(!yarnId)return;
+ try{
+  const d=await api('/api/colours?yarn_id='+encodeURIComponent(yarnId));
+  const own=d.colours.filter(c=>c.yarn_specific);
+  $('palColour').innerHTML=own.length
+   ?own.map(c=>`<option value="${esc(c.colour_id)}">${esc(c.name)} (${esc(c.code)})</option>`).join('')
+   :'<option value="">— no shade card captured for this yarn —</option>';
+  $('palColour').disabled=!own.length;
+ }catch(e){status($('palStatus'),e.message,'bad');}
+}
+async function buildPalette(){
+ const colourId=$('palColour').value;
+ if(!colourId){
+  status($('palStatus'),'This yarn has no shade card in the library yet, so there are no real colours to build from. Pick a yarn whose shades are known.','warn');
+  return;
+ }
+ status($('palStatus'),'Looking through the shade cards…','');
+ try{
+  const p=new URLSearchParams({colour_id:colourId,scheme:$('palScheme').value,
+   scope:$('palScope').value,count:$('palCount').value||3});
+  const d=await api('/api/colours/palette?'+p);
+  $('palStrip').innerHTML=d.palette.map(c=>`<div class="palChip">
+   <div class="sw" style="background:${esc(c.hex)}"></div>
+   <div class="meta"><b>${esc(c.name)}</b>
+    ${esc(c.code||'')} · ${esc(c.hex)}<br>
+    <span class="muted">${esc([c.brand,c.product].filter(Boolean).join(' '))}</span>
+    ${c.role?`<br><span class="muted">${esc(c.role)}</span>`:''}
+    ${c.ideal_hex?`<span class="ideal"><i style="background:${esc(c.ideal_hex)}"></i>
+      ${c.exact?'as close as the wheel asks':'off the ideal by '+fmt(c.distance,1)}</span>`:''}
+   </div></div>`).join('');
+  const pairs=d.pairs.map(p=>`<li>${esc(p.a)} / ${esc(p.b)}: ${fmt(p.difference,1)} apart, contrast ${fmt(p.contrast,2)}:1</li>`).join('');
+  $('palNotes').innerHTML=
+   (d.notes.length?`<ul class="palNote">${d.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:'')+
+   `<details style="margin-top:6px"><summary class="small muted" style="cursor:pointer">How far apart these shades are</summary>
+    <ul class="palNote">${pairs}</ul>
+    <p class="small muted" style="margin:4px 0 0">Under 12 apart and two shades read as one in stitches. Contrast under about 2:1 means a face will not show up across a room.</p></details>`;
+  status($('palStatus'),`${d.palette.length} shades, all from ${d.from}.`,'good');
+ }catch(e){$('palStrip').innerHTML='';$('palNotes').innerHTML='';status($('palStatus'),e.message,'bad');}
+}
+$('btnPalette').onclick=buildPalette;
+$('palYarn').onchange=loadPaletteColours;
+$('palScheme').onchange=showSchemeAbout;
+$('palScope').onchange=showSchemeAbout;
+
+/* ---- what to charge ---- */
+async function loadPriceEntries(){
+ try{
+  const d=await api('/api/worklog');
+  const rows=(d.entries||[]).slice(0,40);
+  $('prEntry').innerHTML=rows.length
+   ?rows.map(e=>`<option value="${e.entry_id}">${esc(e.title)} — ${e.length_m!=null?fmt(e.length_m,1)+' m':'no yarn figure'}${e.progress?' · '+mkFormat(e.progress.elapsed_seconds):''}</option>`).join('')
+   :'<option value="">— calculate a piece first —</option>';
+ }catch(e){/* the log is optional here */}
+}
+$('btnPrice').onclick=async()=>{
+ const extras=Number($('prExtras').value)||0;
+ const body={entry_id:$('prEntry').value||null,hourly_rate:$('prRate').value,
+  hours:$('prHours').value||null,overhead_percent:$('prOverhead').value,
+  margin_percent:$('prMargin').value,vat_percent:$('prVat').value,
+  whole_packages:$('prWhole').checked,
+  price_per_package:$('prBall').value||null,currency:$('prCurrency').value||'GBP',
+  extras:extras?[{name:'Extras',amount:extras}]:[]};
+ if(!body.entry_id){$('prOut').innerHTML='<span class="small">Calculate a piece first — the price is built on what it actually takes.</span>';return;}
+ try{
+  const d=await api('/api/tools/price',{method:'POST',body});
+  const money=n=>n==null?'–':`${esc(d.currency)} ${fmt(n,2)}`;
+  $('prOut').innerHTML=`<div class="big">${money(d.price_each)}${d.pieces>1?` each (${d.pieces} pieces)`:''}</div>
+   <table style="margin-top:6px"><tbody>
+   <tr><td>Yarn${d.packages_used!=null?` (${fmt(d.packages_used,2)} balls)`:''}</td><td>${money(d.yarn_cost)}</td></tr>
+   <tr><td>Extras</td><td>${money(d.extras_total)}</td></tr>
+   <tr><td>Your time (${fmt(d.hours,2)} h${d.time_from_log?', from the log':''})</td><td>${money(d.labour)}</td></tr>
+   <tr><td>Overhead</td><td>${money(d.overhead)}</td></tr>
+   <tr><td><strong>Costs</strong></td><td><strong>${money(d.cost)}</strong></td></tr>
+   <tr><td>Price at that margin</td><td>${money(d.price)}</td></tr>
+   ${d.vat?`<tr><td>With VAT</td><td>${money(d.price_with_vat)}</td></tr>`:''}
+   <tr><td>Left after materials, per hour</td><td>${d.hourly_return!=null?money(d.hourly_return):'–'}</td></tr>
+   </tbody></table>
+   ${d.notes.length?`<ul class="palNote">${d.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:''}`;
+ }catch(e){$('prOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+};
+
+/* ---- spread increases and decreases ---- */
+$('btnSpread').onclick=async()=>{
+ const body={stitches:$('spNow').value,change:$('spChange').value,
+  target:$('spTarget').value||null,stitch:$('spStitch').value};
+ try{
+  const d=await api('/api/tools/spread',{method:'POST',body});
+  TOOLS.lastSpread=d;
+  $('spOut').innerHTML=`<div class="big"><code>${esc(d.instruction)}</code></div>
+   <div class="small muted">${d.from_stitches} → ${d.to_stitches} stitches · ${d.shaping_count} shaping, ${d.plain_count} plain</div>
+   ${d.note?`<ul class="palNote"><li>${esc(d.note)}</li></ul>`:''}`;
+  $('btnSpreadUse').classList.remove('hidden');
+ }catch(e){TOOLS.lastSpread=null;$('btnSpreadUse').classList.add('hidden');
+  $('spOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+};
+$('btnSpreadUse').onclick=()=>{
+ if(!TOOLS.lastSpread)return;
+ const rounds=readRounds?readRounds():[];
+ rounds.push({operations:TOOLS.lastSpread.operations});
+ writeRounds(rounds);
+ document.querySelector('nav.tabs button[data-tab=calc]').click();
+ status($('amiStatus'),`Added ${TOOLS.lastSpread.instruction} as a round.`,'good');
+};
+
+/* ---- stitches and centimetres ---- */
+$('btnSizeFromCalc').onclick=()=>{$('szSt').value=$('gaugeSt').value;$('szRow').value=$('gaugeRows').value;};
+$('btnSize').onclick=async()=>{
+ try{
+  const d=await api('/api/tools/size',{method:'POST',body:{
+   gauge_stitches_per_10cm:$('szSt').value,gauge_rows_per_10cm:$('szRow').value,
+   width_cm:$('szW').value||null,height_cm:$('szH').value||null}});
+  const off=(v)=>v?` <span class="muted">(${v>0?'+':''}${fmt(v,2)} cm off what you asked)</span>`:'';
+  $('szOut').innerHTML=`<div class="big">${d.stitches??'–'} sts × ${d.rows??'–'} rows</div>
+   <div class="small">makes ${fmt(d.width_cm,2)} × ${fmt(d.height_cm,2)} cm${off(d.width_off_by_cm)}${off(d.height_off_by_cm)}</div>
+   <div class="small muted">one stitch ${fmt(d.stitch_width_cm,3)} cm wide, one row ${fmt(d.row_height_cm,3)} cm tall</div>`;
+ }catch(e){$('szOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+};
+
+/* ---- hook and needle sizes ---- */
+async function loadSizeTable(){
+ try{
+  const d=await api('/api/tools/sizes?kind='+$('szKind').value);
+  const find=$('szFind').value.trim().toLowerCase();
+  const rows=d.sizes.filter(r=>!find||String(r.mm)===find||
+   (r.us||'').toLowerCase().includes(find)||(r.uk||'').toLowerCase()===find);
+  $('szTable').innerHTML=`<table class="sizes"><thead><tr><th>mm</th><th>US</th><th>UK (old)</th></tr></thead>
+   <tbody>${rows.map(r=>`<tr><td><strong>${fmt(r.mm,2)}</strong></td><td>${esc(r.us||'–')}</td><td>${esc(r.uk||'–')}</td></tr>`).join('')}</tbody></table>
+   ${rows.length?'':'<span class="small">Nothing on the chart matches that. Hooks are sold in the sizes listed.</span>'}`;
+  $('szSources').innerHTML=Object.values(d.sources).map(s=>
+   `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.name)}</a> — ${esc(s.note)}`).join('<br>');
+ }catch(e){$('szTable').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+}
+$('szKind').onchange=loadSizeTable;
+$('szFind').addEventListener('input',()=>{clearTimeout(TOOLS.sizeTimer);TOOLS.sizeTimer=setTimeout(loadSizeTable,200);});
+
+/* ---- units ---- */
+$('btnUnits').onclick=async()=>{
+ try{
+  const yarnId=$('unYarn').value;
+  const body=yarnId?{yarn_id:yarnId,length_m:$('unUnit').value==='g'||$('unUnit').value==='oz'?null:$('unVal').value,
+                     mass_g:$('unUnit').value==='g'?$('unVal').value:null}
+                   :{value:$('unVal').value,unit:$('unUnit').value};
+  const d=await api('/api/tools/units',{method:'POST',body});
+  $('unOut').innerHTML=d.yarn
+   ?`<div class="big">${fmt(d.length_m,1)} m = ${fmt(d.mass_g,1)} g</div>
+     <div class="small muted">${esc(d.yarn)}, ${esc(d.package)} — ${fmt(d.balls,2)} balls</div>`
+   :`<div class="big">${Object.entries(d).map(([k,v])=>`${fmt(v,2)} ${esc(k)}`).join(' = ')}</div>`;
+ }catch(e){$('unOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+};
+
+/* ---- saved swatches ---- */
+async function loadGauges(){
+ try{
+  const d=await api('/api/tools/gauges');
+  TOOLS.gauges=d.gauges;
+  $('gwList').innerHTML=d.gauges.length?`<table><tbody>${d.gauges.map(g=>`<tr>
+   <td><strong>${esc(g.name)}</strong>${g.notes?`<br><span class="small muted">${esc(g.notes)}</span>`:''}</td>
+   <td class="small">${fmt(g.stitches_per_10cm,1)} × ${fmt(g.rows_per_10cm,1)}${g.hook_mm?`<br>${fmt(g.hook_mm,2)} mm`:''}</td>
+   <td class="small"><button class="link gwUse" data-id="${g.id}">use</button>
+    <button class="link gwDel" data-id="${g.id}">delete</button></td></tr>`).join('')}</tbody></table>`
+   :'<span class="small muted">No swatches saved yet.</span>';
+  $('gwList').querySelectorAll('.gwUse').forEach(b=>b.onclick=()=>{
+   const g=TOOLS.gauges.find(x=>String(x.id)===b.dataset.id);if(!g)return;
+   $('gaugeSt').value=g.stitches_per_10cm;$('gaugeRows').value=g.rows_per_10cm;
+   if(g.hook_mm)$('hook').value=g.hook_mm;
+   document.querySelector('nav.tabs button[data-tab=calc]').click();
+   status($('calcStatus'),`Using the swatch “${g.name}”.`,'good');});
+  $('gwList').querySelectorAll('.gwDel').forEach(b=>b.onclick=async()=>{
+   await api('/api/tools/gauges/'+b.dataset.id,{method:'DELETE'});loadGauges();});
+ }catch(e){$('gwList').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+}
+$('btnGaugeFromCalc').onclick=()=>{
+ $('gwSt').value=$('gaugeSt').value;$('gwRow').value=$('gaugeRows').value;$('gwHook').value=$('hook').value;
+ if(!$('gwName').value&&$('yarn').value){const y=yarnById($('yarn').value);
+  if(y)$('gwName').value=`${y.brand} ${y.product}, ${$('hook').value} mm`;}
+};
+$('btnGaugeSave').onclick=async()=>{
+ try{
+  await api('/api/tools/gauges',{method:'POST',body:{name:$('gwName').value,
+   stitches_per_10cm:$('gwSt').value,rows_per_10cm:$('gwRow').value,
+   hook_mm:$('gwHook').value||null,yarn_id:$('yarn').value||null,
+   notes:$('gwNotes').value||null}});
+  status($('gwStatus'),'Saved.','good');
+  ['gwName','gwNotes'].forEach(id=>$(id).value='');
+  loadGauges();
+ }catch(e){status($('gwStatus'),e.message,'bad');}
+};
+
+/* ---- granny square blanket ---- */
+$('btnSquares').onclick=async()=>{
+ try{
+  const d=await api('/api/tools/squares',{method:'POST',body:{
+   width_cm:$('sqW').value,height_cm:$('sqH').value,square_cm:$('sqSize').value,
+   join_cm:$('sqJoin').value,border_cm:$('sqBorder').value,
+   gauge_rows_per_10cm:$('sqRows').value||null}});
+  TOOLS.lastSquares=d;
+  const off=(v)=>v===0?'exactly as asked':`${v>0?'+':''}${fmt(v,1)} cm`;
+  $('sqOut').innerHTML=`<div class="big">${d.squares} squares — ${d.across} across, ${d.down} down</div>
+   <div class="small">Finished ${fmt(d.finished_width_cm,1)} × ${fmt(d.finished_height_cm,1)} cm
+    <span class="muted">(${off(d.off_by_width_cm)} wide, ${off(d.off_by_height_cm)} tall)</span></div>
+   ${d.rounds_per_square?`<div class="small muted">${d.rounds_per_square} rounds a square, ${d.stitches_per_square} trebles each — ${fmt(d.stitches_per_square*d.squares,0)} in the blanket.</div>`:''}
+   ${d.note_gauge?`<ul class="palNote"><li>${esc(d.note_gauge)}</li></ul>`:''}`;
+  $('btnSquaresCost').classList.toggle('hidden',!d.program);
+ }catch(e){$('sqOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
+};
+$('btnSquaresCost').onclick=()=>{
+ const d=TOOLS.lastSquares;if(!d||!d.program)return;
+ $('amiInitial').value=d.program.initial_stitches;
+ $('amiCopies').value=d.squares;
+ $('amiTemplate').value='custom';
+ writeRounds(d.program.rounds);
+ calcSetMode('ami');
+ document.querySelector('nav.tabs button[data-tab=calc]').click();
+ status($('amiStatus'),`One square as ${d.program.rounds.length+1} rounds, ${d.squares} of them. Calculate the yarn for the whole blanket.`,'good');
+};
 
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;
