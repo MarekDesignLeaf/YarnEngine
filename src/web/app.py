@@ -1532,6 +1532,75 @@ def list_constructions(craft: str | None = None):
     return {"constructions": constructions.listing(craft), "default": constructions.DEFAULT}
 
 
+@app.get("/api/shapes")
+def list_shapes():
+    """The starting shapes, and how tall each one is when nothing says otherwise."""
+    from src.design.shapes import NATURAL_HEIGHT_RATIO, OPEN_ENDED
+    return {"shapes": [{"id": k, "about": v,
+                        "height_ratio": NATURAL_HEIGHT_RATIO.get(k, 1.0),
+                        "flat": k == "disc", "open_end": k in OPEN_ENDED}
+                       for k, v in DESIGN_ARCHETYPES.items()]}
+
+
+@app.post("/api/shapes/rounds")
+def shape_rounds(payload: dict):
+    """A shape at a real size -> the rounds that make it.
+
+    The rounds editor used to draw its own starting shapes in the browser, by
+    adding a fixed number of stitches a round and then working straight. That
+    makes a drum whatever it is called: a ball is not a stack of equal rounds,
+    it is a profile, and the stitch count has to follow the profile's radius at
+    every round or the shape is wrong in a way the 3D preview now shows.
+
+    So the same generator the designer uses answers here too, and a sphere is a
+    sphere.
+    """
+    from src.design.shapes import NATURAL_HEIGHT_RATIO, rounds_for_part
+    archetype = str(payload.get("archetype") or payload.get("shape") or "").strip().lower()
+    if archetype not in DESIGN_ARCHETYPES:
+        raise HTTPException(status_code=422, detail={
+            "message": f"“{archetype or 'that'}” is not a shape this can make.",
+            "shapes": sorted(DESIGN_ARCHETYPES)})
+    try:
+        width_cm = float(payload.get("width_cm") or 0)
+        height_cm = float(payload.get("height_cm") or 0)
+        gauge_st = float(payload.get("gauge_stitches_per_10cm") or 0)
+        gauge_rows = float(payload.get("gauge_rows_per_10cm") or 0)
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=422, detail={
+            "message": "The size and the gauge have to be numbers."})
+    if width_cm <= 0:
+        raise HTTPException(status_code=422, detail={
+            "message": "Say how wide the piece should be, in centimetres."})
+    if gauge_st <= 0 or gauge_rows <= 0:
+        raise HTTPException(status_code=422, detail={
+            "message": ("The gauge is needed to turn a size into stitches — set how many "
+                        "stitches and rows you get over 10 cm.")})
+    if height_cm <= 0:
+        # A flat circle has no height, and every other shape has one it is
+        # normally made at, so nothing has to be guessed at by the maker.
+        height_cm = max(0.1, width_cm * (NATURAL_HEIGHT_RATIO.get(archetype, 1.0) or 1.0))
+    stitch = str(payload.get("stitch") or "SC").upper()
+    if stitch not in service.operations:
+        raise HTTPException(status_code=422, detail={
+            "message": f"“{stitch}” is not a stitch this knows."})
+    initial = int(payload.get("initial_stitches") or 6)
+    try:
+        out = rounds_for_part(archetype, height_cm, width_cm, gauge_st, gauge_rows,
+                              initial_stitches=max(3, initial), stitch=stitch)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail={"message": str(exc)})
+    if not out.get("rounds"):
+        raise HTTPException(status_code=422, detail={
+            "message": ("That comes out smaller than a single round at this gauge — make it "
+                        "bigger, or use a finer yarn and a smaller hook.")})
+    counts = out.get("stitch_counts") or []
+    out["widest_stitches"] = max(counts) if counts else out["initial_stitches"]
+    out["asked_height_cm"] = round(height_cm, 2)
+    out.pop("profile", None)          # the browser draws its own from the rounds
+    return out
+
+
 @app.post("/api/crochet/amigurumi/written")
 def crochet_amigurumi_written(payload: dict):
     """Rounds -> the lines a person actually reads while making it.

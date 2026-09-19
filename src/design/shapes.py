@@ -29,6 +29,14 @@ ARCHETYPES: dict[str, str] = {
     "disc": "flat round piece (base, flat ear, eye patch)",
     "dome": "half ball, open underneath (paw, cheek, shell)",
 }
+# How tall each shape is when nothing says otherwise, as a multiple of its
+# width. A ball is as tall as it is wide; a leg is a long thin tube. These are
+# only the starting suggestion -- the height is a field the maker can change,
+# and every number below is worked out from whatever they put there.
+NATURAL_HEIGHT_RATIO: dict[str, float] = {
+    "sphere": 1.0, "egg": 1.35, "cylinder": 1.5, "limb": 2.5,
+    "cone": 1.2, "disc": 0.0, "dome": 0.5,
+}
 # Parts that finish open, to be stuffed and sewn on, rather than closed off.
 OPEN_ENDED = {"limb", "cone", "disc", "dome", "cylinder"}
 DEFAULT_ARCHETYPE_FOR_CATEGORY = {

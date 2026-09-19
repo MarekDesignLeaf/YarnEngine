@@ -69,3 +69,28 @@ Multiplying rounds by row height is kept alongside as `height_if_stacked_cm`,
 since that is what most calculators do and it is useful to see the difference.
 The 3D preview builds its profile the same way, so the picture and the figure
 cannot disagree.
+
+## Starting shapes
+
+The rounds editor offers a shape to start from — a ball, an egg, a tube, a
+dome, a cone, an arm or leg, a flat circle — and asks for it in centimetres,
+because centimetres are what a maker has a feeling for and stitch counts are
+what the gauge turns them into.
+
+Those rounds come from `POST /api/shapes/rounds`, which is the same generator
+the photo designer uses. The browser used to work them out itself, adding a
+fixed number of stitches every round and then working straight. That makes a
+drum whatever the option is called: at 7.6 cm across it came out 3.6 cm tall,
+because the increases and decreases spread flat and only the straight middle
+had any height. A ball is not a stack of equal rounds — it is a profile, and
+the stitch count has to follow its radius at every round.
+
+Each shape has a height it is normally made at, as a multiple of its width: a
+ball as tall as it is wide, a leg two and a half times as long. That height
+follows the width until the maker types one of their own, after which it is
+theirs and nothing moves it again — which is how an egg-shaped head is one
+number away from a round one.
+
+Nothing is asserted that the geometry does not support. A flat circle is not
+asked how tall it is. A piece the generator closes says what it closes down
+to, and one left open says how many stitches are waiting to be sewn on.
