@@ -33,7 +33,7 @@ footer.appfoot img{height:34px;width:auto}
   --ink:#26313a;--muted:#726c62;--line:#e7ddce;
   --accent:#ef6a4c;--accent-dark:#c94a34;--accent-pale:#fce4dc;
   --accent2:#2f6b7a;--accent2-dark:#204b56;--accent2-light:#6fa9b8;--accent2-pale:#e3eff1;
-  --row-alt:#f9f4ec;--good:#3f8a5a;--good-pale:#dcefe2;--warn:#96700f;--warn-pale:#f6efdc;--bad:#a5362b;--bad-pale:#f7e5e2;--chart:#1d2a33;
+  --row-alt:#f9f4ec;--round-alt:#f4ebdd;--good:#3f8a5a;--good-pale:#dcefe2;--warn:#96700f;--warn-pale:#f6efdc;--bad:#a5362b;--bad-pale:#f7e5e2;--chart:#1d2a33;
   --font-display:'Baloo 2',system-ui,-apple-system,"Segoe UI",sans-serif;
   --shadow-card:0 1px 2px rgba(38,49,58,.05),0 10px 22px -16px rgba(38,49,58,.22);
   --shadow-btn:0 1px 2px rgba(38,49,58,.1);
@@ -193,10 +193,23 @@ tbody tr:hover{background:var(--accent2-pale)}
    which stitch belongs to which round. */
 .round{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:start;
  border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card)}
-.round:nth-child(even){background:var(--row-alt)}
-/* The round you are looking at, picked out here and on the shape at once. */
-.round.marked{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2-pale)}
+/* Every other round on a tinted ground, so the eye can tell where one ends and
+   the next begins without reading the numbers. */
+.round:nth-child(even){background:var(--round-alt)}
+/* The round you are looking at, picked out here and on the shape at once --
+   and the only one showing its stitch pickers, which is what keeps a round
+   small enough to see whole. */
+.round.marked{border-color:var(--accent2);box-shadow:0 0 0 2px var(--accent2-pale);
+ background:var(--card)}
 .round.marked .pill{background:var(--accent2);color:#fff}
+.roundEdit{display:none;flex-direction:column;gap:6px}
+.round.marked .roundEdit{display:flex}
+.round:not(.marked)>.roundDel{display:none}
+.round:not(.marked) .roundViz svg{width:56px;height:56px;flex:0 0 56px}
+.round:not(.marked) .roundViz .vzNum{font-size:15px}
+.round:not(.marked) .roundViz .vzSts{font-size:7.5px}
+.vzTap{display:block;font-size:10.5px;color:var(--accent2-light);margin-top:2px}
+.round.marked .vzTap{display:none}
 #ami3dRound{font-size:12px;color:var(--accent2-dark);font-weight:700}
 .round input{padding:6px}
 /* The line a crocheter actually reads, at the top of the round it describes. */
@@ -452,6 +465,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 .fields label>span{font-size:12px;line-height:1.25}
 .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
 .round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill;justify-self:start}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
+.round:not(.marked){grid-template-columns:34px 1fr;grid-template-areas:"pill ops";align-items:center;padding:6px 8px}
 .op-seg .countGroup{flex:1 1 100%}
  .op-seg input.opCount{width:52px}.op-seg .step{min-width:34px;padding:4px 8px}
 .shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
@@ -1654,7 +1668,7 @@ function evenSequence(ops){
  }
  return out;
 }
-function roundViz(ops,outSt){
+function roundViz(ops,outSt,hint){
  const seq=evenSequence(ops);
  const n=seq.length;
  if(!n)return '';
@@ -1709,13 +1723,23 @@ function roundViz(ops,outSt){
    <circle cx="${c}" cy="${c}" r="${r}" class="vzGuide"/>${marks}
    <text x="${c}" y="${c-1}" class="vzNum">${outSt}</text>
    <text x="${c}" y="${c+11}" class="vzSts">sts</text></svg>
-  <span class="vzLegend">${esc(bits.join(' · '))}</span></div>`;
+  <span class="vzLegend">${esc(bits.join(' · '))}${hint?'<span class="vzTap">tap a round to change its stitches</span>':''}</span></div>`;
 }
+/* One round, one box -- and it has to be small enough that you can see the box.
+   Every round carries a typed line, two pickers, a count, two buttons, a
+   stitches-in/out row and a diagram, which on a phone is a whole screen per
+   round: the boxes stop reading as separate rows because you never see two at
+   once. So a round shows what it *says* -- the pattern line and its diagram --
+   and opens its pickers only when you touch it, which is the same touch that
+   points it out on the 3D shape. */
 function roundRow(i,ops,inSt,outSt){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
  return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">`+
  `<input class="roundLine" data-round="${i}" spellcheck="false"
    placeholder="write it as a pattern: [2 sc, inc] x 6"
-   title="Type the round the way a pattern writes it, or use the pickers below">`+`${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div>${roundViz(ops,outSt)}</div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+   title="Type the round the way a pattern writes it, or use the pickers below">`+
+ `${roundViz(ops,outSt,i===0)}<div class="roundEdit">`+
+ `${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div>`+
+ `</div></div><button class="alt roundDel" data-del="${i}">✕ round</button></div>`;}
 /* Set what a round ends with, the way patterns are written ("R2: inc around
    (12)"). Each step is a validated edit, so it moves as far towards the target
    as the stitches available in that round allow and stops there. */
@@ -1765,7 +1789,7 @@ function writeRounds(list){
   row.addEventListener('pointerdown',()=>markRound(Number(row.dataset.round)));
   row.addEventListener('focusin',()=>markRound(Number(row.dataset.round)));
  });
- if(markedRound!=null)markRound(markedRound,{quiet:true});
+ if(markedRound!=null)markRound(markedRound);
  if(typeof fillRoundLines==='function')fillRoundLines();
  const ent=i=>Object.entries(list[i].operations);
  const setDis=(b,ok)=>markCant(b,ok,strict);
@@ -3921,22 +3945,19 @@ try{if(localStorage.getItem('ye_start_hidden')==='1')$('startHere').classList.ad
    Touching a round marks it in both: a ring drawn round the shape at that
    round's height, and the round's own box picked out in the list. */
 let markedRound=null;
-function markRound(index,{quiet}={}){
+function markRound(index){
  markedRound=index;
  document.querySelectorAll('#rounds .round').forEach(row=>
   row.classList.toggle('marked',Number(row.dataset.round)===index&&!row.classList.contains('ring')));
  if(window.YE3D&&window.YE3D.highlightRound){
   try{window.YE3D.highlightRound(index);}catch(e){}
  }
- if(!quiet){
-  const list=readRounds();
-  const r=list[index];
-  if(r&&$('ami3dInfo')){
-   const out=opsP(r.operations);
-   const badge=$('ami3dRound');
-   if(badge)badge.textContent=`${rowWord()} ${index+2} · ${out} sts`;
-  }
- }
+ // The badge is refreshed on every mark, including the one that follows
+ // a re-render: editing a round and leaving the badge showing what it used to
+ // say is worse than showing nothing.
+ const r=readRounds()[index];
+ const badge=$('ami3dRound');
+ if(badge)badge.textContent=r?`${rowWord()} ${index+2} · ${opsP(r.operations)} sts`:'';
 }
 function clearMarkedRound(){
  markedRound=null;
@@ -4085,33 +4106,55 @@ function updateInfo(stats, message) {
    at are the ones closing the top; a ring drawn round the piece can. */
 let lastProfile = null, highlightMesh = null, highlightIndex = null, meshOffsetY = 0;
 
+function dropHighlight() {
+  if (!highlightMesh) return;
+  scene.remove(highlightMesh);
+  highlightMesh.traverse((o) => {
+    if (o.geometry) o.geometry.dispose();
+    if (o.material) o.material.dispose();
+  });
+  highlightMesh = null;
+}
+
 function clearHighlight() {
   highlightIndex = null;
-  if (highlightMesh) {
-    scene.remove(highlightMesh);
-    highlightMesh.geometry.dispose(); highlightMesh.material.dispose();
-    highlightMesh = null;
-  }
+  dropHighlight();
 }
 
 function highlightRound(index) {
   if (!scene) return;
   highlightIndex = index;
-  if (highlightMesh) {
-    scene.remove(highlightMesh);
-    highlightMesh.geometry.dispose(); highlightMesh.material.dispose();
-    highlightMesh = null;
-  }
+  dropHighlight();
   if (index == null || !lastProfile) return;
   // profile[0] is the start of the piece, so round i is the point after it
   const point = lastProfile[index + 1];
   if (!point) return;
-  const radius = Math.max(0.12, point.x);
-  const tube = Math.max(0.045, radius * 0.06);
-  const geo = new THREE.TorusGeometry(radius, tube, 10, 64);
-  const mat = new THREE.MeshStandardMaterial({ color: 0x2f6b7a, emissive: 0x2f6b7a,
-                                               emissiveIntensity: 0.45, roughness: 0.6 });
-  highlightMesh = new THREE.Mesh(geo, mat);
+  // A ring drawn at exactly the surface radius is *in* the surface: half of it
+  // is inside the fabric and the rest is hidden by the slope, so the round you
+  // asked about shows as a sliver at the silhouette and nothing else. It has
+  // to sit proud of the piece, like a rubber band round a ball -- and thick
+  // enough to find on a phone.
+  const widest = lastProfile.reduce((m, p) => Math.max(m, p.x), 0.3);
+  const tube = Math.max(0.07, widest * 0.05);
+  const radius = Math.max(0.1, point.x) + tube * 1.1;
+  // Two rings in the same place: the near half solid, and a faint one drawn
+  // through the piece so the far half still reads as part of the same band.
+  // With only the solid one a spinning shape hides half the band for half of
+  // every turn, and with only the see-through one it floats in front of the
+  // piece instead of round it.
+  const make = (through) => {
+    const mesh = new THREE.Mesh(
+      new THREE.TorusGeometry(radius, through ? tube * 0.75 : tube, 12, 80),
+      new THREE.MeshStandardMaterial({
+        color: 0x2f6b7a, emissive: 0x2f6b7a, emissiveIntensity: through ? 0.9 : 0.7,
+        roughness: 0.45, transparent: through, opacity: through ? 0.32 : 1,
+        depthTest: !through }));
+    mesh.renderOrder = through ? 1 : 2;
+    return mesh;
+  };
+  highlightMesh = new THREE.Group();
+  highlightMesh.add(make(true));
+  highlightMesh.add(make(false));
   highlightMesh.rotation.x = Math.PI / 2;
   highlightMesh.position.y = point.y + meshOffsetY;
   scene.add(highlightMesh);

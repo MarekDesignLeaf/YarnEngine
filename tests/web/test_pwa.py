@@ -100,7 +100,26 @@ def test_a_row_is_visibly_one_row():
     assert "tbody tr:nth-child(even){background:var(--row-alt)}" in html
     assert "tbody td:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}" in html
     assert "#wlTable,#yarnTable{table-layout:fixed}" in html      # a row cannot spill out
-    assert ".round:nth-child(even){background:var(--row-alt)}" in html
+    assert ".round:nth-child(even){background:var(--round-alt)}" in html
+
+
+def test_a_round_is_small_enough_to_see_whole():
+    """A box round every round is no use if one round fills the screen.
+
+    Each round carries a typed line, two pickers, a count, two buttons, a
+    stitches-in/out row and a diagram. All of it open at once is a whole phone
+    screen per round, so the boxes stop reading as separate rows — you never
+    see two at a time. A round shows what it says; it opens its pickers when
+    you touch it, which is the same touch that points it out on the shape.
+    """
+    html = c.get("/").text
+    assert ".roundEdit{display:none" in html
+    assert ".round.marked .roundEdit{display:flex}" in html
+    assert ".round:not(.marked)>.roundDel{display:none}" in html   # and cannot be deleted by a slip
+    assert ".round:not(.marked) .roundViz svg{width:56px" in html  # the diagram shrinks with it
+    # the typed line and the diagram are what a closed round shows
+    row = html[html.index("function roundRow(i,ops"):html.index("/* Set what a round ends with")]
+    assert row.index('class="roundLine"') < row.index("roundViz(ops,outSt") < row.index('class="roundEdit"')
 
 
 def test_row_one_is_how_the_piece_starts():
@@ -149,10 +168,23 @@ def test_a_stitch_and_its_shaping_are_chosen_separately():
 
 def test_each_round_shows_itself_as_a_picture():
     html = c.get("/").text
-    assert "function roundViz(ops,outSt)" in html
+    assert "function roundViz(ops,outSt,hint)" in html
     assert "function evenSequence(ops)" in html          # shaping spread as it is worked
-    assert "${roundViz(ops,outSt)}" in html              # drawn inside the round's own box
+    assert "${roundViz(ops,outSt,i===0)}" in html        # drawn inside the round's own box
     assert ".roundViz .vzInc{fill:var(--good)}" in html
+
+
+def test_the_round_you_touched_is_pointed_out_on_the_shape():
+    """A ring drawn at exactly the surface radius is *in* the surface: half of
+    it is buried and the slope hides the rest, so the round shows as a sliver
+    at the silhouette and nothing else. It has to sit proud of the piece."""
+    html = c.get("/").text
+    assert "const radius = Math.max(0.1, point.x) + tube * 1.1" in html
+    assert "const make = (through) =>" in html            # solid in front, ghosted behind
+    assert "depthTest: !through" in html
+    assert "function dropHighlight()" in html             # a group has to be disposed of by walking it
+    assert "function markRound(index){" in html
+    assert ".round.marked{border-color:var(--accent2)" in html
 
 
 def test_the_editor_asks_how_the_piece_is_built():
