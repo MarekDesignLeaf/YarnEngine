@@ -187,6 +187,24 @@ def test_the_round_you_touched_is_pointed_out_on_the_shape():
     assert ".round.marked{border-color:var(--accent2)" in html
 
 
+def test_which_end_of_the_shape_round_one_is_at_is_the_makers_choice():
+    """A pattern is read from round 1 downwards, so by default the piece hangs
+    from its first round and grows down the screen in the order the rounds are
+    listed. Some people picture their work standing on its magic ring instead,
+    so it is a switch rather than a decision made for them — and it sticks."""
+    html = c.get("/").text
+    assert 'id="ami3dFlip"' in html
+    assert "function setOrder(topFirst)" in html
+    assert "mesh.rotation.x = ringOnTop ? Math.PI : 0" in html   # a turn, never a scale of -1
+    assert "meshOffsetY = ringOnTop ? meshMidY : -meshMidY" in html
+    # the band goes with the piece when it is turned over
+    assert "meshOffsetY + (ringOnTop ? -point.y : point.y)" in html
+    assert "localStorage.setItem('ye_ring_top'" in html
+    assert "localStorage.getItem('ye_ring_top')!=='bottom'" in html
+    # and it says "Row 1" over a blanket, not "Round 1"
+    assert "rowWord()==='row'?'Row':'Round'" in html
+
+
 def test_the_editor_asks_how_the_piece_is_built():
     """The same engine costs a bear and a blanket; the editor has to ask which,
     because a stitch count means a different thing in each."""

@@ -712,6 +712,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
           <div class="toolbar" style="margin:0;gap:10px">
             <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px"><input type="checkbox" id="ami3dSpin" checked style="width:auto">Spin</label>
             <label style="display:flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px" title="Keep the 3D preview fixed at the bottom of the screen while you scroll through the rounds"><input type="checkbox" id="ami3dPin" checked style="width:auto">Keep visible</label>
+            <button type="button" id="ami3dFlip" class="alt" style="min-height:30px;padding:3px 10px;font-size:12.5px" title="Which end of the shape round 1 is at — the piece can hang from its first round or stand on it">Round 1 on top</button>
             <button type="button" id="ami3dCollapse" class="alt" style="min-height:30px;padding:3px 10px;font-size:12.5px">Hide</button>
           </div>
         </div>
@@ -1946,6 +1947,7 @@ function applyConstructionTemplates(){
  if(grows&&Number($('amiSize').value)>200)$('amiSize').value=36;
  showSizeFields();
  $('roundsHeading').textContent=word==='row'?'Rows':'Rounds';
+ if(typeof applyRingOrder==='function')applyRingOrder();
  $('roundsHelp').textContent=
   `For each ${word}, pick a stitch and how many times it is worked — or just type how many `+
   `stitches the ${word} should end with (the number in brackets in a written pattern) and the `+
@@ -3959,6 +3961,27 @@ function markRound(index){
  const badge=$('ami3dRound');
  if(badge)badge.textContent=r?`${rowWord()} ${index+2} · ${opsP(r.operations)} sts`:'';
 }
+/* Which way up the shape is shown. The default hangs the piece from round 1,
+   so the picture runs in the same direction as the list you are reading; some
+   people picture their work standing on its magic ring instead, so it is a
+   switch rather than a decision made for them. */
+let ringOnTop3D = (()=>{try{return localStorage.getItem('ye_ring_top')!=='bottom';}catch(e){return true;}})();
+function applyRingOrder(){
+ if(window.YE3D&&window.YE3D.setOrder)window.YE3D.setOrder(ringOnTop3D);
+ const b=$('ami3dFlip');
+ if(b){
+  const word=rowWord()==='row'?'Row':'Round';
+  b.textContent=`${word} 1 ${ringOnTop3D?'on top':'at the bottom'}`;
+  b.title=`${word} 1 is drawn at the ${ringOnTop3D?'top':'bottom'} of the shape — tap to turn the piece over`;
+ }
+}
+$('ami3dFlip').onclick=()=>{
+ ringOnTop3D=!ringOnTop3D;
+ try{localStorage.setItem('ye_ring_top',ringOnTop3D?'top':'bottom');}catch(e){}
+ applyRingOrder();
+};
+setTimeout(applyRingOrder,0);
+
 function clearMarkedRound(){
  markedRound=null;
  document.querySelectorAll('#rounds .round.marked').forEach(r=>r.classList.remove('marked'));
@@ -4104,7 +4127,31 @@ function updateInfo(stats, message) {
 /* Which round is which, on the shape itself. A list of numbers cannot show
    you that round 14 is the widest point or that the decreases you are looking
    at are the ones closing the top; a ring drawn round the piece can. */
-let lastProfile = null, highlightMesh = null, highlightIndex = null, meshOffsetY = 0;
+let lastProfile = null, highlightMesh = null, highlightIndex = null, meshOffsetY = 0, meshMidY = 0;
+/* Which way up the piece is drawn. A pattern is read from round 1 downwards,
+   so by default the shape hangs from its first round and grows down the screen
+   in the order the rounds are listed and worked. Anyone who pictures their
+   work standing on its magic ring can turn it over, and the choice sticks.
+
+   The profile is always built from the ring upwards, because that is how the
+   maths reads; it is the finished mesh that gets turned over. Half a turn
+   about X is a proper rotation, so the winding and the normals stay right —
+   a scale of -1 would light the piece inside out. */
+let ringOnTop = (() => { try { return localStorage.getItem('ye_ring_top') !== 'bottom'; }
+                         catch (e) { return true; } })();
+
+function placeMesh() {
+  if (!mesh) return;
+  mesh.rotation.x = ringOnTop ? Math.PI : 0;
+  meshOffsetY = ringOnTop ? meshMidY : -meshMidY;
+  mesh.position.y = meshOffsetY;
+}
+
+function setOrder(topFirst) {
+  ringOnTop = !!topFirst;
+  placeMesh();
+  if (highlightIndex != null) highlightRound(highlightIndex);
+}
 
 function dropHighlight() {
   if (!highlightMesh) return;
@@ -4156,7 +4203,8 @@ function highlightRound(index) {
   highlightMesh.add(make(true));
   highlightMesh.add(make(false));
   highlightMesh.rotation.x = Math.PI / 2;
-  highlightMesh.position.y = point.y + meshOffsetY;
+  // The band goes wherever its round went when the piece was turned.
+  highlightMesh.position.y = meshOffsetY + (ringOnTop ? -point.y : point.y);
   scene.add(highlightMesh);
 }
 
@@ -4171,8 +4219,8 @@ function buildLatheMesh(pts) {
   const bb = geo.boundingBox;
   const height = bb.max.y - bb.min.y;
   const maxR = Math.max(bb.max.x, 0.3);
-  meshOffsetY = -(bb.max.y + bb.min.y) / 2;
-  mesh.position.y = meshOffsetY;
+  meshMidY = (bb.max.y + bb.min.y) / 2;
+  placeMesh();
   scene.add(mesh);
 
   const dist = Math.max(height, maxR * 2) * 1.7 + 1.5;
@@ -4239,6 +4287,7 @@ window.YE3D = {
   previewProfile,
   highlightRound,
   clearHighlight,
+  setOrder,
   resize,
   setSpin: (on) => { spinning = !!on; },
   setColour: (hex) => {
