@@ -127,3 +127,23 @@ def test_a_round_reads_in_the_order_a_pattern_says_it():
     assert "SC_INC:'inc'" in html and "SC:'sc'" in html
     assert "${a} — ${name}" in html
     assert ".op-seg .segDel{margin-left:auto" in html
+
+
+def test_a_stitch_and_its_shaping_are_chosen_separately():
+    """A maker picks the stitch, then says whether it is worked plain, as an
+    increase or as a decrease — and only the combinations the engine has."""
+    html = c.get("/").text
+    assert "const OP_BUILD={" in html
+    assert "SC:{none:'SC',inc:'SC_INC',dec:'SC2TOG',tog3:'SC3TOG'}" in html
+    assert "TR:{none:'TR'}" in html            # no treble decrease is offered
+    assert "none:'— worked plain —'" in html.replace("'none':", "none:")
+    assert 'class="opBase"' in html and 'class="opShape"' in html
+    assert "function opFromParts(base,shape)" in html
+
+
+def test_each_round_shows_itself_as_a_picture():
+    html = c.get("/").text
+    assert "function roundViz(ops,outSt)" in html
+    assert "function evenSequence(ops)" in html          # shaping spread as it is worked
+    assert "${roundViz(ops,outSt)}" in html              # drawn inside the round's own box
+    assert ".roundViz .vzInc{fill:var(--good)}" in html

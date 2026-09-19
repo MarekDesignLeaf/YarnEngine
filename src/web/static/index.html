@@ -195,6 +195,23 @@ tbody tr:hover{background:var(--accent2-pale)}
  border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card)}
 .round:nth-child(even){background:var(--row-alt)}
 .round input{padding:6px}
+/* The round, drawn. Plain stitches are dots round the ring, an increase is the
+   stitch that splits in two, a decrease is two pulled into one. */
+.roundViz{display:flex;align-items:center;gap:10px;margin-top:2px}
+.roundViz svg{width:96px;height:96px;flex:0 0 96px}
+.roundViz .vzGuide{fill:none;stroke:var(--line);stroke-width:1}
+.roundViz .vzPlain{fill:var(--accent2-light)}
+.roundViz .vzInc{fill:var(--good)}
+.roundViz .vzDec{fill:var(--accent)}
+.roundViz .vzDecLine{stroke:var(--accent);stroke-width:1.2}
+.roundViz .vzArc{fill:none;stroke-width:5;stroke-linecap:butt}
+.roundViz .vzArc-plain{stroke:var(--accent2-light)}
+.roundViz .vzArc-inc{stroke:var(--good)}
+.roundViz .vzArc-dec{stroke:var(--accent)}
+.roundViz .vzNum{text-anchor:middle;font-family:var(--font-display);font-weight:700;
+ font-size:19px;fill:var(--ink)}
+.roundViz .vzSts{text-anchor:middle;font-size:9px;fill:var(--muted);letter-spacing:.06em}
+.roundViz .vzLegend{font-size:11.5px;color:var(--muted);line-height:1.4}
 /* The ring row reads as the start of the piece rather than as another round
    to edit: no stitch pickers, no delete, and a tint that sets it apart. */
 .round.ring{align-items:center}
@@ -204,7 +221,10 @@ tbody tr:hover{background:var(--accent2-pale)}
 .round.ring .ringName{font-weight:650}
 .round.ring input{width:62px}
 .round-ops{display:flex;flex-direction:column;gap:6px}
-.op-seg{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.op-seg{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.op-seg .opBase{flex:1 1 130px;min-width:0}
+.op-seg .opShape{flex:1 1 130px;min-width:0}
+.op-seg .countGroup{display:flex;gap:6px;align-items:center;flex:1 1 auto}
 .op-seg .opx{color:var(--muted);font-weight:700;flex:0 0 auto}
 .op-seg .stepPair{display:flex;gap:4px;flex:0 0 auto}
 .op-seg .segDel{margin-left:auto;flex:0 0 auto}
@@ -393,8 +413,8 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 .fields label>span{font-size:12px;line-height:1.25}
 .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
 .round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill;justify-self:start}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
-.op-seg{flex-wrap:nowrap}.op-seg select{flex:1 1 60px;min-width:0}
- .op-seg input.opCount{width:48px}.op-seg .step{min-width:30px;padding:4px 6px}
+.op-seg .countGroup{flex:1 1 100%}
+ .op-seg input.opCount{width:52px}.op-seg .step{min-width:34px;padding:4px 8px}
 .shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
 </style>
 </head>
@@ -1106,6 +1126,28 @@ const OPS_INFO={CH:['Chain','Chain'],SLST:['Slip stitch','Slip stitch'],SC:['Sin
  SC_INC:['Increase – 2 sc in one stitch','Increase – 2 sc in one stitch'],HDC_INC:['Increase – 2 hdc in one stitch','Increase – 2 hdc in one stitch'],DC_INC:['Increase – 2 dc in one stitch','Increase – 2 dc in one stitch'],
  SC_BLO:['sc, back loop only','sc, back loop only'],SC_FLO:['sc, front loop only','sc, front loop only'],HDC_BLO:['hdc, back loop only','hdc, back loop only'],DC_BLO:['dc, back loop only','dc, back loop only'],
  FPDC:['Front post dc','Front post dc'],BPDC:['Back post dc','Back post dc'],PUFF3:['Puff stitch (3 dc)','Puff stitch (3 dc)'],POPCORN5:['Popcorn stitch (5 dc)','Popcorn stitch (5 dc)']};
+/* A line of a round is a stitch and what is done with it: single crochet on
+   its own, or single crochet worked as an increase, or two of them taken
+   together as a decrease. The two are picked separately -- which is how a
+   maker thinks about it -- and combined into the one operation the engine
+   knows. Only the combinations that exist are offered: there is no treble
+   decrease in the registry, so the list does not pretend there is. */
+const OP_BUILD={
+ SC:{none:'SC',inc:'SC_INC',dec:'SC2TOG',tog3:'SC3TOG'},
+ HDC:{none:'HDC',inc:'HDC_INC',dec:'HDC2TOG'},
+ DC:{none:'DC',inc:'DC_INC',dec:'DC2TOG',tog3:'DC3TOG'},
+ TR:{none:'TR'},DTR:{none:'DTR'},CH:{none:'CH'},SLST:{none:'SLST'},
+ SC_BLO:{none:'SC_BLO'},SC_FLO:{none:'SC_FLO'},HDC_BLO:{none:'HDC_BLO'},DC_BLO:{none:'DC_BLO'},
+ FPDC:{none:'FPDC'},BPDC:{none:'BPDC'},PUFF3:{none:'PUFF3'},POPCORN5:{none:'POPCORN5'}};
+const SHAPE_NAMES={none:'— worked plain —',inc:'increase (2 in one stitch)',
+ dec:'decrease (2 together)',tog3:'decrease (3 together)'};
+const OP_PARTS={};
+for(const [base,made] of Object.entries(OP_BUILD))
+ for(const [shape,op] of Object.entries(made)) OP_PARTS[op]=[base,shape];
+function opBaseOf(op){return (OP_PARTS[op]||[op,'none'])[0];}
+function opShapeOf(op){return (OP_PARTS[op]||[op,'none'])[1];}
+function opFromParts(base,shape){const made=OP_BUILD[base]||{};return made[shape]||made.none||base;}
+
 /* What a written pattern calls each one. The dropdown leads with this, because
    on a narrow screen the end of a long name is the first thing to be cut off
    and "Increase – 2..." tells you less than "inc". */
@@ -1410,12 +1452,28 @@ function roundsNote(msg,kind){if(msg)status($('amiStatus'),msg,kind||'warn');els
 function markCant(b,ok,strict){if(strict&&!ok){b.classList.add('cant');b.title=DIS_TITLE;}}
 function cantClick(b){if(!b.classList.contains('cant'))return false;roundsNote(DIS_TITLE+'.');return true;}
 
-function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opLabel(op))}</option>`).join('')}</optgroup>`).join('')}</select>`;}
+function opSelectHTML(selected){
+ const base=opBaseOf(selected);
+ const stitches=['CH','SLST','SC','HDC','DC','TR','DTR'];
+ const special=['SC_BLO','SC_FLO','HDC_BLO','DC_BLO','FPDC','BPDC','PUFF3','POPCORN5'];
+ const opt=op=>`<option value="${op}"${op===base?' selected':''}>${esc(opLabel(op))}</option>`;
+ return `<select class="opBase" title="Which stitch">
+   <optgroup label="Stitches">${stitches.map(opt).join('')}</optgroup>
+   <optgroup label="Special stitches">${special.map(opt).join('')}</optgroup>
+  </select>${shapeSelectHTML(selected)}`;
+}
+function shapeSelectHTML(selected){
+ const base=opBaseOf(selected),shape=opShapeOf(selected);
+ const available=Object.keys(OP_BUILD[base]||{none:1});
+ return `<select class="opShape" title="Worked plain, or as an increase or a decrease"${available.length<2?' disabled':''}>`+
+  available.map(s=>`<option value="${s}"${s===shape?' selected':''}>${esc(SHAPE_NAMES[s]||s)}</option>`).join('')+
+  '</select>';
+}
 /* A line of a round, in the order a pattern says it: the stitch (or the
    increase, or the decrease), then "x", then how many times. The steppers sit
    after the number where they belong to it, and the remove button is pushed to
    the far end so it is never next to the thing you are adjusting. */
-function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><input type="number" class="opCount" min="0" value="${n}"><span class="stepPair"><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button></span><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="countGroup"><span class="opx">×</span><input type="number" class="opCount" min="0" value="${n}"><span class="stepPair"><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button></span><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></span></div>`;}
 /* The one round that is not editable as stitches: a magic ring, with only the
    number of stitches in it to choose. Every amigurumi piece starts with one. */
 function ringRow(initial){
@@ -1441,8 +1499,88 @@ function bindRingRow(){
  box.onchange=commit;
  box.onblur=commit;
 }
+/* A small picture of the round, under its own controls: the stitches laid
+   round a circle in the order they are worked, plain ones as dots, an increase
+   as a stitch that splits in two, a decrease as two drawn together. It is the
+   one thing a column of numbers cannot show -- whether the shaping is spread
+   evenly round the piece or bunched on one side -- and it redraws with every
+   edit, because it is rendered from the same round the editor just accepted. */
+function evenSequence(ops){
+ // Largest-remainder interleaving: each kind gets its share spread as evenly
+ // as the count allows, which is how the shaping is actually worked.
+ const kinds=Object.entries(ops).filter(([,n])=>n>0);
+ const total=kinds.reduce((s,[,n])=>s+n,0);
+ if(!total)return [];
+ const taken=kinds.map(()=>0),out=[];
+ for(let i=1;i<=total;i++){
+  let best=0,bestCredit=-Infinity;
+  kinds.forEach(([,n],k)=>{
+   const credit=n*i/total-taken[k];
+   if(credit>bestCredit){bestCredit=credit;best=k;}
+  });
+  taken[best]++;out.push(kinds[best][0]);
+ }
+ return out;
+}
+function roundViz(ops,outSt){
+ const seq=evenSequence(ops);
+ const n=seq.length;
+ if(!n)return '';
+ const size=104,c=size/2;
+ const r=Math.max(26,Math.min(38,10+n*0.55));
+ const kind=op=>{
+  const io=OP_IO[op]||[1,1];
+  if(io[1]>io[0])return 'inc';
+  if(io[0]>io[1])return 'dec';
+  return 'plain';
+ };
+ let marks='';
+ if(n<=90){
+  seq.forEach((op,i)=>{
+   const a=(-90+i*360/n)*Math.PI/180;
+   const x=c+Math.cos(a)*r,y=c+Math.sin(a)*r;
+   const k=kind(op),dot=Math.max(1.6,Math.min(3,90/n));
+   if(k==='inc'){
+    const x2=c+Math.cos(a)*(r+4.6),y2=c+Math.sin(a)*(r+4.6);
+    marks+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dot}" class="vzInc"/>`
+        +`<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="${(dot*0.8).toFixed(1)}" class="vzInc"/>`;
+   }else if(k==='dec'){
+    const x2=c+Math.cos(a)*(r-4.6),y2=c+Math.sin(a)*(r-4.6);
+    marks+=`<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" class="vzDecLine"/>`
+        +`<circle cx="${x2.toFixed(1)}" cy="${y2.toFixed(1)}" r="${dot}" class="vzDec"/>`;
+   }else{
+    marks+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${dot}" class="vzPlain"/>`;
+   }
+  });
+ }else{
+  // Too many to draw one by one, so the ring is divided in proportion instead
+  // of drawing a fiction of individual stitches.
+  const counts={plain:0,inc:0,dec:0};
+  seq.forEach(op=>counts[kind(op)]++);
+  let from=-90;
+  for(const k of ['plain','inc','dec']){
+   if(!counts[k])continue;
+   const sweep=counts[k]*360/n,to=from+sweep;
+   const p=(deg)=>[c+Math.cos(deg*Math.PI/180)*r,c+Math.sin(deg*Math.PI/180)*r];
+   const [x1,y1]=p(from),[x2,y2]=p(to);
+   marks+=`<path d="M${x1.toFixed(1)} ${y1.toFixed(1)} A${r} ${r} 0 ${sweep>180?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)}" class="vzArc vzArc-${k}"/>`;
+   from=to;
+  }
+ }
+ const counts={plain:0,inc:0,dec:0};
+ seq.forEach(op=>counts[kind(op)]++);
+ const bits=[`${n} worked`];
+ if(counts.inc)bits.push(`${counts.inc} increase${counts.inc>1?'s':''}`);
+ if(counts.dec)bits.push(`${counts.dec} decrease${counts.dec>1?'s':''}`);
+ return `<div class="roundViz"><svg viewBox="0 0 ${size} ${size}" role="img"
+   aria-label="${esc(bits.join(', '))}, ending with ${outSt} stitches">
+   <circle cx="${c}" cy="${c}" r="${r}" class="vzGuide"/>${marks}
+   <text x="${c}" y="${c-1}" class="vzNum">${outSt}</text>
+   <text x="${c}" y="${c+11}" class="vzSts">sts</text></svg>
+  <span class="vzLegend">${esc(bits.join(' · '))}</span></div>`;
+}
 function roundRow(i,ops,inSt,outSt){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
- return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+ return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div>${roundViz(ops,outSt)}</div><button class="alt" data-del="${i}">✕ round</button></div>`;}
 /* Set what a round ends with, the way patterns are written ("R2: inc around
    (12)"). Each step is a validated edit, so it moves as far towards the target
    as the stitches available in that round allow and stops there. */
@@ -1456,7 +1594,8 @@ function setRoundOutput(list,initial,ri,target){
  }
  return cur;
 }
-function domRounds(){return [...document.querySelectorAll('#rounds .round:not(.ring)')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
+function domRounds(){return [...document.querySelectorAll('#rounds .round:not(.ring)')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=opFromParts(seg.querySelector('.opBase').value,
+                                 (seg.querySelector('.opShape')||{}).value||'none');const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
 /* The rounds the editor has actually accepted. A number typed into a count
    field is not committed until it is confirmed, so reading raw DOM values
    would let a half-typed number leak into the next click and break the chain;
@@ -1568,12 +1707,28 @@ function writeRounds(list){
   };
   inp.oninput=()=>{clearTimeout(outTimer);outTimer=setTimeout(()=>{if(inp.isConnected&&inp.onchange)inp.onchange();},700);};
  });
- document.querySelectorAll('#rounds .opSel').forEach(sel=>{
+ // The stitch and the shaping are two choices that make one operation, so
+ // either one changing is the same edit: work out what the pair now means and
+ // swap it in.
+ document.querySelectorAll('#rounds .opBase,#rounds .opShape').forEach(sel=>{
   sel.onchange=()=>{
    const seg=sel.closest('.op-seg');const ri=Number(seg.dataset.round),si=Number(seg.dataset.seg);
    const pair=ent(ri)[si];if(!pair)return;
-   const [oldOp,n]=pair;const newOp=sel.value;
-   if(newOp===oldOp)return;
+   const [oldOp,n]=pair;
+   const base=seg.querySelector('.opBase').value;
+   const shapeSel=seg.querySelector('.opShape');
+   let shape=shapeSel?shapeSel.value:'none';
+   if(!(OP_BUILD[base]||{})[shape]){
+    // this stitch has no such shaping -- fall back to plain rather than to
+    // something the registry does not have
+    shape='none';
+   }
+   const newOp=opFromParts(base,shape);
+   if(newOp===oldOp){
+    if(shapeSel)shapeSel.outerHTML=shapeSelectHTML(newOp);   // keep the list honest
+    writeRounds(list);
+    return;
+   }
    const ini=curInitial();
    if(!chainValid(list,ini)){scheduleAmi3D();return;}
    if(!(newOp in OP_IO)){writeRounds(list);return;}
