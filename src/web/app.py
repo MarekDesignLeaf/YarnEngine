@@ -35,7 +35,10 @@ from src.stitch_groups.service import analyse_stitch_groups
 import base64
 from src.design.parts import build_design, written_pattern, round_text, OP_WORDS
 from src.design.shapes import ARCHETYPES as DESIGN_ARCHETYPES
-from src.pattern_import.crochet_rounds import parse_pattern as parse_crochet_rounds
+from src.pattern_import.crochet_rounds import (parse_pattern as parse_crochet_rounds,
+                                               parse_round as parse_one_round,
+                                               _vocabulary as crochet_vocabulary,
+                                               ROUND_HEADER)
 from src.design.vision import (describe_photo, transcribe_pattern, configured as vision_configured,
                                model_name as vision_model_name, env_key as vision_env_key,
                                mask_key as vision_mask_key, DEFAULT_MODEL as VISION_DEFAULT_MODEL,
@@ -64,6 +67,7 @@ from src.crochet_geometry.stitch_loop import (operation_length_mm, OPERATION_WRA
 from src.library.colours import match_colour
 from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
 from src.construction import types as constructions
+from src.web.plain import problem as plain_problem
 from src.tools import maths as tool_maths
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
@@ -510,7 +514,8 @@ def _cost_design_in_yarn(design: dict, payload: dict) -> None:
                                    "rounds": part["rounds"]}, service.operations)
         if not analysed.get("valid"):
             raise HTTPException(status_code=500,
-                                detail={"part": part["name"], "program_issues": analysed["issues"]})
+                                detail={**plain_problem(analysed["issues"]),
+                                        "part": part["name"]})
         try:
             calc, pred, _audit = calculate_operation_program(
                 record=production, operation_counts=analysed["operation_counts"], gauge=gauge,
@@ -994,6 +999,56 @@ def _import_result(text: str, dialect: str, source: str) -> dict:
     return out
 
 
+@app.post("/api/crochet/round/read")
+def read_one_round(payload: dict):
+    """One round, typed the way a pattern writes it.
+
+    Someone who has crocheted for thirty years reads and writes a round as a
+    line of text — "[2 sc, inc] x 6" — and assembling that out of dropdowns is
+    slower than a pencil. This reads the line with the same parser the pattern
+    import uses, so anything a pattern can say, the editor can take.
+    """
+    text = str(payload.get("text") or "").strip()
+    if not text:
+        raise HTTPException(status_code=422, detail="type the round first")
+    incoming = payload.get("incoming")
+    incoming = int(incoming) if incoming not in (None, "") else None
+    dialect = "uk" if str(payload.get("dialect") or "us") == "uk" else "us"
+    vocab = crochet_vocabulary(dialect)
+    # A round number at the front is how it is written; it is not part of the
+    # stitches, so it is taken off before reading.
+    body = ROUND_HEADER.sub("", text) if ROUND_HEADER.match(text) else text
+    header = ROUND_HEADER.match(text)
+    if header:
+        body = header.group(3)
+    ops, why = parse_one_round(body, vocab, incoming)
+    if ops is None:
+        # the parser already says what defeated it; do not say it twice
+        reason = str(why or "").strip()
+        # The parser names the fragment that defeated it; quote that rather than
+        # repeating its sentence inside another one.
+        for opener in ("a repeat could not be read:", "could not read:"):
+            if reason.lower().startswith(opener):
+                reason = f"“{reason[len(opener):].strip()}” is not something it can read"
+                break
+        raise HTTPException(status_code=422, detail=(
+            f"That round could not be read — {reason}. "
+            "Write it the way a pattern does: “[2 sc, inc] x 6”, “sc in each st around”, "
+            "“6 inc”."))
+    produced = sum(service.operations[op]["produces_stitches"] * n
+                   for op, n in ops.items() if op in service.operations)
+    consumed = sum(service.operations[op]["consumes_stitches"] * n
+                   for op, n in ops.items() if op in service.operations)
+    if incoming is not None and consumed != incoming:
+        issue = {"code": "ROUND_INPUT_MISMATCH", "expected": incoming, "consumed": consumed}
+        if payload.get("round"):
+            issue["round"] = int(payload["round"])
+        raise HTTPException(status_code=422, detail=plain_problem(
+            [issue], str(payload.get("row_word") or "round")))
+    return {"operations": ops, "output_stitches": produced, "consumed": consumed,
+            "written": round_text(ops, produced)}
+
+
 @app.post("/api/import/rounds")
 def import_rounds(payload: dict):
     """Pasted or typed pattern text -> rounds."""
@@ -1350,7 +1405,8 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
             analysed={**analysed,"valid":False,
                       "issues":list(analysed.get("issues") or [])+[issue]}
     if not analysed.get("valid"):
-        raise HTTPException(status_code=422,detail={"program_issues":analysed.get("issues",[])})
+        raise HTTPException(status_code=422,
+                            detail=plain_problem(analysed.get("issues", []), construction.row_word))
     production=model_registry.production()
     yarn=service._yarn(payload.get("yarn_id")) if payload.get("yarn_id") else None
     diameter,diameter_source,diameter_warnings=estimate_yarn_diameter_mm(yarn,payload.get("yarn_diameter_mm"))
@@ -1421,7 +1477,8 @@ def crochet_amigurumi_written(payload: dict):
     """
     analysed = analyse_rounds(payload, service.operations)
     if not analysed.get("valid"):
-        raise HTTPException(status_code=422, detail={"program_issues": analysed.get("issues", [])})
+        raise HTTPException(status_code=422,
+                            detail=plain_problem(analysed.get("issues", [])))
     stitch = str(payload.get("stitch") or "SC").upper()
     initial = int(payload.get("initial_stitches") or 6)
     word = OP_WORDS.get(stitch, "sc")

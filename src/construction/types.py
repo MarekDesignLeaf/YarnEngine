@@ -50,7 +50,7 @@ class Construction:
 
 CONSTRUCTIONS: dict[str, Construction] = {
     "round_closed": Construction(
-        id="round_closed", name="In the round, closed at one end",
+        id="round_closed", name="In the round, from a magic ring",
         about=("Worked in a spiral from a magic ring, so the piece starts closed. The stitch "
                "count is the circumference at that point."),
         worked="round", start="magic_ring", stitches_are="circumference", shaping="anywhere",
@@ -59,21 +59,21 @@ CONSTRUCTIONS: dict[str, Construction] = {
         notes=("The diameter is worked out from the circumference, which assumes the piece is "
                "roughly round in section — true of a stuffed toy, less so of a tube pressed flat.",)),
     "round_open": Construction(
-        id="round_open", name="In the round, open tube",
+        id="round_open", name="In the round, as a tube",
         about=("Worked round and round from a ring of stitches that is already there — a chain "
                "joined into a ring, or a cast-on. Open at both ends."),
         worked="round", start="ring_of_stitches", stitches_are="circumference", shaping="anywhere",
         preview="tube", examples=("a sleeve", "a sock leg", "a cowl", "a bag body", "a hat brim"),
-        start_label="Ring of stitches", row_word="round"),
+        start_label="Starting ring", row_word="round"),
     "flat_rows": Construction(
-        id="flat_rows", name="Flat, back and forth",
+        id="flat_rows", name="In rows, straight",
         about=("Worked in rows from a foundation row. The stitch count is the width, and it "
                "stays the same all the way up."),
         worked="rows", start="foundation_row", stitches_are="width", shaping="none",
         preview="panel", examples=("a blanket", "a scarf", "a dishcloth", "a plain panel"),
         start_label="Foundation row", row_word="row"),
     "flat_shaped": Construction(
-        id="flat_shaped", name="Flat, shaped at the edges",
+        id="flat_shaped", name="In rows, shaped as it goes",
         about=("Worked in rows, with increases or decreases changing the width as it grows — "
                "which is how a garment panel, a triangle or a shawl gets its outline."),
         worked="rows", start="foundation_row", stitches_are="width", shaping="edges",
@@ -91,7 +91,7 @@ CONSTRUCTIONS: dict[str, Construction] = {
                                    "a join-as-you-go throw"),
         start_label="Motif round 1", row_word="round"),
     "branched": Construction(
-        id="branched", name="Branched — pieces that split or join",
+        id="branched", name="Split onto separate groups",
         about=("Stitches divided onto separate groups and worked on, or joined back together: "
                "a body that splits for sleeves, a yoke, a thumb gusset."),
         worked="rows", start="held", stitches_are="mixed", shaping="anywhere",

@@ -195,6 +195,10 @@ tbody tr:hover{background:var(--accent2-pale)}
  border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card)}
 .round:nth-child(even){background:var(--row-alt)}
 .round input{padding:6px}
+/* The line a crocheter actually reads, at the top of the round it describes. */
+.roundLine{width:100%;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+ padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.roundLine:focus{border-color:var(--accent2)}
 /* The round, drawn. Plain stitches are dots round the ring, an increase is the
    stitch that splits in two, a decrease is two pulled into one. */
 .roundViz{display:flex;align-items:center;gap:10px;margin-top:2px}
@@ -558,7 +562,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <select id="construction"></select></label>
       <p class="small muted" id="constructionAbout" style="margin:-2px 0 10px"></p>
       <div class="fields">
-        <label><span>Shape (template)</span><select id="amiTemplate">
+        <label><span>Starting shape</span><select id="amiTemplate">
           <option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="cone">Cone / ear</option><option value="limb">Limb</option><option value="custom">Custom</option></select></label>
         <label><span id="amiSizeLabel">Template size (max stitches per round)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
         <input id="amiInitial" type="number" min="2" value="6" hidden>
@@ -662,14 +666,14 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <div class="metric"><span>Estimated range</span><strong id="rRange" style="font-size:16px">–</strong></div>
         <div class="metric"><span id="rMassLabel">Weight</span><strong id="rMass">–</strong></div>
         <div class="metric"><span>Balls / skeins</span><strong id="rPacks">–</strong></div>
-        <div class="metric"><span>Total stitches</span><strong id="rSt">–</strong></div>
-        <div class="metric"><span>Achieved size</span><strong id="rSize" style="font-size:16px">–</strong></div>
+        <div class="metric"><span>Stitches worked</span><strong id="rSt">–</strong></div>
+        <div class="metric"><span>Finished size</span><strong id="rSize" style="font-size:16px">–</strong></div>
         <div class="metric hidden" id="rCostBox"><span>Estimated cost</span><strong id="rCost">–</strong></div>
         <div class="metric hidden" id="rStashBox"><span>From your stash</span><strong id="rStash">–</strong></div>
       </div>
       <div id="rMassNote" class="small muted" style="margin-top:6px"></div>
-      <h3>Operations used</h3><div id="rOps" class="legend"></div>
-      <h3>Accuracy notes</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
+      <h3>Stitches used</h3><div id="rOps" class="legend"></div>
+      <h3>Worth knowing</h3><ul id="rWarn" class="small muted" style="margin:0;padding-left:18px"></ul>
       <p class="small"><a href="/static/calibration_print.html" target="_blank" rel="noopener">Open a printable gauge-swatch calibration sheet ↗</a></p>
     </div>
   </div>
@@ -1107,7 +1111,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 </div>
 <script>
 /* ============================ strings ============================ */
-const MSG={"msg.calibrated": "Calibrated estimate (measured swatch)", "msg.model": "Calibrated estimate (approved model)", "msg.baseline": "Uncalibrated estimate – stitch geometry baseline", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter.", "msg.resetSent": "If that account exists and has an email on file, we've sent a reset link."};
+const MSG={"msg.calibrated": "Checked against a swatch you measured", "msg.model": "Checked against measured swatches", "msg.baseline": "Worked out from stitch size — not yet checked against a swatch of yours", "msg.loginFail": "Sign-in failed", "msg.saved": "Saved.", "msg.deleted": "Deleted.", "msg.confirmDel": "Delete this user?", "msg.projName": "Project name", "msg.open": "Open", "msg.delete": "Delete", "msg.noProjects": "No saved projects yet.", "msg.pwMismatch": "Passwords do not match.", "msg.valid": "Rounds are consistent.", "msg.deact": "Deactivate", "msg.act": "Activate", "msg.resetPw": "Reset password", "msg.newPw": "New password for", "msg.yarnMissing": "Select a yarn or enter a yarn diameter.", "msg.resetSent": "If that account exists and has an email on file, we've sent a reset link."};
 function t(k){return MSG[k]||k;}
 function applyLang(){}
 /* ============================ helpers ============================ */
@@ -1115,11 +1119,29 @@ const $=id=>document.getElementById(id);
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function status(el,msg,kind=''){el.textContent=msg;el.className='status '+kind;el.classList.remove('hidden');}
 function fmt(x,d=1){return (x==null||isNaN(x))?'–':Number(x).toFixed(d);}
+/* Never put the inside of the engine on the screen. A refusal carries a
+   sentence; anything older or unexpected is made into one rather than printed
+   as JSON, which is what "this makes no sense" looks like from the outside. */
+function readableError(body,response){
+ const d=body&&body.detail;
+ if(typeof d==='string'&&d.trim())return d;
+ if(d&&typeof d==='object'){
+  if(d.message)return d.message;
+  if(Array.isArray(d.problems)&&d.problems.length)return d.problems.join(' ');
+  if(Array.isArray(d)&&d.length&&d[0]&&d[0].msg)return d.map(x=>x.msg).join('. ');
+  if(Array.isArray(d.program_issues)&&d.program_issues.length){
+   return d.program_issues.map(i=>i.message||i.code||'').filter(Boolean).join(' ');
+  }
+ }
+ if(response&&response.status===413)return 'That file is too large.';
+ if(response&&response.status>=500)return 'Something went wrong at our end. Try again in a moment.';
+ return (response&&response.statusText)||'That did not work.';
+}
 async function api(path,opts={}){
  const r=await fetch(path,{headers:{'Content-Type':'application/json'},credentials:'same-origin',...opts,body:opts.body?JSON.stringify(opts.body):undefined});
  let d=null;try{d=await r.json();}catch(e){}
  if(r.status===401&&!path.startsWith('/api/auth/')){showLogin();throw new Error('login required');}
- if(!r.ok){const m=d&&d.detail?(typeof d.detail==='string'?d.detail:JSON.stringify(d.detail)):r.statusText;throw new Error(m);}
+ if(!r.ok){throw new Error(readableError(d,r));}
  return d;
 }
 
@@ -1586,7 +1608,10 @@ function roundViz(ops,outSt){
   <span class="vzLegend">${esc(bits.join(' · '))}</span></div>`;
 }
 function roundRow(i,ops,inSt,outSt){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
- return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div>${roundViz(ops,outSt)}</div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+ return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">`+
+ `<input class="roundLine" data-round="${i}" spellcheck="false"
+   placeholder="write it as a pattern: [2 sc, inc] x 6"
+   title="Type the round the way a pattern writes it, or use the pickers below">`+`${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div>${roundViz(ops,outSt)}</div><button class="alt" data-del="${i}">✕ round</button></div>`;}
 /* Set what a round ends with, the way patterns are written ("R2: inc around
    (12)"). Each step is a validated edit, so it moves as far towards the target
    as the stitches available in that round allow and stops there. */
@@ -1626,6 +1651,11 @@ function writeRounds(list){
  $('rounds').innerHTML=ringRow(initial)+
   list.map((r,i)=>{const inSt=run,outSt=opsP(r.operations);run=outSt;return roundRow(i,r.operations,inSt,outSt);}).join('');
  bindRingRow();
+ document.querySelectorAll('#rounds .roundLine').forEach(box=>{
+  box.onchange=()=>readTypedRound(box);
+  box.onkeydown=(ev)=>{if(ev.key==='Enter'){ev.preventDefault();box.blur();}};
+ });
+ if(typeof fillRoundLines==='function')fillRoundLines();
  const ent=i=>Object.entries(list[i].operations);
  const setDis=(b,ok)=>markCant(b,ok,strict);
  document.querySelectorAll('#rounds [data-del]').forEach(b=>{
@@ -2173,7 +2203,9 @@ function showResult(r){
  if(r.mass!=null)$('rMass').style.fontSize='';
  let packs=r.packs;if(packs==null&&r.packLen&&shownLen)packs=Math.ceil(shownLen/r.packLen);$('rPacks').textContent=packs!=null?String(packs):'–';
  $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
- $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>`<span><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(op)} × ${n}</span>`).join('');
+ // "SC_INC × 30" is the engine's name for it. A pattern says "inc × 30".
+ $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>
+  `<span title="${esc(opName(op))}"><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(OP_ABBR[op]||op.toLowerCase())} × ${n}</span>`).join('');
  $('rWarn').innerHTML=(r.warnings||[]).map(w=>`<li>${esc(w)}</li>`).join('');
  if(r.cost){$('rCostBox').classList.remove('hidden');$('rCost').textContent=`${fmt(r.cost.amount,2)} ${esc(r.cost.currency)} (${r.cost.packages}×)`;}
  else $('rCostBox').classList.add('hidden');
@@ -3098,7 +3130,7 @@ function renderStitches(){
   return `<div class="stitchCard">
    <svg viewBox="0 0 20 20" role="img" aria-label="${esc(s.name)}">${glyph(s.operation_id)}</svg>
    <div><div class="sName">${esc(s.name)}</div>
-    <div class="sAbbr">${esc(s.abbreviation)} · ${esc(s.operation_id)}</div>
+    <div class="sAbbr">${esc(s.abbreviation)}</div>
     ${s.use?`<div class="sUse">${esc(s.use)}</div>`:''}
     <div class="sFacts">${esc(facts.join(' · '))}</div></div></div>`;
  }).join('');
@@ -3395,6 +3427,62 @@ function setConstruction(id){
 function rowWord(){return CONSTRUCTION?CONSTRUCTION.row_word:'round';}
 function startLabel(){return CONSTRUCTION?CONSTRUCTION.start_label:'Magic ring';}
 $('construction').onchange=()=>setConstruction($('construction').value);
+
+/* ==================== typing a round as a pattern ======================
+   Someone who has crocheted for thirty years reads a round as one line --
+   "[2 sc, inc] x 6 (24)" -- and building that out of dropdowns is slower than
+   a pencil. So the line is editable, read by the same parser that imports
+   other people's patterns, and the pickers stay for anyone who would rather
+   point at things. Whatever is typed, the round still has to use up the
+   stitches the one before it left: that rule is the app's whole job. */
+let lineFillTimer=null;
+function fillRoundLines(){
+ clearTimeout(lineFillTimer);
+ lineFillTimer=setTimeout(async()=>{
+  const boxes=[...document.querySelectorAll('#rounds .roundLine')];
+  if(!boxes.length)return;
+  try{
+   const d=await api('/api/crochet/amigurumi/written',{method:'POST',body:{
+    initial_stitches:curInitial(),rounds:readRounds(),
+    construction:($('construction')&&$('construction').value)||null}});
+   // lines[0] is the start of the piece, which has its own row in the list
+   boxes.forEach((box,i)=>{
+    if(document.activeElement===box)return;      // never overwrite what is being typed
+    const line=(d.lines||[])[i+1]||'';
+    box.value=line.replace(/^(R|Row)\s*\d+:\s*/i,'');
+   });
+  }catch(e){/* the pickers still work; the line is a convenience */}
+ },250);
+}
+async function readTypedRound(box){
+ const ri=Number(box.dataset.round);
+ const list=readRounds(),initial=curInitial();
+ if(!list[ri])return;
+ const incoming=ri===0?initial:opsP(list[ri-1].operations);
+ const text=box.value.trim();
+ if(!text){fillRoundLines();return;}
+ try{
+  const d=await api('/api/crochet/round/read',{method:'POST',
+   body:{text,incoming,round:ri+2,row_word:rowWord(),
+         dialect:($('impDialect')&&$('impDialect').value)||'us'}});
+  const next=cloneRounds(list);
+  const before=opsP(next[ri].operations);
+  next[ri]={operations:d.operations};
+  // A round that changes its stitch count changes every round after it; the
+  // same absorption the pickers use carries that through.
+  if(!cascade(next,ri+1,d.output_stitches-before)||!chainValid(next,initial)){
+   roundsNote(`That round works out, but the rounds after it cannot take the change from `+
+              `${before} to ${d.output_stitches} stitches. Adjust a later round first.`);
+   fillRoundLines();
+   return;
+  }
+  writeRounds(next);
+  roundsNote('');
+ }catch(e){
+  roundsNote(e.message);
+  fillRoundLines();
+ }
+}
 
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;
