@@ -91,3 +91,27 @@ def test_the_phone_layout_guards_are_in_place():
     assert "@media(max-width:520px){.fields,.fields.three{grid-template-columns:repeat(2" in html
     assert "input[type=checkbox],input[type=radio]{width:20px;height:20px" in html
     assert "body.has-install-bar{padding-bottom:104px}" in html
+
+
+def test_a_row_is_visibly_one_row():
+    """Cells wrap onto several lines, so rows need an outline of their own."""
+    html = c.get("/").text
+    assert "border-collapse:separate;border-spacing:0 5px" in html
+    assert "tbody tr:nth-child(even){background:var(--row-alt)}" in html
+    assert "tbody td:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}" in html
+    assert "#wlTable,#yarnTable{table-layout:fixed}" in html      # a row cannot spill out
+    assert ".round:nth-child(even){background:var(--row-alt)}" in html
+
+
+def test_round_one_is_always_the_magic_ring():
+    """The editor, the written pattern and the make-mode agree on the number of
+    every round, because the ring is round one in all three."""
+    html = c.get("/").text
+    assert "function ringRow(initial)" in html
+    assert ">magic ring<" in html
+    assert '<span class="pill">${i+2}</span>' in html            # editable rounds start at two
+    assert "#rounds .round:not(.ring)" in html                   # and the ring is not one of them
+    written = c.post("/api/crochet/amigurumi/written",
+                     json={"initial_stitches": 6, "rounds": [{"operations": {"SC_INC": 6}}]})
+    assert written.json()["lines"][0] == "R1: 6 sc in magic ring (6)"
+    assert written.json()["lines"][1].startswith("R2:")

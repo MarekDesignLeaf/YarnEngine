@@ -33,7 +33,7 @@ footer.appfoot img{height:34px;width:auto}
   --ink:#26313a;--muted:#726c62;--line:#e7ddce;
   --accent:#ef6a4c;--accent-dark:#c94a34;--accent-pale:#fce4dc;
   --accent2:#2f6b7a;--accent2-dark:#204b56;--accent2-light:#6fa9b8;--accent2-pale:#e3eff1;
-  --good:#3f8a5a;--good-pale:#dcefe2;--warn:#96700f;--warn-pale:#f6efdc;--bad:#a5362b;--bad-pale:#f7e5e2;--chart:#1d2a33;
+  --row-alt:#f9f4ec;--good:#3f8a5a;--good-pale:#dcefe2;--warn:#96700f;--warn-pale:#f6efdc;--bad:#a5362b;--bad-pale:#f7e5e2;--chart:#1d2a33;
   --font-display:'Baloo 2',system-ui,-apple-system,"Segoe UI",sans-serif;
   --shadow-card:0 1px 2px rgba(38,49,58,.05),0 10px 22px -16px rgba(38,49,58,.22);
   --shadow-btn:0 1px 2px rgba(38,49,58,.1);
@@ -116,11 +116,93 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
 .modal{position:fixed;inset:0;background:rgba(38,49,58,.55);display:grid;place-items:center;padding:14px;z-index:20}.modal-card{background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:18px;box-shadow:var(--shadow-pop)}
 .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
-table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:11.5px;color:var(--accent2-dark);text-transform:uppercase;letter-spacing:.07em;font-weight:700}
+/* One row, one box. Cells in these tables wrap onto two and three lines --
+   a fibre list, a long product name -- and with nothing but a hairline
+   between them it stops being obvious where one yarn ends and the next
+   begins. Separated borders let each row carry its own outline and rounded
+   ends; the alternating tint does the same job again for a reader skimming
+   quickly down a column. */
+table{width:100%;border-collapse:separate;border-spacing:0 5px;font-size:13.5px}
+th,td{text-align:left;padding:8px 8px;vertical-align:top}
+th{font-size:11.5px;color:var(--accent2-dark);text-transform:uppercase;letter-spacing:.07em;
+ font-weight:700;padding-bottom:2px}
+tbody tr{background:var(--card)}
+.wlActions{white-space:nowrap}
+tbody tr:nth-child(even){background:var(--row-alt)}
+tbody td{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+tbody td:first-child{border-left:1px solid var(--line);border-radius:10px 0 0 10px}
+tbody td:last-child{border-right:1px solid var(--line);border-radius:0 10px 10px 0}
+/* A single-cell row is a message ("nothing here yet"), not a record. */
+tbody tr td:only-child{border-radius:10px}
+tbody tr:hover{background:var(--accent2-pale)}
+@media(max-width:600px){
+ /* A box round a row only reads as a box if you can see all four sides, and a
+    nine-column table on a phone is always sliced down the middle. So the
+    columns a maker can do without on a small screen step aside -- the fibre,
+    the diameter, the indicative price, the source link -- and the row fits.
+    None of it is lost: "details" still opens the full record, and the desktop
+    table is unchanged. */
+ #yarnTable th:nth-child(5),#yarnTable td:nth-child(5),
+ #yarnTable th:nth-child(6),#yarnTable td:nth-child(6),
+ #yarnTable th:nth-child(7),#yarnTable td:nth-child(7),
+ #yarnTable th:nth-child(8),#yarnTable td:nth-child(8){display:none}
+ /* The work log keeps when, what, the yarn and the buttons; the numbers it
+    drops are all on the piece's own entry. */
+ #wlTable th:nth-child(4),#wlTable td:nth-child(4),
+ #wlTable th:nth-child(5),#wlTable td:nth-child(5),
+ #wlTable th:nth-child(6),#wlTable td:nth-child(6),
+ #wlTable th:nth-child(7),#wlTable td:nth-child(7),
+ #wlTable th:nth-child(8),#wlTable td:nth-child(8){display:none}
+ /* With the wide columns gone the rows fit, so the list no longer needs its
+    own sideways scroll. */
+ .tablewrap{overflow-x:visible}
+ /* Fixed layout is what actually guarantees a row cannot spill past its own
+    box: the columns are given shares of the width and the text wraps inside
+    them, instead of the widest cell deciding and the last one falling off the
+    screen. */
+ #wlTable,#yarnTable{table-layout:fixed}
+ #wlTable td,#wlTable th,#yarnTable td,#yarnTable th{overflow-wrap:break-word}
+ #wlTable th:nth-child(1),#wlTable td:nth-child(1){width:22%}
+ #wlTable th:nth-child(2),#wlTable td:nth-child(2){width:29%}
+ #wlTable th:nth-child(3),#wlTable td:nth-child(3){width:25%}
+ #wlTable th:nth-child(9),#wlTable td:nth-child(9){width:24%}
+ #yarnTable th:nth-child(1),#yarnTable td:nth-child(1){width:26%}
+ #yarnTable th:nth-child(2),#yarnTable td:nth-child(2){width:28%}
+ #yarnTable th:nth-child(3),#yarnTable td:nth-child(3){width:11%}
+ #yarnTable th:nth-child(4),#yarnTable td:nth-child(4){width:17%}
+ #yarnTable th:nth-child(9),#yarnTable td:nth-child(9){width:18%}
+ /* The buttons on a row stack rather than running off the edge, where the
+    last one is unreachable. */
+ /* No flex here: display:flex on a td takes the cell out of the table's
+    column model, so it stops being sized by the column and collapses. Plain
+    block children stack just as well and keep the cell a cell. */
+ .wlActions{white-space:normal}
+ .wlActions button.link,.wlActions label{display:block;text-align:left;width:100%}
+ /* A plain block label lets the word wrap inside a narrow column; an
+    inline-flex one cannot break and pushes out of the row. */
+ .wlActions label{display:block;font-size:11.5px;line-height:1.3}
+ .wlActions label input{vertical-align:-4px;margin-right:4px}
+ .wlActions button.link{min-height:30px;padding:5px 2px}
+}
 .login{max-width:440px;margin:7vh auto;text-align:center;padding:28px 26px}
 .login .fields{text-align:left}
 .login img.brand{height:96px;width:auto;margin-bottom:10px;filter:drop-shadow(0 4px 10px rgba(38,49,58,.15))}
-.rounds{display:grid;gap:10px}.round{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:start}.round input{padding:6px}
+.rounds{display:grid;gap:8px}
+/* One round, one box -- same idea as a table row. On a phone the controls of
+   one round otherwise run straight into the next and it stops being obvious
+   which stitch belongs to which round. */
+.round{display:grid;grid-template-columns:40px 1fr auto;gap:8px;align-items:start;
+ border:1px solid var(--line);border-radius:12px;padding:8px;background:var(--card)}
+.round:nth-child(even){background:var(--row-alt)}
+.round input{padding:6px}
+/* The ring row reads as the start of the piece rather than as another round
+   to edit: no stitch pickers, no delete, and a tint that sets it apart. */
+.round.ring{align-items:center}
+.round.ring .pill{background:var(--accent-pale);color:var(--accent-dark)}
+.round.ring .round-ops{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap;
+ background:var(--bg-tint);border:1px solid var(--line);border-radius:12px;padding:7px 10px}
+.round.ring .ringName{font-weight:650}
+.round.ring input{width:62px}
 .round-ops{display:flex;flex-direction:column;gap:6px}
 .op-seg{display:flex;gap:6px;align-items:center}
 .op-seg select{flex:1 1 auto;min-width:0;padding:6px}
@@ -452,7 +534,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <label><span>Shape (template)</span><select id="amiTemplate">
           <option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="cone">Cone / ear</option><option value="limb">Limb</option><option value="custom">Custom</option></select></label>
         <label><span>Template size (max stitches per round)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
-        <label><span>Starting stitches (magic ring)</span><input id="amiInitial" type="number" min="0" value="6"></label>
+        <input id="amiInitial" type="number" min="2" value="6" hidden>
         <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
       <details id="importDetails" style="margin-top:12px">
@@ -1316,8 +1398,33 @@ function cantClick(b){if(!b.classList.contains('cant'))return false;roundsNote(D
 
 function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
 function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="0" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+/* The one round that is not editable as stitches: a magic ring, with only the
+   number of stitches in it to choose. Every amigurumi piece starts with one. */
+function ringRow(initial){
+ return `<div class="round ring"><span class="pill">1</span>
+  <div class="round-ops"><span class="ringName">magic ring</span>
+   <div class="rsum"><input type="number" id="ringCount" class="roundOut" min="2" max="12"
+     value="${initial}" title="How many stitches to work into the ring">
+    <span>sts to start</span></div></div></div>`;
+}
+/* The ring box shows what was accepted, not what was typed: a count the rounds
+   below cannot take is refused, and the box has to go back to the one in use
+   rather than sitting there showing a number that is not true. */
+function syncRingRow(){const box=$('ringCount');if(box)box.value=curInitial();}
+function bindRingRow(){
+ const box=$('ringCount');
+ if(!box)return;
+ const commit=()=>{
+  const v=Math.max(2,Math.min(12,Number(box.value)||6));
+  if(v===curInitial())return;
+  $('amiInitial').value=v;
+  $('amiInitial').dispatchEvent(new Event('change'));
+ };
+ box.onchange=commit;
+ box.onblur=commit;
+}
 function roundRow(i,ops,inSt,outSt){const entries=Object.entries(ops).length?Object.entries(ops):[['SC',6]];
- return `<div class="round" data-round="${i}"><span class="pill">${i+1}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
+ return `<div class="round" data-round="${i}"><span class="pill">${i+2}</span><div class="round-ops">${entries.map(([op,n],si)=>opSegHTML(i,si,op,n)).join('')}<div class="segBtns"><button class="addSeg alt small" type="button" data-round="${i}">+ stitch</button><button class="subSeg alt small" type="button" data-round="${i}">− stitch</button></div><div class="rsum"><span>${inSt} sts in →</span><input type="number" class="roundOut" min="1" value="${outSt}" data-round="${i}" title="Stitches this round ends with — the number in brackets in a written pattern"><span>sts</span></div></div><button class="alt" data-del="${i}">✕ round</button></div>`;}
 /* Set what a round ends with, the way patterns are written ("R2: inc around
    (12)"). Each step is a validated edit, so it moves as far towards the target
    as the stitches available in that round allow and stops there. */
@@ -1331,7 +1438,7 @@ function setRoundOutput(list,initial,ri,target){
  }
  return cur;
 }
-function domRounds(){return [...document.querySelectorAll('#rounds .round')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
+function domRounds(){return [...document.querySelectorAll('#rounds .round:not(.ring)')].map(row=>{const operations={};row.querySelectorAll('.op-seg').forEach(seg=>{const op=seg.querySelector('.opSel').value;const n=Number(seg.querySelector('.opCount').value||0);if(op&&n>0)operations[op]=(operations[op]||0)+n;});return {operations};});}
 /* The rounds the editor has actually accepted. A number typed into a count
    field is not committed until it is confirmed, so reading raw DOM values
    would let a half-typed number leak into the next click and break the chain;
@@ -1350,7 +1457,12 @@ function writeRounds(list){
  const strict=chainValid(list,initial);
  roundsState=cloneRounds(list);
  let run=initial;
- $('rounds').innerHTML=list.map((r,i)=>{const inSt=run,outSt=opsP(r.operations);run=outSt;return roundRow(i,r.operations,inSt,outSt);}).join('');
+ // Round one is the magic ring, always. It is drawn as the first row of the
+ // list rather than as a field somewhere else, so the numbering a maker reads
+ // here is the numbering the written pattern and the make-mode use.
+ $('rounds').innerHTML=ringRow(initial)+
+  list.map((r,i)=>{const inSt=run,outSt=opsP(r.operations);run=outSt;return roundRow(i,r.operations,inSt,outSt);}).join('');
+ bindRingRow();
  const ent=i=>Object.entries(list[i].operations);
  const setDis=(b,ok)=>markCant(b,ok,strict);
  document.querySelectorAll('#rounds [data-del]').forEach(b=>{
@@ -1417,7 +1529,7 @@ function writeRounds(list){
   inp.oninput=()=>{clearTimeout(countTimer);countTimer=setTimeout(()=>{if(inp.isConnected&&inp.onchange)inp.onchange();},700);};
  });
  let outTimer=null;
- document.querySelectorAll('#rounds .roundOut').forEach(inp=>{
+ document.querySelectorAll('#rounds .round:not(.ring) .roundOut').forEach(inp=>{
   inp.onchange=()=>{
    clearTimeout(outTimer);
    if(!inp.isConnected)return;
@@ -1485,9 +1597,10 @@ function commitInitial(){
  if(!chainValid(l,lastInitial)){lastInitial=v;scheduleAmi3D();return;}
  let res=null,d=d0;
  for(;d!==0;d+=(d0>0?-1:1)){res=tryShiftAll(l,lastInitial,d);if(res)break;}
- if(res){lastInitial+=d;$('amiInitial').value=lastInitial;writeRounds(res);
+ if(res){lastInitial+=d;$('amiInitial').value=lastInitial;writeRounds(res);syncRingRow();
   if(d!==d0)roundsNote(`Magic ring set to ${lastInitial} — ${v} would break the stitch counts of the rounds below.`);else roundsNote('');}
- else{$('amiInitial').value=lastInitial;roundsNote(`The rounds below can't be shifted to a ${v}-stitch magic ring.`);scheduleAmi3D();}
+ else{$('amiInitial').value=lastInitial;syncRingRow();
+  roundsNote(`The rounds below can't be shifted to a ${v}-stitch magic ring.`);scheduleAmi3D();}
 }
 $('amiInitial').addEventListener('change',commitInitial);
 // Commit while typing too, so a number left sitting in the field is never used
@@ -2395,7 +2508,7 @@ function renderWorkLog(rows,owner){
  tb.innerHTML=rows.map(e=>{
   const sw=e.colour_hex?`<span style="display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;background:${esc(e.colour_hex)};border:1px solid rgba(0,0,0,.25)"></span> `:'';
   return `<tr data-id="${e.entry_id}">
-   <td class="small">${esc(new Date(e.updated_at).toLocaleString())}${e.repeat_count>1?`<br><span class="muted">recalculated ×${e.repeat_count}</span>`:''}
+   <td class="small" title="${esc(new Date(e.updated_at).toLocaleString())}">${shortWhen(e.updated_at)}${e.repeat_count>1?`<br><span class="muted">recalculated ×${e.repeat_count}</span>`:''}
     ${e.progress?`<br><span class="muted">${e.progress.finished_at?'made':'making'} · ${mkFormat(e.progress.elapsed_seconds)}${e.progress.running?' ⏵':''}${e.progress.done_count?` · ${e.progress.done_count} rounds done`:''}</span>`:''}</td>
    <td>${esc(e.title)}<br><span class="small muted">${esc(e.kind)}${e.pieces>1?' · '+e.pieces+' pieces':''}${e.gauge_stitches?' · '+fmt(e.gauge_stitches,0)+'×'+fmt(e.gauge_rows,0)+' per 10 cm':''}${e.hook_mm?' · hook '+fmt(e.hook_mm,2)+' mm':''}</span></td>
    <td class="small">${esc(e.yarn_name||'—')}<br>${sw}${esc(e.colour_name||'')}</td>
@@ -2404,7 +2517,7 @@ function renderWorkLog(rows,owner){
    <td>${e.packages??'–'}</td>
    <td class="small">${e.stitches!=null?e.stitches.toLocaleString():'–'}</td>
    <td>${mine?`<input class="wlNote" data-id="${e.entry_id}" value="${esc(e.note||'')}" placeholder="note" style="min-width:120px">`:esc(e.note||'')}</td>
-   <td class="small" style="white-space:nowrap">
+   <td class="small wlActions">
     ${mine&&(e.kind==='amigurumi'||e.kind==='branch')?`<button class="link wlMake" data-id="${e.entry_id}">make</button>`:''}
     <button class="link wlOpen" data-id="${e.entry_id}">open</button>
     ${mine?`<label title="Hide this one from the people you share with" style="font-weight:500"><input type="checkbox" class="wlPriv" data-id="${e.entry_id}" ${e.private?'checked':''} style="width:auto"> private</label>
@@ -2469,6 +2582,16 @@ async function openEntry(id){
 let MK={entry:null,lines:[],counts:[],done:new Set(),current:0,counters:[],running:false,
         base:0,startedAt:null,timer:null,saveTimer:null};
 
+/* A full locale timestamp takes three lines in a phone-width column and says
+   more than anyone needs; the exact time stays on the cell's tooltip. */
+function shortWhen(iso){
+ const d=new Date(iso);
+ if(isNaN(d))return esc(String(iso||''));
+ const date=d.toLocaleDateString(undefined,{day:'numeric',month:'short'});
+ const time=d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+ const year=d.getFullYear()!==new Date().getFullYear()?` ${d.getFullYear()}`:'';
+ return `${date}${year}, ${time}`;
+}
 function mkFormat(sec){
  sec=Math.max(0,Math.round(sec));
  const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
