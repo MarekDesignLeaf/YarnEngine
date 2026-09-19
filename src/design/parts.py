@@ -20,22 +20,27 @@ OP_WORDS = {
 }
 
 
-def _round_text(ops: dict, out_stitches: int, plain: str = "SC", closing: str = "around") -> str:
+def _round_text(ops: dict, out_stitches: int, plain: str = "SC", closing: str = "around",
+                words: dict | None = None) -> str:
     """One round, written the way patterns are written.
 
     A round that repeats evenly is written as a repeat -- "[3 sc, inc] x 6" --
     because that is what a crocheter counts along; anything else is listed.
     """
+    # Which words to print in -- US or UK -- is the caller's to decide.
+    say = dict(OP_WORDS)
+    if words:
+        say.update(words)
     items = [(op, n) for op, n in ops.items() if n > 0]
     if not items:
         return "-"
     if len(items) == 1:
         op, n = items[0]
         if op == plain:
-            return f"{OP_WORDS.get(op, op.lower())} in each st {closing} ({out_stitches})"
+            return f"{say.get(op, op.lower())} in each st {closing} ({out_stitches})"
         if op in ("SC_INC", "HDC_INC", "DC_INC"):
-            return f"{OP_WORDS.get(op, op.lower())} in each st {closing} ({out_stitches})"
-        return f"{OP_WORDS.get(op, op.lower())} x {n} ({out_stitches})"
+            return f"{say.get(op, op.lower())} in each st {closing} ({out_stitches})"
+        return f"{say.get(op, op.lower())} x {n} ({out_stitches})"
     if len(items) == 2:
         # Plain stitches plus one shaping stitch: write it as a repeat, which is
         # how it is worked -- spread evenly around, with any odd stitches left
@@ -45,7 +50,7 @@ def _round_text(ops: dict, out_stitches: int, plain: str = "SC", closing: str = 
         if len(shaping) == 1 and len(plains) == 1 and shaping[0][1] > 0:
             s_op, s_n = shaping[0]
             p_op, p_n = plains[0]
-            p_word, s_word = OP_WORDS.get(p_op, p_op.lower()), OP_WORDS.get(s_op, s_op.lower())
+            p_word, s_word = say.get(p_op, p_op.lower()), say.get(s_op, s_op.lower())
             per, rem = divmod(p_n, s_n)
             if per == 0:                       # nothing plain between them
                 body = f"{s_n} {s_word}" if s_n > 1 else s_word
@@ -55,7 +60,7 @@ def _round_text(ops: dict, out_stitches: int, plain: str = "SC", closing: str = 
             if rem:
                 body += f", {rem} {p_word}" if rem > 1 else f", {p_word}"
             return f"{body} ({out_stitches})"
-    listed = ", ".join(f"{OP_WORDS.get(op, op.lower())} x {n}" for op, n in items)
+    listed = ", ".join(f"{say.get(op, op.lower())} x {n}" for op, n in items)
     return f"{listed} ({out_stitches})"
 
 

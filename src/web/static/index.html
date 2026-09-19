@@ -344,6 +344,19 @@ table.sizes td,table.sizes th{padding:3px 8px;font-size:12.5px}
  background:var(--card);box-shadow:0 2px 10px rgba(38,49,58,.07)}
 .yarnbar .swatch{width:26px;height:26px;border-radius:8px;border:1px solid rgba(0,0,0,.18);flex:0 0 auto;
  box-shadow:inset 0 -3px 6px rgba(0,0,0,.12)}
+/* UK or US terms, in the one place that is always on screen. A flag says it
+   faster than a word, and the word is there too because a flag on its own is
+   a guess. */
+.termsSwitch{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;
+ flex:0 0 auto;background:var(--card)}
+.flagBtn{display:flex;align-items:center;gap:5px;padding:4px 8px;min-height:30px;border:0;
+ border-radius:0;background:transparent;color:var(--muted);font-size:11.5px;font-weight:700;
+ letter-spacing:.04em;box-shadow:none}
+.flagBtn svg{width:19px;height:13px;border-radius:2px;border:1px solid rgba(0,0,0,.18);display:block}
+.flagBtn[aria-pressed="true"]{background:var(--accent2-pale);color:var(--accent2-dark)}
+.flagBtn:not([aria-pressed="true"]) svg{filter:grayscale(.75);opacity:.75}
+@media(max-width:600px){.flagBtn{padding:4px 6px;font-size:10.5px;gap:4px}
+ .flagBtn svg{width:17px;height:12px}}
 .yarnbar .swatch.empty{border:1px dashed var(--muted);box-shadow:none;
  background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 6px)}
 .yarnbar .yb-name{font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.15}
@@ -488,6 +501,22 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
   <div><div class="yb-name" id="ybName">No yarn chosen</div><div class="yb-sub" id="ybSub">Pick a yarn and a shade below</div></div>
   <div class="yb-specs" id="ybSpecs"></div>
   <div class="yb-actions">
+    <span class="termsSwitch" role="group" aria-label="Crochet terms">
+      <button type="button" id="termsUS" class="flagBtn" title="US terms — sc, hdc, dc" aria-pressed="true">
+        <svg viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/>
+         <g fill="#b22234"><rect width="24" height="1.85"/><rect y="3.7" width="24" height="1.85"/>
+          <rect y="7.4" width="24" height="1.85"/><rect y="11.1" width="24" height="1.85"/>
+          <rect y="14.8" width="24" height="1.2"/></g>
+         <rect width="10" height="9.25" fill="#3c3b6e"/></svg><span>US</span>
+      </button>
+      <button type="button" id="termsUK" class="flagBtn" title="UK terms — dc, htr, tr" aria-pressed="false">
+        <svg viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#012169"/>
+         <path d="M0 0l24 16M24 0L0 16" stroke="#fff" stroke-width="3.2"/>
+         <path d="M0 0l24 16M24 0L0 16" stroke="#c8102e" stroke-width="1.9"/>
+         <path d="M12 0v16M0 8h24" stroke="#fff" stroke-width="5.3"/>
+         <path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="3.2"/></svg><span>UK</span>
+      </button>
+    </span>
     <button type="button" id="btnBack" class="alt" title="Back to the previous screen">&larr; Back</button>
     <button type="button" id="btn3d" class="alt" title="Show or hide the 3D shape preview">3D</button>
   </div>
@@ -1181,7 +1210,25 @@ const OP_ABBR={CH:'ch',SLST:'sl st',SC:'sc',HDC:'hdc',DC:'dc',TR:'tr',DTR:'dtr',
  SC_INC:'inc',HDC_INC:'hdc inc',DC_INC:'dc inc',
  SC_BLO:'sc blo',SC_FLO:'sc flo',HDC_BLO:'hdc blo',DC_BLO:'dc blo',
  FPDC:'fpdc',BPDC:'bpdc',PUFF3:'puff',POPCORN5:'popcorn'};
-function opLabel(op){const a=OP_ABBR[op];const name=opName(op);
+const OP_ABBR_UK={CH:'ch',SLST:'ss',SC:'dc',HDC:'htr',DC:'tr',TR:'dtr',DTR:'trtr',
+ SC2TOG:'dec',SC3TOG:'dc3tog',HDC2TOG:'htr2tog',DC2TOG:'tr2tog',DC3TOG:'tr3tog',
+ SC_INC:'inc',HDC_INC:'htr inc',DC_INC:'tr inc',
+ SC_BLO:'dc blo',SC_FLO:'dc flo',HDC_BLO:'htr blo',DC_BLO:'tr blo',
+ FPDC:'fptr',BPDC:'bptr',PUFF3:'puff',POPCORN5:'popcorn'};
+const OP_NAME_UK={SC:'Double crochet',HDC:'Half treble crochet',DC:'Treble crochet',
+ TR:'Double treble crochet',DTR:'Triple treble crochet',
+ SC_INC:'Increase – 2 dc in one stitch',HDC_INC:'Increase – 2 htr in one stitch',
+ DC_INC:'Increase – 2 tr in one stitch',
+ SC2TOG:'Decrease – 2 dc together',SC3TOG:'Decrease – 3 dc together',
+ HDC2TOG:'Decrease – 2 htr together',DC2TOG:'Decrease – 2 tr together',
+ DC3TOG:'Decrease – 3 tr together',
+ SC_BLO:'dc, back loop only',SC_FLO:'dc, front loop only',
+ HDC_BLO:'htr, back loop only',DC_BLO:'tr, back loop only',
+ FPDC:'Front post tr',BPDC:'Back post tr'};
+/* The same stitch, under whichever name is switched on. */
+function opAbbr(op){return (TERMS_DIALECT==='uk'?OP_ABBR_UK[op]:OP_ABBR[op])||OP_ABBR[op]||op.toLowerCase();}
+function opTermName(op){return (TERMS_DIALECT==='uk'&&OP_NAME_UK[op])||opName(op);}
+function opLabel(op){const a=opAbbr(op);const name=opTermName(op);
  return a&&a.toLowerCase()!==name.toLowerCase()?`${a} — ${name}`:name;}
 const OP_GROUPS=[
  {label:'Basic stitches',ops:['CH','SLST','SC','HDC','DC','TR','DTR']},
@@ -2205,7 +2252,7 @@ function showResult(r){
  $('rSt').textContent=String(r.st);$('rSize').textContent=r.size;
  // "SC_INC × 30" is the engine's name for it. A pattern says "inc × 30".
  $('rOps').innerHTML=Object.entries(r.ops||{}).map(([op,n])=>
-  `<span title="${esc(opName(op))}"><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(OP_ABBR[op]||op.toLowerCase())} × ${n}</span>`).join('');
+  `<span title="${esc(opTermName(op))}"><svg viewBox="0 0 20 20">${glyph(op)}</svg>${esc(opAbbr(op))} × ${n}</span>`).join('');
  $('rWarn').innerHTML=(r.warnings||[]).map(w=>`<li>${esc(w)}</li>`).join('');
  if(r.cost){$('rCostBox').classList.remove('hidden');$('rCost').textContent=`${fmt(r.cost.amount,2)} ${esc(r.cost.currency)} (${r.cost.packages}×)`;}
  else $('rCostBox').classList.add('hidden');
@@ -2867,7 +2914,8 @@ async function openMake(entryId){
   }
   const w=await api('/api/crochet/amigurumi/written',{method:'POST',
    body:{initial_stitches:program.initial_stitches,rounds:program.rounds,
-         stitch:program.stitch||'SC',construction:(e.request&&e.request.construction)||null}});
+         stitch:program.stitch||'SC',terms:TERMS_DIALECT,
+         construction:(e.request&&e.request.construction)||null}});
   const p=await api('/api/worklog/'+entryId+'/progress');
   MK.entry=e;MK.lines=w.lines;MK.counts=w.stitch_counts;
   MK.done=new Set(p.done||[]);MK.current=p.current_round||0;
@@ -3107,7 +3155,7 @@ let STITCHES=null;
 async function loadStitches(){
  try{
   const hook=Number($('hook')?.value)||3.5, diam=Number($('diam')?.value)||2.5;
-  const d=await api(`/api/stitches?hook_mm=${hook}&yarn_diameter_mm=${diam}`);
+  const d=await api(`/api/stitches?hook_mm=${hook}&yarn_diameter_mm=${diam}&terms=${TERMS_DIALECT}`);
   STITCHES=d;
   const fams=[...new Set(d.stitches.map(s=>s.family))].sort();
   const keep=$('stFamily').value;
@@ -3443,7 +3491,7 @@ function fillRoundLines(){
   if(!boxes.length)return;
   try{
    const d=await api('/api/crochet/amigurumi/written',{method:'POST',body:{
-    initial_stitches:curInitial(),rounds:readRounds(),
+    initial_stitches:curInitial(),rounds:readRounds(),terms:TERMS_DIALECT,
     construction:($('construction')&&$('construction').value)||null}});
    // lines[0] is the start of the piece, which has its own row in the list
    boxes.forEach((box,i)=>{
@@ -3463,8 +3511,7 @@ async function readTypedRound(box){
  if(!text){fillRoundLines();return;}
  try{
   const d=await api('/api/crochet/round/read',{method:'POST',
-   body:{text,incoming,round:ri+2,row_word:rowWord(),
-         dialect:($('impDialect')&&$('impDialect').value)||'us'}});
+   body:{text,incoming,round:ri+2,row_word:rowWord(),dialect:TERMS_DIALECT}});
   const next=cloneRounds(list);
   const before=opsP(next[ri].operations);
   next[ri]={operations:d.operations};
@@ -3483,6 +3530,47 @@ async function readTypedRound(box){
   fillRoundLines();
  }
 }
+
+/* ======================= UK or US terms ================================
+   One stitch, two names: what a US pattern calls single crochet a British one
+   calls double crochet, and what a US pattern calls double crochet is a
+   British treble. Nothing about the piece changes when this is switched --
+   the stitches, the counts, the yarn and the size are identical. Only the
+   words move, which is exactly why the app has to be explicit about which
+   set it is printing in. */
+let TERMS_DIALECT='us';
+function loadTermsChoice(){
+ try{const v=localStorage.getItem('ye_terms');if(v==='uk'||v==='us')TERMS_DIALECT=v;}catch(_){}
+ paintTermsSwitch();
+}
+function paintTermsSwitch(){
+ const us=$('termsUS'),uk=$('termsUK');
+ if(!us||!uk)return;
+ us.setAttribute('aria-pressed',String(TERMS_DIALECT==='us'));
+ uk.setAttribute('aria-pressed',String(TERMS_DIALECT==='uk'));
+}
+async function setTerms(dialect,{quiet}={}){
+ if(dialect!==TERMS_DIALECT){
+  TERMS_DIALECT=dialect;
+  try{localStorage.setItem('ye_terms',dialect);}catch(_){}
+ }
+ paintTermsSwitch();
+ if($('impDialect'))$('impDialect').value=TERMS_DIALECT;
+ // everything that prints a stitch name is redrawn from the server's table
+ if(typeof STITCHES!=='undefined'&&STITCHES)loadStitches();
+ if(typeof fillRoundLines==='function')fillRoundLines();
+ if(typeof writeRounds==='function'&&typeof readRounds==='function'&&
+    document.querySelectorAll('#rounds .round').length)writeRounds(readRounds());
+ if(!quiet){
+  const same=TERMS_DIALECT==='uk'
+   ?'Showing UK terms. The same stitches — what US patterns call sc is dc here.'
+   :'Showing US terms. The same stitches — what UK patterns call dc is sc here.';
+  if($('amiStatus'))status($('amiStatus'),same,'good');
+ }
+}
+if($('termsUS'))$('termsUS').onclick=()=>setTerms('us');
+if($('termsUK'))$('termsUK').onclick=()=>setTerms('uk');
+loadTermsChoice();
 
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;

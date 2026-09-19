@@ -84,3 +84,63 @@ def test_the_interface_uses_crochet_words_not_engine_words():
     assert "function readableError(" in html            # no JSON ever reaches the screen
     assert "JSON.stringify(d.detail)" not in html
     assert "In the round, from a magic ring" in c.get("/api/constructions").text
+
+
+def test_one_stitch_two_names():
+    """US single crochet and UK double crochet are the same stitch. The app
+    stores the stitch and prints whichever name is switched on."""
+    prog = {"initial_stitches": 6, "rounds": [{"operations": {"SC": 6}}]}
+    us = c.post("/api/crochet/amigurumi/written", json={**prog, "terms": "us"}).json()
+    uk = c.post("/api/crochet/amigurumi/written", json={**prog, "terms": "uk"}).json()
+    assert us["lines"][0] == "R1: 6 sc in magic ring (6)"
+    assert uk["lines"][0] == "R1: 6 dc in magic ring (6)"
+    assert us["stitch_counts"] == uk["stitch_counts"]        # nothing about the piece moves
+    tall = {"initial_stitches": 12, "rounds": [{"operations": {"DC": 12}}]}
+    # a piece of trebles reads in trebles, in whichever country's words
+    assert "dc in each st" in c.post("/api/crochet/amigurumi/written",
+                                     json={**tall, "terms": "us"}).json()["lines"][1]
+    assert "tr in each st" in c.post("/api/crochet/amigurumi/written",
+                                     json={**tall, "terms": "uk"}).json()["lines"][1]
+    # and a piece worked in trebles starts with trebles, not with single crochet
+    assert c.post("/api/crochet/amigurumi/written",
+                  json={**tall, "terms": "us"}).json()["lines"][0].startswith("R1: 12 dc")
+
+
+def test_switching_terms_never_changes_the_piece():
+    program = {"initial_stitches": 6,
+               "rounds": [{"operations": {"SC_INC": 6}}, {"operations": {"SC": 6, "SC_INC": 6}}]}
+    figures = []
+    for dialect in ("us", "uk"):
+        r = c.post("/api/complex-consumption/calculate",
+                   json={**BASE, "construction": "round_closed", "program": program,
+                         "terms": dialect}).json()
+        figures.append((r["calculation"]["recommended_length_m"],
+                        r["finished_size"]["summary"], r["program_analysis"]["operation_counts"]))
+    assert figures[0] == figures[1], "terminology is a label, not a stitch"
+
+
+def test_the_conversion_table_is_available_and_honest():
+    body = c.get("/api/terms").json()
+    rows = {r["operation_id"]: r for r in body["stitches"]}
+    assert rows["SC"]["us_abbr"] == "sc" and rows["SC"]["uk_abbr"] == "dc"
+    assert rows["DC"]["us_abbr"] == "dc" and rows["DC"]["uk_abbr"] == "tr"
+    assert rows["CH"]["differs"] is False                     # some are the same either side
+    assert rows["SC"]["differs"] is True
+    assert "US single crochet (sc)" in body["headline"]
+    assert body["shared"]["yo"].startswith("yarn over")
+
+
+def test_the_stitch_reference_shows_the_other_name_too():
+    uk = {s["operation_id"]: s for s in
+          c.get("/api/stitches", params={"terms": "uk"}).json()["stitches"]}
+    assert uk["SC"]["abbreviation"] == "dc" and uk["SC"]["name"] == "Double crochet"
+    assert uk["SC"]["other_abbr"] == "sc"                     # and says what it is elsewhere
+    assert uk["CH"]["other_abbr"] is None                     # nothing to say when it is the same
+
+
+def test_the_switch_is_in_the_header():
+    html = c.get("/").text
+    assert 'id="termsUS"' in html and 'id="termsUK"' in html
+    assert "aria-label=\"Crochet terms\"" in html
+    assert "function setTerms(dialect" in html
+    assert "ye_terms" in html                                  # remembered between visits

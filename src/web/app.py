@@ -68,6 +68,7 @@ from src.library.colours import match_colour
 from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
 from src.construction import types as constructions
 from src.web.plain import problem as plain_problem
+from src.crochet import terms as crochet_terms
 from src.tools import maths as tool_maths
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
@@ -1046,7 +1047,8 @@ def read_one_round(payload: dict):
         raise HTTPException(status_code=422, detail=plain_problem(
             [issue], str(payload.get("row_word") or "round")))
     return {"operations": ops, "output_stitches": produced, "consumed": consumed,
-            "written": round_text(ops, produced)}
+            "written": round_text(ops, produced, words=crochet_terms.words(dialect)),
+            "terms": dialect}
 
 
 @app.post("/api/import/rounds")
@@ -1479,9 +1481,26 @@ def crochet_amigurumi_written(payload: dict):
     if not analysed.get("valid"):
         raise HTTPException(status_code=422,
                             detail=plain_problem(analysed.get("issues", [])))
-    stitch = str(payload.get("stitch") or "SC").upper()
+    # Which stitch the piece is mostly worked in decides how the rounds read
+    # and what goes into the ring. A piece of trebles that starts "12 sc in
+    # magic ring" is wrong in a way every crocheter would catch.
+    def _mainstay() -> str:
+        tally: dict[str, int] = {}
+        for r in payload.get("rounds", []):
+            for op, n in (r.get("operations") or {}).items():
+                base = {"SC_INC": "SC", "SC2TOG": "SC", "SC3TOG": "SC",
+                        "HDC_INC": "HDC", "HDC2TOG": "HDC",
+                        "DC_INC": "DC", "DC2TOG": "DC", "DC3TOG": "DC"}.get(op, op)
+                if base in ("SC", "HDC", "DC", "TR", "DTR"):
+                    tally[base] = tally.get(base, 0) + int(n or 0)
+        return max(tally, key=tally.get) if tally else "SC"
+
+    stitch = str(payload.get("stitch") or _mainstay()).upper()
     initial = int(payload.get("initial_stitches") or 6)
-    word = OP_WORDS.get(stitch, "sc")
+    dialect = crochet_terms.normalise(payload.get("terms"))
+    # The same stitches, printed in the words the maker reads in.
+    terms = crochet_terms.words(dialect)
+    word = terms.get(stitch, "sc")
     try:
         construction = constructions.get(payload.get("construction"))
     except KeyError:
@@ -1500,9 +1519,11 @@ def crochet_amigurumi_written(payload: dict):
     for i, (r, step) in enumerate(zip(payload.get("rounds", []), analysed["trace"]), start=2):
         lines.append(f"{prefix}{i}: " + round_text(
             r.get("operations", {}), step["output_stitches"], plain=stitch,
-            closing=("around" if construction.row_word == "round" else "across")))
+            closing=("around" if construction.row_word == "round" else "across"),
+            words=terms))
     return {"lines": lines, "stitch_counts": [initial] + [t["output_stitches"] for t in analysed["trace"]],
             "round_count": len(lines), "construction": construction.as_dict(),
+            "terms": dialect,
             "notes": ([("Turning chains are not in these counts. Most flat patterns work one at "
                         "the start of each row — add them if yours does, and the yarn figure "
                         "will go up a little.")]
@@ -2329,8 +2350,21 @@ STITCH_ORDER = ["CH", "SLST", "SC", "HDC", "DC", "TR", "DTR",
                 "FPDC", "BPDC", "PUFF3", "POPCORN5"]
 
 
+@app.get("/api/terms")
+def crochet_term_table():
+    """Both names for every stitch, and the ones that are the same either side.
+
+    A pattern that does not say whether it is written in UK or US terms can
+    quietly ruin a piece: "dc" is single crochet in Britain and a stitch twice
+    as tall in America.
+    """
+    return {"dialects": list(crochet_terms.DIALECTS), "default": crochet_terms.DEFAULT,
+            "headline": crochet_terms.HEADLINE, "stitches": crochet_terms.table(),
+            "shared": crochet_terms.SHARED}
+
+
 @app.get("/api/stitches")
-def stitches(hook_mm: float = 3.5, yarn_diameter_mm: float = 2.5):
+def stitches(hook_mm: float = 3.5, yarn_diameter_mm: float = 2.5, terms: str = "us"):
     """Every crochet stitch the app knows, and what each one costs.
 
     The yarn figure is the geometry baseline at a stated hook and yarn, so it
@@ -2355,8 +2389,12 @@ def stitches(hook_mm: float = 3.5, yarn_diameter_mm: float = 2.5):
             per_stitch_mm, measured = None, False
         out.append({
             "operation_id": op_id,
-            "name": op.get("name") or op_id,
-            "abbreviation": OP_WORDS.get(op_id, op_id.lower()),
+            "name": crochet_terms.name(op_id, terms) or op.get("name") or op_id,
+            "abbreviation": crochet_terms.abbr(op_id, terms),
+            "other_name": (crochet_terms.name(op_id, "uk" if crochet_terms.normalise(terms) == "us" else "us")
+                           if crochet_terms.differs(op_id) else None),
+            "other_abbr": (crochet_terms.abbr(op_id, "uk" if crochet_terms.normalise(terms) == "us" else "us")
+                           if crochet_terms.differs(op_id) else None),
             "family": family,
             "consumes": op.get("consumes_stitches"),
             "produces": op.get("produces_stitches"),
@@ -2368,7 +2406,7 @@ def stitches(hook_mm: float = 3.5, yarn_diameter_mm: float = 2.5):
             "use": STITCH_USES.get(op_id),
         })
     return {"hook_mm": hook_mm, "yarn_diameter_mm": yarn_diameter_mm,
-            "stitches": out,
+            "terms": crochet_terms.normalise(terms), "stitches": out,
             "note": ("Yarn per stitch is the uncalibrated geometry baseline at this hook and "
                      "yarn: wraps x tension x the loop around hook and yarn. It is for "
                      "comparing stitches, not for costing a piece — the calculator does that "
