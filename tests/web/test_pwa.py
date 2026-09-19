@@ -80,3 +80,14 @@ def test_the_yarn_bar_does_not_claim_things_that_are_not_true():
     assert ".yarnbar .swatch.empty" in html and "classList.toggle('empty'" in html
     assert "function amiFinishedSize(" in html
     assert "$('btn3d').classList.toggle('hidden',!applies)" in html
+
+
+def test_the_phone_layout_guards_are_in_place():
+    """One wide table used to stretch the whole app sideways on a phone; these
+    are the rules that stop it, and they are easy to lose in a refactor."""
+    html = c.get("/").text
+    assert ".grid2>*,.toolGrid>*,.fields>*,.card{min-width:0}" in html
+    assert ".tablewrap{max-height:58vh" in html          # the 200-row list scrolls itself
+    assert "@media(max-width:520px){.fields,.fields.three{grid-template-columns:repeat(2" in html
+    assert "input[type=checkbox],input[type=radio]{width:20px;height:20px" in html
+    assert "body.has-install-bar{padding-bottom:104px}" in html

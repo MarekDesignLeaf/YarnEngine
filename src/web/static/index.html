@@ -82,7 +82,13 @@ button.link:hover{background:none;color:var(--accent2-dark);transform:none}
 button:disabled{opacity:.5;cursor:not-allowed;transform:none}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--accent2-light);outline-offset:1px}
 
-.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.grid2{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+/* A grid or flex child refuses to shrink below its content unless told to, so
+   one wide table used to stretch the whole page sideways and drag the header
+   and the tab bar off the screen with it. The table still scrolls on its own;
+   it just no longer sets the width of the app. */
+.grid2>*,.toolGrid>*,.fields>*,.card{min-width:0}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.fields.three{grid-template-columns:repeat(3,minmax(0,1fr))}
 label{display:grid;gap:4px;font-weight:600;font-size:13.5px}
 input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px;background:#fff;color:var(--ink);font:inherit;transition:border-color .12s ease}
 input:focus,select:focus,textarea:focus{border-color:var(--accent2-light)}
@@ -134,6 +140,23 @@ button.cant{opacity:.4;box-shadow:none}
 #iosInstall{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:58;display:flex;gap:10px;align-items:center;
  padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-pop);font-size:13.5px}
 #iosInstall img{width:34px;height:34px;border-radius:8px;flex:0 0 auto}
+/* The banner floats over the page, so the page ends above it rather than
+   underneath it -- the last thing you asked for is usually the thing it
+   was covering. */
+body.has-install-bar{padding-bottom:104px}
+.tablewrap{overflow:auto}
+@media(max-width:700px){
+ /* Two hundred yarns in one column is a fifteen-thousand-pixel page, and the
+    form to add one sits underneath it. The list keeps its own scroll so the
+    rest of the page stays reachable. */
+ .tablewrap{max-height:58vh;overscroll-behavior:contain}
+ /* The facts strip scrolls sideways; a fade says so, rather than leaving a
+    word sliced in half looking like a bug. */
+ .yarnbar .yb-specs{-webkit-mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent);
+  mask-image:linear-gradient(to right,#000 calc(100% - 22px),transparent)}
+}
+/* Below this a two-column field row genuinely has no room. */
+@media(max-width:360px){.fields,.fields.three{grid-template-columns:1fr}}
 #iosInstall span{flex:1 1 auto}
 #iosInstall button{flex:0 0 auto;padding:6px 12px;font-size:12.5px}
 /* 3D preview docked to the bottom of the screen, so the shape stays in view
@@ -221,6 +244,14 @@ table.sizes td,table.sizes th{padding:3px 8px;font-size:12.5px}
 .yarnbar .yb-actions{display:flex;gap:6px;margin-left:8px}
 .yarnbar button{min-height:30px;padding:4px 10px;font-size:12.5px}
 .yarnbar button.on{background:var(--accent2);color:#fff}
+@media(max-width:600px){
+ /* Everything tappable gets a finger-sized target: a 13 px checkbox and a
+    20 px text button are misses waiting to happen on a phone. */
+ input[type=checkbox],input[type=radio]{width:20px;height:20px;flex:0 0 auto}
+ label>span>input[type=checkbox]{vertical-align:-4px;margin-right:6px}
+ button.link{min-height:34px;padding:8px 6px}
+ table td,table th{padding:9px 6px}
+}
 @media(max-width:700px){
  /* One line of facts that scrolls sideways, not five rows of wrapped pills:
     the bar is stuck to the top of every screen, so its height is a tax on
@@ -270,7 +301,12 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 .shape-pt-row label{gap:2px}.shape-pt-row input{padding:6px}
 .shape-pt-row .idx{align-self:center;color:var(--muted);font-size:12.5px;font-weight:700}
 @media(max-width:860px){.grid2{grid-template-columns:1fr}.fields,.fields.three{grid-template-columns:1fr 1fr}}
-@media(max-width:520px){.fields,.fields.three{grid-template-columns:1fr}.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
+/* Two columns are kept right down to phone width: these are mostly number
+   boxes, and one per row turned a six-field card into a whole screen of
+   scrolling. A field that needs the full width asks for it individually. */
+@media(max-width:520px){.fields,.fields.three{grid-template-columns:repeat(2,minmax(0,1fr))}
+.fields label>span{font-size:12px;line-height:1.25}
+.gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
 .round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
 .op-seg{flex-wrap:wrap}.op-seg select{flex-basis:100%}
 .shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
@@ -580,7 +616,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         </select>
         <span id="yarnCount" class="small"></span>
       </div>
-      <div style="overflow:auto"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th><th>Price</th><th>Source</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      <div class="tablewrap"><table id="yarnTable"><thead><tr><th>Brand</th><th>Product</th><th>CYC</th><th>g / m</th><th>Fibre</th><th>Ø mm</th><th>Price</th><th>Source</th><th></th></tr></thead><tbody></tbody></table></div></div>
     <div class="card"><h2>Add yarn</h2>
       <div class="fields">
         <label>ID<input id="yId" placeholder="BRAND_PRODUCT_50G_120M"></label>
@@ -3039,10 +3075,10 @@ function isStandalone(){return (window.matchMedia&&window.matchMedia('(display-m
 function maybeShowIosInstall(){
  if(!isIOS()||isStandalone()||document.getElementById('iosInstall'))return;
  try{if(localStorage.getItem('ye_ios_hint')==='1')return;}catch(_){}
- const d=document.createElement('div');d.id='iosInstall';
+ const d=document.createElement('div');d.id='iosInstall';document.body.classList.add('has-install-bar');
  d.innerHTML='<img src="/static/apple-touch-icon.png" alt=""><span>Install this app: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span><button id="iosInstallOk" class="alt" type="button">Got it</button>';
  document.body.appendChild(d);
- document.getElementById('iosInstallOk').onclick=()=>{try{localStorage.setItem('ye_ios_hint','1');}catch(_){}d.remove();};
+ document.getElementById('iosInstallOk').onclick=()=>{try{localStorage.setItem('ye_ios_hint','1');}catch(_){}document.body.classList.remove('has-install-bar');d.remove();};
 }
 setTimeout(maybeShowIosInstall,1500);
 </script>
