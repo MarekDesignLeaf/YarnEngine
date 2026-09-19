@@ -69,6 +69,7 @@ from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
 from src.construction import types as constructions
 from src.web.plain import problem as plain_problem
 from src.crochet import terms as crochet_terms
+from src.beginner import plans as beginner
 from src.tools import maths as tool_maths
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
@@ -789,6 +790,10 @@ def _log_calculation(http_request, kind, title, payload, result, **fields):
             user_id=_current_user_id(http_request), kind=kind, title=title,
             request=payload, result=result, **fields)
     except Exception:            # noqa: BLE001 - see the docstring
+        import os
+        import traceback
+        if os.getenv("YARNENGINE_DEBUG_LOG"):
+            traceback.print_exc()     # a swallowed failure is still findable
         return None
 
 
@@ -1432,10 +1437,12 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
     copies=max(1,int(payload.get("copies") or 1))
     stitches=sum(int(v) for v in analysed["operation_counts"].values())
     rounds=len(analysed.get("trace") or [])
+    # What the log calls this piece. Older entries were all "amigurumi" because
+    # that was the only thing the app made; a piece now records how it was
+    # built, which is the thing worth knowing when it comes back.
     logged=_log_calculation(
-        http_request, kind,
-        payload.get("title") or (f"Amigurumi piece — {rounds} rounds" if kind=="amigurumi"
-                                 else "Branch piece"),
+        http_request, kind or construction.id,
+        payload.get("title") or (f"{construction.name} — {rounds} {construction.row_word}s"),
         payload, result,
         **_yarn_fields(payload.get("yarn_id")),
         **_colour_fields(_public_colour(_colour(payload.get("colour_id")))),
@@ -1456,6 +1463,61 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
     except (ValueError, KeyError):
         result["finished_size"]=None
     return result
+
+@app.get("/api/beginner/projects")
+def beginner_projects():
+    """What a first piece can be, in the words someone would use for it."""
+    return {"projects": [{"id": key, **{k: v for k, v in spec.items() if k != "firm"}}
+                         for key, spec in beginner.PROJECTS.items()]}
+
+
+@app.post("/api/beginner/plan")
+def beginner_plan(payload: dict, http_request: Request):
+    """Two answers — what, and how big — turned into a real piece.
+
+    Everything the calculator would have asked for is worked out from the yarn
+    and said out loud: which hook, which gauge, and that a swatch beats both.
+    """
+    project_id = str(payload.get("project") or "")
+    if project_id not in beginner.PROJECTS:
+        raise HTTPException(status_code=422,
+                            detail=f"choose one of: {', '.join(beginner.PROJECTS)}")
+    spec = beginner.PROJECTS[project_id]
+    yarn = service._yarn(payload.get("yarn_id")) if payload.get("yarn_id") else None
+    if yarn is None:
+        raise HTTPException(status_code=422, detail="choose a yarn first")
+
+    gauge = beginner.suggest_gauge(yarn.get("cyc_weight"), firm=spec["firm"])
+    # Anything the person has actually measured beats what was suggested.
+    for key in ("gauge_stitches_per_10cm", "gauge_rows_per_10cm", "hook_mm"):
+        if payload.get(key) not in (None, ""):
+            gauge = {**gauge, key: float(payload[key]), "known": True,
+                     "note": "Using the gauge you measured."}
+    try:
+        built = beginner.build(project_id, payload.get("answers") or {}, gauge)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+    body = {"construction": built["construction"], "program": built["program"],
+            "yarn_id": payload.get("yarn_id"), "hook_mm": gauge["hook_mm"],
+            "gauge_stitches_per_10cm": gauge["gauge_stitches_per_10cm"],
+            "gauge_rows_per_10cm": gauge["gauge_rows_per_10cm"],
+            "allowance_percent": float(payload.get("allowance_percent") or 10),
+            "domain_policy": "warn", "colour_id": payload.get("colour_id"),
+            "copies": int(payload.get("copies") or 1),
+            "title": payload.get("title") or spec["name"]}
+    costed = complex_consumption_calculate(body, http_request)
+    written = crochet_amigurumi_written({**built["program"],
+                                         "construction": built["construction"],
+                                         "terms": payload.get("terms")})
+    # Everything worth knowing in one list, in the order it matters: where the
+    # hook and gauge came from first, because that is what the size rests on.
+    notes = [gauge["note"]] + built["notes"] + list(written.get("notes") or [])
+    return {"project": project_id, "name": spec["name"], "about": spec["about"],
+            "gauge": gauge, "notes": notes,
+            "written": written["lines"], "terms": written.get("terms"),
+            "result": costed, "body": body}
+
 
 @app.get("/api/constructions")
 def list_constructions(craft: str | None = None):

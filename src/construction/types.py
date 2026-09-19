@@ -173,11 +173,33 @@ def finished_size(construction_id: str, trace: list[dict], *,
         widest = max(counts)
         narrowest = min(counts)
         diameter = widest * stitch_cm / math.pi
+        # A round is one row-height of fabric *along the surface*, not one
+        # row-height straight up: where a round grows fast it is going outwards
+        # and the piece gets wider rather than taller. Counting every round as
+        # height is what makes an app tell someone their coaster is four
+        # centimetres thick.
+        height = 0.0
+        previous_radius = (initial_stitches or counts[0]) * stitch_cm / (2 * math.pi)
+        for count in counts:
+            radius = count * stitch_cm / (2 * math.pi)
+            spread = abs(radius - previous_radius)
+            height += math.sqrt(max(0.0, row_cm ** 2 - spread ** 2))
+            previous_radius = radius
+        # A piece whose height is a fraction of its width is a circle with a
+        # little curl in it, not a shape with a height worth quoting.
+        lies_flat = height < max(row_cm * 1.5, diameter * 0.15)
         out.update({"known": True, "height_cm": round(height, 1),
+                    "height_if_stacked_cm": round(rows * row_cm, 1),
                     "diameter_cm": round(diameter, 1),
                     "circumference_cm": round(widest * stitch_cm, 1),
                     "narrowest_diameter_cm": round(narrowest * stitch_cm / math.pi, 1),
-                    "summary": f"≈ {round(height, 1)} × {round(diameter, 1)} cm"})
+                    "lies_flat": lies_flat,
+                    "summary": (f"≈ {round(diameter, 1)} cm across" if lies_flat else
+                                f"≈ {round(height, 1)} × {round(diameter, 1)} cm")})
+        if lies_flat:
+            out["notes"] = list(out["notes"]) + [
+                "Every round on this piece grows fast enough to lie flat, so it is a circle "
+                "rather than a shape with a height."]
         if construction.id == "round_open":
             out["summary"] = (f"≈ {round(height, 1)} cm long, "
                               f"{round(widest * stitch_cm, 1)} cm around")

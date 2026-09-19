@@ -51,3 +51,21 @@ piece short.
 `program_type: "amigurumi"` still means `round_closed` and `"branch"` still
 means `branched`, so everything calculated before this existed reads and costs
 exactly as it did.
+
+## How tall a piece is
+
+A round is one row-height of fabric *along the surface*, not one row-height
+straight up. Where a round grows fast the yarn is travelling outwards, and the
+piece gets wider rather than taller — which is why increasing six stitches
+every round makes a flat circle and not a tall stack of rings.
+
+So height is walked along the profile: for each round, the radius change is
+the spread, and the rise is `sqrt(row² − spread²)`, which goes to zero when a
+round spreads faster than a row is tall. A piece whose height stays under a
+sixth of its width is reported as a circle with a diameter and no height at
+all, because a ten-centimetre coaster is not four centimetres thick.
+
+Multiplying rounds by row height is kept alongside as `height_if_stacked_cm`,
+since that is what most calculators do and it is useful to see the difference.
+The 3D preview builds its profile the same way, so the picture and the figure
+cannot disagree.

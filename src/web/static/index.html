@@ -280,6 +280,24 @@ body.has-install-bar{padding-bottom:104px}
 .stitchCard .sAbbr{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--muted)}
 .stitchCard .sUse{font-size:12px;line-height:1.4;margin-top:3px}
 .stitchCard .sFacts{font-size:11px;color:var(--muted);margin-top:4px}
+/* Start here: the first screen for someone who has never crocheted from an
+   app. Two questions, then a real piece — no gauge, no construction, no
+   rounds editor until they want one. */
+.startGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.startPick{display:block;text-align:left;padding:10px 12px;border:1px solid var(--line);
+ border-radius:12px;background:var(--card);box-shadow:none;min-height:auto;color:var(--ink)}
+.startPick.on{border-color:var(--accent);background:var(--accent-pale)}
+.startPick b{display:block;font-size:14px;font-family:var(--font-display);color:var(--ink)}
+.startPick span{display:block;font-size:11.5px;color:var(--muted);line-height:1.35;margin-top:2px;
+ font-weight:400}
+.startLines{font-family:ui-monospace,Menlo,monospace;font-size:12.5px;line-height:1.55;
+ max-height:220px;overflow:auto;background:var(--bg);border:1px solid var(--line);
+ border-radius:10px;padding:8px 10px;margin-top:8px;white-space:pre-wrap}
+.startFigures{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;
+ margin-top:8px}
+.startFigures div{background:var(--bg-tint);border-radius:12px;padding:8px 10px}
+.startFigures b{display:block;font-family:var(--font-display);font-size:18px}
+.startFigures span{font-size:11px;color:var(--muted)}
 /* Tools: the small sums a maker does on the back of an envelope, each one
    showing its working rather than just a number. */
 .toolGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:12px}
@@ -535,6 +553,21 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 
 <!-- ---------- CALCULATOR ---------- -->
 <section id="tab-calc">
+<div class="card" id="startHere">
+  <div class="toolbar" style="margin-top:0;justify-content:space-between">
+    <h2 style="margin:0">Start here</h2>
+    <button type="button" id="startHide" class="link">hide this</button>
+  </div>
+  <p class="small muted" style="margin-top:0">New to this? Tell me two things — what you want to make and roughly how big — and I will work out the hook, the stitches, the pattern and how much yarn it takes.</p>
+  <div id="startProjects" class="startGrid"></div>
+  <div id="startAsk" class="hidden" style="margin-top:10px">
+    <div class="fields" id="startFields"></div>
+    <div class="toolbar"><button type="button" id="startGo" class="accent">Work it out</button>
+      <button type="button" id="startBack" class="link">something else</button></div>
+  </div>
+  <div id="startStatus" class="status hidden"></div>
+  <div id="startResult" class="hidden" style="margin-top:10px"></div>
+</div>
 <div class="grid2">
 <div>
   <div class="card">
@@ -1352,6 +1385,7 @@ async function loadData(){
  [PATTERNS,YARNS]=await Promise.all([api('/api/patterns/full'),api('/api/yarns')]);
  PATTERNS=PATTERNS.filter(p=>(p.techniques||[]).map(x=>String(x).toLowerCase()).includes('crochet'));
  renderPatternSelect();renderYarnSelect();renderYarns();buildFilters();setTemplate();
+ if(typeof loadStartHere==='function')loadStartHere();
  if(PATTERNS.length)selectPattern(KEY(PATTERNS.find(p=>p.pattern_id==='CROCHET_SOLID_SC_01')||PATTERNS[0]));
  loadCompanyFooter();
 }
@@ -2821,7 +2855,7 @@ function renderWorkLog(rows,owner){
    <td class="small">${e.stitches!=null?e.stitches.toLocaleString():'–'}</td>
    <td>${mine?`<input class="wlNote" data-id="${e.entry_id}" value="${esc(e.note||'')}" placeholder="note" style="min-width:120px">`:esc(e.note||'')}</td>
    <td class="small wlActions">
-    ${mine&&(e.kind==='amigurumi'||e.kind==='branch')?`<button class="link wlMake" data-id="${e.entry_id}">make</button>`:''}
+    ${mine&&e.kind!=='flat'?`<button class="link wlMake" data-id="${e.entry_id}">make</button>`:''}
     <button class="link wlOpen" data-id="${e.entry_id}">open</button>
     ${mine?`<label title="Hide this one from the people you share with" style="font-weight:500"><input type="checkbox" class="wlPriv" data-id="${e.entry_id}" ${e.private?'checked':''} style="width:auto"> private</label>
     <button class="link wlDel" data-id="${e.entry_id}">delete</button>`:''}
@@ -3572,6 +3606,100 @@ if($('termsUS'))$('termsUS').onclick=()=>setTerms('us');
 if($('termsUK'))$('termsUK').onclick=()=>setTerms('uk');
 loadTermsChoice();
 
+/* ========================== start here =================================
+   The calculator asks for a gauge, a hook, a construction, a starting stitch
+   count and a list of rounds. Every one is a fair question and all of them
+   together are a wall. This asks two: what, and how big. Everything else is
+   worked out from the yarn and said out loud, including which parts are an
+   estimate. */
+let START={projects:null,chosen:null,plan:null};
+async function loadStartHere(){
+ if(START.projects)return;
+ try{
+  const d=await api('/api/beginner/projects');
+  START.projects=d.projects;
+  $('startProjects').innerHTML=d.projects.map(p=>
+   `<button type="button" class="startPick" data-project="${esc(p.id)}">
+     <b>${esc(p.name)}</b><span>${esc(p.also||'')}</span></button>`).join('');
+  $('startProjects').querySelectorAll('.startPick').forEach(b=>
+   b.onclick=()=>chooseStart(b.dataset.project));
+ }catch(e){$('startHere').classList.add('hidden');}
+}
+function chooseStart(id){
+ const p=(START.projects||[]).find(x=>x.id===id);
+ if(!p)return;
+ START.chosen=p;START.plan=null;
+ $('startProjects').querySelectorAll('.startPick').forEach(b=>
+  b.classList.toggle('on',b.dataset.project===id));
+ $('startFields').innerHTML=
+  `<label style="grid-column:1/-1"><span>Which yarn</span>
+    <select id="startYarn">${YARNS.map(y=>
+      `<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}</option>`).join('')}</select></label>`+
+  p.asks.map(a=>`<label><span>${esc(a.label)} (${esc(a.unit)})</span>
+    <input type="number" class="startAnswer" data-key="${esc(a.key)}" value="${a.default}"
+     min="${a.min}" max="${a.max}" step="0.5"></label>`).join('');
+ if($('yarn')&&$('yarn').value)$('startYarn').value=$('yarn').value;
+ $('startAsk').classList.remove('hidden');
+ $('startResult').classList.add('hidden');
+ status($('startStatus'),p.about,'');
+}
+$('startBack').onclick=()=>{
+ START.chosen=null;$('startAsk').classList.add('hidden');$('startResult').classList.add('hidden');
+ $('startProjects').querySelectorAll('.startPick').forEach(b=>b.classList.remove('on'));
+};
+$('startGo').onclick=async()=>{
+ if(!START.chosen)return;
+ const answers={};
+ document.querySelectorAll('.startAnswer').forEach(i=>answers[i.dataset.key]=i.value);
+ status($('startStatus'),'Working it out…','');
+ try{
+  const d=await api('/api/beginner/plan',{method:'POST',body:{
+   project:START.chosen.id,yarn_id:$('startYarn').value,answers,terms:TERMS_DIALECT}});
+  START.plan=d;
+  const calc=d.result.calculation,size=d.result.finished_size;
+  $('startResult').innerHTML=`
+   <div class="startFigures">
+    <div><b>${fmt(toLen(calc.recommended_length_m))} ${esc(unitLenLabel())}</b><span>of yarn</span></div>
+    ${calc.mass_g!=null?`<div><b>${fmt(toMass(calc.mass_g),0)} ${esc(unitMassLabel())}</b><span>weight</span></div>`:''}
+    <div><b>${fmt(d.gauge.hook_mm,2)} mm</b><span>hook to start with</span></div>
+    <div><b>${esc(size&&size.known?size.summary.replace('≈ ',''):'–')}</b><span>finished size</span></div>
+   </div>
+   <div class="startLines">${esc(d.written.join('\n'))}</div>
+   <ul class="palNote">${(d.notes||[]).filter(Boolean).map(n=>`<li>${esc(n)}</li>`).join('')}</ul>
+   <div class="toolbar">
+    <button type="button" id="startMake" class="accent">Start making it</button>
+    <button type="button" id="startOpen" class="alt">Open it in the editor</button>
+   </div>`;
+  $('startResult').classList.remove('hidden');
+  status($('startStatus'),`${esc(d.name)} — worked out and saved to your log.`,'good');
+  $('startMake').onclick=()=>{
+   const id=d.result.worklog_entry_id;
+   if(id)openMake(id);
+  };
+  $('startOpen').onclick=()=>{
+   $('yarn').value=d.body.yarn_id;renderColourSelect&&renderColourSelect();
+   $('hook').value=d.gauge.hook_mm;
+   $('gaugeSt').value=d.gauge.gauge_stitches_per_10cm;
+   $('gaugeRows').value=d.gauge.gauge_rows_per_10cm;
+   if($('construction'))$('construction').value=d.body.construction;
+   calcSetMode('ami');
+   if(typeof loadConstructions==='function')loadConstructions().then(()=>{
+    if($('construction'))$('construction').value=d.body.construction;
+    if(typeof setConstruction==='function')setConstruction(d.body.construction);
+    $('amiInitial').value=d.body.program.initial_stitches;
+    $('amiTemplate').value='custom';
+    writeRounds(d.body.program.rounds);
+   });
+   $('startHere').scrollIntoView({block:'start'});
+  };
+ }catch(e){status($('startStatus'),e.message,'bad');}
+};
+$('startHide').onclick=()=>{
+ $('startHere').classList.add('hidden');
+ try{localStorage.setItem('ye_start_hidden','1');}catch(_){}
+};
+try{if(localStorage.getItem('ye_start_hidden')==='1')$('startHere').classList.add('hidden');}catch(_){}
+
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;
 $('wlKind').onchange=loadWorkLogEntries;
@@ -3744,11 +3872,21 @@ function renderAmiShape(trace, opts, message) {
 
   const stitchWidthCm = 10 / (opts.gaugeSt || 20);
   const rowHeightCm = 10 / (opts.gaugeRows || 22);
+  // A round is one row-height of fabric along the surface, not one row-height
+  // straight up. Where a round grows fast it is travelling outwards and the
+  // piece gets wider rather than taller — which is why a flat circle is a
+  // circle and not a tall stack of rings.
   const pts = [new THREE.Vector2(0.12, 0)];
-  trace.forEach((r, i) => {
+  let y = 0, previous = Math.max(0.08,
+    ((opts.initialStitches || (trace[0] && trace[0].input_stitches) || 6) * stitchWidthCm)
+    / (2 * Math.PI));
+  trace.forEach((r) => {
     const circumference = (r.output_stitches || 0) * stitchWidthCm;
     const radius = Math.max(0.08, circumference / (2 * Math.PI));
-    pts.push(new THREE.Vector2(radius, (i + 1) * rowHeightCm));
+    const spread = Math.abs(radius - previous);
+    y += Math.sqrt(Math.max(0, rowHeightCm * rowHeightCm - spread * spread));
+    pts.push(new THREE.Vector2(radius, y));
+    previous = radius;
   });
 
   const stats = buildLatheMesh(pts);
