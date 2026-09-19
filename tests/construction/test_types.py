@@ -75,7 +75,7 @@ def test_each_construction_says_enough_to_be_offered_in_a_list():
         assert row["name"] and row["about"] and row["examples"]
         assert row["row_word"] in ("round", "row")
         assert row["start_label"]
-    assert "branched" not in {c["id"] for c in listing("crochet")}   # knitting only
+    assert "branched" in {c["id"] for c in listing("crochet")}      # legs, too, not just yokes
     assert {"round_closed", "flat_rows"} <= {c["id"] for c in listing("crochet")}
 
 

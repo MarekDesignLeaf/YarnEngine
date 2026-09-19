@@ -677,6 +677,21 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
+      <details id="branchDetails" style="margin-top:12px">
+        <summary style="cursor:pointer;font-weight:650">Legs, arms, tentacles — pieces that meet this one</summary>
+        <p class="small muted" style="margin-top:6px">A piece worked in the round is one circle, and most toys are not. There are three ways a crocheter gets from one circle to several, and which one you want decides everything else.</p>
+        <div id="branchModes" class="startGrid"></div>
+        <div id="branchAsk" class="fields hidden" style="margin-top:10px"></div>
+        <div id="branchOut" class="hidden" style="margin-top:10px">
+          <div class="chartbox" style="padding:10px 12px">
+            <p id="branchLine" class="small" style="margin:0 0 6px;font-family:ui-monospace,Menlo,monospace;font-size:12.5px"></p>
+            <p id="branchHow" class="small" style="margin:0"></p>
+            <ul id="branchNotes" class="small muted" style="margin:8px 0 0;padding-left:18px"></ul>
+          </div>
+          <div class="toolbar"><button type="button" id="btnBranchApply" class="accent hidden">Carry on from here</button></div>
+        </div>
+        <div id="branchStatus" class="status hidden"></div>
+      </details>
       <div id="ami3dBlock" style="margin-top:14px">
         <div class="toolbar ami3dBar" style="margin-top:0;justify-content:space-between">
           <h3 style="margin:0">3D shape preview</h3>
@@ -2151,6 +2166,121 @@ $('btnGenRounds').onclick=()=>{
 };
 $('shapeEditorDetails').addEventListener('toggle',()=>{if($('shapeEditorDetails').open){window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleShapePreview();}});
 renderShapeEditor();renderShapeFields();
+
+/* ==================== legs, arms and tentacles ====================
+   A piece worked in the round is one circle, and most toys are not. This is
+   the moment the editor could not express: a pair of legs was two unrelated
+   pieces and the body they turn into was a third, with nothing saying they
+   were the same toy.
+
+   There are only three ways a crocheter gets from one circle to several, and
+   the difference matters more than the arithmetic -- a tentacle is not split
+   off anything, it is a separate piece that gets sewn on. So the choice comes
+   first, in those words, and the numbers follow from it. */
+let BRANCH_MODES=null,branchMode=null,branchTimer=null,branchPlan=null;
+async function loadBranchModes(){
+ if(BRANCH_MODES)return BRANCH_MODES;
+ try{BRANCH_MODES=(await api('/api/branching')).modes;}catch(e){BRANCH_MODES=[];}
+ return BRANCH_MODES;
+}
+/* Where a split happens. If a round is highlighted in the 3D preview that is
+   the round the maker is looking at, so that is the one they mean; otherwise
+   the widest round, because splitting at the last round of a closed ball is
+   six stitches and an immediate wall of errors. */
+function splitFromStitches(){
+ const outs=[...document.querySelectorAll('#rounds .round:not(.ring) .roundOut')];
+ if(!outs.length)return curInitial()||0;
+ const marked=document.querySelector('#rounds .round.marked .roundOut');
+ if(marked)return Number(marked.value)||0;
+ return Math.max(...outs.map(o=>Number(o.value)||0));
+}
+async function renderBranchModes(){
+ const modes=await loadBranchModes();
+ if(!modes.length){$('branchModes').innerHTML='';return;}
+ $('branchModes').innerHTML=modes.map(m=>
+  `<button type="button" class="startPick${m.id===branchMode?' on':''}" data-branch="${esc(m.id)}">
+    <b>${esc(m.name)}</b><span>${esc(m.about)}</span>
+    <span style="margin-top:4px">For example: ${esc(m.examples.join(', '))}</span></button>`).join('');
+ document.querySelectorAll('[data-branch]').forEach(b=>b.onclick=()=>chooseBranch(b.dataset.branch));
+}
+function chooseBranch(id){
+ branchMode=id;
+ document.querySelectorAll('[data-branch]').forEach(b=>b.classList.toggle('on',b.dataset.branch===id));
+ renderBranchAsk();
+ askBranch();
+}
+function renderBranchAsk(){
+ const ask=$('branchAsk');ask.classList.remove('hidden');
+ const n=Number($('branchPieces')&&$('branchPieces').value)||2;
+ // Number(null) is 0, not NaN, so a missing field has to be checked for
+ // rather than sniffed at -- otherwise "two chains" silently becomes none.
+ const ch=$('branchChains')?Number($('branchChains').value)||0:2;
+ const each=Number($('branchEach')&&$('branchEach').value)||12;
+ const num=(id,label,val,min,max,title)=>
+  `<label title="${esc(title||'')}"><span>${esc(label)}</span>
+    <input id="${id}" type="number" min="${min}" max="${max}" value="${val}"></label>`;
+ if(branchMode==='sewn'){
+  ask.innerHTML=num('branchPieces','How many pieces',n,1,24,'Ears, arms, tentacles — however many there are');
+ }else if(branchMode==='joined'){
+  ask.innerHTML=num('branchPieces','How many pieces are joined',n,2,12,'Two legs, four legs, a body and two sleeves')
+   +num('branchEach','Stitches in each',each,1,400,'How many stitches each piece has when you stop working it')
+   +num('branchChains','Chains across each gap',ch,0,20,'What bridges the gap between one piece and the next — 0 leaves a small hole to close by hand')
+   +num('branchSkip','Stitches skipped at each side',Number($('branchSkip')&&$('branchSkip').value)||0,0,10,'Some patterns skip a stitch where the pieces touch, so the join does not bulge');
+ }else{
+  ask.innerHTML=`<label><span>Stitches in the round being split</span>
+    <input id="branchFrom" type="number" min="4" max="600" value="${splitFromStitches()||44}"></label>`
+   +num('branchPieces','How many pieces it becomes',n,2,12,'Two legs, four legs, a thumb and a hand')
+   +num('branchChains','Chains across each gap',ch,0,20,'What closes each piece into its own ring — 0 makes the pieces meet at a point, which pulls');
+ }
+ ask.querySelectorAll('input').forEach(i=>['input','change'].forEach(ev=>i.addEventListener(ev,askBranch)));
+}
+function askBranch(){clearTimeout(branchTimer);branchTimer=setTimeout(sendBranch,220);}
+async function sendBranch(){
+ if(!branchMode)return;
+ const pieces=Math.max(1,Number($('branchPieces')&&$('branchPieces').value)||2);
+ const body={mode:branchMode,chains_between:Number($('branchChains')&&$('branchChains').value)||0,
+             skip_each_side:Number($('branchSkip')&&$('branchSkip').value)||0,stitch:'SC'};
+ if(branchMode==='sewn')body.parts=Array(pieces).fill(1);
+ else if(branchMode==='joined')body.parts=Array(pieces).fill(Math.max(1,Number($('branchEach').value)||12));
+ else{body.stitches=Math.max(1,Number($('branchFrom').value)||0);body.pieces=pieces;}
+ try{
+  const d=await api('/api/branching/plan',{method:'POST',body});
+  branchPlan=d;$('branchOut').classList.remove('hidden');
+  // When it does not work, the stitch counts are not an answer — printing
+  // "piece 3: 1 st (3)" above "3 stitches cannot be worked in the round" is
+  // showing someone a pattern and then telling them it is not one.
+  $('branchLine').textContent=d.valid?(d.line||(d.lines||[]).join('  ·  ')||''):'';
+  $('branchLine').classList.toggle('hidden',!$('branchLine').textContent);
+  $('branchHow').textContent=d.valid?(d.how||''):'';
+  $('branchHow').classList.toggle('hidden',!d.valid);
+  const notes=[...(d.issues||[]),...(d.valid?(d.notes||[]):[])];
+  $('branchNotes').innerHTML=notes.map(x=>`<li>${esc(x)}</li>`).join('');
+  // Only offer to carry on when there is a real stitch count to carry on from.
+  const next=d.valid?(d.mode==='joined'?d.stitches:(d.branches||[])[0]):0;
+  const go=$('btnBranchApply');
+  go.classList.toggle('hidden',!next);
+  if(next){go.textContent=`Start a new piece at ${next} sts`;go.dataset.next=next;}
+  status($('branchStatus'),'','good');$('branchStatus').classList.add('hidden');
+ }catch(e){status($('branchStatus'),e.message,'bad');}
+}
+$('btnBranchApply').onclick=()=>{
+ const next=Number($('btnBranchApply').dataset.next)||0;if(!next)return;
+ // This begins the piece that carries on from the join, so it clears what is
+ // below rather than quietly shifting every round by twenty stitches.
+ $('construction').value='round_open';$('construction').dispatchEvent(new Event('change'));
+ setTimeout(()=>{
+  $('amiTemplate').value='custom';
+  $('amiInitial').value=next;lastInitial=next;
+  writeRounds([{operations:{SC:next}}]);syncRingRow();scheduleAmi3D();
+  status($('branchStatus'),
+   `Started again at ${next} stitches, worked as a tube. The rounds below are the piece that `+
+   `carries on from here — the pieces you joined are made on their own and are not in this list.`,'good');
+ },120);
+};
+$('branchDetails').addEventListener('toggle',()=>{
+ if($('branchDetails').open&&!BRANCH_MODES)renderBranchModes();
+ if($('branchDetails').open&&branchMode==='split')renderBranchAsk();
+});
 
 /* ============================ design from a photo ============================
    The photo decides *what the parts are*; the server's generator decides every

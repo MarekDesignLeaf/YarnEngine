@@ -19,8 +19,10 @@ def test_the_app_lists_the_ways_a_piece_can_be_built():
     ids = {row["id"] for row in body["constructions"]}
     assert {"round_closed", "round_open", "flat_rows", "flat_shaped", "motif_joined"} <= ids
     assert body["default"] == "round_closed"
-    assert "branched" not in {r["id"] for r in c.get("/api/constructions",
-                                                     params={"craft": "crochet"}).json()["constructions"]}
+    # Splitting is not a knitting-only idea: a crochet toy's legs become its
+    # body the same way a yoke does.
+    assert "branched" in {r["id"] for r in c.get("/api/constructions",
+                                                 params={"craft": "crochet"}).json()["constructions"]}
     assert c.get("/api/constructions", params={"craft": "macrame"}).status_code == 422
 
 

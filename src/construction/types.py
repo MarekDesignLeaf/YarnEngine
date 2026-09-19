@@ -91,15 +91,18 @@ CONSTRUCTIONS: dict[str, Construction] = {
                                    "a join-as-you-go throw"),
         start_label="Motif round 1", row_word="round"),
     "branched": Construction(
-        id="branched", name="Split onto separate groups",
-        about=("Stitches divided onto separate groups and worked on, or joined back together: "
-               "a body that splits for sleeves, a yoke, a thumb gusset."),
+        id="branched", name="Split into separate pieces, or joined from them",
+        about=("One round becomes several, or several become one: two legs worked into a body, a "
+               "body divided into legs, a yoke, a thumb. Each piece carries on in its own right."),
         worked="rows", start="held", stitches_are="mixed", shaping="anywhere",
-        preview="none", crafts=("knitting",),
-        examples=("a yoke", "a body split for armholes", "a mitten thumb"),
-        start_label="Held stitches", row_word="row",
+        preview="none",
+        examples=("two legs joined into a body", "trousers worked downwards", "a yoke",
+                  "a body split for armholes", "a mitten thumb"),
+        start_label="Held stitches", row_word="round",
         notes=("A branched piece has no single width or circumference, so no finished size is "
-               "given here — each branch has its own.",)),
+               "given here — each piece has its own.",
+               "Parts that are simply sewn on — ears, arms, an octopus's tentacles — are not "
+               "branched at all. They are separate pieces, and nearly always should be.")),
 }
 
 DEFAULT = "round_closed"

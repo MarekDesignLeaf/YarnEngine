@@ -66,6 +66,7 @@ from src.crochet_geometry.stitch_loop import (operation_length_mm, OPERATION_WRA
                                               OPERATION_WRAP_RATIO)
 from src.library.colours import match_colour
 from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
+from src.construction import branching
 from src.construction import types as constructions
 from src.web.plain import problem as plain_problem
 from src.crochet import terms as crochet_terms
@@ -1530,6 +1531,34 @@ def list_constructions(craft: str | None = None):
     if craft not in (None, "crochet", "knitting"):
         raise HTTPException(status_code=422, detail="craft must be crochet or knitting")
     return {"constructions": constructions.listing(craft), "default": constructions.DEFAULT}
+
+
+@app.get("/api/branching")
+def list_branching():
+    """The three ways a piece becomes more than one, in the order people need them."""
+    return {"modes": branching.listing()}
+
+
+@app.post("/api/branching/plan")
+def branching_plan(payload: dict):
+    """One round to several, or several to one — what it costs and what to work.
+
+    Legs, arms and tentacles were the one thing the rounds editor could not
+    express: it knew a single chain of rounds, so a pair of legs was two
+    unrelated pieces and the body they turn into was a third. This says how
+    they meet, in the three ways a crocheter actually does it, and gives back
+    the line they would read in a pattern rather than a stitch count on its own.
+    """
+    out = branching.plan(payload or {})
+    if out.get("mode") is None and not out.get("valid"):
+        raise HTTPException(status_code=422, detail={
+            "message": (out.get("issues") or ["That is not a way of joining pieces."])[0],
+            "problems": out.get("issues", [])})
+    if not out.get("valid"):
+        # Not a server error: the maker asked for something the stitches do not
+        # allow, and needs to be told which bit, in words.
+        return out
+    return out
 
 
 @app.get("/api/shapes")
