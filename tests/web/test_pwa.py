@@ -115,3 +115,15 @@ def test_round_one_is_always_the_magic_ring():
                      json={"initial_stitches": 6, "rounds": [{"operations": {"SC_INC": 6}}]})
     assert written.json()["lines"][0] == "R1: 6 sc in magic ring (6)"
     assert written.json()["lines"][1].startswith("R2:")
+
+
+def test_a_round_reads_in_the_order_a_pattern_says_it():
+    """Stitch, then "x", then how many times — with the abbreviation first, so a
+    narrow dropdown still shows the part that names the stitch."""
+    html = c.get("/").text
+    seg = html[html.index("function opSegHTML"):html.index("function ringRow")]
+    assert seg.index("opSelectHTML(op)") < seg.index('class="opx"') < seg.index('class="opCount"')
+    assert seg.index('class="opCount"') < seg.index('class="stepPair"') < seg.index('class="segDel"')
+    assert "SC_INC:'inc'" in html and "SC:'sc'" in html
+    assert "${a} — ${name}" in html
+    assert ".op-seg .segDel{margin-left:auto" in html

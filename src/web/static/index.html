@@ -204,7 +204,10 @@ tbody tr:hover{background:var(--accent2-pale)}
 .round.ring .ringName{font-weight:650}
 .round.ring input{width:62px}
 .round-ops{display:flex;flex-direction:column;gap:6px}
-.op-seg{display:flex;gap:6px;align-items:center}
+.op-seg{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.op-seg .opx{color:var(--muted);font-weight:700;flex:0 0 auto}
+.op-seg .stepPair{display:flex;gap:4px;flex:0 0 auto}
+.op-seg .segDel{margin-left:auto;flex:0 0 auto}
 .op-seg select{flex:1 1 auto;min-width:0;padding:6px}
 .op-seg input.opCount{width:60px;flex:0 0 auto;padding:6px}
 .op-seg .opx{color:var(--muted);font-weight:700}
@@ -389,8 +392,9 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 @media(max-width:520px){.fields,.fields.three{grid-template-columns:repeat(2,minmax(0,1fr))}
 .fields label>span{font-size:12px;line-height:1.25}
 .gallery{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}.topbar{padding:12px}
-.round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
-.op-seg{flex-wrap:wrap}.op-seg select{flex-basis:100%}
+.round{grid-template-columns:1fr auto;grid-template-areas:"pill del" "ops ops"}.round .pill{grid-area:pill;justify-self:start}.round>.alt{grid-area:del}.round-ops{grid-area:ops}
+.op-seg{flex-wrap:nowrap}.op-seg select{flex:1 1 60px;min-width:0}
+ .op-seg input.opCount{width:48px}.op-seg .step{min-width:30px;padding:4px 6px}
 .shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
 </style>
 </head>
@@ -1102,6 +1106,16 @@ const OPS_INFO={CH:['Chain','Chain'],SLST:['Slip stitch','Slip stitch'],SC:['Sin
  SC_INC:['Increase – 2 sc in one stitch','Increase – 2 sc in one stitch'],HDC_INC:['Increase – 2 hdc in one stitch','Increase – 2 hdc in one stitch'],DC_INC:['Increase – 2 dc in one stitch','Increase – 2 dc in one stitch'],
  SC_BLO:['sc, back loop only','sc, back loop only'],SC_FLO:['sc, front loop only','sc, front loop only'],HDC_BLO:['hdc, back loop only','hdc, back loop only'],DC_BLO:['dc, back loop only','dc, back loop only'],
  FPDC:['Front post dc','Front post dc'],BPDC:['Back post dc','Back post dc'],PUFF3:['Puff stitch (3 dc)','Puff stitch (3 dc)'],POPCORN5:['Popcorn stitch (5 dc)','Popcorn stitch (5 dc)']};
+/* What a written pattern calls each one. The dropdown leads with this, because
+   on a narrow screen the end of a long name is the first thing to be cut off
+   and "Increase – 2..." tells you less than "inc". */
+const OP_ABBR={CH:'ch',SLST:'sl st',SC:'sc',HDC:'hdc',DC:'dc',TR:'tr',DTR:'dtr',
+ SC2TOG:'dec',SC3TOG:'sc3tog',HDC2TOG:'hdc dec',DC2TOG:'dc dec',DC3TOG:'dc3tog',
+ SC_INC:'inc',HDC_INC:'hdc inc',DC_INC:'dc inc',
+ SC_BLO:'sc blo',SC_FLO:'sc flo',HDC_BLO:'hdc blo',DC_BLO:'dc blo',
+ FPDC:'fpdc',BPDC:'bpdc',PUFF3:'puff',POPCORN5:'popcorn'};
+function opLabel(op){const a=OP_ABBR[op];const name=opName(op);
+ return a&&a.toLowerCase()!==name.toLowerCase()?`${a} — ${name}`:name;}
 const OP_GROUPS=[
  {label:'Basic stitches',ops:['CH','SLST','SC','HDC','DC','TR','DTR']},
  {label:'Increases (more stitches)',ops:['SC_INC','HDC_INC','DC_INC']},
@@ -1396,8 +1410,12 @@ function roundsNote(msg,kind){if(msg)status($('amiStatus'),msg,kind||'warn');els
 function markCant(b,ok,strict){if(strict&&!ok){b.classList.add('cant');b.title=DIS_TITLE;}}
 function cantClick(b){if(!b.classList.contains('cant'))return false;roundsNote(DIS_TITLE+'.');return true;}
 
-function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opName(op))} (${op})</option>`).join('')}</optgroup>`).join('')}</select>`;}
-function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><input type="number" class="opCount" min="0" value="${n}"><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
+function opSelectHTML(selected){return `<select class="opSel">${OP_GROUPS.map(g=>`<optgroup label="${esc(g.label)}">${g.ops.map(op=>`<option value="${op}"${op===selected?' selected':''}>${esc(opLabel(op))}</option>`).join('')}</optgroup>`).join('')}</select>`;}
+/* A line of a round, in the order a pattern says it: the stitch (or the
+   increase, or the decrease), then "x", then how many times. The steppers sit
+   after the number where they belong to it, and the remove button is pushed to
+   the far end so it is never next to the thing you are adjusting. */
+function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" data-seg="${si}">${opSelectHTML(op)}<span class="opx">×</span><input type="number" class="opCount" min="0" value="${n}"><span class="stepPair"><button class="step alt stepDown" type="button" data-round="${ri}" data-seg="${si}" title="One fewer">−</button><button class="step alt stepUp" type="button" data-round="${ri}" data-seg="${si}" title="One more">+</button></span><button class="segDel" type="button" data-round="${ri}" data-seg="${si}" title="Remove this stitch">✕</button></div>`;}
 /* The one round that is not editable as stitches: a magic ring, with only the
    number of stitches in it to choose. Every amigurumi piece starts with one. */
 function ringRow(initial){
