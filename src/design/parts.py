@@ -20,7 +20,7 @@ OP_WORDS = {
 }
 
 
-def _round_text(ops: dict, out_stitches: int, plain: str = "SC") -> str:
+def _round_text(ops: dict, out_stitches: int, plain: str = "SC", closing: str = "around") -> str:
     """One round, written the way patterns are written.
 
     A round that repeats evenly is written as a repeat -- "[3 sc, inc] x 6" --
@@ -32,9 +32,9 @@ def _round_text(ops: dict, out_stitches: int, plain: str = "SC") -> str:
     if len(items) == 1:
         op, n = items[0]
         if op == plain:
-            return f"{OP_WORDS.get(op, op.lower())} in each st around ({out_stitches})"
+            return f"{OP_WORDS.get(op, op.lower())} in each st {closing} ({out_stitches})"
         if op in ("SC_INC", "HDC_INC", "DC_INC"):
-            return f"{OP_WORDS.get(op, op.lower())} in each st around ({out_stitches})"
+            return f"{OP_WORDS.get(op, op.lower())} in each st {closing} ({out_stitches})"
         return f"{OP_WORDS.get(op, op.lower())} x {n} ({out_stitches})"
     if len(items) == 2:
         # Plain stitches plus one shaping stitch: write it as a repeat, which is

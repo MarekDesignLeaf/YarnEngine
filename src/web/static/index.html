@@ -554,10 +554,13 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <div class="toolbar"><button id="btnPickPattern" class="alt">Pick from the graphical library</button></div>
     </div>
     <div id="amiBox" class="hidden" style="margin-top:12px">
+      <label style="display:block;margin-bottom:6px"><span>How is this piece built?</span>
+        <select id="construction"></select></label>
+      <p class="small muted" id="constructionAbout" style="margin:-2px 0 10px"></p>
       <div class="fields">
         <label><span>Shape (template)</span><select id="amiTemplate">
           <option value="sphere">Sphere / head</option><option value="cylinder">Cylinder / body</option><option value="cone">Cone / ear</option><option value="limb">Limb</option><option value="custom">Custom</option></select></label>
-        <label><span>Template size (max stitches per round)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
+        <label><span id="amiSizeLabel">Template size (max stitches per round)</span><input id="amiSize" type="number" min="6" step="6" value="36"></label>
         <input id="amiInitial" type="number" min="2" value="6" hidden>
         <label><span>Number of pieces</span><input id="amiCopies" type="number" min="1" value="1"></label>
       </div>
@@ -596,8 +599,8 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
         <div class="toolbar"><button type="button" id="btnGenRounds" class="accent">Generate rounds from shape ▸</button></div>
         <div id="shapeStatus" class="small muted" style="margin-top:6px"></div>
       </details>
-      <h3>Rounds</h3>
-      <p class="small muted" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked — or just type how many stitches the round should end with (the number in brackets in a written pattern) and the increases or decreases are worked out for you. Everything stays balanced automatically, so the rounds are always consistent.</p>
+      <h3 id="roundsHeading">Rounds</h3>
+      <p class="small muted" id="roundsHelp" style="margin-top:-4px">For each round, pick a stitch from the list and how many times it's worked — or just type how many stitches the round should end with (the number in brackets in a written pattern) and the increases or decreases are worked out for you. Everything stays balanced automatically, so the rounds are always consistent.</p>
       <div id="rounds" class="rounds"></div>
       <div class="toolbar"><button id="btnAddRound" class="alt">+ round</button><button id="btnAnalyse" class="alt">Check rounds</button></div>
       <div id="amiStatus" class="status hidden"></div>
@@ -1315,7 +1318,7 @@ function openPattern(key){const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$(
 $('pmClose').onclick=()=>$('patternModal').classList.add('hidden');
 
 /* ============================ amigurumi rounds ============================ */
-function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(typeof apply3dToggle==='function')apply3dToggle();if(m==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);if(typeof pushView==='function')setTimeout(pushView,0);}
+function calcSetMode(m){calcMode=m;$('modeFlat').className=m==='flat'?'accent':'alt';$('modeAmi').className=m==='ami'?'accent':'alt';$('modeDesign').className=m==='design'?'accent':'alt';$('flatBox').classList.toggle('hidden',m!=='flat');$('amiBox').classList.toggle('hidden',m!=='ami');$('designBox').classList.toggle('hidden',m!=='design');if(typeof applyPin3d==='function')applyPin3d();if(typeof apply3dToggle==='function')apply3dToggle();if(m==='ami'){if(typeof loadConstructions==='function')loadConstructions();setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);}if(typeof pushView==='function')setTimeout(pushView,0);}
 $('modeFlat').onclick=()=>calcSetMode('flat');$('modeAmi').onclick=()=>calcSetMode('ami');$('modeDesign').onclick=()=>calcSetMode('design');
 let ami3dTimer=null;
 function scheduleAmi3D(){clearTimeout(ami3dTimer);ami3dTimer=setTimeout(refreshAmi3D,350);}
@@ -1477,10 +1480,13 @@ function opSegHTML(ri,si,op,n){return `<div class="op-seg" data-round="${ri}" da
 /* The one round that is not editable as stitches: a magic ring, with only the
    number of stitches in it to choose. Every amigurumi piece starts with one. */
 function ringRow(initial){
+ const label=(typeof startLabel==='function'?startLabel():'Magic ring');
+ const closed=!CONSTRUCTION||CONSTRUCTION.closed_start;
  return `<div class="round ring"><span class="pill">1</span>
-  <div class="round-ops"><span class="ringName">magic ring</span>
-   <div class="rsum"><input type="number" id="ringCount" class="roundOut" min="2" max="12"
-     value="${initial}" title="How many stitches to work into the ring">
+  <div class="round-ops"><span class="ringName">${esc(label.toLowerCase())}</span>
+   <div class="rsum"><input type="number" id="ringCount" class="roundOut" min="${closed?2:1}"
+     max="${closed?12:400}" value="${initial}"
+     title="How many stitches this piece starts with">
     <span>sts to start</span></div></div></div>`;
 }
 /* The ring box shows what was accepted, not what was typed: a count the rounds
@@ -1747,6 +1753,37 @@ function writeRounds(list){
  });
  scheduleAmi3D();
 }
+/* Which starting shapes a construction can even have: a sphere is a shape a
+   closed round piece can be and a flat panel cannot, and offering "Sphere /
+   head" above a blanket is how an app teaches people to distrust it. */
+const CONSTRUCTION_TEMPLATES={
+ round_closed:[['sphere','Sphere / head'],['cylinder','Cylinder / body'],['cone','Cone / ear'],
+               ['limb','Limb'],['custom','Custom']],
+ round_open:[['tube','Straight tube'],['taper','Tapered tube'],['custom','Custom']],
+ flat_rows:[['rect','Rectangle'],['custom','Custom']],
+ flat_shaped:[['triangle','Triangle / shawl'],['taper_flat','Tapered panel'],['custom','Custom']],
+ motif_joined:[['motif','Square motif'],['custom','Custom']],
+};
+function applyConstructionTemplates(){
+ const id=CONSTRUCTION?CONSTRUCTION.id:'round_closed';
+ const list=CONSTRUCTION_TEMPLATES[id]||CONSTRUCTION_TEMPLATES.round_closed;
+ const keep=$('amiTemplate').value;
+ $('amiTemplate').innerHTML=list.map(([v,label])=>`<option value="${v}">${esc(label)}</option>`).join('');
+ $('amiTemplate').value=list.some(([v])=>v===keep)?keep:list[0][0];
+ const word=rowWord();
+ // The second field means different things: how wide the piece gets, or how
+ // long it is. Labelling it "max stitches per round" above a blanket is how an
+ // app teaches people to ignore its labels.
+ const grows=id==='round_closed'||id==='flat_shaped';
+ $('amiSizeLabel').textContent=grows?'Widest stitch count':`How many ${word}s`;
+ if(!grows&&Number($('amiSize').value)<8)$('amiSize').value=30;
+ if(grows&&Number($('amiSize').value)>200)$('amiSize').value=36;
+ $('roundsHeading').textContent=word==='row'?'Rows':'Rounds';
+ $('roundsHelp').textContent=
+  `For each ${word}, pick a stitch and how many times it is worked — or just type how many `+
+  `stitches the ${word} should end with (the number in brackets in a written pattern) and the `+
+  `increases or decreases are worked out for you. Everything stays balanced automatically.`;
+}
 function genTemplate(kind,maxSt,init){
  const inc=[],rounds=[];let cur=init;const step=init;
  rounds.push({operations:{SC_INC:init}});cur=init*2;
@@ -1756,6 +1793,18 @@ function genTemplate(kind,maxSt,init){
  else if(kind==='cylinder'){straight(Math.max(2,Math.round(cur/step)*2));}
  else if(kind==='cone'){straight(1);}
  else if(kind==='limb'){rounds.length=0;cur=init;rounds.push({operations:{SC_INC:init}});cur=init*2;straight(Math.max(3,Math.round(maxSt/step)));}
+ else if(kind==='tube'||kind==='rect'||kind==='motif'){
+  // Nothing grows here, so the second field is a length rather than a width:
+  // a rectangle is as wide as it starts and as long as you work it.
+  rounds.length=0;cur=init;straight(Math.max(2,Math.round(maxSt)));}
+ else if(kind==='taper'||kind==='taper_flat'){
+  // Narrows steadily, which is a sleeve and also a shaped side seam.
+  rounds.length=0;cur=init;
+  while(cur-2>=Math.max(4,Math.round(init/2))){straight(2);rounds.push({operations:{SC:cur-4,SC2TOG:2}});cur-=2;}}
+ else if(kind==='triangle'){
+  // Grows by two stitches a row, which is the plainest shawl there is.
+  rounds.length=0;cur=init;
+  while(cur+2<=maxSt){rounds.push({operations:{SC:cur-2,SC_INC:2}});cur+=2;}}
  return rounds;
 }
 function setTemplate(){const k=$('amiTemplate').value;if(k==='custom')return;const init=Number($('amiInitial').value)||6;writeRounds(genTemplate(k,Number($('amiSize').value)||36,init));}
@@ -2055,11 +2104,13 @@ $('btnCalc').onclick=async()=>{
    showResult({len:d.consumption.recommended_length_m,lower:d.confidence.lower_m,upper:d.confidence.upper_m,mass:d.consumption.mass_g,packs:d.consumption.packages,st:d.project.stitches*d.project.rows,size:`${fmt(d.project.achieved_width_cm)} × ${fmt(d.project.achieved_height_cm)} cm`,ops:d.project.operation_counts,warnings:d.warnings,level:d.confidence.level,copies:1,cost:d.cost_estimate,stash:d.stash_status});
   }else{
    const copies=Math.max(1,Number($('amiCopies').value)||1);
-   const body={program_type:"amigurumi",program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn',colour_id:c.colour_id,copies,
+   const body={program_type:"amigurumi",construction:($("construction").value||"round_closed"),program:{initial_stitches:Number($("amiInitial").value),rounds:readRounds()},yarn_id:c.yarn_id,hook_mm:Number($("hook").value)||null,yarn_diameter_mm:c.yarn_diameter_mm,gauge_stitches_per_10cm:c.gauge_stitches_per_10cm,gauge_rows_per_10cm:c.gauge_rows_per_10cm,allowance_percent:c.allowance_percent,domain_policy:'warn',colour_id:c.colour_id,copies,
     title:$('pieceName').value.trim()||($('amiTemplate').value&&$('amiTemplate').value!=='custom'?$('amiTemplate').selectedOptions[0].text:null)};
    const d=await api('/api/complex-consumption/calculate',{method:'POST',body});lastResult={kind:'ami',request:body,response:d};
    const calib=d.model_id!=='uncalibrated_geometry_baseline_v1';const tot=Object.values(d.program_analysis.operation_counts).reduce((a,b)=>a+b,0);
-   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:amiFinishedSize(d.program_analysis.trace,c,copies),ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m,makeEntryId:d.worklog_entry_id});
+   showResult({len:d.calculation.recommended_length_m*copies,lower:d.prediction.lower_95_m?d.prediction.lower_95_m*copies*(1+body.allowance_percent/100):null,upper:d.prediction.upper_95_m?d.prediction.upper_95_m*copies*(1+body.allowance_percent/100):null,mass:d.calculation.mass_g!=null?d.calculation.mass_g*copies:null,packs:null,st:tot*copies,size:(d.finished_size&&d.finished_size.known
+      ?d.finished_size.summary+` · ${d.finished_size.rows} ${d.finished_size.row_word}s`+(copies>1?` · ${copies}×`:'')
+      :amiFinishedSize(d.program_analysis.trace,c,copies)),ops:d.program_analysis.operation_counts,warnings:[...(d.calculation.warnings||[]),...(d.audit.yarn_diameter_warnings||[])],level:calib?'production_model_in_domain':'uncalibrated_baseline',copies,packLen:yarnById(c.yarn_id)?.package_length_m,makeEntryId:d.worklog_entry_id});
   }
  }catch(e){
   // The server's own wording here is for API callers; on screen it has to say
@@ -2783,7 +2834,8 @@ async function openMake(entryId){
    return;
   }
   const w=await api('/api/crochet/amigurumi/written',{method:'POST',
-   body:{initial_stitches:program.initial_stitches,rounds:program.rounds,stitch:program.stitch||'SC'}});
+   body:{initial_stitches:program.initial_stitches,rounds:program.rounds,
+         stitch:program.stitch||'SC',construction:(e.request&&e.request.construction)||null}});
   const p=await api('/api/worklog/'+entryId+'/progress');
   MK.entry=e;MK.lines=w.lines;MK.counts=w.stitch_counts;
   MK.done=new Set(p.done||[]);MK.current=p.current_round||0;
@@ -3304,6 +3356,45 @@ $('btnSquaresCost').onclick=()=>{
  document.querySelector('nav.tabs button[data-tab=calc]').click();
  status($('amiStatus'),`One square as ${d.program.rounds.length+1} rounds, ${d.squares} of them. Calculate the yarn for the whole blanket.`,'good');
 };
+
+/* ====================== how the piece is built =========================
+   The engine costs a jumper panel and a bear with the same arithmetic; what
+   differs is what the stitch counts mean and how the piece starts. So the
+   editor asks, and then uses the construction's own words -- round or row,
+   magic ring or foundation row -- rather than assuming a toy. */
+let CONSTRUCTIONS=null,CONSTRUCTION=null;
+async function loadConstructions(){
+ if(CONSTRUCTIONS)return CONSTRUCTIONS;
+ try{
+  const d=await api('/api/constructions?craft=crochet');
+  CONSTRUCTIONS=d.constructions;
+  $('construction').innerHTML=CONSTRUCTIONS.map(x=>
+   `<option value="${esc(x.id)}">${esc(x.name)}</option>`).join('');
+  $('construction').value=d.default;
+  setConstruction(d.default);
+ }catch(e){/* the editor still works on the default */}
+ return CONSTRUCTIONS;
+}
+function constructionById(id){return (CONSTRUCTIONS||[]).find(x=>x.id===id)||null;}
+function setConstruction(id){
+ CONSTRUCTION=constructionById(id);
+ if(!CONSTRUCTION)return;
+ $('constructionAbout').textContent=CONSTRUCTION.about+
+  (CONSTRUCTION.examples.length?` For example: ${CONSTRUCTION.examples.join(', ')}.`:'');
+ applyConstructionTemplates();
+ // A magic ring is six stitches; a foundation row is not. Switching between
+ // them carries a starting count that makes no sense for the new piece, so it
+ // gets a workable default instead -- a default, not a claim about the piece.
+ if(!CONSTRUCTION.closed_start&&curInitial()<12){
+  $('amiInitial').value=30;lastInitial=30;
+ }else if(CONSTRUCTION.closed_start&&curInitial()>12){
+  $('amiInitial').value=6;lastInitial=6;
+ }
+ if($('amiTemplate').value!=='custom')setTemplate();else writeRounds(readRounds());
+}
+function rowWord(){return CONSTRUCTION?CONSTRUCTION.row_word:'round';}
+function startLabel(){return CONSTRUCTION?CONSTRUCTION.start_label:'Magic ring';}
+$('construction').onchange=()=>setConstruction($('construction').value);
 
 $('wlRefresh').onclick=loadWorkLog;
 $('wlOwner').onchange=loadWorkLogEntries;

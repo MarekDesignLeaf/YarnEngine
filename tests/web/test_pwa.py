@@ -103,18 +103,24 @@ def test_a_row_is_visibly_one_row():
     assert ".round:nth-child(even){background:var(--row-alt)}" in html
 
 
-def test_round_one_is_always_the_magic_ring():
+def test_row_one_is_how_the_piece_starts():
     """The editor, the written pattern and the make-mode agree on the number of
-    every round, because the ring is round one in all three."""
+    every round — and on what row one is, which the construction decides."""
     html = c.get("/").text
     assert "function ringRow(initial)" in html
-    assert ">magic ring<" in html
-    assert '<span class="pill">${i+2}</span>' in html            # editable rounds start at two
-    assert "#rounds .round:not(.ring)" in html                   # and the ring is not one of them
-    written = c.post("/api/crochet/amigurumi/written",
-                     json={"initial_stitches": 6, "rounds": [{"operations": {"SC_INC": 6}}]})
-    assert written.json()["lines"][0] == "R1: 6 sc in magic ring (6)"
-    assert written.json()["lines"][1].startswith("R2:")
+    assert "startLabel()" in html                                # named by the construction
+    assert '<span class="pill">${i+2}</span>' in html            # the rest start at two
+    assert "#rounds .round:not(.ring)" in html                   # and the start is not one of them
+    closed = c.post("/api/crochet/amigurumi/written",
+                    json={"initial_stitches": 6, "rounds": [{"operations": {"SC_INC": 6}}]}).json()
+    assert closed["lines"][0] == "R1: 6 sc in magic ring (6)"
+    assert closed["lines"][1].startswith("R2:")
+    flat = c.post("/api/crochet/amigurumi/written",
+                  json={"initial_stitches": 30, "construction": "flat_rows",
+                        "rounds": [{"operations": {"SC": 30}}]}).json()
+    assert flat["lines"][0].startswith("Row 1: ch 31")
+    assert "across" in flat["lines"][1] and "around" not in flat["lines"][1]
+    assert any("Turning chains" in n for n in flat["notes"])
 
 
 def test_a_round_reads_in_the_order_a_pattern_says_it():
@@ -147,3 +153,17 @@ def test_each_round_shows_itself_as_a_picture():
     assert "function evenSequence(ops)" in html          # shaping spread as it is worked
     assert "${roundViz(ops,outSt)}" in html              # drawn inside the round's own box
     assert ".roundViz .vzInc{fill:var(--good)}" in html
+
+
+def test_the_editor_asks_how_the_piece_is_built():
+    """The same engine costs a bear and a blanket; the editor has to ask which,
+    because a stitch count means a different thing in each."""
+    html = c.get("/").text
+    assert 'id="construction"' in html and "How is this piece built?" in html
+    assert "const CONSTRUCTION_TEMPLATES={" in html
+    assert "round_open:[['tube','Straight tube']" in html
+    assert "flat_rows:[['rect','Rectangle']" in html
+    # the words follow the construction rather than assuming a toy
+    assert "$('roundsHeading').textContent=word==='row'?'Rows':'Rounds'" in html
+    assert "grows?'Widest stitch count':`How many ${word}s`" in html
+    assert 'construction:($("construction").value||"round_closed")' in html

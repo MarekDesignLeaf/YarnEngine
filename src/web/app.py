@@ -63,6 +63,7 @@ from src.crochet_geometry.stitch_loop import (operation_length_mm, OPERATION_WRA
                                               OPERATION_WRAP_RATIO)
 from src.library.colours import match_colour
 from src.colour.harmony import SCHEMES as COLOUR_SCHEMES, build_palette
+from src.construction import types as constructions
 from src.tools import maths as tool_maths
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
@@ -1330,12 +1331,24 @@ def crochet_calibration_status(payload:dict):
 def complex_consumption_calculate(payload:dict, http_request:Request):
     kind=payload.get("program_type")
     program=payload.get("program",{})
-    if kind=="amigurumi":
-        analysed=analyse_rounds(program,service.operations)
-    elif kind=="branch":
+    # How the piece is built. The engine below is the same whatever the answer;
+    # what changes is how the piece starts and what its stitch counts mean.
+    try:
+        construction=constructions.get(payload.get("construction") or kind)
+    except KeyError:
+        raise HTTPException(status_code=422, detail=(
+            f"construction must be one of {sorted(constructions.CONSTRUCTIONS)}"))
+    if construction.id=="branched":
         analysed=execute_branch_program(program,service.operations)
     else:
-        raise HTTPException(status_code=422,detail="program_type must be amigurumi or branch")
+        analysed=analyse_rounds(program,service.operations)
+        trace=analysed.get("trace") or []
+        issue=constructions.start_issue(
+            construction.id, int(program.get("initial_stitches") or 0),
+            int(trace[0].get("consumed") or 0) if trace else 0)
+        if issue is not None:
+            analysed={**analysed,"valid":False,
+                      "issues":list(analysed.get("issues") or [])+[issue]}
     if not analysed.get("valid"):
         raise HTTPException(status_code=422,detail={"program_issues":analysed.get("issues",[])})
     production=model_registry.production()
@@ -1374,7 +1387,30 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
         packages=calc.packages, stitches=stitches*copies, pieces=copies)
     # so the result can offer to work through the piece straight away
     result["worklog_entry_id"] = (logged or {}).get("entry_id")
+    result["construction"]=construction.as_dict()
+    try:
+        result["finished_size"]=constructions.finished_size(
+            construction.id, analysed.get("trace") or [],
+            gauge_stitches_per_10cm=float(payload.get("gauge_stitches_per_10cm") or 0),
+            gauge_rows_per_10cm=float(payload.get("gauge_rows_per_10cm") or 0),
+            initial_stitches=int((program or {}).get("initial_stitches") or 0),
+            layout=payload.get("layout"))
+    except (ValueError, KeyError):
+        result["finished_size"]=None
     return result
+
+@app.get("/api/constructions")
+def list_constructions(craft: str | None = None):
+    """Every way of building a piece the app knows, and what each one means.
+
+    A stitch count is a circumference on one of these and a width on another;
+    "round 1" is a magic ring here and a cast-on there. Asking rather than
+    assuming is what lets the same engine cost a jumper and a bear.
+    """
+    if craft not in (None, "crochet", "knitting"):
+        raise HTTPException(status_code=422, detail="craft must be crochet or knitting")
+    return {"constructions": constructions.listing(craft), "default": constructions.DEFAULT}
+
 
 @app.post("/api/crochet/amigurumi/written")
 def crochet_amigurumi_written(payload: dict):
@@ -1388,12 +1424,32 @@ def crochet_amigurumi_written(payload: dict):
         raise HTTPException(status_code=422, detail={"program_issues": analysed.get("issues", [])})
     stitch = str(payload.get("stitch") or "SC").upper()
     initial = int(payload.get("initial_stitches") or 6)
-    lines = [f"R1: {initial} {OP_WORDS.get(stitch, 'sc')} in magic ring ({initial})"]
+    word = OP_WORDS.get(stitch, "sc")
+    try:
+        construction = constructions.get(payload.get("construction"))
+    except KeyError:
+        raise HTTPException(status_code=422, detail=(
+            f"construction must be one of {sorted(constructions.CONSTRUCTIONS)}"))
+    # A pattern says how the piece begins, and that is not the same sentence for
+    # a stuffed head, a sleeve and a blanket.
+    prefix = "R" if construction.row_word == "round" else "Row "
+    if construction.closed_start:
+        first = f"{initial} {word} in magic ring"
+    elif construction.start == "ring_of_stitches":
+        first = f"ch {initial}, join into a ring, {word} in each ch"
+    else:
+        first = f"ch {initial + 1}, {word} in 2nd ch from hook and in each ch across"
+    lines = [f"{prefix}1: {first} ({initial})"]
     for i, (r, step) in enumerate(zip(payload.get("rounds", []), analysed["trace"]), start=2):
-        lines.append(f"R{i}: " + round_text(r.get("operations", {}),
-                                            step["output_stitches"], plain=stitch))
+        lines.append(f"{prefix}{i}: " + round_text(
+            r.get("operations", {}), step["output_stitches"], plain=stitch,
+            closing=("around" if construction.row_word == "round" else "across")))
     return {"lines": lines, "stitch_counts": [initial] + [t["output_stitches"] for t in analysed["trace"]],
-            "round_count": len(lines)}
+            "round_count": len(lines), "construction": construction.as_dict(),
+            "notes": ([("Turning chains are not in these counts. Most flat patterns work one at "
+                        "the start of each row — add them if yours does, and the yarn figure "
+                        "will go up a little.")]
+                      if construction.row_word == "row" else [])}
 
 
 @app.post("/api/crochet/amigurumi/analyse")
