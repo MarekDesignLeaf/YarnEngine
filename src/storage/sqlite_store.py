@@ -173,6 +173,24 @@ CREATE INDEX IF NOT EXISTS idx_yarn_colours_yarn ON yarn_colours(yarn_id);
 CREATE INDEX IF NOT EXISTS idx_yarns_brand_product ON yarns(brand,product);
 CREATE INDEX IF NOT EXISTS idx_yarns_weight ON yarns(cyc_weight);
 CREATE INDEX IF NOT EXISTS idx_yarn_suppliers_yarn ON yarn_suppliers(yarn_id);
+
+/* Every price ever read off a shop's own page, kept rather than overwritten:
+   a price that has moved is worth seeing, and a figure with no history behind
+   it is indistinguishable from a figure somebody typed. */
+CREATE TABLE IF NOT EXISTS yarn_price_checks(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  supplier_id INTEGER NOT NULL,
+  yarn_id TEXT NOT NULL,
+  amount REAL,
+  currency TEXT,
+  status TEXT NOT NULL,
+  note TEXT,
+  source TEXT,
+  availability TEXT,
+  checked_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_price_checks_supplier ON yarn_price_checks(supplier_id, checked_at);
+CREATE INDEX IF NOT EXISTS idx_price_checks_yarn ON yarn_price_checks(yarn_id, checked_at);
 CREATE INDEX IF NOT EXISTS idx_product_lines_name ON product_lines(name);
 CREATE INDEX IF NOT EXISTS idx_product_line_materials_line ON product_line_materials(product_line_id);
 CREATE INDEX IF NOT EXISTS idx_patterns_family ON patterns(family_id);
@@ -203,6 +221,19 @@ YARN_EXTRA_COLUMNS = {
     "price_currency": "TEXT",
 }
 
+# What a price check leaves behind on the supplier it checked. Kept apart from
+# the typed price_amount so the two never get confused: one is what somebody
+# remembered, the other is what the shop's own page said, and on what day.
+SUPPLIER_EXTRA_COLUMNS = {
+    "checked_price": "REAL",
+    "checked_currency": "TEXT",
+    "checked_at": "TEXT",
+    "check_status": "TEXT",
+    "check_note": "TEXT",
+    "check_source": "TEXT",
+    "availability": "TEXT",
+}
+
 
 class SQLiteStore:
     def __init__(self,path):
@@ -217,6 +248,10 @@ class SQLiteStore:
         for name,coltype in YARN_EXTRA_COLUMNS.items():
             if name not in cols:
                 self.conn.execute(f"ALTER TABLE yarns ADD COLUMN {name} {coltype}")
+        sup={r["name"] for r in self.conn.execute("PRAGMA table_info(yarn_suppliers)")}
+        for name,coltype in SUPPLIER_EXTRA_COLUMNS.items():
+            if name not in sup:
+                self.conn.execute(f"ALTER TABLE yarn_suppliers ADD COLUMN {name} {coltype}")
         self.conn.commit()
 
     def close(self): self.conn.close()
@@ -297,6 +332,41 @@ class SQLiteStore:
     def list_suppliers(self,yarn_id):
         rows=self.conn.execute("SELECT * FROM yarn_suppliers WHERE yarn_id=? ORDER BY price_amount IS NULL,price_amount,id",
                                 (yarn_id,)).fetchall()
+        return [dict(r) for r in rows]
+
+    def get_supplier(self,yarn_id,supplier_id):
+        r=self.conn.execute("SELECT * FROM yarn_suppliers WHERE id=? AND yarn_id=?",
+                            (supplier_id,yarn_id)).fetchone()
+        return dict(r) if r else None
+
+    def record_price_check(self,yarn_id,supplier_id,*,status,now,amount=None,currency=None,
+                           note=None,source=None,availability=None):
+        """What the shop's page said, kept on the supplier and in the history.
+
+        A failed check is recorded too, and never wipes the last price that did
+        work: a shop being down for an afternoon is not a reason to lose what it
+        charged yesterday.
+        """
+        c=self.conn.cursor()
+        if status=="ok" and amount is not None:
+            c.execute("""UPDATE yarn_suppliers SET checked_price=?,checked_currency=?,checked_at=?,
+                         check_status=?,check_note=?,check_source=?,availability=?,updated_at=?
+                         WHERE id=? AND yarn_id=?""",
+                      (amount,currency,now,status,note,source,availability,now,supplier_id,yarn_id))
+        else:
+            c.execute("""UPDATE yarn_suppliers SET check_status=?,check_note=?,updated_at=?
+                         WHERE id=? AND yarn_id=?""",(status,note,now,supplier_id,yarn_id))
+        c.execute("""INSERT INTO yarn_price_checks(supplier_id,yarn_id,amount,currency,status,note,
+                     source,availability,checked_at) VALUES(?,?,?,?,?,?,?,?,?)""",
+                  (supplier_id,yarn_id,amount,currency,status,note,source,availability,now))
+        self.conn.commit()
+        return self.get_supplier(yarn_id,supplier_id)
+
+    def price_history(self,yarn_id,limit=60):
+        rows=self.conn.execute("""SELECT h.*,s.name AS supplier_name FROM yarn_price_checks h
+                                  LEFT JOIN yarn_suppliers s ON s.id=h.supplier_id
+                                  WHERE h.yarn_id=? AND h.amount IS NOT NULL
+                                  ORDER BY h.checked_at DESC LIMIT ?""",(yarn_id,limit)).fetchall()
         return [dict(r) for r in rows]
 
     def delete_supplier(self,yarn_id,supplier_id):

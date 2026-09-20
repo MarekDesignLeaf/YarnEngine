@@ -416,6 +416,20 @@ button.shadeChip:hover i{border-color:var(--accent2)}
 button.shadeChip:focus-visible i{outline:2px solid var(--accent2-light);outline-offset:2px}
 span.shadeChip{cursor:default}
 .shadeFind{width:100%;margin-bottom:2px}
+/* A price with its date attached, because a price without one is a rumour. */
+.supRow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;padding:6px 0;
+ border-top:1px solid var(--line)}
+.supRow:first-child{border-top:0}
+.supRow .supName{font-weight:650;color:var(--ink)}
+.supRow .supPrice{font-family:var(--font-display);font-weight:700;color:var(--accent2-dark)}
+.supRow .supAge{color:var(--muted);font-size:11.5px}
+.supRow .supAge.stale{color:var(--warn)}
+.supRow .supWhy{flex:1 1 100%;color:var(--muted);font-size:11.5px;line-height:1.35}
+.supRow .supGo{margin-left:auto;display:flex;gap:6px;align-items:center}
+.supRow button{min-height:28px;padding:3px 10px;font-size:12px}
+.priceBadge{display:inline-flex;align-items:baseline;gap:6px;padding:3px 9px;border-radius:9px;
+ background:var(--accent2-pale);color:var(--accent2-dark);font-size:11.5px;font-weight:650}
+.priceBadge.stale{background:var(--warn-pale);color:var(--warn)}
 .shadeNote{font-size:11.5px;color:var(--muted);margin:6px 0 0}
 .yarnbar .swatch.empty{border:1px dashed var(--muted);box-shadow:none;
  background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 6px)}
@@ -1181,7 +1195,15 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
   </div>
   <div class="toolbar"><button id="ymSavePrice" class="alt">Update indicative price</button></div>
   <h3>Shades</h3><div id="ymShades" class="shadeCard"></div>
-  <h3>Suppliers</h3><div id="ymSuppliers" class="small"></div>
+  <div class="toolbar" style="justify-content:space-between;margin-top:14px">
+    <h3 style="margin:0">Where to buy it, and what it costs</h3>
+    <button type="button" id="ymCheckAll" class="alt">Check prices now</button>
+  </div>
+  <p class="small muted" style="margin:2px 0 6px">Prices are read from each shop's own product
+    page, from the price the shop publishes for search engines — never guessed off the page. A
+    page that does not publish one is left alone and said so.</p>
+  <div id="ymSuppliers" class="small"></div>
+  <div id="ymPriceNote" class="small muted" style="margin-top:6px"></div>
   <div class="fields three" style="margin-top:8px">
     <label><span>Name</span><input id="ymSupName"></label>
     <label><span>Price</span><input id="ymSupPrice" type="number" step="0.01" min="0"></label>
@@ -2657,11 +2679,71 @@ async function refreshYarnShades(yarnId){
     +'standard palette is offered for it.</p>';
  }catch(e){box.innerHTML='<p class="shadeNote">Could not load the shades.</p>';}
 }
-async function refreshYarnSuppliers(yarnId){
- const list=await api(`/api/yarns/${encodeURIComponent(yarnId)}/suppliers`);
- $('ymSuppliers').innerHTML=list.length?list.map(s=>`<div class="toolbar" style="margin-top:4px"><span>${esc(s.name)}${s.price_amount?' · '+fmt(s.price_amount,2)+' '+esc(s.price_currency||''):''}</span>${s.product_url?`<a href="${esc(s.product_url)}" target="_blank" rel="noopener">link ↗</a>`:''}${(ME&&ME.role==='admin')?`<button class="link" data-supdel="${s.id}">remove</button>`:''}</div>`).join(''):'<span class="muted">No suppliers listed yet.</span>';
- $('ymSuppliers').querySelectorAll('[data-supdel]').forEach(b=>b.onclick=async()=>{await api(`/api/admin/yarns/${encodeURIComponent(yarnId)}/suppliers/${b.dataset.supdel}`,{method:'DELETE'});refreshYarnSuppliers(yarnId);});
+/* Where a yarn can be bought, what it costs there, and — the part that was
+   missing — when anybody last checked. A price with no date on it is a rumour:
+   it was typed in once, it has been quietly wrong ever since, and a maker has
+   been pricing bears off it. */
+function supplierRow(s){
+ const checked=s.checked_price!=null;
+ const price=checked
+  ?`<span class="supPrice">${esc(s.checked_currency||'')} ${fmt(s.checked_price,2)}</span>`
+  :(s.price_amount!=null
+    ?`<span class="supPrice" title="Typed in by hand — not checked against the shop">${fmt(s.price_amount,2)} ${esc(s.price_currency||'')}</span>`
+    :'<span class="muted">no price yet</span>');
+ const age=checked?`<span class="supAge${s.stale?' stale':''}">${esc(s.age)}</span>`
+  :(s.price_amount!=null?'<span class="supAge">typed in by hand</span>':'');
+ const stock=s.availability==='out of stock'?'<span class="supAge stale">out of stock</span>':'';
+ // A check that could not read a price says why, rather than leaving someone
+ // pressing the button again.
+ const why=(s.check_status&&s.check_status!=='ok'&&s.check_note)
+  ?`<span class="supWhy">Last check: ${esc(s.check_note)}</span>`:'';
+ return `<div class="supRow">
+   <span class="supName">${esc(s.name)}</span>${price}${age}${stock}
+   <span class="supGo">
+     ${s.product_url?`<a href="${esc(s.product_url)}" target="_blank" rel="noopener">shop ↗</a>`:''}
+     ${s.product_url?`<button type="button" class="alt" data-supcheck="${s.id}">Check</button>`:''}
+     ${(ME&&ME.role==='admin')?`<button class="link" data-supdel="${s.id}">remove</button>`:''}
+   </span>${why}</div>`;
 }
+function renderSuppliers(yarnId,list,price){
+ $('ymSuppliers').innerHTML=list.length?list.map(supplierRow).join('')
+  :'<span class="muted">No shops listed yet. Add one with a link to the product page and its price can be checked.</span>';
+ if(price)$('ymPriceNote').innerHTML=price.amount!=null
+  ?`<span class="priceBadge${price.stale?' stale':''}">Costing uses ${esc(price.currency||'')} ${fmt(price.amount,2)}</span> ${esc(price.note)}`
+  :esc(price.note);
+ else $('ymPriceNote').textContent='';
+ $('ymSuppliers').querySelectorAll('[data-supdel]').forEach(b=>b.onclick=async()=>{
+  await api(`/api/admin/yarns/${encodeURIComponent(yarnId)}/suppliers/${b.dataset.supdel}`,{method:'DELETE'});
+  refreshYarnSuppliers(yarnId);});
+ $('ymSuppliers').querySelectorAll('[data-supcheck]').forEach(b=>b.onclick=async()=>{
+  const was=b.textContent;b.textContent='Asking…';b.disabled=true;
+  try{
+   const d=await api(`/api/yarns/${encodeURIComponent(yarnId)}/suppliers/${b.dataset.supcheck}/check-price`,
+                     {method:'POST',body:{force:true}});
+   renderSuppliers(yarnId,d.suppliers,d.price);
+  }catch(e){b.textContent=was;b.disabled=false;$('ymPriceNote').textContent=e.message;}
+ });
+}
+async function refreshYarnSuppliers(yarnId){
+ ymCurrent=yarnId;
+ try{
+  const d=await api(`/api/yarns/${encodeURIComponent(yarnId)}/price`);
+  renderSuppliers(yarnId,d.suppliers,d.price);
+ }catch(e){
+  const list=await api(`/api/yarns/${encodeURIComponent(yarnId)}/suppliers`);
+  renderSuppliers(yarnId,list,null);
+ }
+}
+$('ymCheckAll').onclick=async()=>{
+ const b=$('ymCheckAll'),was=b.textContent;
+ b.textContent='Asking the shops…';b.disabled=true;
+ try{
+  const d=await api(`/api/yarns/${encodeURIComponent(ymCurrent)}/check-prices`,
+                    {method:'POST',body:{force:true}});
+  renderSuppliers(ymCurrent,d.suppliers,d.price);
+ }catch(e){$('ymPriceNote').textContent=e.message;}
+ b.textContent=was;b.disabled=false;
+};
 $('ymSavePrice').onclick=async()=>{
  try{
    const updated=await api(`/api/yarns/${encodeURIComponent(ymCurrent)}`,{method:'PATCH',body:{price_amount:$('ymPrice').value?Number($('ymPrice').value):null,price_currency:$('ymCurrency').value.trim()||null,product_line:$('ymLine').value.trim()||null}});
@@ -3684,6 +3766,7 @@ $('btnPrice').onclick=async()=>{
    ${d.vat?`<tr><td>With VAT</td><td>${money(d.price_with_vat)}</td></tr>`:''}
    <tr><td>Left after materials, per hour</td><td>${d.hourly_return!=null?money(d.hourly_return):'–'}</td></tr>
    </tbody></table>
+   ${d.yarn_price_from?`<div class="small muted" style="margin-top:6px"><strong>Yarn price:</strong> ${esc(d.yarn_price_from)}</div>`:''}
    ${d.notes.length?`<ul class="palNote">${d.notes.map(n=>`<li>${esc(n)}</li>`).join('')}</ul>`:''}`;
  }catch(e){$('prOut').innerHTML=`<span class="small">${esc(e.message)}</span>`;}
 };

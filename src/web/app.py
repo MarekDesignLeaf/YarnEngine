@@ -72,6 +72,9 @@ from src.web.plain import problem as plain_problem
 from src.crochet import terms as crochet_terms
 from src.beginner import plans as beginner
 from src.tools import maths as tool_maths
+from src.pricing.best import STALE_AFTER_DAYS, age_in_days, best_price, describe_age
+from src.pricing.fetch import CannotFetch, MIN_SECONDS_BETWEEN_CHECKS, fetch as fetch_page
+from src.pricing.shop_page import read_price
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
 import datetime, os, sqlite3, time
@@ -2044,7 +2047,7 @@ def list_yarn_suppliers(yarn_id:str):
     try:
         if store.get_yarn(yarn_id) is None:
             raise HTTPException(status_code=404,detail="yarn not found")
-        return store.list_suppliers(yarn_id)
+        return _suppliers_with_age(store,yarn_id)
     finally: store.close()
 
 @app.post("/api/yarns/{yarn_id}/suppliers")
@@ -2057,6 +2060,118 @@ def add_yarn_supplier(yarn_id:str, request:SupplierCreateRequest):
         return store.add_supplier(yarn_id,request.name,request.price_amount,request.price_currency,
                                    request.product_url,request.notes,now)
     finally: store.close()
+
+def _check_one_supplier(store, yarn_id: str, supplier: dict, *, force: bool = False) -> dict:
+    """Read one shop's page and record what it said — or why it said nothing.
+
+    A check never throws away the last price that worked: a shop being down for
+    an afternoon is not a reason to lose what it charged yesterday.
+    """
+    now = datetime.datetime.now(datetime.timezone.utc)
+    stamp = now.isoformat()
+    url = (supplier.get("product_url") or "").strip()
+    if not url:
+        return {"supplier_id": supplier["id"], "name": supplier.get("name"), "status": "skipped",
+                "message": "There is no link to this shop's page, so there is nothing to read."}
+    last = supplier.get("checked_at")
+    if not force and last:
+        since = (now - datetime.datetime.fromisoformat(str(last).replace("Z", "+00:00"))
+                 ).total_seconds()
+        if since < MIN_SECONDS_BETWEEN_CHECKS:
+            return {"supplier_id": supplier["id"], "name": supplier.get("name"),
+                    "status": "too soon", "amount": supplier.get("checked_price"),
+                    "currency": supplier.get("checked_currency"), "checked_at": last,
+                    "message": ("This one was checked a few minutes ago. Shops are asked once "
+                                "and not hammered.")}
+    try:
+        html = fetch_page(url)
+    except CannotFetch as exc:
+        store.record_price_check(yarn_id, supplier["id"], status="failed", now=stamp,
+                                 note=str(exc))
+        return {"supplier_id": supplier["id"], "name": supplier.get("name"), "status": "failed",
+                "message": str(exc)}
+    found = read_price(html, url)
+    if not found.get("found"):
+        store.record_price_check(yarn_id, supplier["id"], status="no price", now=stamp,
+                                 note=found.get("reason"))
+        return {"supplier_id": supplier["id"], "name": supplier.get("name"), "status": "no price",
+                "message": found.get("reason")}
+    note = " ".join(found.get("notes") or []) or None
+    store.record_price_check(yarn_id, supplier["id"], status="ok", now=stamp,
+                             amount=found["amount"], currency=found.get("currency"),
+                             note=note, source=found.get("source"),
+                             availability=found.get("availability"))
+    return {"supplier_id": supplier["id"], "name": supplier.get("name"), "status": "ok",
+            "amount": found["amount"], "currency": found.get("currency"),
+            "availability": found.get("availability"), "source": found.get("source"),
+            "checked_at": stamp, "message": note,
+            "message_parts": found.get("notes") or []}
+
+
+@app.post("/api/yarns/{yarn_id}/suppliers/{supplier_id}/check-price")
+def check_supplier_price(yarn_id: str, supplier_id: int, payload: dict | None = None):
+    """Ask one shop what it charges today, from its own published product data."""
+    store = service._store()
+    try:
+        supplier = store.get_supplier(yarn_id, supplier_id)
+        if supplier is None:
+            raise HTTPException(status_code=404, detail={"message": "That shop is not on this "
+                                                                    "yarn's list."})
+        result = _check_one_supplier(store, yarn_id, supplier,
+                                     force=bool((payload or {}).get("force")))
+        return {"result": result, "suppliers": _suppliers_with_age(store, yarn_id),
+                "price": _yarn_price(store, yarn_id)}
+    finally:
+        store.close()
+
+
+@app.post("/api/yarns/{yarn_id}/check-prices")
+def check_yarn_prices(yarn_id: str, payload: dict | None = None):
+    """Ask every shop on this yarn's list, one after another."""
+    store = service._store()
+    try:
+        if store.get_yarn(yarn_id) is None:
+            raise HTTPException(status_code=404, detail={"message": "That yarn is not on file."})
+        force = bool((payload or {}).get("force"))
+        results = [_check_one_supplier(store, yarn_id, row, force=force)
+                   for row in store.list_suppliers(yarn_id)]
+        return {"results": results, "suppliers": _suppliers_with_age(store, yarn_id),
+                "price": _yarn_price(store, yarn_id)}
+    finally:
+        store.close()
+
+
+def _suppliers_with_age(store, yarn_id: str) -> list[dict]:
+    """The shops, each saying how old its price is in words."""
+    out = []
+    for row in store.list_suppliers(yarn_id):
+        days = age_in_days(row.get("checked_at"))
+        out.append(dict(row, age_days=days, age=describe_age(days),
+                        stale=bool(days is not None and days > STALE_AFTER_DAYS)))
+    return out
+
+
+def _yarn_price(store, yarn_id: str) -> dict:
+    yarn = store.get_yarn(yarn_id) or {}
+    return best_price(store.list_suppliers(yarn_id),
+                      typed_amount=yarn.get("price_amount"),
+                      typed_currency=yarn.get("price_currency"))
+
+
+@app.get("/api/yarns/{yarn_id}/price")
+def yarn_price(yarn_id: str):
+    """What this yarn costs, which shop says so, and when they last said it."""
+    store = service._store()
+    try:
+        if store.get_yarn(yarn_id) is None:
+            raise HTTPException(status_code=404, detail={"message": "That yarn is not on file."})
+        return {"yarn_id": yarn_id, "price": _yarn_price(store, yarn_id),
+                "suppliers": _suppliers_with_age(store, yarn_id),
+                "history": store.price_history(yarn_id),
+                "stale_after_days": STALE_AFTER_DAYS}
+    finally:
+        store.close()
+
 
 @app.delete("/api/admin/yarns/{yarn_id}/suppliers/{supplier_id}")
 def delete_yarn_supplier(yarn_id:str, supplier_id:int):
@@ -2398,10 +2513,29 @@ def tools_price(payload: dict, http_request: Request):
     if length_m in (None, ""):
         raise HTTPException(status_code=422, detail="calculate the piece first, or type in how much yarn it takes")
     yarn = service._yarn(yarn_id) if yarn_id else None
+    # What a ball costs: whatever was typed in here, else the cheapest price
+    # read off a shop's own page, else the figure on the yarn. Which one it was
+    # is reported, because a costing sheet nobody can trace is one nobody can
+    # defend to a customer.
     price_per_package = payload.get("price_per_package")
+    price_from = "typed into this form" if price_per_package not in (None, "") else None
+    chosen = None
+    if price_per_package in (None, "") and yarn_id:
+        store = service._store()
+        try:
+            chosen = _yarn_price(store, yarn_id)
+        except Exception:
+            chosen = None
+        finally:
+            store.close()
+        if chosen and chosen.get("amount") is not None:
+            price_per_package = chosen["amount"]
+            price_from = chosen["note"]
     if price_per_package in (None, ""):
         price_per_package = (yarn or {}).get("price_amount")
-    currency = (payload.get("currency") or (yarn or {}).get("price_currency") or "GBP")
+    currency = (payload.get("currency")
+                or (chosen or {}).get("currency")
+                or (yarn or {}).get("price_currency") or "GBP")
     try:
         out = price_piece(
             length_m=float(length_m),
@@ -2421,6 +2555,14 @@ def tools_price(payload: dict, http_request: Request):
         raise _bad(e)
     out["from"] = source
     out["yarn"] = f"{yarn['brand']} {yarn['product']}" if yarn else None
+    out["yarn_price"] = chosen
+    if price_from:
+        out["yarn_price_from"] = price_from
+        out["notes"] = [n for n in out.get("notes", [])
+                        if "No price is set for this yarn" not in n]
+        if chosen and chosen.get("stale"):
+            out["notes"].append(
+                f"That yarn price was {chosen['age']} — check it again before quoting.")
     out["time_from_log"] = bool(payload.get("entry_id") and payload.get("hours") in (None, ""))
     return out
 
