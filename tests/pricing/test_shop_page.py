@@ -6,6 +6,8 @@ price the shop states in machine-readable form, and otherwise say there is
 none. Never lift a number out of the visible page because it sits next to a
 pound sign.
 """
+from pathlib import Path
+
 import pytest
 
 from src.pricing.shop_page import parse_amount, parse_currency, read_price
@@ -101,3 +103,70 @@ def test_one_broken_block_does_not_lose_the_whole_page():
 def test_an_empty_page_says_so_rather_than_failing():
     assert read_price("")["found"] is False
     assert read_price("<html></html>")["found"] is False
+
+
+# ---------------------------------------------------------- real shop pages --
+# Trimmed from pages actually fetched from the shops, so a redesign that breaks
+# the reader shows up here rather than in somebody's costing sheet.
+PAGES = Path(__file__).parent / "pages"
+
+
+def page(name: str) -> str:
+    return (PAGES / f"{name}.html").read_text(encoding="utf-8")
+
+
+def test_a_real_shopify_style_variant_page_reads():
+    """LoveCrafts publishes a ProductGroup whose prices sit two levels down,
+    under hasVariant → offers — which is why the reader walks the whole
+    document instead of looking at the top level."""
+    found = read_price(page("lovecrafts"), "https://www.lovecrafts.com/en-gb/p/x")
+    assert found["amount"] == 8.13 and found["currency"] == "GBP"
+    assert found["availability"] == "in stock"
+    assert "JSON-LD" in found["source"]
+
+
+def test_a_real_shop_that_publishes_nothing_is_read_by_a_rule_written_for_it():
+    """Wool Warehouse — the biggest yarn shop in the UK — publishes no JSON-LD,
+    no microdata and no product tags. The first pound sign on its page belongs
+    to a navigation filter reading "Up to £2.50", which is exactly what a
+    generic scraper would grab.
+    """
+    html = page("woolwarehouse")
+    assert "Up to &pound;2.50" in html                 # the trap is in the fixture
+    found = read_price(html, "https://www.woolwarehouse.co.uk/yarn/stylecraft-special-dk-black")
+    assert found["amount"] == 2.35                     # the product, not the filter
+    assert found["currency"] == "GBP" and found["availability"] == "in stock"
+    assert "rule written for this shop" in found["source"]
+
+
+def test_a_named_shops_rule_only_applies_to_that_shop():
+    """Otherwise a selector written for one shop starts reading another's page."""
+    found = read_price(page("woolwarehouse"), "https://some-other-shop.example/p")
+    assert found["found"] is False
+
+
+def test_when_a_named_shops_page_changes_it_says_so_rather_than_guessing():
+    broken = page("woolwarehouse").replace("gbp-price-value", "whatever-they-renamed-it-to")
+    found = read_price(broken, "https://www.woolwarehouse.co.uk/yarn/x")
+    assert found["found"] is False
+    assert "no longer looks the way this app expects" in found["reason"]
+    assert "2.50" not in found["reason"]               # and never quotes the filter at you
+
+
+def test_a_named_rule_finding_several_different_prices_is_treated_as_broken():
+    """One price is what the rule promises. Two means the page moved on, and
+    picking one of them is how a wrong price gets into a costing sheet."""
+    doubled = page("woolwarehouse").replace(
+        "</div>\n<div class=\"instockmessage\">",
+        "<span class='gbp-price-value'>£9.99</span></div>\n<div class=\"instockmessage\">")
+    found = read_price(doubled, "https://www.woolwarehouse.co.uk/yarn/x")
+    assert found["found"] is False
+
+
+def test_published_data_is_preferred_over_a_rule_written_by_hand():
+    """A rule is a weaker thing than the shop stating its own price."""
+    with_both = page("woolwarehouse").replace("<body>", """<body>
+      <script type="application/ld+json">{"@type":"Product","offers":
+      {"@type":"Offer","price":"3.10","priceCurrency":"GBP"}}</script>""")
+    found = read_price(with_both, "https://www.woolwarehouse.co.uk/yarn/x")
+    assert found["amount"] == 3.10 and "JSON-LD" in found["source"]

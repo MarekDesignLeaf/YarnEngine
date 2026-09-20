@@ -201,6 +201,66 @@ def from_meta(soup: BeautifulSoup) -> list[dict]:
              "source": "the shop's product tags (Open Graph)", "title": None}]
 
 
+# ---------------------------------------------------------------- named shops --
+# Some shops publish nothing at all -- no JSON-LD, no microdata, no product
+# tags. Wool Warehouse, the biggest yarn retailer in the UK, is one of them,
+# and the first pound sign on its page belongs to a navigation filter reading
+# "Up to £2.50", which is exactly what a generic scraper would grab.
+#
+# So for a named shop, and only a named shop, the price may be read from an
+# element this file names explicitly -- a rule somebody looked at a real page
+# to write, that can be read here and argued with, rather than a guess made at
+# runtime. The rule must find exactly one price or it is treated as broken:
+# when the shop redesigns, the honest answer is "this page has changed", not a
+# number lifted from whatever moved into place.
+#
+# A price read this way is labelled differently from a published one, because
+# it is a weaker thing and the maker should be able to tell.
+SHOP_RULES = {
+    "woolwarehouse.co.uk": {
+        "name": "Wool Warehouse",
+        "price": ".price-box .gbp-price-value",
+        "currency": "GBP",
+        "in_stock": ".instockmessage",
+    },
+}
+
+
+def _rule_for(url: str) -> dict | None:
+    host = re.sub(r"^https?://", "", url or "").split("/")[0].lower()
+    for domain, rule in SHOP_RULES.items():
+        if host == domain or host.endswith("." + domain):
+            return rule
+    return None
+
+
+def from_named_shop(soup: BeautifulSoup, url: str) -> list[dict]:
+    rule = _rule_for(url)
+    if not rule:
+        return []
+    amounts = []
+    for tag in soup.select(rule["price"]):
+        amount = parse_amount(tag.get("content") or tag.get_text(strip=True))
+        if amount is not None:
+            amounts.append(amount)
+    if not amounts:
+        return []
+    # More than one different price where the rule expects one means the rule no
+    # longer fits the page. Guessing which is right is how a wrong price gets in.
+    if len(set(amounts)) > 1:
+        return []
+    availability = None
+    if rule.get("in_stock"):
+        stock = soup.select_one(rule["in_stock"])
+        if stock:
+            text = stock.get_text(" ", strip=True).lower()
+            availability = ("out of stock" if "out of stock" in text or "sold out" in text
+                            else "in stock" if "in stock" in text else None)
+    return [{"amount": amounts[0], "currency": rule.get("currency"),
+             "availability": availability, "title": None,
+             "source": f"{rule['name']}'s own price box, by a rule written for this shop"}]
+
+
 def read_price(html: str, url: str = "") -> dict:
     """What this page says its product costs — or why it does not say.
 
@@ -211,8 +271,15 @@ def read_price(html: str, url: str = "") -> dict:
     if not (html or "").strip():
         return {"found": False, "reason": "That page came back empty."}
     soup = BeautifulSoup(html, "lxml")
-    hits = from_json_ld(soup) or from_microdata(soup) or from_meta(soup)
+    hits = (from_json_ld(soup) or from_microdata(soup) or from_meta(soup)
+            or from_named_shop(soup, url))
     if not hits:
+        named = _rule_for(url)
+        if named:
+            return {"found": False, "url": url,
+                    "reason": (f"{named['name']}'s page no longer looks the way this app expects, "
+                               f"so nothing has been changed rather than a wrong price read off "
+                               f"it. Type the price in by hand for now.")}
         return {"found": False, "url": url,
                 "reason": ("This page does not publish a price in a form that can be read "
                            "reliably, so nothing has been changed. Type the price in by hand, "
@@ -241,12 +308,13 @@ def read_price(html: str, url: str = "") -> dict:
 
 
 def _availability(raw: Any) -> str | None:
+    """schema.org writes InStock, a shop writes "in stock", and both arrive here."""
     if not raw:
         return None
-    text = str(raw).lower()
-    if "outofstock" in text or "out_of_stock" in text or "soldout" in text:
+    text = re.sub(r"[^a-z]", "", str(raw).lower())
+    if "outofstock" in text or "soldout" in text:
         return "out of stock"
-    if "instock" in text or "in_stock" in text:
+    if "instock" in text:
         return "in stock"
     if "preorder" in text or "backorder" in text:
         return "on back order"

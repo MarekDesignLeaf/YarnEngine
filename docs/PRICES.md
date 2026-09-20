@@ -32,6 +32,26 @@ a piece from it.
 The same rule the rest of the app follows about colours, gauges and stitch
 counts: use what was stated, and say so when there is nothing to use.
 
+## Shops that publish nothing
+
+Some do not. Wool Warehouse — the biggest yarn retailer in the UK — has no
+JSON-LD, no microdata and no product tags anywhere on a product page, and the
+first pound sign in its markup belongs to a navigation filter reading "Up to
+£2.50". That is precisely what a generic scraper would come back with.
+
+For a **named** shop, and only a named shop, the price may be read from an
+element `src/pricing/shop_page.py` names explicitly — a rule somebody wrote
+after looking at a real page, which can be read there and argued with. The
+rule has to find exactly one price or it is treated as broken: when the shop
+redesigns, the honest answer is "this page no longer looks the way this app
+expects", not a number lifted from whatever moved into place. A price read
+this way is labelled differently from a published one, because it is a weaker
+thing and the maker should be able to tell.
+
+Published data always wins over a hand-written rule where a page has both.
+Each named shop has a trimmed copy of its real page in `tests/pricing/pages/`,
+so a redesign fails a test rather than a costing sheet.
+
 ## The details that decide whether a figure is right
 
 - **Several prices on one page** — variants, a sale price beside the old one, an
