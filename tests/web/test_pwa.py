@@ -1,3 +1,5 @@
+import re
+
 from fastapi.testclient import TestClient
 from src.web.app import app
 c=TestClient(app)
@@ -203,6 +205,41 @@ def test_which_end_of_the_shape_round_one_is_at_is_the_makers_choice():
     assert "localStorage.getItem('ye_ring_top')!=='bottom'" in html
     # and it says "Row 1" over a blanket, not "Round 1"
     assert "rowWord()==='row'?'Row':'Round'" in html
+
+
+def test_a_shade_is_shown_as_a_shade():
+    """“S218 Duck Egg” in a dropdown tells a maker nothing about the yarn they
+    are about to buy. Every shade already carries the manufacturer's own hex —
+    nothing invented, the same rule as everywhere else colour is touched — so
+    it can simply be shown."""
+    html = c.get("/").text
+    assert 'id="shadeCard"' in html and 'id="shadeBody"' in html
+    assert "function shadeChip(c,selected,pickable=true)" in html
+    assert "function renderShadeCard()" in html
+    assert "renderYarnBar();renderShadeCard();" in html      # kept in step with the picker
+    # the app's orange button style must not bleed onto a swatch
+    assert "button.shadeChip:hover,button.shadeChip:active" in html
+    # a card of two hundred is worth searching; one of eight is not
+    assert 'id="shadeFind"' in html
+    assert "find.classList.toggle('hidden',COLOURS.length<=24)" in html
+    assert "function shadeMatches(c,q)" in html
+    # and the yarn's own card is there to look at, not to choose from
+    assert "async function refreshYarnShades(yarnId)" in html
+    assert "shadeChip(c,false,false)" in html
+
+
+def test_every_shade_offered_carries_a_real_colour():
+    """There is nothing to preview if a shade has no hex, and a made-up hex
+    would be worse than none."""
+    body = c.get("/api/colours").json()
+    assert body["colours"]
+    for shade in body["colours"]:
+        assert shade["name"] and shade["colour_id"]
+        assert re.fullmatch(r"#[0-9a-fA-F]{6}", shade["hex"]), shade
+    yarn = c.get("/api/colours", params={"yarn_id": "YARNSMITHS_COTTONARAN"}).json()
+    own = [s for s in yarn["colours"] if s["yarn_specific"]]
+    assert own and yarn["yarn_specific_count"] == len(own)
+    assert all(s["code"] for s in own)          # a shade card has codes to match against
 
 
 def test_the_editor_asks_how_the_piece_is_built():

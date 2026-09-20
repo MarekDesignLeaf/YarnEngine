@@ -392,6 +392,31 @@ table.sizes td,table.sizes th{padding:3px 8px;font-size:12.5px}
 .flagBtn:not([aria-pressed="true"]) svg{filter:grayscale(.75);opacity:.75}
 @media(max-width:600px){.flagBtn{padding:4px 6px;font-size:10.5px;gap:4px}
  .flagBtn svg{width:17px;height:12px}}
+/* Shades you can see. A shade is a name and a code in a dropdown -- "S218 Duck
+   Egg" -- which tells a maker nothing about what they are about to crochet.
+   The card shows the colour itself, at a size a thumb can hit. */
+.shadeCard{margin-top:10px}
+.shadeCard h4{margin:8px 0 4px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+ color:var(--muted);font-family:var(--font-display)}
+.shadeGrid{display:flex;flex-wrap:wrap;gap:6px;max-height:186px;overflow:auto;padding:2px;
+ border-radius:10px}
+.shadeChip{width:42px;padding:0;border:0;background:transparent;box-shadow:none;min-height:0;
+ display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.shadeChip i{display:block;width:34px;height:34px;border-radius:9px;border:1px solid rgba(0,0,0,.2);
+ box-shadow:inset 0 -3px 6px rgba(0,0,0,.14)}
+.shadeChip span{font-size:9.5px;line-height:1.1;color:var(--muted);text-align:center;
+ max-width:42px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shadeChip[aria-pressed="true"] i{outline:2px solid var(--accent2);outline-offset:2px}
+.shadeChip[aria-pressed="true"] span{color:var(--accent2-dark);font-weight:700}
+.shadeChip.none i{border:1px dashed var(--muted);box-shadow:none;
+ background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 6px)}
+button.shadeChip:hover,button.shadeChip:active,button.shadeChip:focus,
+button.shadeChip:focus-visible{background:transparent;transform:none;outline:none}
+button.shadeChip:hover i{border-color:var(--accent2)}
+button.shadeChip:focus-visible i{outline:2px solid var(--accent2-light);outline-offset:2px}
+span.shadeChip{cursor:default}
+.shadeFind{width:100%;margin-bottom:2px}
+.shadeNote{font-size:11.5px;color:var(--muted);margin:6px 0 0}
 .yarnbar .swatch.empty{border:1px dashed var(--muted);box-shadow:none;
  background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(0,0,0,.10) 4px,rgba(0,0,0,.10) 6px)}
 .yarnbar .yb-name{font-family:var(--font-display);font-weight:700;font-size:14px;line-height:1.15}
@@ -734,6 +759,11 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
       <label><span>Yarn diameter (mm, optional)</span><input id="diam" type="number" step="0.1" min="0.1" placeholder="auto"></label>
       <label><span>Allowance (%)</span><input id="allowance" type="number" step="1" min="0" max="50" value="10"></label>
       <label><span>Piece name (for your log)</span><input id="pieceName" placeholder="e.g. Bear head, order 214"></label>
+    </div>
+    <div id="shadeCard" class="shadeCard">
+      <input id="shadeFind" class="shadeFind hidden" type="search" autocomplete="off"
+        placeholder="Find a shade — by name, code or hex">
+      <div id="shadeBody"></div>
     </div>
     <details style="margin-top:10px"><summary style="cursor:pointer;font-weight:650">Calibrate with a measured swatch (optional supplement)</summary>
       <p class="muted small">Crochet a small swatch in the same pattern, yarn and hook, unravel it and measure the yarn used. The estimate is then replaced by your measurement.</p>
@@ -1150,6 +1180,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
     <label><span>Product line</span><input id="ymLine"></label>
   </div>
   <div class="toolbar"><button id="ymSavePrice" class="alt">Update indicative price</button></div>
+  <h3>Shades</h3><div id="ymShades" class="shadeCard"></div>
   <h3>Suppliers</h3><div id="ymSuppliers" class="small"></div>
   <div class="fields three" style="margin-top:8px">
     <label><span>Name</span><input id="ymSupName"></label>
@@ -2606,10 +2637,26 @@ async function openYarnModal(yarnId){
  if(y.photo_url){$('ymPhoto').src=y.photo_url;$('ymPhoto').classList.remove('hidden');}else{$('ymPhoto').classList.add('hidden');}
  $('ymDesc').textContent=y.description||'';
  $('ymPrice').value=y.price_amount??'';$('ymCurrency').value=y.price_currency||'GBP';$('ymLine').value=y.product_line||'';
+ refreshYarnShades(yarnId);
  await refreshYarnSuppliers(yarnId);
  $('yarnModal').classList.remove('hidden');
 }
 $('ymClose').onclick=()=>$('yarnModal').classList.add('hidden');
+/* What the yarn actually comes in — the reason to open a yarn's details at all
+   is usually to see whether it is made in the colour you want. */
+async function refreshYarnShades(yarnId){
+ const box=$('ymShades');if(!box)return;
+ box.innerHTML='<p class="shadeNote">Looking…</p>';
+ try{
+  const r=await api('/api/colours?yarn_id='+encodeURIComponent(yarnId));
+  const own=(r.colours||[]).filter(c=>c.yarn_specific);
+  box.innerHTML=own.length
+   ?`<div class="shadeGrid">${own.map(c=>shadeChip(c,false,false)).join('')}</div>`
+    +`<p class="shadeNote">${own.length} shade${own.length===1?'':'s'} on this yarn's card.</p>`
+   :'<p class="shadeNote">This yarn\u2019s own shade card has not been captured yet, so only the '
+    +'standard palette is offered for it.</p>';
+ }catch(e){box.innerHTML='<p class="shadeNote">Could not load the shades.</p>';}
+}
 async function refreshYarnSuppliers(yarnId){
  const list=await api(`/api/yarns/${encodeURIComponent(yarnId)}/suppliers`);
  $('ymSuppliers').innerHTML=list.length?list.map(s=>`<div class="toolbar" style="margin-top:4px"><span>${esc(s.name)}${s.price_amount?' · '+fmt(s.price_amount,2)+' '+esc(s.price_currency||''):''}</span>${s.product_url?`<a href="${esc(s.product_url)}" target="_blank" rel="noopener">link ↗</a>`:''}${(ME&&ME.role==='admin')?`<button class="link" data-supdel="${s.id}">remove</button>`:''}</div>`).join(''):'<span class="muted">No suppliers listed yet.</span>';
@@ -2851,8 +2898,71 @@ function colourById(id){return COLOURS.find(c=>c.colour_id===id)||null;}
 function syncColour(){
  currentColour=colourById($('yarnColour').value);
  if(window.YE3D&&window.YE3D.setColour)window.YE3D.setColour(currentColour?currentColour.hex:null);
- renderYarnBar();
+ renderYarnBar();renderShadeCard();
 }
+/* A shade shown as a shade.
+
+   Colour is picked from a dropdown that reads "S218 Duck Egg", which tells a
+   maker nothing about the yarn they are about to buy. Every shade in the app
+   already carries the manufacturer's own hex -- nothing here is invented, the
+   same rule as everywhere else colour is touched -- so it can simply be shown.
+
+   The dropdown stays: it is searchable from the keyboard and it is what a
+   screen reader reads. The card beside it is for eyes. */
+function shadeChip(c,selected,pickable=true){
+ // In the yarn's details the card is there to be looked at, not chosen from,
+ // so it is not drawn as something that can be pressed.
+ const tag=pickable?'button':'span';
+ const attrs=pickable?` type="button" data-shade="${c?esc(c.colour_id):''}" aria-pressed="${selected?'true':'false'}"`:'';
+ if(!c)return `<${tag} class="shadeChip none"${attrs} title="No shade chosen"><i></i><span>none</span></${tag}>`;
+ return `<${tag} class="shadeChip"${attrs}
+   title="${esc(c.name)}${c.code?` (${esc(c.code)})`:''} · ${esc(c.hex)}"
+   ><i style="background:${esc(c.hex)}"></i><span>${esc(c.code||c.name)}</span></${tag}>`;
+}
+function shadeGrid(list,chosen){
+ return `<div class="shadeGrid">${list.map(c=>shadeChip(c,c.colour_id===chosen)).join('')}</div>`;
+}
+function shadeMatches(c,q){
+ if(!q)return true;
+ return `${c.name} ${c.code||''} ${c.hex} ${c.family||''}`.toLowerCase().includes(q);
+}
+function renderShadeCard(){
+ const body=$('shadeBody');if(!body)return;
+ const chosen=$('yarnColour').value||'';
+ const find=$('shadeFind');
+ // A shade card of two hundred is worth searching; one of eight is not.
+ find.classList.toggle('hidden',COLOURS.length<=24);
+ if(COLOURS.length<=24)find.value='';
+ const q=(find.value||'').trim().toLowerCase();
+ if(!COLOURS.length){
+  body.innerHTML='<p class="shadeNote">No shades on file for this yarn yet.</p>';return;
+ }
+ const own=COLOURS.filter(c=>c.yarn_specific&&shadeMatches(c,q));
+ const gen=COLOURS.filter(c=>!c.yarn_specific&&shadeMatches(c,q));
+ const y=yarnById($('yarn').value);
+ const hasOwn=COLOURS.some(c=>c.yarn_specific);
+ let html='';
+ if(!own.length&&!gen.length){
+  html=`<p class="shadeNote">Nothing matches “${esc(find.value.trim())}”.</p>`;
+ }else{
+  // The "no shade" chip goes on the first group, whichever that is, and only
+  // when it is not filtered out of the way.
+  let none=!q;
+  const grid=(list)=>{const bits=list.map(c=>shadeChip(c,c.colour_id===chosen));
+   if(none){bits.unshift(shadeChip(null,!chosen));none=false;}
+   return `<div class="shadeGrid">${bits.join('')}</div>`;};
+  if(own.length)html+=`<h4>${esc((y&&y.brand)||'This yarn')} shade card · ${own.length}</h4>`+grid(own);
+  if(gen.length)html+=`<h4>${hasOwn?'Standard palette':'Shades'} · ${gen.length}</h4>`+grid(gen);
+ }
+ const c=colourById(chosen);
+ html+=`<p class="shadeNote">${c?`${esc(c.name)}${c.code?` · ${esc(c.code)}`:''} · ${esc(c.hex)}`
+   :'No shade chosen — the preview uses a plain yarn colour.'}</p>`;
+ body.innerHTML=html;
+ body.querySelectorAll('[data-shade]').forEach(b=>b.onclick=()=>{
+  $('yarnColour').value=b.dataset.shade;syncColour();
+ });
+}
+$('shadeFind').addEventListener('input',renderShadeCard);
 /* The header. Name, maker, shade and every figure the calculation uses, so a
    result can be checked against the yarn it was made from without scrolling. */
 function renderYarnBar(){
