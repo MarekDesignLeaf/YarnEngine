@@ -1031,7 +1031,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
 <section id="tab-catalogue" class="hidden">
   <div class="card">
     <div class="topbar" style="margin-bottom:8px"><div><div class="eyebrow">OPEN CROCHET PRO</div><h2 style="margin:0">Catalogue Generator</h2></div></div>
-    <p class="small muted">Build a deterministic catalogue draft from the approved product records already stored in OpenCrochet Pro. The generator does not invent missing product facts.</p>
+    <p class="small muted">Build a catalogue from a prompt, an already generated JSON model, or products stored in OpenCrochet Pro. Missing product facts are never invented.</p>
     <div class="fields">
       <label><span>Catalogue title</span><input id="catTitle" value="Product Catalogue"></label>
       <label><span>Edition / subtitle</span><input id="catSubtitle" placeholder="e.g. Autumn 2026"></label>
@@ -1045,7 +1045,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
   </div>
   <div class="card">
     <h2>Input</h2>
-    <p class="small muted" style="margin-top:0">Use a prompt, load an already generated JSON model, or build directly from the stored products below.</p>
+    <p class="small muted" style="margin-top:0"><strong>Prompt</strong> can work by itself, or use the stored products you leave selected below. <strong>Generated model file</strong> loads an existing JSON model. <strong>Stored products</strong> builds directly from OpenCrochet Pro. Prompt or model products can be previewed, printed and exported before they are stored; saving an edition requires stored Products.</p>
     <div class="fields">
       <label style="grid-column:1/-1"><span>Prompt</span><textarea id="catPrompt" rows="4" placeholder="Example: Create a clean A4 catalogue for the selected products, concise copy, include materials but not costs."></textarea></label>
       <label style="grid-column:1/-1"><span>Generated model file (JSON)</span><input id="catModelFile" type="file" accept=".json,application/json"></label>
@@ -1059,7 +1059,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
   <div class="card">
     <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Stored products</h2><button id="catAll" class="alt">Select all</button><button id="catNone" class="alt">Clear</button></div>
     <div id="catProducts" class="lineGrid"></div>
-    <div id="catEmpty" class="muted hidden">No products are available. Add products in Workshop → Products first.</div>
+    <div id="catEmpty" class="muted hidden">No stored products yet. You can still generate from a prompt or load a generated JSON model.</div>
   </div>
   <div class="card">
     <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Preview</h2><button id="catGenerate">Generate catalogue</button><button id="catSave" class="alt" disabled>Save edition</button><button id="catManifest" class="alt" disabled>Download manifest</button><button id="catPrint" class="alt" disabled>Open print view</button></div>
@@ -1720,7 +1720,7 @@ async function generateCatalogueFromPrompt(){
   status($('catStatus'),'Generating catalogue plan from the prompt…','');
   const selected=selectedCatalogueProducts();
   const body={prompt,title:$('catTitle').value.trim(),subtitle:$('catSubtitle').value.trim(),locale:$('catLanguage').value,format:$('catFormat').value,include_materials:$('catMaterials').checked,include_estimated_material_cost:$('catCosts').checked};
-  if(selected.length)body.product_ids=selected.map(p=>p.id);
+  body.product_ids=selected.map(p=>p.id);
   const manifest=await api('/api/catalogue/generate-from-prompt',{method:'POST',body});
   renderCatalogueManifest(manifest,'prompt');
  }catch(e){status($('catStatus'),e.message,'bad');}
@@ -1747,7 +1747,7 @@ async function loadCatalogueEditions(){
 async function saveCatalogueEdition(){
  if(!CATALOGUE_MANIFEST)return;
  const m=CATALOGUE_MANIFEST;
- if((m.products||[]).some(p=>p.product_line_id===null||p.product_line_id===undefined||isNaN(Number(p.product_line_id)))){status($('catStatus'),'This model-file preview contains products that are not stored in OpenCrochet Pro. Add them to Products first before saving an edition.','bad');return;}
+ if((m.products||[]).some(p=>p.product_line_id===null||p.product_line_id===undefined||isNaN(Number(p.product_line_id)))){status($('catStatus'),'This preview contains products that are not stored in OpenCrochet Pro. Add them to Products first before saving an edition.','bad');return;}
  const payload={title:m.title,subtitle:m.subtitle,locale:m.locale,format:m.format,
    include_materials:m.options.include_materials,
    include_estimated_material_cost:m.options.include_estimated_material_cost,
