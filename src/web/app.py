@@ -79,6 +79,7 @@ from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
 from typing import Optional
 from src.production.store import ProductionStore, ProductionError
+from src.catalogue.store import CatalogueStore
 import datetime, os, sqlite3, time, traceback, uuid
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -130,6 +131,7 @@ project_store = ProjectStore(DATA_DIR / 'projects.sqlite')
 swatch_store = SwatchStore(DATA_DIR / 'swatches.sqlite')
 worklog_store = WorkLogStore(DATA_DIR / 'worklog.sqlite')
 production_store = ProductionStore(DATA_DIR / 'production.sqlite')
+catalogue_store = CatalogueStore(DATA_DIR / 'catalogue.sqlite')
 crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
@@ -2356,6 +2358,68 @@ def step_back_production_order(order_id: int, http_request: Request, payload: Op
 @app.post("/api/production/orders/{order_id}/cancel")
 def cancel_production_order(order_id: int, http_request: Request, payload: Optional[dict] = None):
     return _production_call(production_store.cancel, order_id, user=_actor(http_request), reason=(payload or {}).get("reason"))
+
+# ------------------------------------------------------------- catalogue factory ---
+def _catalogue_actor(request: Request):
+    u=getattr(request.state,"user",None)
+    return (u.get("username") if u else None)
+
+def _catalogue_manifest(payload: dict):
+    title=str(payload.get("title") or "").strip()
+    if not title: raise HTTPException(status_code=422,detail="catalogue title is required")
+    raw_ids=payload.get("product_ids")
+    if not isinstance(raw_ids,list) or not raw_ids:
+        raise HTTPException(status_code=422,detail="select at least one product")
+    try: ids=[int(x) for x in raw_ids]
+    except (TypeError,ValueError): raise HTTPException(status_code=422,detail="invalid product id")
+    store=service._store()
+    try:
+        products=[]
+        for seq,pid in enumerate(ids,1):
+            p=store.get_product_line(pid)
+            if p is None: raise HTTPException(status_code=422,detail=f"product {pid} not found")
+            products.append({
+              "sequence":seq,"product_line_id":p["id"],"name":p["name"],
+              "description":p.get("description"),"photo_url":p.get("photo_url"),
+              "product_url":p.get("product_url"),"materials":p.get("materials") or [],
+              "estimated_material_cost":None if p.get("total_cost") is None else
+                {"amount":p["total_cost"],"currency":p.get("total_cost_currency")},
+              "source_updated_at":p.get("updated_at")
+            })
+    finally: store.close()
+    return {
+      "schema":"opencrochet.catalogue.manifest.v1",
+      "title":title,"subtitle":str(payload.get("subtitle") or "").strip(),
+      "locale":payload.get("locale") or "en-GB","format":payload.get("format") or "A4",
+      "options":{
+        "include_materials":bool(payload.get("include_materials",True)),
+        "include_estimated_material_cost":bool(payload.get("include_estimated_material_cost",False))
+      },"products":products
+    }
+
+@app.get("/api/catalogues")
+def list_catalogues():
+    return catalogue_store.list()
+
+@app.get("/api/catalogues/{edition_id}")
+def get_catalogue(edition_id:int):
+    row=catalogue_store.get(edition_id)
+    if row is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    row["events"]=catalogue_store.events(edition_id)
+    return row
+
+@app.post("/api/catalogues")
+def create_catalogue(payload:dict,http_request:Request):
+    manifest=_catalogue_manifest(payload)
+    return catalogue_store.create(manifest,_catalogue_actor(http_request))
+
+@app.post("/api/catalogues/{edition_id}/transition")
+def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
+    target=str(payload.get("state") or "").strip().upper()
+    if not target: raise HTTPException(status_code=422,detail="target state is required")
+    try: return catalogue_store.transition(edition_id,target,_catalogue_actor(http_request),payload.get("details"))
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
 
 # ------------------------------------------------------------- product lines (catalogue) ---
 @app.get("/api/product-lines")
