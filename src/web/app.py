@@ -82,7 +82,7 @@ from src.production.store import ProductionStore, ProductionError
 from src.catalogue.store import CatalogueStore
 from src.catalogue.providers import ProviderRegistry, DeterministicFixtureProvider, GenerationRequest, provenance
 from src.catalogue.interior import InteriorBuilder
-import datetime, os, sqlite3, time, traceback, uuid
+import datetime, os, sqlite3, time, traceback, uuid, hashlib
 from collections import defaultdict
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
@@ -2483,7 +2483,13 @@ def attach_catalogue_correction_candidate(correction_id:int,candidate_asset_id:i
 
 @app.post("/api/catalogues/{edition_id}/build-interior")
 def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
-    brand=payload.get("brand") or {}
+    brand=dict(payload.get("brand") or {})
+    if not brand:
+        logo_path=STATIC/"piloop_logo.png"
+        if not logo_path.exists():
+            raise HTTPException(status_code=409,detail="approved application logo asset is missing")
+        brand={"logo_uri":"/static/piloop_logo.png",
+               "logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
     try:
         result=catalogue_interior.build(edition_id,brand,_catalogue_actor(http_request))
         return result
