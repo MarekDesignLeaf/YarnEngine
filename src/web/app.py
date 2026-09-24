@@ -85,6 +85,7 @@ from src.catalogue.interior import InteriorBuilder
 from src.catalogue.cover import CoverBuilder
 from src.catalogue.print_export import PrintExporter
 from src.catalogue.digital import DigitalCatalogueBuilder
+from src.catalogue.apvp_contract import run_conformance as run_catalogue_apvp_conformance, CONTRACT_VERSION as CATALOGUE_APVP_CONTRACT_VERSION
 from src.catalogue.ai_input import (CatalogueAIUnavailable, generate_catalogue_plan,
                                     describe_product_photo, ALLOWED_MEDIA as CATALOGUE_PHOTO_MEDIA,
                                     MAX_IMAGE_BYTES as CATALOGUE_PHOTO_MAX_BYTES)
@@ -178,7 +179,7 @@ app.mount("/media/catalogues", StaticFiles(directory=CATALOGUE_OUTPUT, html=True
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
                 "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status",
-                "/api/auth/forgot-password", "/api/auth/reset-password"}
+                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/catalogue/apvp/conformance"}
 
 def _auth_disabled() -> bool:
     return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
@@ -2589,6 +2590,12 @@ def get_catalogue(edition_id:int):
 def create_catalogue(payload:dict,http_request:Request):
     manifest=_catalogue_manifest(payload)
     return catalogue_store.create(manifest,_catalogue_actor(http_request))
+
+@app.get("/api/catalogue/apvp/conformance")
+def catalogue_apvp_conformance():
+    result=run_catalogue_apvp_conformance()
+    return {"product":"open-crochet-pro","component":"catalogue-factory",
+            "contract_version":CATALOGUE_APVP_CONTRACT_VERSION,**result}
 
 @app.get("/api/catalogue/providers")
 def list_catalogue_generation_providers():
