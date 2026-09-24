@@ -2413,6 +2413,29 @@ def create_catalogue(payload:dict,http_request:Request):
     manifest=_catalogue_manifest(payload)
     return catalogue_store.create(manifest,_catalogue_actor(http_request))
 
+@app.get("/api/catalogue-product-masters")
+def list_catalogue_product_masters(product_line_id:int|None=None):
+    return catalogue_store.list_product_masters(product_line_id)
+
+@app.post("/api/catalogue-product-masters")
+def create_catalogue_product_master(payload:dict,http_request:Request):
+    try:
+        return catalogue_store.create_product_master(
+          int(payload.get("product_line_id")),payload.get("record") or {},
+          str(payload.get("record_hash") or ""),_catalogue_actor(http_request))
+    except (TypeError,ValueError) as e: raise HTTPException(status_code=422,detail=str(e))
+
+@app.post("/api/catalogue-product-masters/{master_id}/approve")
+def approve_catalogue_product_master(master_id:int,http_request:Request):
+    try: return catalogue_store.approve_product_master(master_id,_catalogue_actor(http_request))
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
+@app.get("/api/catalogues/{edition_id}/dependencies")
+def list_catalogue_dependencies(edition_id:int):
+    if catalogue_store.get(edition_id) is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    return catalogue_store.list_dependencies(edition_id)
+
 @app.get("/api/catalogues/{edition_id}/assets")
 def list_catalogue_assets(edition_id:int):
     if catalogue_store.get(edition_id) is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
