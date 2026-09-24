@@ -1066,6 +1066,40 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     <div id="catStatus" class="status hidden"></div>
     <div id="catPreview" class="cataloguePreview"></div><div id="catEditions" style="margin-top:14px"></div>
   </div>
+  <div class="card">
+    <div class="toolbar" style="margin-top:0">
+      <h2 style="margin:0;flex:1">Catalogue Factory</h2>
+      <select id="catFactoryEdition" style="max-width:320px"><option value="">Choose saved edition</option></select>
+      <button id="catFactoryRefresh" class="alt">Refresh</button>
+    </div>
+    <p class="small muted">Production pipeline: Product Master → Master Visual → Views → Validation → Interior → Cover → Print / Digital → 3D / 360. Every object keeps its state, version and dependencies.</p>
+    <div id="catFactoryState" class="status hidden"></div>
+    <div class="toolbar">
+      <button id="catBuildInterior">Build + lock interior</button>
+      <button id="catBuildCover" class="alt">Build + validate cover</button>
+      <button id="catExportPdf" class="alt">Export PDF</button>
+      <button id="catBuildDigital" class="alt">Build digital catalogue</button>
+    </div>
+    <div class="toolbar" style="margin-top:12px">
+      <button class="alt catFactoryView" data-view="assets">Master Visual + Views</button>
+      <button class="alt catFactoryView" data-view="validation">Validation</button>
+      <button class="alt catFactoryView" data-view="exports">Cover + Exports</button>
+      <button class="alt catFactoryView" data-view="threed">3D + 360</button>
+      <button class="alt catFactoryView" data-view="audit">Audit</button>
+    </div>
+    <div id="catFactoryPanel" style="margin-top:12px"></div>
+    <div id="cat360Box" class="hidden" style="margin-top:12px">
+      <h3>Register governed 360 manifest</h3>
+      <div class="fields">
+        <label><span>Product line ID</span><input id="cat360Product" type="number" min="1"></label>
+        <label><span>Canonical 3D asset ID</span><input id="cat360Asset" type="number" min="1"></label>
+        <label><span>Frame count</span><input id="cat360Count" type="number" min="8" value="24"></label>
+        <label><span>Step degrees</span><input id="cat360Step" type="number" step="0.1" value="15"></label>
+        <label style="grid-column:1/-1"><span>Frame SHA256 values, one per line</span><textarea id="cat360Hashes" rows="5"></textarea></label>
+      </div>
+      <div class="toolbar"><button id="cat360Register">Register Canonical 3D 360</button></div>
+    </div>
+  </div>
 </section>
 
 <!-- ---------- PROJECTS ---------- -->
@@ -1651,6 +1685,7 @@ async function loadCatalogueGenerator(){
   CATALOGUE_PRODUCTS=await api('/api/product-lines');
   renderCatalogueProducts();
   await loadCatalogueEditions();
+  populateCatalogueFactoryEditions();
   if(!CATALOGUE_MANIFEST){$('catSource').textContent='Current source: stored products';$('catStatus').classList.add('hidden');}
  }catch(e){status($('catStatus'),e.message,'bad');}
 }
@@ -1758,6 +1793,62 @@ async function saveCatalogueEdition(){
   await loadCatalogueEditions();
  }catch(e){status($('catStatus'),e.message,'bad');}
 }
+function populateCatalogueFactoryEditions(){
+ const sel=$('catFactoryEdition');if(!sel)return;
+ const cur=sel.value;
+ sel.innerHTML='<option value="">Choose saved edition</option>'+CATALOGUE_EDITIONS.map(x=>`<option value="${x.id}">#${esc(x.id)} · ${esc(x.title)} · ${esc(x.state)}</option>`).join('');
+ if(cur&&CATALOGUE_EDITIONS.some(x=>String(x.id)===String(cur)))sel.value=cur;
+}
+function currentFactoryEditionId(){const v=$('catFactoryEdition').value;return v?Number(v):null;}
+async function loadFactoryData(view='assets'){
+ const id=currentFactoryEditionId();if(!id){$('catFactoryPanel').innerHTML='<p class="muted">Choose a saved edition.</p>';$('catFactoryState').classList.add('hidden');return;}
+ try{
+  const [edition,assets,approvals,deps,runs,spins,masters]=await Promise.all([
+    api('/api/catalogues/'+id),api('/api/catalogues/'+id+'/assets'),api('/api/catalogues/'+id+'/approvals'),
+    api('/api/catalogues/'+id+'/dependencies'),api('/api/catalogues/'+id+'/generation-runs'),
+    api('/api/catalogues/'+id+'/360'),api('/api/catalogue-product-masters')
+  ]);
+  status($('catFactoryState'),`Edition #${id}: ${edition.state} · ${assets.length} assets · ${deps.length} dependencies`,'good');
+  const badge=x=>`<span class="badge ${x==='FAILED'||x==='BLOCKED'||x==='STALE'?'warn':''}">${esc(x||'')}</span>`;
+  const row=a=>`<div class="catPick"><strong>#${a.id} · ${esc(a.asset_type)}</strong> ${badge(a.state)}
+    <span class="small muted" style="display:block">v${esc(a.version)} · product ${esc(a.product_line_id??'—')} · SHA ${esc((a.sha256||'').slice(0,16))}</span>
+    ${a.metadata&&a.metadata.view_token?`<span class="small">View: ${esc(a.metadata.view_token)}</span>`:''}</div>`;
+  if(view==='assets'){
+    const visual=assets.filter(a=>['MASTER_VISUAL','PRODUCT_VIEW'].includes(a.asset_type));
+    const pm=masters.filter(m=>(edition.manifest.products||[]).some(p=>Number(p.product_line_id)===Number(m.product_line_id)));
+    $('catFactoryPanel').innerHTML='<h3>Product Masters</h3>'+ (pm.length?pm.map(m=>`<div class="catPick"><strong>Product ${m.product_line_id} · PMR v${m.version}</strong> ${badge(m.state)}<span class="small muted" style="display:block">${esc(m.record&&m.record.display_name||'')}</span></div>`).join(''):'<p class="muted">No Product Master Records for this edition.</p>')+
+      '<h3>Master Visual + Views</h3>'+(visual.length?visual.map(row).join(''):'<p class="muted">No visual assets yet.</p>');
+  }else if(view==='validation'){
+    const states={};assets.forEach(a=>states[a.state]=(states[a.state]||0)+1);
+    $('catFactoryPanel').innerHTML='<h3>Validation status</h3><div class="metrics">'+Object.entries(states).map(([k,v])=>`<div class="metric"><strong>${v}</strong><span>${esc(k)}</span></div>`).join('')+'</div>'+
+      '<p class="small muted">PASS moves an asset to VALIDATED. FAIL moves it to FAILED. Missing checks, unavailable validators and invalid policy remain BLOCKED. Uncertainty goes to HUMAN_REVIEW.</p>';
+  }else if(view==='exports'){
+    const ex=assets.filter(a=>['PAGE','COVER','EXPORT'].includes(a.asset_type));
+    $('catFactoryPanel').innerHTML='<h3>Pages, cover and exports</h3>'+(ex.length?ex.map(row).join(''):'<p class="muted">No output assets yet.</p>');
+  }else if(view==='threed'){
+    const three=assets.filter(a=>a.asset_type==='CANONICAL_3D');
+    $('catFactoryPanel').innerHTML='<h3>Canonical 3D</h3>'+(three.length?three.map(row).join(''):'<p class="muted">No Canonical 3D asset yet.</p>')+
+      '<h3>360 manifests</h3>'+(spins.length?spins.map(x=>`<div class="catPick"><strong>#${x.id} · product ${x.product_line_id}</strong><span class="small muted" style="display:block">${esc(x.manifest.source)} · ${esc(x.manifest.frame_count)} frames · SHA ${esc(x.manifest_hash.slice(0,16))}</span></div>`).join(''):'<p class="muted">No governed 360 manifest yet.</p>');
+    $('cat360Box').classList.remove('hidden');
+  }else{
+    $('cat360Box').classList.add('hidden');
+    $('catFactoryPanel').innerHTML='<h3>Audit trail</h3>'+
+      (edition.events||[]).map(e=>`<div class="catPick"><strong>${esc(e.event)}</strong><span class="small muted" style="display:block">${esc(e.created_at)} · ${esc(e.from_state||'')} → ${esc(e.to_state||'')} · ${esc(e.actor||'system')}</span></div>`).join('')+
+      '<h3>Approvals</h3>'+(approvals.length?approvals.map(a=>`<div class="catPick"><strong>${esc(a.approval_type)}</strong> ${badge(a.decision)}<span class="small muted" style="display:block">${esc(a.authority)}</span></div>`).join(''):'<p class="muted">No approval records.</p>')+
+      '<h3>Generation provenance</h3>'+(runs.length?runs.map(r=>`<div class="catPick"><strong>${esc(r.provider_id)} / ${esc(r.model_id)}</strong><span class="small muted" style="display:block">${esc(r.task)} · prompt ${esc((r.prompt_hash||'').slice(0,16))}</span></div>`).join(''):'<p class="muted">No generation runs.</p>');
+  }
+ }catch(e){status($('catFactoryState'),e.message,'bad');}
+}
+async function factoryAction(path,body={}){
+ const id=currentFactoryEditionId();if(!id){status($('catFactoryState'),'Choose a saved edition first.','bad');return null;}
+ try{
+  status($('catFactoryState'),'Working…','');
+  const r=await api('/api/catalogues/'+id+path,{method:'POST',body});
+  await loadCatalogueEditions();populateCatalogueFactoryEditions();$('catFactoryEdition').value=String(id);
+  await loadFactoryData(path.includes('digital')?'exports':'assets');
+  return r;
+ }catch(e){status($('catFactoryState'),e.message,'bad');return null;}
+}
 function downloadCatalogueManifest(){
  if(!CATALOGUE_MANIFEST)return;
  const blob=new Blob([JSON.stringify(CATALOGUE_MANIFEST,null,2)],{type:'application/json'});
@@ -1780,6 +1871,21 @@ $('catModelLoad').onclick=loadCatalogueModel;
 $('catSave').onclick=saveCatalogueEdition;
 $('catManifest').onclick=downloadCatalogueManifest;
 $('catPrint').onclick=openCataloguePrint;
+$('catFactoryEdition').onchange=()=>loadFactoryData('assets');
+$('catFactoryRefresh').onclick=()=>loadFactoryData('assets');
+document.querySelectorAll('.catFactoryView').forEach(b=>b.onclick=()=>{if(b.dataset.view!=='threed')$('cat360Box').classList.add('hidden');loadFactoryData(b.dataset.view);});
+$('catBuildInterior').onclick=()=>factoryAction('/build-interior',{});
+$('catBuildCover').onclick=()=>factoryAction('/build-cover',{});
+$('catExportPdf').onclick=async()=>{const r=await factoryAction('/print-export',{});if(r&&r.download_url)window.open(r.download_url,'_blank');};
+$('catBuildDigital').onclick=async()=>{const r=await factoryAction('/digital-build',{});if(r&&r.url)window.open(r.url,'_blank');};
+$('cat360Register').onclick=async()=>{
+ const id=currentFactoryEditionId();if(!id){status($('catFactoryState'),'Choose a saved edition first.','bad');return;}
+ const pid=Number($('cat360Product').value),aid=Number($('cat360Asset').value);
+ const hashes=$('cat360Hashes').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+ const body={source:'CANONICAL_3D',canonical_3d_asset_id:aid,frame_count:Number($('cat360Count').value),step_deg:Number($('cat360Step').value),frame_hashes:hashes};
+ try{await api('/api/catalogues/'+id+'/products/'+pid+'/360',{method:'POST',body});await loadFactoryData('threed');}
+ catch(e){status($('catFactoryState'),e.message,'bad');}
+};
 
 /* ============================ data ============================ */
 async function loadData(){
