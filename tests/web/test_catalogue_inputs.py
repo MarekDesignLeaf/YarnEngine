@@ -51,6 +51,7 @@ def test_model_file_normalizes_stored_ids_and_standalone_product():
 
     one = normalize_catalogue_model(
         {
+            "id": "external-model-42",
             "display_name": "Prototype rabbit",
             "description": "White rabbit with long ears.",
             "materials": [{"brand": "Example", "product": "DK", "quantity_g": 25}],
