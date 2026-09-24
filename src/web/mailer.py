@@ -8,7 +8,7 @@ Configured via two environment variables:
                       reset) degrade gracefully -- they still respond
                       normally -- instead of crashing when email hasn't been
                       configured yet.
-  RESEND_FROM_EMAIL   Sender address, e.g. "YarnEngine <noreply@designleaf.co.uk>".
+  RESEND_FROM_EMAIL   Sender address, e.g. "OpenCrochet Pro <noreply@designleaf.co.uk>".
                       Requires that sending domain to be verified in Resend.
                       Defaults to Resend's shared onboarding sender, which
                       only delivers to the Resend account's own verified
@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 
 RESEND_API_URL = "https://api.resend.com/emails"
-DEFAULT_FROM = "PILOOP OpenCrochet Pro <onboarding@resend.dev>"
+DEFAULT_FROM = "OpenCrochet Pro <onboarding@resend.dev>"
 
 
 def send_email(to: str, subject: str, html: str, text: str | None = None) -> bool:

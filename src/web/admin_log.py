@@ -1,4 +1,4 @@
-"""Persistent administrator-visible application log for OpenCrochet Pro.
+"""Persistent administrator-visible application log for OpenCrochet Pro (powered by YarnEngine core).
 
 The log deliberately stores request metadata and diagnostic details, never request
 bodies, passwords, API keys or session cookies.  A separate SQLite database keeps

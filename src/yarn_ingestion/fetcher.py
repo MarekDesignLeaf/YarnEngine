@@ -19,7 +19,7 @@ class FetchResult:
 
 
 class PoliteFetcher:
-    def __init__(self, user_agent: str = "YarnEngineCatalogueBot/1.0", timeout: float = 20.0):
+    def __init__(self, user_agent: str = "OpenCrochetPro-YarnEngineCatalogueBot/1.0", timeout: float = 20.0):
         self.user_agent = user_agent
         self.timeout = timeout
         self.session = requests.Session()

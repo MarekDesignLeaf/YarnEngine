@@ -18,7 +18,7 @@ from urllib.parse import urlparse
 
 import requests
 
-USER_AGENT = ("YarnEngine/1.0 (+https://yarnengine-production.up.railway.app; "
+USER_AGENT = ("OpenCrochetPro-YarnEngine/1.0 (+https://yarnengine-production.up.railway.app; "
               "price check for a yarn a user has linked)")
 TIMEOUT_SECONDS = 12
 MAX_BYTES = 3_000_000

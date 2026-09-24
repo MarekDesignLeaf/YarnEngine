@@ -1,6 +1,6 @@
 {
   "palette_id": "yarnengine_craft_palette_v1",
-  "name": "YarnEngine craft shade palette",
+  "name": "OpenCrochet Pro craft shade palette",
   "description": "Generic craft-yarn shade names with their sRGB values, used when a manufacturer shade card has not been captured for a yarn. These are standard colour names, not any brand's shade names.",
   "source_type": "standard_palette",
   "source_reference": "ISCC-NBS centroid colour names (NBS Special Publication 440) reduced to the shades craft yarn ranges normally carry",
