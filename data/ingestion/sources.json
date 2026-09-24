@@ -35,7 +35,7 @@
     "max_product_pages": 1500,
     "delay_seconds": 0.7,
     "robots_policy": "respect",
-    "notes": "Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work."
+    "notes": "Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro."
   },
   {
     "source_id": "SRC_HAYFIELD",
@@ -91,7 +91,7 @@
     "max_product_pages": 1500,
     "delay_seconds": 0.7,
     "robots_policy": "respect",
-    "notes": "Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work."
+    "notes": "Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro."
   },
   {
     "source_id": "SRC_JAMES_C_BRETT",
@@ -635,8 +635,8 @@
   },
   {
     "source_id": "SRC_HILLESV_G_ULLVAREFABRIKK",
-    "display_name": "Hillesvåg Ullvarefabrikk",
-    "manufacturer_name": "Hillesvåg Ullvarefabrikk",
+    "display_name": "Hillesv\u00e5g Ullvarefabrikk",
+    "manufacturer_name": "Hillesv\u00e5g Ullvarefabrikk",
     "country": "Norway",
     "base_url": null,
     "catalogue_urls": [],
@@ -707,8 +707,8 @@
   },
   {
     "source_id": "SRC_B_STMOR",
-    "display_name": "Bæstmor",
-    "manufacturer_name": "Bæstmor",
+    "display_name": "B\u00e6stmor",
+    "manufacturer_name": "B\u00e6stmor",
     "country": "Norway",
     "base_url": null,
     "catalogue_urls": [],
@@ -923,8 +923,8 @@
   },
   {
     "source_id": "SRC_J_RBO",
-    "display_name": "Järbo",
-    "manufacturer_name": "Järbo",
+    "display_name": "J\u00e4rbo",
+    "manufacturer_name": "J\u00e4rbo",
     "country": "Sweden and Finland",
     "base_url": null,
     "catalogue_urls": [],
@@ -941,8 +941,8 @@
   },
   {
     "source_id": "SRC_SVARTA_F_RET",
-    "display_name": "Svarta Fåret",
-    "manufacturer_name": "Svarta Fåret",
+    "display_name": "Svarta F\u00e5ret",
+    "manufacturer_name": "Svarta F\u00e5ret",
     "country": "Sweden and Finland",
     "base_url": null,
     "catalogue_urls": [],
@@ -1031,8 +1031,8 @@
   },
   {
     "source_id": "SRC_STEX",
-    "display_name": "Ístex",
-    "manufacturer_name": "Ístex",
+    "display_name": "\u00cdstex",
+    "manufacturer_name": "\u00cdstex",
     "country": "Iceland",
     "base_url": null,
     "catalogue_urls": [],
@@ -1083,7 +1083,7 @@
     "max_product_pages": 1500,
     "delay_seconds": 0.7,
     "robots_policy": "respect",
-    "notes": "Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work."
+    "notes": "Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro."
   },
   {
     "source_id": "SRC_DURABLE_YARN",
@@ -1339,8 +1339,8 @@
   },
   {
     "source_id": "SRC_GR_NDL",
-    "display_name": "Gründl",
-    "manufacturer_name": "Gründl",
+    "display_name": "Gr\u00fcndl",
+    "manufacturer_name": "Gr\u00fcndl",
     "country": "Germany Austria Switzerland",
     "base_url": null,
     "catalogue_urls": [],
@@ -1429,8 +1429,8 @@
   },
   {
     "source_id": "SRC_BERG_RE_DE_FRANCE",
-    "display_name": "Bergère de France",
-    "manufacturer_name": "Bergère de France",
+    "display_name": "Berg\u00e8re de France",
+    "manufacturer_name": "Berg\u00e8re de France",
     "country": "France",
     "base_url": null,
     "catalogue_urls": [],
@@ -1645,8 +1645,8 @@
   },
   {
     "source_id": "SRC_ROS_RIOS_4",
-    "display_name": "Rosários 4",
-    "manufacturer_name": "Rosários 4",
+    "display_name": "Ros\u00e1rios 4",
+    "manufacturer_name": "Ros\u00e1rios 4",
     "country": "Spain and Portugal",
     "base_url": null,
     "catalogue_urls": [],
@@ -1969,8 +1969,8 @@
   },
   {
     "source_id": "SRC_LINEAPI_ITALIA",
-    "display_name": "Lineapiù Italia",
-    "manufacturer_name": "Lineapiù Italia",
+    "display_name": "Lineapi\u00f9 Italia",
+    "manufacturer_name": "Lineapi\u00f9 Italia",
     "country": "Italy",
     "base_url": null,
     "catalogue_urls": [],
@@ -2275,8 +2275,8 @@
   },
   {
     "source_id": "SRC_S_DWOLLE_GROUP",
-    "display_name": "Südwolle Group",
-    "manufacturer_name": "Südwolle Group",
+    "display_name": "S\u00fcdwolle Group",
+    "manufacturer_name": "S\u00fcdwolle Group",
     "country": "Italy",
     "base_url": null,
     "catalogue_urls": [],
@@ -2455,8 +2455,8 @@
   },
   {
     "source_id": "SRC_REN_BAYAN",
-    "display_name": "Ören Bayan",
-    "manufacturer_name": "Ören Bayan",
+    "display_name": "\u00d6ren Bayan",
+    "manufacturer_name": "\u00d6ren Bayan",
     "country": "Turkey",
     "base_url": null,
     "catalogue_urls": [],
@@ -2563,8 +2563,8 @@
   },
   {
     "source_id": "SRC_YE_IN_TEKSTIL",
-    "display_name": "Yeğin Tekstil",
-    "manufacturer_name": "Yeğin Tekstil",
+    "display_name": "Ye\u011fin Tekstil",
+    "manufacturer_name": "Ye\u011fin Tekstil",
     "country": "Turkey",
     "base_url": null,
     "catalogue_urls": [],
@@ -2581,8 +2581,8 @@
   },
   {
     "source_id": "SRC_G_KSIM_I_PLIK",
-    "display_name": "Göksim İplik",
-    "manufacturer_name": "Göksim İplik",
+    "display_name": "G\u00f6ksim \u0130plik",
+    "manufacturer_name": "G\u00f6ksim \u0130plik",
     "country": "Turkey",
     "base_url": null,
     "catalogue_urls": [],
@@ -2617,8 +2617,8 @@
   },
   {
     "source_id": "SRC_BODURO_LU_I_PLIK",
-    "display_name": "Boduroğlu İplik",
-    "manufacturer_name": "Boduroğlu İplik",
+    "display_name": "Boduro\u011flu \u0130plik",
+    "manufacturer_name": "Boduro\u011flu \u0130plik",
     "country": "Turkey",
     "base_url": null,
     "catalogue_urls": [],
@@ -3031,8 +3031,8 @@
   },
   {
     "source_id": "SRC_SPUD_AND_CHLO",
-    "display_name": "Spud & Chloë",
-    "manufacturer_name": "Spud & Chloë",
+    "display_name": "Spud & Chlo\u00eb",
+    "manufacturer_name": "Spud & Chlo\u00eb",
     "country": "United States",
     "base_url": null,
     "catalogue_urls": [],
@@ -3407,7 +3407,7 @@
     "max_product_pages": 1500,
     "delay_seconds": 0.7,
     "robots_policy": "respect",
-    "notes": "Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work."
+    "notes": "Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro."
   },
   {
     "source_id": "SRC_MANOS_DEL_URUGUAY",
@@ -4111,7 +4111,7 @@
     "max_product_pages": 1500,
     "delay_seconds": 0.7,
     "robots_policy": "respect",
-    "notes": "Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work."
+    "notes": "Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro."
   },
   {
     "source_id": "SRC_URTH_YARNS",

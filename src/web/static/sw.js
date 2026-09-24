@@ -1,4 +1,4 @@
-const CACHE="yarnengine-m12-v4";
+const CACHE="opencrochet-pro-m12-v5";
 const SHELL=["/static/manifest.webmanifest","/static/icon-192.png","/static/icon-512.png","/static/apple-touch-icon.png"];
 // true when this worker replaces an older one (an update), false on first install
 let isUpdate=false;

@@ -10,7 +10,7 @@ from src.yarn_ingestion.seed import import_seed_jsonl
 
 
 def main():
-    p = argparse.ArgumentParser(description="YarnEngine automated current-catalogue ingestion")
+    p = argparse.ArgumentParser(description="OpenCrochet Pro YarnEngine core automated current-catalogue ingestion")
     p.add_argument("--db", default="data/db/yarn_engine.sqlite")
     p.add_argument("--registry", default="data/ingestion/sources.json")
     sub = p.add_subparsers(dest="cmd", required=True)

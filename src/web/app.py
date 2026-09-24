@@ -146,8 +146,8 @@ def _write_admin_log(**kwargs):
         return None
 
 app = FastAPI(
-    title="PILOOP OpenCrochet Pro",
-    version="M12.2",
+    title="OpenCrochet Pro",
+    version="M12.3",
     description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
@@ -448,13 +448,13 @@ def auth_forgot_password(payload: dict, request: Request):
         try:
             send_email(
                 to=user["email"],
-                subject="Reset your PILOOP OpenCrochet Pro password",
-                html=(f"<p>Someone asked to reset the password for the PILOOP OpenCrochet Pro account "
+                subject="Reset your OpenCrochet Pro password",
+                html=(f"<p>Someone asked to reset the password for your OpenCrochet Pro account "
                       f"<b>{user['username']}</b>.</p>"
                       f"<p><a href=\"{reset_link}\">Click here to set a new password</a>. "
                       f"This link expires in {RESET_TOKEN_TTL_MINUTES} minutes.</p>"
                       f"<p>If you didn't request this, you can safely ignore this email.</p>"),
-                text=(f"Reset your PILOOP OpenCrochet Pro password: {reset_link} "
+                text=(f"Reset your OpenCrochet Pro password: {reset_link} "
                       f"(expires in {RESET_TOKEN_TTL_MINUTES} minutes). "
                       f"If you didn't request this, ignore this email."),
             )
@@ -1382,7 +1382,7 @@ def web_manifest():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": "M12.2"}
+    return {"status": "ok", "version": "M12.3"}
 
 
 def _existing_pattern_rows():

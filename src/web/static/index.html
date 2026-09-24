@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>PILOOP OpenCrochet Pro</title>
+<title>OpenCrochet Pro</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/static/favicon.png">
 <meta name="theme-color" content="#ef6a4c">
@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="OpenCrochet">
+<meta name="apple-mobile-web-app-title" content="OpenCrochet Pro">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -583,7 +583,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
 <!-- ===================== LOGIN ===================== -->
 <section id="viewLogin" class="card login hidden">
   <img src="/static/piloop_logo.png" alt="PiLoop" class="brand">
-  <div class="eyebrow">PILOOP OPENCROCHET PRO</div>
+  <div class="eyebrow">OPENCROCHET PRO</div>
   <h1>Sign in</h1>
   <p class="muted small">Crochet & amigurumi yarn calculator with a graphical pattern library. Registered users only.</p>
 
@@ -4614,7 +4614,7 @@ function maybeShowIosInstall(){
  if(!isIOS()||isStandalone()||document.getElementById('iosInstall'))return;
  try{if(localStorage.getItem('ye_ios_hint')==='1')return;}catch(_){}
  const d=document.createElement('div');d.id='iosInstall';document.body.classList.add('has-install-bar');
- d.innerHTML='<img src="/static/apple-touch-icon.png" alt=""><span>Install this app: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span><button id="iosInstallOk" class="alt" type="button">Got it</button>';
+ d.innerHTML='<img src="/static/piloop_logo.png" alt=""><span>Install this app: tap <strong>Share</strong> in Safari, then <strong>Add to Home Screen</strong>.</span><button id="iosInstallOk" class="alt" type="button">Got it</button>';
  document.body.appendChild(d);
  document.getElementById('iosInstallOk').onclick=()=>{try{localStorage.setItem('ye_ios_hint','1');}catch(_){}document.body.classList.remove('has-install-bar');d.remove();};
 }

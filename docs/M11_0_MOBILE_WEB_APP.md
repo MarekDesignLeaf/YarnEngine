@@ -2,7 +2,7 @@
 
 Added responsive mobile layout, PWA manifest, service worker application-shell caching, Home Screen metadata, Docker deployment, generic process deployment files, and public health endpoint compatibility.
 
-Supported delivery model: one HTTPS YarnEngine server, accessed from Android, iOS, tablets and desktop browsers.
+Supported delivery model: one HTTPS OpenCrochet Pro server (powered by YarnEngine core), accessed from Android, iOS, tablets and desktop browsers.
 
 No phone needs Python. Python runs only on the server.
 

@@ -1,7 +1,7 @@
 """Tier-B (uncalibrated) crochet yarn-length baseline.
 
 This is the crochet counterpart of ``src/geometry/ciukas.py`` (the Tier-B
-model used for weft knitting). It lets YarnEngine return a first yarn-length
+model used for weft knitting). It lets YarnEngine core return a first yarn-length
 estimate for a crochet/amigurumi project before any physical calibration has
 been captured for the chosen yarn, hook and tension. Calibration remains the
 accurate path -- a measured swatch or an approved calibration model replaces
