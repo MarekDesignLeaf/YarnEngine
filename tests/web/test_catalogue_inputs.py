@@ -182,7 +182,103 @@ def test_shell_has_three_catalogue_inputs_photo_upload_and_hides_irrelevant_yarn
     assert "company_number" in footer
 
 
-def test_m124_shell_and_cache_version():
+def test_prompt_helper_can_build_grounded_standalone_product():
+    prompt = "Create a catalogue for Fox toy with orange body and white muzzle."
+
+    def transport(_body):
+        return """{
+          "title":"Fox toy catalogue",
+          "locale":"en-GB",
+          "format":"A4",
+          "products":[
+            {"name":"Fox toy","source_excerpt":"Fox toy with orange body and white muzzle."}
+          ]
+        }"""
+
+    plan = generate_catalogue_plan(
+        prompt, [], api_key="", model="test-model", _transport=transport
+    )
+    assert plan["products"] == [{
+        "name": "Fox toy",
+        "description": "Fox toy with orange body and white muzzle.",
+    }]
+    assert plan["include_materials"] is False
+    assert plan["include_estimated_material_cost"] is False
+
+
+def test_prompt_helper_rejects_unsupported_or_ungrounded_standalone_facts():
+    prompt = "Create a catalogue for Fox toy with orange body."
+
+    with pytest.raises(CatalogueAIUnavailable, match="unsupported factual fields"):
+        generate_catalogue_plan(
+            prompt, [], api_key="", model="test-model",
+            _transport=lambda _body: """{
+              "title":"Catalogue",
+              "products":[
+                {"name":"Fox toy","source_excerpt":"Fox toy with orange body.",
+                 "materials":["cashmere"]}
+              ]
+            }""",
+        )
+
+    with pytest.raises(CatalogueAIUnavailable, match="not grounded"):
+        generate_catalogue_plan(
+            prompt, [], api_key="", model="test-model",
+            _transport=lambda _body: """{
+              "title":"Catalogue",
+              "products":[
+                {"name":"Luxury Fox","source_excerpt":"Fox toy with orange body."}
+              ]
+            }""",
+        )
+
+
+def test_prompt_helper_rejects_prompt_without_product():
+    with pytest.raises(CatalogueAIUnavailable, match="does not contain an identifiable product"):
+        generate_catalogue_plan(
+            "Make it elegant and minimal.", [], api_key="", model="test-model",
+            _transport=lambda _body: '{"title":"Catalogue","products":[]}',
+        )
+
+
+def test_catalogue_prompt_endpoint_supports_zero_stored_products(monkeypatch):
+    monkeypatch.setattr(appmod, "_catalogue_products_from_store", lambda: [])
+    monkeypatch.setattr(appmod, "_vision_settings", lambda: ("fake-key", "test-model"))
+    monkeypatch.setattr(appmod, "vision_model_name", lambda _m: "test-model")
+    monkeypatch.setattr(
+        appmod,
+        "generate_catalogue_plan",
+        lambda *a, **k: {
+            "title": "Prompt only catalogue",
+            "subtitle": "",
+            "locale": "en-GB",
+            "format": "A4",
+            "include_materials": False,
+            "include_estimated_material_cost": False,
+            "products": [{
+                "name": "Fox toy",
+                "description": "Fox toy with orange body.",
+            }],
+        },
+    )
     client = TestClient(appmod.app)
-    assert client.get("/api/health").json()["version"] == "M12.4"
-    assert 'opencrochet-pro-m12-v6' in client.get("/sw.js").text
+    r = client.post(
+        "/api/catalogue/generate-from-prompt",
+        json={"prompt": "Fox toy with orange body.", "product_ids": []},
+    )
+    assert r.status_code == 200
+    body = r.json()
+    assert body["products"][0]["product_line_id"] is None
+    assert body["products"][0]["name"] == "Fox toy"
+    assert body["generation"]["source"] == "prompt"
+    assert body["generation"]["mode"] == "standalone_prompt"
+    assert "fake-key" not in str(body)
+
+
+def test_m125_shell_and_cache_version():
+    client = TestClient(appmod.app)
+    assert client.get("/api/health").json()["version"] == "M12.5"
+    assert 'opencrochet-pro-m12-v7' in client.get("/sw.js").text
+    html = client.get("/").text
+    assert "body.product_ids=selected.map(p=>p.id);" in html
+    assert "Prompt</strong> can work by itself" in html

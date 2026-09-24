@@ -82,6 +82,18 @@ def _call_anthropic(content: list[dict], api_key: str, model: str, max_tokens: i
     )
 
 
+def _prompt_contains(prompt: str, value: str) -> bool:
+    """Conservative grounding check for standalone prompt products.
+
+    Product names and evidence excerpts must occur in the user's prompt after
+    whitespace/case normalisation.  This keeps standalone mode useful without
+    turning the catalogue generator into a product-fact invention engine.
+    """
+    haystack = " ".join(str(prompt or "").split()).casefold()
+    needle = " ".join(str(value or "").split()).casefold()
+    return bool(needle) and needle in haystack
+
+
 def generate_catalogue_plan(prompt: str, products: list[dict], api_key: str, model: str,
                             _transport=None) -> dict:
     prompt = str(prompt or "").strip()
@@ -89,6 +101,7 @@ def generate_catalogue_plan(prompt: str, products: list[dict], api_key: str, mod
         raise ValueError("prompt is required")
     if len(prompt) > MAX_PROMPT_CHARS:
         raise ValueError(f"prompt is too long (maximum {MAX_PROMPT_CHARS} characters)")
+
     available = {}
     compact = []
     for row in products:
@@ -119,10 +132,9 @@ def generate_catalogue_plan(prompt: str, products: list[dict], api_key: str, mod
                 }
             ),
         })
-    if not compact:
-        raise ValueError("no stored products are available")
 
-    instruction = """Create a catalogue plan from the user's prompt and ONLY the product records provided below.
+    if compact:
+        instruction = """Create a catalogue plan from the user's prompt and ONLY the product records provided below.
 Return JSON only with:
 {
   "title": "required catalogue title",
@@ -140,59 +152,137 @@ Rules:
 - Include at least one valid supplied product.
 - If the user does not specify locale or format, use en-GB and A4.
 """
-    content = [{
-        "type": "text",
-        "text": instruction + "\n\nPRODUCT RECORDS:\n" +
-                json.dumps(compact, ensure_ascii=False, separators=(",", ":")) +
-                "\n\nUSER PROMPT:\n" + prompt,
-    }]
+        content = [{
+            "type": "text",
+            "text": instruction + "\n\nPRODUCT RECORDS:\n" +
+                    json.dumps(compact, ensure_ascii=False, separators=(",", ":")) +
+                    "\n\nUSER PROMPT:\n" + prompt,
+        }]
+        raw = _extract_json(_call_anthropic(
+            content, api_key, model, max_tokens=3000, _transport=_transport
+        ))
+
+        title = str(raw.get("title") or "").strip()[:200]
+        if not title:
+            raise CatalogueAIUnavailable("the generated catalogue has no title")
+        locale = str(raw.get("locale") or "en-GB")
+        if locale not in {"en-GB", "cs-CZ"}:
+            locale = "en-GB"
+        page_format = str(raw.get("format") or "A4").upper()
+        if page_format not in {"A4", "A4L"}:
+            page_format = "A4"
+        raw_ids = raw.get("product_ids")
+        if not isinstance(raw_ids, list) or not raw_ids:
+            raise CatalogueAIUnavailable("the generated catalogue did not select any products")
+        ids = []
+        for value in raw_ids:
+            try:
+                pid = int(value)
+            except (TypeError, ValueError):
+                raise CatalogueAIUnavailable("the generated catalogue contains an invalid product id")
+            if pid not in available:
+                raise CatalogueAIUnavailable(f"the generated catalogue referenced unknown product {pid}")
+            if pid not in ids:
+                ids.append(pid)
+        copy_in = raw.get("product_copy") or {}
+        product_copy = {}
+        if isinstance(copy_in, dict):
+            for pid in ids:
+                text = copy_in.get(str(pid), copy_in.get(pid))
+                if text:
+                    product_copy[str(pid)] = str(text).strip()[:1200]
+
+        return {
+            "title": title,
+            "subtitle": str(raw.get("subtitle") or "").strip()[:300],
+            "locale": locale,
+            "format": page_format,
+            "include_materials": bool(raw.get("include_materials", True)),
+            "include_estimated_material_cost": bool(
+                raw.get("include_estimated_material_cost", False)
+            ),
+            "product_ids": ids,
+            "product_copy": product_copy,
+        }
+
+    # No stored products were supplied.  In this mode the prompt itself is the
+    # evidence.  The model may identify/order products and choose presentation,
+    # but every product name and evidence excerpt must be copied from the prompt.
+    instruction = """Create a catalogue plan using ONLY product facts explicitly present in the USER PROMPT.
+Return JSON only with:
+{
+  "title": "catalogue title",
+  "subtitle": "optional",
+  "locale": "en-GB or cs-CZ",
+  "format": "A4 or A4L",
+  "products": [
+    {"name": "an exact product name/phrase copied from the prompt",
+     "source_excerpt": "an exact excerpt copied from the prompt that describes this product"}
+  ]
+}
+Rules:
+- Include at least one identifiable product that is explicitly present in the prompt.
+- Product name and source_excerpt must be copied from the prompt, not invented.
+- Do NOT return materials, dimensions, price, manufacturer, certification, origin, identifiers, URLs or technical claims as product fields.
+- Do not infer anything that is not written in the prompt.
+- If there is no identifiable product in the prompt, return an empty products array.
+"""
+    content = [{"type": "text", "text": instruction + "\n\nUSER PROMPT:\n" + prompt}]
     raw = _extract_json(_call_anthropic(
-        content, api_key, model, max_tokens=3000, _transport=_transport
+        content, api_key, model, max_tokens=2500, _transport=_transport
     ))
 
-    title = str(raw.get("title") or "").strip()[:200]
-    if not title:
-        raise CatalogueAIUnavailable("the generated catalogue has no title")
+    rows = raw.get("products")
+    if not isinstance(rows, list) or not rows:
+        raise CatalogueAIUnavailable(
+            "the prompt does not contain an identifiable product to put in the catalogue"
+        )
+    standalone = []
+    allowed_fields = {"name", "source_excerpt"}
+    for item in rows[:100]:
+        if not isinstance(item, dict):
+            raise CatalogueAIUnavailable("the generated standalone product is invalid")
+        unexpected = set(item) - allowed_fields
+        if unexpected:
+            raise CatalogueAIUnavailable(
+                "the generated standalone product contained unsupported factual fields"
+            )
+        name = str(item.get("name") or "").strip()
+        excerpt = str(item.get("source_excerpt") or "").strip()
+        if not name or not excerpt:
+            raise CatalogueAIUnavailable(
+                "the generated standalone product is missing prompt evidence"
+            )
+        if not _prompt_contains(prompt, name) or not _prompt_contains(prompt, excerpt):
+            raise CatalogueAIUnavailable(
+                "the generated standalone product was not grounded in the prompt"
+            )
+        standalone.append({
+            "name": name[:200],
+            "description": excerpt[:2000],
+        })
+    if not standalone:
+        raise CatalogueAIUnavailable(
+            "the prompt does not contain an identifiable product to put in the catalogue"
+        )
+
     locale = str(raw.get("locale") or "en-GB")
     if locale not in {"en-GB", "cs-CZ"}:
         locale = "en-GB"
     page_format = str(raw.get("format") or "A4").upper()
     if page_format not in {"A4", "A4L"}:
         page_format = "A4"
-    raw_ids = raw.get("product_ids")
-    if not isinstance(raw_ids, list) or not raw_ids:
-        raise CatalogueAIUnavailable("the generated catalogue did not select any products")
-    ids = []
-    for value in raw_ids:
-        try:
-            pid = int(value)
-        except (TypeError, ValueError):
-            raise CatalogueAIUnavailable("the generated catalogue contains an invalid product id")
-        if pid not in available:
-            raise CatalogueAIUnavailable(f"the generated catalogue referenced unknown product {pid}")
-        if pid not in ids:
-            ids.append(pid)
-    copy_in = raw.get("product_copy") or {}
-    product_copy = {}
-    if isinstance(copy_in, dict):
-        for pid in ids:
-            text = copy_in.get(str(pid), copy_in.get(pid))
-            if text:
-                product_copy[str(pid)] = str(text).strip()[:1200]
-
+    title = str(raw.get("title") or "Product Catalogue").strip()[:200] or "Product Catalogue"
+    subtitle = str(raw.get("subtitle") or "").strip()[:300]
     return {
         "title": title,
-        "subtitle": str(raw.get("subtitle") or "").strip()[:300],
+        "subtitle": subtitle,
         "locale": locale,
         "format": page_format,
-        "include_materials": bool(raw.get("include_materials", True)),
-        "include_estimated_material_cost": bool(
-            raw.get("include_estimated_material_cost", False)
-        ),
-        "product_ids": ids,
-        "product_copy": product_copy,
+        "include_materials": False,
+        "include_estimated_material_cost": False,
+        "products": standalone,
     }
-
 
 def describe_product_photo(media_type: str, blob: bytes, api_key: str, model: str,
                            _transport=None) -> dict:

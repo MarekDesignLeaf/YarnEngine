@@ -160,7 +160,7 @@ def _write_admin_log(**kwargs):
 
 app = FastAPI(
     title="OpenCrochet Pro",
-    version="M12.4",
+    version="M12.5",
     description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
@@ -1396,7 +1396,7 @@ def web_manifest():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": "M12.4"}
+    return {"status": "ok", "version": "M12.5"}
 
 
 def _existing_pattern_rows():
@@ -2459,12 +2459,13 @@ def catalogue_generate_from_prompt(payload: dict):
     prompt = str(payload.get("prompt") or "").strip()
     if not prompt:
         raise HTTPException(status_code=422, detail="prompt is required")
-    rows = _catalogue_products_from_store()
-    rows_by_id = {int(row["id"]): row for row in rows}
+
+    all_rows = _catalogue_products_from_store()
+    rows_by_id = {int(row["id"]): row for row in all_rows}
     raw_ids = payload.get("product_ids")
     if raw_ids is not None:
-        if not isinstance(raw_ids, list) or not raw_ids:
-            raise HTTPException(status_code=422, detail="product_ids must be a non-empty list")
+        if not isinstance(raw_ids, list):
+            raise HTTPException(status_code=422, detail="product_ids must be a list")
         selected = []
         for value in raw_ids:
             try:
@@ -2474,9 +2475,11 @@ def catalogue_generate_from_prompt(payload: dict):
             if pid not in rows_by_id:
                 raise HTTPException(status_code=422, detail=f"product {pid} not found")
             selected.append(rows_by_id[pid])
+        # An explicit empty list means prompt-only standalone mode.  Omitting
+        # product_ids preserves the older API behaviour of using all products.
         rows = selected
-    if not rows:
-        raise HTTPException(status_code=422, detail="no products are available")
+    else:
+        rows = all_rows
 
     preferences = {
         "title": str(payload.get("title") or "").strip(),
@@ -2504,22 +2507,46 @@ def catalogue_generate_from_prompt(payload: dict):
         raise HTTPException(status_code=422, detail=str(e))
     except CatalogueAIUnavailable as e:
         raise HTTPException(status_code=503, detail=str(e))
-    allowed = {int(row["id"]): row for row in rows}
-    for pid in plan["product_ids"]:
-        if int(pid) not in allowed:
-            raise HTTPException(status_code=422, detail=f"generated product {pid} is not available")
-    manifest = _catalogue_manifest_from_rows(plan, allowed)
+
+    if plan.get("product_ids"):
+        allowed = {int(row["id"]): row for row in rows}
+        for pid in plan["product_ids"]:
+            if int(pid) not in allowed:
+                raise HTTPException(status_code=422, detail=f"generated product {pid} is not available")
+        manifest = _catalogue_manifest_from_rows(plan, allowed)
+    elif isinstance(plan.get("products"), list) and plan["products"]:
+        # Reuse the same normalizer used for uploaded model files so prompt-only
+        # products have exactly the same safe standalone manifest shape.
+        standalone_model = {
+            "title": plan.get("title") or preferences["title"] or "Product Catalogue",
+            "subtitle": plan.get("subtitle") or preferences["subtitle"],
+            "locale": plan.get("locale") or preferences["locale"],
+            "format": plan.get("format") or preferences["format"],
+            "include_materials": False,
+            "include_estimated_material_cost": False,
+            "products": plan["products"],
+        }
+        try:
+            manifest = normalize_catalogue_model(standalone_model, [])
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
+    else:
+        raise HTTPException(
+            status_code=422,
+            detail="the prompt did not produce any catalogue products",
+        )
+
     digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
     generation = {
         "source": "prompt",
         "model": chosen_model,
         "prompt_hash": digest,
+        "mode": "stored_products" if plan.get("product_ids") else "standalone_prompt",
     }
     if len(prompt) <= 2000:
         generation["prompt"] = prompt
     manifest["generation"] = generation
     return manifest
-
 
 @app.post("/api/catalogue/normalize-model")
 def catalogue_normalize_model(payload: dict):
