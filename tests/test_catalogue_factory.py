@@ -107,3 +107,66 @@ def test_locked_asset_is_not_reopened_after_master_change(tmp_path):
     replacement=s.create_asset(e["id"],"MASTER_VISUAL",9,"bear-v2.png","a2","tester",source_record_version="2")
     assert replacement["version"]==2
     assert replacement["state"]=="CANDIDATE"
+
+
+def _identity_record(name="Fox"):
+    return {"product_id":"P1","variant_id":"V1","display_name":name,
+            "mandatory_features":{"ears":2,"tails":1,"legs":4},
+            "handed_features":{"heart":"left_chest"},
+            "silhouette_class":"fox","pattern_topology":"striped",
+            "material_class":"crochet","colours":["orange","white"]}
+
+
+def _identity_observation(ears=2):
+    return {"features":{"ears":ears,"tails":1,"legs":4},
+            "handed_features":{"heart":"left_chest"},
+            "silhouette_class":"fox","pattern_topology":"striped",
+            "material_class":"crochet","colours":["orange","white"]}
+
+
+def test_master_visual_requires_validation_before_lock(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite");e=s.create(manifest(),"tester")
+    pm=s.create_product_master(1,_identity_record(),"pm1","tester");s.approve_product_master(pm["id"],"tester")
+    a=s.create_asset(e["id"],"MASTER_VISUAL",1,"fox.png","asset-hash","tester",source_record_version="1")
+    with pytest.raises(ValueError,match="PASS validation"):s.lock_master_visual(a["id"],"tester")
+    r=s.validate_product_identity(a["id"],_identity_observation(),"tester")
+    assert r["decision"]=="PASS"
+    assert s.lock_master_visual(a["id"],"tester")["state"]=="LOCKED"
+
+
+def test_identity_validator_catches_extra_ear(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite");e=s.create(manifest(),"tester")
+    pm=s.create_product_master(1,_identity_record(),"pm1","tester");s.approve_product_master(pm["id"],"tester")
+    a=s.create_asset(e["id"],"MASTER_VISUAL",1,"bad.png","bad-hash","tester",source_record_version="1")
+    r=s.validate_product_identity(a["id"],_identity_observation(ears=3),"tester")
+    assert r["decision"]=="FAIL"
+    assert any(x["id"]=="FEATURE_COUNT:ears" and x["status"]=="FAIL" for x in r["checks"])
+
+
+def test_product_view_requires_locked_master_and_canonical_token(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite");e=s.create(manifest(),"tester")
+    pm=s.create_product_master(1,_identity_record(),"pm1","tester");s.approve_product_master(pm["id"],"tester")
+    mv=s.create_asset(e["id"],"MASTER_VISUAL",1,"fox.png","mv","tester",source_record_version="1")
+    s.validate_product_identity(mv["id"],_identity_observation(),"tester");s.lock_master_visual(mv["id"],"tester")
+    with pytest.raises(ValueError,match="canonical view_token"):
+        s.create_asset(e["id"],"PRODUCT_VIEW",1,"x.png","x","tester",{"master_visual_id":mv["id"],"view_token":"SIDE"},"1")
+    v=s.create_asset(e["id"],"PRODUCT_VIEW",1,"front.png","front","tester",
+                     {"master_visual_id":mv["id"],"view_token":"AZ000","observation":{
+                       "identity_key":"P1/V1","feature_signature":"2e-1t-4l","material_signature":"crochet",
+                       "colour_signature":"orange-white","pattern_signature":"striped"}},"1")
+    assert v["metadata"]["azimuth_deg"]==0
+
+
+def test_multiview_graph_is_fail_closed_until_complete(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite");e=s.create(manifest(),"tester")
+    pm=s.create_product_master(1,_identity_record(),"pm1","tester");s.approve_product_master(pm["id"],"tester")
+    mv=s.create_asset(e["id"],"MASTER_VISUAL",1,"fox.png","mv","tester",source_record_version="1")
+    s.validate_product_identity(mv["id"],_identity_observation(),"tester");s.lock_master_visual(mv["id"],"tester")
+    obs={"identity_key":"P1/V1","feature_signature":"2e-1t-4l","material_signature":"crochet",
+         "colour_signature":"orange-white","pattern_signature":"striped"}
+    for token in ("AZ000","AZ045"):
+        s.create_asset(e["id"],"PRODUCT_VIEW",1,token+".png",token,"tester",
+                       {"master_visual_id":mv["id"],"view_token":token,"observation":obs},"1")
+    r=s.validate_view_consistency(e["id"],1,"tester")
+    assert r["decision"]=="BLOCKED"
+    assert "AZ090" in r["missing_views"]
