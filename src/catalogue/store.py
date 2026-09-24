@@ -37,6 +37,17 @@ class CatalogueStore:
               updated_at TEXT NOT NULL,
               released_at TEXT
             );
+            CREATE TABLE IF NOT EXISTS catalogue_product_masters(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              product_line_id INTEGER NOT NULL,
+              version INTEGER NOT NULL,
+              state TEXT NOT NULL DEFAULT 'DRAFT',
+              record_json TEXT NOT NULL,
+              record_hash TEXT NOT NULL,
+              created_by TEXT,
+              created_at TEXT NOT NULL,
+              UNIQUE(product_line_id,version)
+            );
             CREATE TABLE IF NOT EXISTS catalogue_assets(
               id INTEGER PRIMARY KEY AUTOINCREMENT,
               edition_id INTEGER NOT NULL,
@@ -79,6 +90,18 @@ class CatalogueStore:
               created_at TEXT NOT NULL,
               FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id),
               FOREIGN KEY(asset_id) REFERENCES catalogue_assets(id)
+            );
+            CREATE TABLE IF NOT EXISTS catalogue_dependencies(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              edition_id INTEGER NOT NULL,
+              upstream_kind TEXT NOT NULL,
+              upstream_id INTEGER NOT NULL,
+              upstream_version TEXT,
+              downstream_kind TEXT NOT NULL,
+              downstream_id INTEGER NOT NULL,
+              created_at TEXT NOT NULL,
+              UNIQUE(upstream_kind,upstream_id,upstream_version,downstream_kind,downstream_id),
+              FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id)
             );
             CREATE TABLE IF NOT EXISTS catalogue_events(
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -134,6 +157,96 @@ class CatalogueStore:
                 d=dict(r); d["details"]=json.loads(d.pop("details_json") or "{}"); out.append(d)
             return out
 
+    def create_product_master(self, product_line_id:int, record:dict, record_hash:str, actor:str|None):
+        if not record_hash: raise ValueError("Product Master Record hash is required")
+        required=("product_id","variant_id","display_name")
+        missing=[k for k in required if not record.get(k)]
+        if missing: raise ValueError("incomplete Product Master Record: "+", ".join(missing))
+        now=self._now()
+        with self._conn() as c:
+            r=c.execute("SELECT COALESCE(MAX(version),0)+1 AS v FROM catalogue_product_masters WHERE product_line_id=?",
+                        (product_line_id,)).fetchone()
+            version=int(r["v"])
+            cur=c.execute("""INSERT INTO catalogue_product_masters
+              (product_line_id,version,state,record_json,record_hash,created_by,created_at)
+              VALUES(?,?,?,?,?,?,?)""",(product_line_id,version,"DRAFT",
+              json.dumps(record,separators=(",",":"),sort_keys=True),record_hash,actor,now))
+            return self.get_product_master(cur.lastrowid)
+
+    def get_product_master(self, master_id:int):
+        with self._conn() as c:
+            r=c.execute("SELECT * FROM catalogue_product_masters WHERE id=?",(master_id,)).fetchone()
+            if not r:return None
+            d=dict(r);d["record"]=json.loads(d.pop("record_json"));return d
+
+    def list_product_masters(self, product_line_id:int|None=None):
+        with self._conn() as c:
+            if product_line_id is None:
+                rows=c.execute("SELECT * FROM catalogue_product_masters ORDER BY product_line_id,version DESC").fetchall()
+            else:
+                rows=c.execute("SELECT * FROM catalogue_product_masters WHERE product_line_id=? ORDER BY version DESC",
+                               (product_line_id,)).fetchall()
+            out=[]
+            for r in rows:
+                d=dict(r);d["record"]=json.loads(d.pop("record_json"));out.append(d)
+            return out
+
+    def approve_product_master(self, master_id:int, actor:str|None):
+        m=self.get_product_master(master_id)
+        if not m: raise KeyError("Product Master Record not found")
+        if m["state"]!="DRAFT": raise ValueError("only DRAFT Product Master Record can be approved")
+        now=self._now()
+        with self._conn() as c:
+            c.execute("""UPDATE catalogue_product_masters SET state='SUPERSEDED'
+                         WHERE product_line_id=? AND state='APPROVED' AND id<>?""",(m["product_line_id"],master_id))
+            c.execute("UPDATE catalogue_product_masters SET state='APPROVED' WHERE id=?",(master_id,))
+        self.invalidate_dependencies("PRODUCT_MASTER",m["product_line_id"],str(m["version"]),actor)
+        return self.get_product_master(master_id)
+
+    def add_dependency(self, edition_id:int, upstream_kind:str, upstream_id:int, upstream_version:str|None,
+                       downstream_kind:str, downstream_id:int):
+        if downstream_kind not in {"ASSET","EDITION"}: raise ValueError("invalid downstream kind")
+        now=self._now()
+        with self._conn() as c:
+            c.execute("""INSERT OR IGNORE INTO catalogue_dependencies
+              (edition_id,upstream_kind,upstream_id,upstream_version,downstream_kind,downstream_id,created_at)
+              VALUES(?,?,?,?,?,?,?)""",(edition_id,upstream_kind,upstream_id,upstream_version,
+              downstream_kind,downstream_id,now))
+
+    def list_dependencies(self, edition_id:int):
+        with self._conn() as c:
+            return [dict(r) for r in c.execute(
+              "SELECT * FROM catalogue_dependencies WHERE edition_id=? ORDER BY id",(edition_id,)).fetchall()]
+
+    def invalidate_dependencies(self, upstream_kind:str, upstream_id:int, current_version:str|None, actor:str|None):
+        now=self._now(); affected_assets=[]; affected_editions=[]
+        with self._conn() as c:
+            rows=c.execute("""SELECT * FROM catalogue_dependencies
+              WHERE upstream_kind=? AND upstream_id=? AND COALESCE(upstream_version,'')<>COALESCE(?, '')""",
+              (upstream_kind,upstream_id,current_version)).fetchall()
+            for r in rows:
+                if r["downstream_kind"]=="ASSET":
+                    a=c.execute("SELECT state,edition_id FROM catalogue_assets WHERE id=?",(r["downstream_id"],)).fetchone()
+                    if a and a["state"] not in {"SUPERSEDED"}:
+                        c.execute("UPDATE catalogue_assets SET state='STALE' WHERE id=?",(r["downstream_id"],))
+                        affected_assets.append(r["downstream_id"])
+                elif r["downstream_kind"]=="EDITION":
+                    e=c.execute("SELECT state FROM catalogue_editions WHERE id=?",(r["downstream_id"],)).fetchone()
+                    if e and e["state"] not in {"PUBLISHED","SUPERSEDED"}:
+                        c.execute("UPDATE catalogue_editions SET state='BLOCKED',updated_at=? WHERE id=?",(now,r["downstream_id"]))
+                        affected_editions.append(r["downstream_id"])
+            editions=set(affected_editions)
+            for aid in affected_assets:
+                er=c.execute("SELECT edition_id FROM catalogue_assets WHERE id=?",(aid,)).fetchone()
+                if er: editions.add(er["edition_id"])
+            for eid in editions:
+                c.execute("""INSERT INTO catalogue_events
+                  (edition_id,event,actor,details_json,created_at) VALUES(?,?,?,?,?)""",
+                  (eid,"dependency.invalidated",actor,json.dumps({"upstream_kind":upstream_kind,
+                  "upstream_id":upstream_id,"current_version":current_version,
+                  "assets":affected_assets},separators=(",",":")),now))
+        return {"assets":affected_assets,"editions":affected_editions}
+
     def create_asset(self, edition_id: int, asset_type: str, product_line_id: int | None,
                      uri: str | None, sha256: str | None, actor: str | None,
                      metadata: dict | None=None, source_record_version: str | None=None):
@@ -152,7 +265,10 @@ class CatalogueStore:
               (edition_id,product_line_id,asset_type,version,"CANDIDATE",uri,sha256,source_record_version,
                json.dumps(metadata or {},separators=(",",":")),actor,now))
             aid=cur.lastrowid
-        return self.get_asset(aid)
+        asset=self.get_asset(aid)
+        if product_line_id is not None and source_record_version is not None:
+            self.add_dependency(edition_id,"PRODUCT_MASTER",product_line_id,str(source_record_version),"ASSET",aid)
+        return asset
 
     def get_asset(self, asset_id:int):
         with self._conn() as c:
