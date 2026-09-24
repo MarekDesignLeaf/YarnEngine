@@ -640,7 +640,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
       <button data-tab="worklog">Work log</button>
     </div></details>
     <button data-tab="heart" class="navHeart"><svg class="navHeartIcon" viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.2 10.6 20C5.4 15.3 2 12.2 2 8.4 2 5.3 4.4 3 7.4 3c1.8 0 3.5.8 4.6 2.1C13.1 3.8 14.8 3 16.6 3 19.6 3 22 5.3 22 8.4c0 3.8-3.4 6.9-8.6 11.6L12 21.2z"/></svg>Living Heart</button>
-    <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
+    <button data-tab="admin" id="tabAdmin" class="hidden">Admin</button>
   </nav>
   <div class="headTools">
     <button type="button" id="btnBack" class="alt" title="Back to the previous screen">&larr; Back</button>
@@ -1225,8 +1225,22 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     </div>
   </div>
   <div class="card"><h2>Backup</h2>
-    <p class="small muted">Download a snapshot of the whole database (users, yarns, product lines, projects, swatches, calibration data) as a zip file, in case something ever happens to the server's storage.</p>
+    <p class="small muted">Download a snapshot of the whole database (users, yarns, product lines, projects, swatches, calibration data and the administrator log) as a zip file, in case something ever happens to the server's storage.</p>
     <div class="toolbar"><button id="btnBackup" class="alt">Download backup</button></div>
+  </div>
+  <div class="card"><h2>System log</h2>
+    <p class="small muted">Live application and audit log from this server. It records API activity, errors and sign-in events. Passwords, API keys, cookies and request bodies are never written to the log.</p>
+    <div class="toolbar" style="align-items:end">
+      <label><span>Level</span><select id="logLevel"><option value="">All levels</option><option value="INFO">Info</option><option value="WARNING">Warning</option><option value="ERROR">Error</option></select></label>
+      <label style="min-width:220px;flex:1"><span>Search</span><input id="logSearch" placeholder="path, user, event, request ID or message"></label>
+      <button id="btnLogsRefresh" class="alt">Refresh</button>
+      <label class="small" style="display:flex;align-items:center;gap:6px;padding-bottom:8px"><input id="logAuto" type="checkbox" checked> Auto refresh</label>
+    </div>
+    <div id="logSummary" class="small muted" style="margin:6px 0"></div>
+    <div style="overflow:auto;max-height:520px">
+      <table id="logTable"><thead><tr><th>Time</th><th>Level</th><th>User</th><th>Request</th><th>Status</th><th>ms</th><th>Event / detail</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div id="logStatus" class="status hidden"></div>
   </div>
   <div class="card"><h2>Yarn data ingestion</h2>
     <p class="small muted">Status of the automated manufacturer-catalogue ingestion pipeline (M9). Source list and crawling run from the command line on the server; this is a read-only status view.</p>
@@ -1568,7 +1582,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='production')loadProduction();if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='production')loadProduction();if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
  if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
@@ -3050,6 +3064,59 @@ async function loadUsers(){const tb=document.querySelector('#userTable tbody');t
 async function adminUpdate(id,body){try{await api('/api/admin/users/'+id,{method:'PUT',body});status($('adminStatus'),t('msg.saved'),'good');loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}}
 $('btnCreateUser').onclick=async()=>{try{await api('/api/admin/users',{method:'POST',body:{username:$('auUser').value,password:$('auPass').value,role:$('auRole').value,email:$('auEmail').value||null}});status($('adminStatus'),t('msg.saved'),'good');$('auUser').value='';$('auPass').value='';$('auEmail').value='';loadUsers();}catch(e){status($('adminStatus'),e.message,'bad');}};
 $('btnBackup').onclick=()=>{location.href='/api/admin/backup';};
+
+let adminLogTimer=null,adminLogSearchTimer=null;
+function stopAdminLogAuto(){
+ if(adminLogTimer){clearInterval(adminLogTimer);adminLogTimer=null;}
+}
+function startAdminLogAuto(){
+ stopAdminLogAuto();
+ if($('logAuto')&&$('logAuto').checked){
+  adminLogTimer=setInterval(()=>{
+   const tab=$('tab-admin');
+   if(tab&&!tab.classList.contains('hidden'))loadAdminLogs();
+  },10000);
+ }
+}
+function adminLogLevelBadge(level){
+ const cls=level==='ERROR'?'bad':(level==='WARNING'?'warn':'good');
+ return `<span class="badge ${cls}">${esc(level||'INFO')}</span>`;
+}
+async function loadAdminLogs(){
+ if(!ME||ME.role!=='admin')return;
+ const tb=document.querySelector('#logTable tbody');
+ const params=new URLSearchParams({limit:'200'});
+ const level=$('logLevel').value;
+ const q=$('logSearch').value.trim();
+ if(level)params.set('level',level);
+ if(q)params.set('q',q);
+ try{
+  const data=await api('/api/admin/logs?'+params.toString());
+  $('logSummary').textContent=`Showing ${data.items.length} of ${data.total} matching entries · newest first`;
+  tb.innerHTML=data.items.map(row=>{
+   const when=esc((row.created_at||'').replace('T',' ').replace('Z',' UTC'));
+   const who=row.username?esc(row.username+(row.role?' · '+row.role:'')):'—';
+   const req=[row.method,row.path].filter(Boolean).map(esc).join(' ');
+   const detailText=row.details?JSON.stringify(row.details,null,2):'';
+   const detail=(row.message||detailText)
+    ?`<details><summary>${esc(row.event||'event')}${row.message?' · '+esc(row.message):''}</summary>${detailText?`<pre style="white-space:pre-wrap;max-width:720px">${esc(detailText)}</pre>`:''}<div class="small muted">Request ID: ${esc(row.request_id||'—')}</div></details>`
+    :`<span>${esc(row.event||'')}</span><div class="small muted">${esc(row.request_id||'')}</div>`;
+   return `<tr><td class="small" style="white-space:nowrap">${when}</td><td>${adminLogLevelBadge(row.level)}</td><td class="small">${who}</td><td class="small"><code>${req}</code></td><td>${row.status_code??'—'}</td><td>${row.duration_ms??'—'}</td><td class="small">${detail}</td></tr>`;
+  }).join('');
+  $('logStatus').classList.add('hidden');
+ }catch(e){
+  tb.innerHTML='';
+  status($('logStatus'),e.message,'bad');
+ }
+}
+$('btnLogsRefresh').onclick=loadAdminLogs;
+$('logLevel').onchange=loadAdminLogs;
+$('logSearch').oninput=()=>{
+ clearTimeout(adminLogSearchTimer);
+ adminLogSearchTimer=setTimeout(loadAdminLogs,350);
+};
+$('logAuto').onchange=startAdminLogAuto;
+
 async function loadIngestionStats(){const box=$('ingestStats');try{const s=await api('/api/admin/ingestion/stats');box.innerHTML=`<table style="width:100%"><tbody>
   <tr><td>Manufacturer sources on file</td><td><b>${s.sources}</b></td></tr>
   <tr><td>— with a verified official domain</td><td><b>${s.sources_verified}</b></td></tr>
