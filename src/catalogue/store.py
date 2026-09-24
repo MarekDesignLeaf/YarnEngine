@@ -11,6 +11,7 @@ from pathlib import Path
 from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_checks, consistency_checks
 from .decision import decide
 from .correction import choose_correction
+from .threed import validate_canonical_3d, validate_360_manifest
 
 
 class CatalogueStore:
@@ -133,6 +134,18 @@ class CatalogueStore:
               created_at TEXT NOT NULL,
               UNIQUE(upstream_kind,upstream_id,upstream_version,downstream_kind,downstream_id),
               FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id)
+            );
+            CREATE TABLE IF NOT EXISTS catalogue_360_manifests(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              edition_id INTEGER NOT NULL,
+              product_line_id INTEGER NOT NULL,
+              canonical_3d_asset_id INTEGER,
+              manifest_json TEXT NOT NULL,
+              manifest_hash TEXT NOT NULL,
+              created_by TEXT,
+              created_at TEXT NOT NULL,
+              FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id),
+              FOREIGN KEY(canonical_3d_asset_id) REFERENCES catalogue_assets(id)
             );
             CREATE TABLE IF NOT EXISTS catalogue_events(
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -289,6 +302,10 @@ class CatalogueStore:
             if product_line_id is None or source_record_version is None:
                 raise ValueError("MASTER_VISUAL requires product and Product Master Record version")
             metadata.setdefault("role","authoritative_visual_reference")
+        if asset_type=="CANONICAL_3D":
+            if product_line_id is None or source_record_version is None:
+                raise ValueError("CANONICAL_3D requires product and Product Master Record version")
+            metadata=validate_canonical_3d(metadata)
         if asset_type=="PRODUCT_VIEW":
             if product_line_id is None or source_record_version is None:
                 raise ValueError("PRODUCT_VIEW requires product and Product Master Record version")
@@ -495,6 +512,46 @@ class CatalogueStore:
             c.execute("UPDATE catalogue_corrections SET candidate_asset_id=? WHERE id=?",
                       (candidate_asset_id,correction_id))
         return candidate
+
+    def register_360(self, edition_id:int, product_line_id:int, manifest:dict, actor:str|None):
+        if not self.get(edition_id):raise KeyError("catalogue edition not found")
+        m=validate_360_manifest(manifest)
+        canonical_id=m.get("canonical_3d_asset_id")
+        if m["source"]=="CANONICAL_3D":
+            asset=self.get_asset(int(canonical_id))
+            if not asset or asset["edition_id"]!=edition_id or asset["product_line_id"]!=product_line_id:
+                raise ValueError("Canonical 3D asset does not match edition/product")
+            if asset["asset_type"]!="CANONICAL_3D" or asset["state"] not in {"VALIDATED","APPROVED","LOCKED"}:
+                raise ValueError("Canonical 3D source must be validated")
+        import hashlib
+        raw=json.dumps(m,sort_keys=True,separators=(",",":")).encode("utf-8")
+        digest=hashlib.sha256(raw).hexdigest();now=self._now()
+        with self._conn() as c:
+            cur=c.execute("""INSERT INTO catalogue_360_manifests
+              (edition_id,product_line_id,canonical_3d_asset_id,manifest_json,manifest_hash,created_by,created_at)
+              VALUES(?,?,?,?,?,?,?)""",(edition_id,product_line_id,canonical_id,
+              raw.decode("utf-8"),digest,actor,now))
+            mid=cur.lastrowid
+        if canonical_id:
+            self.add_dependency(edition_id,"ASSET",int(canonical_id),str(self.get_asset(int(canonical_id))["version"]),
+                                "EDITION",edition_id)
+        return {"id":mid,"manifest":m,"manifest_hash":digest}
+
+    def list_360(self, edition_id:int):
+        with self._conn() as c:
+            rows=c.execute("SELECT * FROM catalogue_360_manifests WHERE edition_id=? ORDER BY id",
+                           (edition_id,)).fetchall()
+            out=[]
+            for r in rows:
+                d=dict(r);d["manifest"]=json.loads(d.pop("manifest_json"));out.append(d)
+            return out
+
+    def lock_asset(self, asset_id:int):
+        a=self.get_asset(asset_id)
+        if not a:raise KeyError("catalogue asset not found")
+        if a["state"]!="VALIDATED":raise ValueError("asset must be VALIDATED before lock")
+        with self._conn() as c:c.execute("UPDATE catalogue_assets SET state='LOCKED' WHERE id=?",(asset_id,))
+        return self.get_asset(asset_id)
 
     def add_validation(self, asset_id:int, report:dict, actor:str|None):
         asset=self.get_asset(asset_id)
