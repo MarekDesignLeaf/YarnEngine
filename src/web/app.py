@@ -2451,6 +2451,26 @@ def create_catalogue_asset(edition_id:int,payload:dict,http_request:Request):
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=422,detail=str(e))
 
+@app.post("/api/catalogue-assets/{asset_id}/master-visual/lock")
+def lock_catalogue_master_visual(asset_id:int,http_request:Request):
+    try:return catalogue_store.lock_master_visual(asset_id,_catalogue_actor(http_request))
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogue-assets/{asset_id}/identity-validation")
+def validate_catalogue_identity(asset_id:int,payload:dict,http_request:Request):
+    try:return catalogue_store.validate_product_identity(asset_id,payload.get("observation") or {},_catalogue_actor(http_request))
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=422,detail=str(e))
+
+@app.get("/api/catalogues/{edition_id}/products/{product_line_id}/view-graph")
+def get_catalogue_view_graph(edition_id:int,product_line_id:int):
+    return catalogue_store.view_graph(edition_id,product_line_id)
+
+@app.post("/api/catalogues/{edition_id}/products/{product_line_id}/view-consistency")
+def validate_catalogue_view_consistency(edition_id:int,product_line_id:int,http_request:Request):
+    return catalogue_store.validate_view_consistency(edition_id,product_line_id,_catalogue_actor(http_request))
+
 @app.post("/api/catalogue-assets/{asset_id}/validation")
 def validate_catalogue_asset(asset_id:int,payload:dict,http_request:Request):
     try:
