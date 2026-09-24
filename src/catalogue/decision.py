@@ -19,14 +19,20 @@ def decide(policy:dict|None, results:list[dict]) -> dict:
     if duplicates:
         return {"decision":"BLOCKED","reason":"duplicate_check_results","checks":sorted(duplicates)}
     concrete=[]
+    missing=[]
     for cid in required:
         r=by.get(cid)
-        if r is None:return {"decision":"BLOCKED","reason":"required_check_missing","check_id":cid}
+        if r is None:
+            missing.append(cid)
+            continue
         status=str(r.get("status") or "").upper()
         if status not in STATUSES:return {"decision":"BLOCKED","reason":"invalid_status","check_id":cid}
         concrete.append((cid,status,r))
+    # Known mandatory FAIL has precedence so correction can start immediately,
+    # while the caller still retains missing/incomplete checks in the report.
     fails=[cid for cid,s,_ in concrete if s=="FAIL"]
-    if fails:return {"decision":"FAIL","reason":"mandatory_fail","checks":fails}
+    if fails:return {"decision":"FAIL","reason":"mandatory_fail","checks":fails,"missing_checks":missing}
+    if missing:return {"decision":"BLOCKED","reason":"required_check_missing","checks":missing}
     errors=[cid for cid,s,_ in concrete if s=="ERROR"]
     if errors:return {"decision":"BLOCKED","reason":"validator_error","checks":errors}
     unavailable=[cid for cid,s,_ in concrete if s in {"NOT_RUN","UNAVAILABLE"}]
