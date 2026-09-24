@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: yarnengine
+    name: opencrochet-pro
     runtime: docker
     healthCheckPath: /api/health
     envVars:

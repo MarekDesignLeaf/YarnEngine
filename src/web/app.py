@@ -82,6 +82,10 @@ from src.production.store import ProductionStore, ProductionError
 from src.catalogue.store import CatalogueStore
 from src.catalogue.providers import ProviderRegistry, DeterministicFixtureProvider, GenerationRequest, provenance
 from src.catalogue.interior import InteriorBuilder
+from src.catalogue.ai_input import (CatalogueAIUnavailable, generate_catalogue_plan,
+                                    describe_product_photo, ALLOWED_MEDIA as CATALOGUE_PHOTO_MEDIA,
+                                    MAX_IMAGE_BYTES as CATALOGUE_PHOTO_MAX_BYTES)
+from src.catalogue.model_input import normalize_catalogue_model
 import datetime, os, sqlite3, time, traceback, uuid, hashlib
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -95,6 +99,8 @@ ROOT = Path(__file__).resolve().parents[2]
 # persistent volume can be mounted there in production (Railway) and survive deploys.
 DATA_DIR = Path(os.environ.get("YARNENGINE_DATA_DIR") or (ROOT / "data/db"))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+PRODUCT_PHOTO_DIR = DATA_DIR / "product_photos"
+PRODUCT_PHOTO_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = DATA_DIR / "web_app.sqlite"
 STATIC = Path(__file__).resolve().parent / "static"
 
@@ -154,10 +160,11 @@ def _write_admin_log(**kwargs):
 
 app = FastAPI(
     title="OpenCrochet Pro",
-    version="M12.3",
+    version="M12.4",
     description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
+app.mount("/media/product-photos", StaticFiles(directory=PRODUCT_PHOTO_DIR), name="product_photos")
 
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
@@ -537,7 +544,7 @@ def admin_backup():
     second copy against volume loss or corruption."""
     data = build_backup_zip(DATA_DIR)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
-    filename = f"yarnengine-backup-{stamp}.zip"
+    filename = f"opencrochet-pro-backup-{stamp}.zip"
     return StreamingResponse(_io.BytesIO(data), media_type="application/zip",
                              headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 
@@ -1389,7 +1396,7 @@ def web_manifest():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": "M12.3"}
+    return {"status": "ok", "version": "M12.4"}
 
 
 def _existing_pattern_rows():
@@ -2402,6 +2409,135 @@ def _catalogue_manifest(payload: dict):
       },"products":products
     }
 
+
+def _catalogue_products_from_store() -> list[dict]:
+    store = service._store()
+    try:
+        return store.list_product_lines()
+    finally:
+        store.close()
+
+
+def _catalogue_manifest_from_rows(plan: dict, rows_by_id: dict[int, dict]) -> dict:
+    products = []
+    product_copy = plan.get("product_copy") or {}
+    for seq, pid in enumerate(plan["product_ids"], 1):
+        row = rows_by_id[int(pid)]
+        copy = product_copy.get(str(pid))
+        products.append({
+            "sequence": seq,
+            "product_line_id": row["id"],
+            "name": row["name"],
+            "description": (copy if copy is not None else row.get("description")),
+            "photo_url": row.get("photo_url"),
+            "product_url": row.get("product_url"),
+            "materials": row.get("materials") or [],
+            "estimated_material_cost": None if row.get("total_cost") is None else {
+                "amount": row["total_cost"],
+                "currency": row.get("total_cost_currency"),
+            },
+            "source_updated_at": row.get("updated_at"),
+        })
+    return {
+        "schema": "opencrochet.catalogue.manifest.v1",
+        "title": plan["title"],
+        "subtitle": plan.get("subtitle") or "",
+        "locale": plan.get("locale") or "en-GB",
+        "format": plan.get("format") or "A4",
+        "options": {
+            "include_materials": bool(plan.get("include_materials", True)),
+            "include_estimated_material_cost": bool(
+                plan.get("include_estimated_material_cost", False)
+            ),
+        },
+        "products": products,
+    }
+
+
+@app.post("/api/catalogue/generate-from-prompt")
+def catalogue_generate_from_prompt(payload: dict):
+    prompt = str(payload.get("prompt") or "").strip()
+    if not prompt:
+        raise HTTPException(status_code=422, detail="prompt is required")
+    rows = _catalogue_products_from_store()
+    rows_by_id = {int(row["id"]): row for row in rows}
+    raw_ids = payload.get("product_ids")
+    if raw_ids is not None:
+        if not isinstance(raw_ids, list) or not raw_ids:
+            raise HTTPException(status_code=422, detail="product_ids must be a non-empty list")
+        selected = []
+        for value in raw_ids:
+            try:
+                pid = int(value)
+            except (TypeError, ValueError):
+                raise HTTPException(status_code=422, detail="invalid product id")
+            if pid not in rows_by_id:
+                raise HTTPException(status_code=422, detail=f"product {pid} not found")
+            selected.append(rows_by_id[pid])
+        rows = selected
+    if not rows:
+        raise HTTPException(status_code=422, detail="no products are available")
+
+    preferences = {
+        "title": str(payload.get("title") or "").strip(),
+        "subtitle": str(payload.get("subtitle") or "").strip(),
+        "locale": payload.get("locale") or "en-GB",
+        "format": payload.get("format") or "A4",
+        "include_materials": bool(payload.get("include_materials", True)),
+        "include_estimated_material_cost": bool(
+            payload.get("include_estimated_material_cost", False)
+        ),
+    }
+    augmented_prompt = prompt + "\n\nCurrent UI preferences (use unless the prompt says otherwise): " + json.dumps(
+        preferences, ensure_ascii=False, separators=(",", ":")
+    )
+    stored_key, stored_model = _vision_settings()
+    chosen_model = vision_model_name(stored_model)
+    try:
+        plan = generate_catalogue_plan(
+            augmented_prompt,
+            rows,
+            api_key=stored_key or vision_env_key(),
+            model=chosen_model,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except CatalogueAIUnavailable as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    allowed = {int(row["id"]): row for row in rows}
+    for pid in plan["product_ids"]:
+        if int(pid) not in allowed:
+            raise HTTPException(status_code=422, detail=f"generated product {pid} is not available")
+    manifest = _catalogue_manifest_from_rows(plan, allowed)
+    digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
+    generation = {
+        "source": "prompt",
+        "model": chosen_model,
+        "prompt_hash": digest,
+    }
+    if len(prompt) <= 2000:
+        generation["prompt"] = prompt
+    manifest["generation"] = generation
+    return manifest
+
+
+@app.post("/api/catalogue/normalize-model")
+def catalogue_normalize_model(payload: dict):
+    raw = payload.get("model")
+    if not isinstance(raw, dict):
+        raise HTTPException(status_code=422, detail="model must be a JSON object")
+    try:
+        size = len(json.dumps(raw, ensure_ascii=False).encode("utf-8"))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=422, detail="model is not valid JSON data")
+    if size > 2 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="model file is too large (maximum 2 MB)")
+    try:
+        return normalize_catalogue_model(raw, _catalogue_products_from_store())
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+
+
 @app.get("/api/catalogues")
 def list_catalogues():
     return catalogue_store.list()
@@ -2585,6 +2721,80 @@ def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
     try: return catalogue_store.transition(edition_id,target,_catalogue_actor(http_request),payload.get("details"))
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
+# ------------------------------------------------------------- product photos ---
+_PRODUCT_PHOTO_EXT = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "image/gif": ".gif",
+}
+
+
+def _decode_product_photo(payload: dict) -> tuple[str, bytes]:
+    media_type = str(payload.get("media_type") or "").lower().strip()
+    data = str(payload.get("data") or "").strip()
+    if data.startswith("data:") and "," in data:
+        header, data = data.split(",", 1)
+        declared = header[5:].split(";", 1)[0].strip().lower()
+        if declared:
+            media_type = declared
+    if media_type not in CATALOGUE_PHOTO_MEDIA:
+        raise HTTPException(status_code=422, detail="unsupported image type")
+    if not data:
+        raise HTTPException(status_code=422, detail="photo data is required")
+    if len(data) > 12 * 1024 * 1024:
+        raise HTTPException(status_code=413, detail="photo is too large (maximum 8 MB)")
+    try:
+        blob = base64.b64decode(data, validate=True)
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=422, detail="photo could not be decoded")
+    if not blob:
+        raise HTTPException(status_code=422, detail="photo is empty")
+    if len(blob) > CATALOGUE_PHOTO_MAX_BYTES:
+        raise HTTPException(status_code=413, detail="photo is too large (maximum 8 MB)")
+    return media_type, blob
+
+
+@app.post("/api/admin/product-photo/upload")
+def upload_product_photo(payload: dict, http_request: Request):
+    _require_admin(http_request)
+    media_type, blob = _decode_product_photo(payload)
+    suffix = _PRODUCT_PHOTO_EXT[media_type]
+    name = uuid.uuid4().hex + suffix
+    target = PRODUCT_PHOTO_DIR / name
+    tmp = PRODUCT_PHOTO_DIR / (name + ".tmp")
+    try:
+        tmp.write_bytes(blob)
+        os.replace(tmp, target)
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+    return {"url": f"/media/product-photos/{name}"}
+
+
+@app.post("/api/admin/product-photo/read")
+def read_product_photo(payload: dict, http_request: Request):
+    _require_admin(http_request)
+    media_type, blob = _decode_product_photo(payload)
+    stored_key, stored_model = _vision_settings()
+    chosen_model = vision_model_name(stored_model)
+    try:
+        result = describe_product_photo(
+            media_type,
+            blob,
+            api_key=stored_key or vision_env_key(),
+            model=chosen_model,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
+    except CatalogueAIUnavailable as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    return {**result, "model": chosen_model}
+
 
 # ------------------------------------------------------------- product lines (catalogue) ---
 @app.get("/api/product-lines")
