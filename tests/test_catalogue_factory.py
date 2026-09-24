@@ -74,3 +74,36 @@ def test_ai_pass_requires_calibration(tmp_path):
             "evidence":{"region":[0,0,1,1]},"method":"AI"}
     with pytest.raises(ValueError, match="calibration_id"):
         s.add_validation(a["id"],report,"tester")
+
+
+def test_product_master_change_marks_old_dependent_asset_stale(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite")
+    e=s.create(manifest(),"tester")
+    pm1=s.create_product_master(7,{"product_id":"P7","variant_id":"V1","display_name":"Fox"},"hash-pm1","tester")
+    pm1=s.approve_product_master(pm1["id"],"tester")
+    a=s.create_asset(e["id"],"MASTER_VISUAL",7,"fox-v1.png","asset1","tester",
+                     source_record_version=str(pm1["version"]))
+    assert s.get_asset(a["id"])["state"]=="CANDIDATE"
+    pm2=s.create_product_master(7,{"product_id":"P7","variant_id":"V1","display_name":"Fox",
+                                  "materials":["new"]},"hash-pm2","tester")
+    s.approve_product_master(pm2["id"],"tester")
+    assert s.get_asset(a["id"])["state"]=="STALE"
+    assert s.get_product_master(pm1["id"])["state"]=="SUPERSEDED"
+    assert s.get_product_master(pm2["id"])["state"]=="APPROVED"
+
+
+def test_locked_asset_is_not_reopened_after_master_change(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite")
+    e=s.create(manifest(),"tester")
+    pm1=s.create_product_master(9,{"product_id":"P9","variant_id":"V1","display_name":"Bear"},"h1","tester")
+    s.approve_product_master(pm1["id"],"tester")
+    a=s.create_asset(e["id"],"MASTER_VISUAL",9,"bear.png","a1","tester",source_record_version="1")
+    # Simulate an approved/locked production binary. Invalidation may only mark it stale.
+    with s._conn() as db: db.execute("UPDATE catalogue_assets SET state='LOCKED' WHERE id=?",(a["id"],))
+    pm2=s.create_product_master(9,{"product_id":"P9","variant_id":"V1","display_name":"Bear 2"},"h2","tester")
+    s.approve_product_master(pm2["id"],"tester")
+    assert s.get_asset(a["id"])["state"]=="STALE"
+    # A replacement is a new asset version, never the old binary reopened.
+    replacement=s.create_asset(e["id"],"MASTER_VISUAL",9,"bear-v2.png","a2","tester",source_record_version="2")
+    assert replacement["version"]==2
+    assert replacement["state"]=="CANDIDATE"
