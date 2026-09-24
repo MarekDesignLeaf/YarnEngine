@@ -80,6 +80,8 @@ from src.worklog.store import WorkLogStore
 from typing import Optional
 from src.production.store import ProductionStore, ProductionError
 from src.catalogue.store import CatalogueStore
+from src.catalogue.providers import ProviderRegistry, DeterministicFixtureProvider, GenerationRequest, provenance
+from src.catalogue.interior import InteriorBuilder
 import datetime, os, sqlite3, time, traceback, uuid
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -132,6 +134,9 @@ swatch_store = SwatchStore(DATA_DIR / 'swatches.sqlite')
 worklog_store = WorkLogStore(DATA_DIR / 'worklog.sqlite')
 production_store = ProductionStore(DATA_DIR / 'production.sqlite')
 catalogue_store = CatalogueStore(DATA_DIR / 'catalogue.sqlite')
+catalogue_providers = ProviderRegistry()
+catalogue_providers.register(DeterministicFixtureProvider())
+catalogue_interior = InteriorBuilder(catalogue_store, DATA_DIR / 'catalogue_output')
 crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
@@ -2412,6 +2417,78 @@ def get_catalogue(edition_id:int):
 def create_catalogue(payload:dict,http_request:Request):
     manifest=_catalogue_manifest(payload)
     return catalogue_store.create(manifest,_catalogue_actor(http_request))
+
+@app.get("/api/catalogue/providers")
+def list_catalogue_generation_providers():
+    return {"providers":catalogue_providers.list()}
+
+@app.post("/api/catalogues/{edition_id}/generate")
+def generate_catalogue_candidate(edition_id:int,payload:dict,http_request:Request):
+    edition=catalogue_store.get(edition_id)
+    if edition is None:raise HTTPException(status_code=404,detail="catalogue edition not found")
+    provider_id=str(payload.get("provider_id") or "").strip()
+    try:provider=catalogue_providers.get(provider_id)
+    except KeyError as e:raise HTTPException(status_code=422,detail=str(e))
+    try:
+        product_line_id=int(payload.get("product_line_id"))
+        source_record_version=str(payload.get("source_record_version") or "")
+        if not source_record_version:raise ValueError("source_record_version is required")
+        req=GenerationRequest(
+          task=str(payload.get("task") or "PRODUCT_VIEW"),
+          product_line_id=product_line_id,
+          source_record_version=source_record_version,
+          prompt=str(payload.get("prompt") or ""),
+          references=tuple(payload.get("references") or ()),
+          parameters=payload.get("parameters") or {})
+        if not req.prompt.strip():raise ValueError("prompt is required")
+        result=provider.generate(req)
+        asset_type=str(payload.get("asset_type") or "PRODUCT_VIEW").upper()
+        metadata=dict(payload.get("metadata") or {})
+        metadata["generation_provenance"]=provenance(req,result)
+        candidate=catalogue_store.create_asset(
+          edition_id,asset_type,product_line_id,result.candidate_uri,result.candidate_sha256,
+          _catalogue_actor(http_request),metadata,source_record_version)
+        run_id=catalogue_store.record_generation(
+          edition_id,product_line_id,candidate["id"],result.provider_id,result.model_id,
+          req.task,req.prompt_hash,req.parameters,req.references,_catalogue_actor(http_request))
+        return {"generation_run_id":run_id,"candidate":candidate}
+    except (TypeError,ValueError,KeyError) as e:raise HTTPException(status_code=422,detail=str(e))
+
+@app.get("/api/catalogues/{edition_id}/generation-runs")
+def list_catalogue_generation_runs(edition_id:int):
+    if catalogue_store.get(edition_id) is None:raise HTTPException(status_code=404,detail="catalogue edition not found")
+    return catalogue_store.generation_runs(edition_id)
+
+@app.post("/api/catalogue-assets/{asset_id}/decision")
+def decide_catalogue_asset(asset_id:int,payload:dict,http_request:Request):
+    try:return catalogue_store.decide_and_add_validation(
+      asset_id,payload.get("policy"),payload.get("results") or [],_catalogue_actor(http_request),
+      str(payload.get("validator_id") or "decision-engine"),str(payload.get("validator_version") or "1"))
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=422,detail=str(e))
+
+@app.post("/api/catalogue-assets/{asset_id}/correction-plan")
+def plan_catalogue_asset_correction(asset_id:int,payload:dict,http_request:Request):
+    try:return catalogue_store.plan_correction(
+      asset_id,payload.get("failed_checks") or [],_catalogue_actor(http_request),
+      bool(payload.get("local_edit_allowed",True)),int(payload.get("max_regenerations",2)))
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=422,detail=str(e))
+
+@app.post("/api/catalogue-corrections/{correction_id}/candidate/{candidate_asset_id}")
+def attach_catalogue_correction_candidate(correction_id:int,candidate_asset_id:int):
+    try:return catalogue_store.attach_correction_candidate(correction_id,candidate_asset_id)
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/build-interior")
+def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
+    brand=payload.get("brand") or {}
+    try:
+        result=catalogue_interior.build(edition_id,brand,_catalogue_actor(http_request))
+        return result
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
 
 @app.get("/api/catalogue-product-masters")
 def list_catalogue_product_masters(product_line_id:int|None=None):
