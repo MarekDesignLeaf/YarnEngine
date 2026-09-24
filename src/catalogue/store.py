@@ -8,6 +8,7 @@ import datetime as _dt
 import json
 import sqlite3
 from pathlib import Path
+from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_checks, consistency_checks
 
 
 class CatalogueStore:
@@ -253,6 +254,21 @@ class CatalogueStore:
         if not self.get(edition_id): raise KeyError("catalogue edition not found")
         if asset_type not in {"MASTER_VISUAL","PRODUCT_VIEW","CANONICAL_3D","PAGE","COVER","EXPORT"}:
             raise ValueError("unknown catalogue asset type")
+        metadata=dict(metadata or {})
+        if asset_type=="MASTER_VISUAL":
+            if product_line_id is None or source_record_version is None:
+                raise ValueError("MASTER_VISUAL requires product and Product Master Record version")
+            metadata.setdefault("role","authoritative_visual_reference")
+        if asset_type=="PRODUCT_VIEW":
+            if product_line_id is None or source_record_version is None:
+                raise ValueError("PRODUCT_VIEW requires product and Product Master Record version")
+            metadata=validate_view_metadata(metadata)
+            master_visual_id=metadata.get("master_visual_id")
+            master_visual=self.get_asset(int(master_visual_id)) if master_visual_id is not None else None
+            if not master_visual or master_visual["asset_type"]!="MASTER_VISUAL" or master_visual["product_line_id"]!=product_line_id:
+                raise ValueError("PRODUCT_VIEW requires Master Visual for the same product")
+            if master_visual["state"] not in {"APPROVED","LOCKED","VALIDATED"}:
+                raise ValueError("PRODUCT_VIEW requires validated or approved Master Visual")
         now=self._now()
         with self._conn() as c:
             r=c.execute("""SELECT COALESCE(MAX(version),0)+1 AS v FROM catalogue_assets
@@ -263,11 +279,14 @@ class CatalogueStore:
               (edition_id,product_line_id,asset_type,version,state,uri,sha256,source_record_version,
                metadata_json,created_by,created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)""",
               (edition_id,product_line_id,asset_type,version,"CANDIDATE",uri,sha256,source_record_version,
-               json.dumps(metadata or {},separators=(",",":")),actor,now))
+               json.dumps(metadata,separators=(",",":")),actor,now))
             aid=cur.lastrowid
         asset=self.get_asset(aid)
         if product_line_id is not None and source_record_version is not None:
             self.add_dependency(edition_id,"PRODUCT_MASTER",product_line_id,str(source_record_version),"ASSET",aid)
+        if asset_type=="PRODUCT_VIEW":
+            self.add_dependency(edition_id,"ASSET",int(metadata["master_visual_id"]),
+                                str(master_visual["version"]),"ASSET",aid)
         return asset
 
     def get_asset(self, asset_id:int):
@@ -283,6 +302,79 @@ class CatalogueStore:
             for r in rows:
                 d=dict(r);d["metadata"]=json.loads(d.pop("metadata_json") or "{}");out.append(d)
             return out
+
+    def lock_master_visual(self, asset_id:int, actor:str|None):
+        a=self.get_asset(asset_id)
+        if not a or a["asset_type"]!="MASTER_VISUAL": raise KeyError("Master Visual not found")
+        if a["state"]!="VALIDATED": raise ValueError("Master Visual must PASS validation before lock")
+        with self._conn() as c:
+            c.execute("""UPDATE catalogue_assets SET state='SUPERSEDED'
+              WHERE edition_id=? AND product_line_id=? AND asset_type='MASTER_VISUAL'
+              AND id<>? AND state IN ('APPROVED','LOCKED')""",(a["edition_id"],a["product_line_id"],asset_id))
+            c.execute("UPDATE catalogue_assets SET state='LOCKED' WHERE id=?",(asset_id,))
+        self.invalidate_dependencies("ASSET",asset_id,str(a["version"]),actor)
+        return self.get_asset(asset_id)
+
+    def product_master_for_asset(self, asset:dict):
+        if asset.get("product_line_id") is None or asset.get("source_record_version") is None:return None
+        with self._conn() as c:
+            r=c.execute("""SELECT * FROM catalogue_product_masters
+              WHERE product_line_id=? AND version=?""",(asset["product_line_id"],int(asset["source_record_version"]))).fetchone()
+            if not r:return None
+            d=dict(r);d["record"]=json.loads(d.pop("record_json"));return d
+
+    def validate_product_identity(self, asset_id:int, observation:dict, actor:str|None,
+                                  validator_id="structured-identity",validator_version="1"):
+        asset=self.get_asset(asset_id)
+        if not asset or asset["asset_type"] not in {"MASTER_VISUAL","PRODUCT_VIEW"}:
+            raise KeyError("visual catalogue asset not found")
+        pm=self.product_master_for_asset(asset)
+        if not pm: raise ValueError("Product Master Record dependency missing")
+        result=identity_checks(pm["record"],observation)
+        report={"asset_sha256":asset.get("sha256"),"policy_version":"identity-v1",
+          "validator_id":validator_id,"validator_version":validator_version,
+          "decision":result["decision"],"checks":result["checks"],
+          "evidence":{"observation":observation},"method":"EXACT"}
+        if result["decision"]=="BLOCKED":
+            with self._conn() as c:c.execute("UPDATE catalogue_assets SET state='BLOCKED' WHERE id=?",(asset_id,))
+            return {"decision":"BLOCKED","checks":result["checks"]}
+        rid=self.add_validation(asset_id,report,actor)
+        return {"validation_report_id":rid,**result}
+
+    def view_graph(self, edition_id:int, product_line_id:int):
+        assets=[a for a in self.list_assets(edition_id)
+                if a["product_line_id"]==product_line_id and a["asset_type"]=="PRODUCT_VIEW"]
+        latest={}
+        for a in assets:
+            token=a["metadata"].get("view_token")
+            if token and (token not in latest or a["version"]>latest[token]["version"]):latest[token]=a
+        nodes=[]
+        for token in VIEW_ORDER:
+            a=latest.get(token)
+            nodes.append({"view_token":token,"asset":a,
+                          "neighbours":list(neighbours(token))})
+        return {"product_line_id":product_line_id,"nodes":nodes}
+
+    def validate_view_consistency(self, edition_id:int, product_line_id:int, actor:str|None):
+        graph=self.view_graph(edition_id,product_line_id)
+        by={n["view_token"]:n["asset"] for n in graph["nodes"] if n["asset"]}
+        results=[];seen=set()
+        for token,a in by.items():
+            for other in neighbours(token):
+                if other not in by: continue
+                edge=tuple(sorted((token,other)))
+                if edge in seen: continue
+                seen.add(edge)
+                r=consistency_checks(a["metadata"].get("observation") or {},
+                                     by[other]["metadata"].get("observation") or {})
+                results.append({"views":list(edge),**r})
+        required=set(VIEW_ORDER)
+        missing=sorted(required-set(by))
+        if missing: decision="BLOCKED"
+        elif any(r["decision"]=="FAIL" for r in results): decision="FAIL"
+        elif any(r["decision"]=="BLOCKED" for r in results): decision="BLOCKED"
+        else: decision="PASS"
+        return {"decision":decision,"missing_views":missing,"edges":results}
 
     def add_validation(self, asset_id:int, report:dict, actor:str|None):
         asset=self.get_asset(asset_id)
