@@ -8,6 +8,11 @@ from .decision import decide
 from .correction import choose_correction
 from .multiview import VIEW_ORDER, neighbours, validate_view_metadata
 from .threed import validate_360_manifest
+from .providers import DeterministicFixtureProvider, GenerationRequest
+from .composer import compose_product_page
+from .store import CatalogueStore
+import tempfile
+from pathlib import Path
 
 CONTRACT_VERSION="catalogue-factory-apvp-v1"
 
@@ -79,6 +84,76 @@ def run_conformance():
         assert m["frame_count"]==24 and m["source"]=="PHYSICAL_TURNTABLE"
     checks.append(_check("TRUE_360_MANIFEST_CONTRACT",valid_360_shape))
 
+    def provider_candidate_only():
+        provider=DeterministicFixtureProvider()
+        req=GenerationRequest("PRODUCT_VIEW",1,"1","canonical product view",(),{"view":"AZ000"})
+        result=provider.generate(req)
+        assert result.candidate_sha256
+        assert not hasattr(result,"decision") and not hasattr(result,"approved")
+    checks.append(_check("GENERATOR_CANNOT_SELF_APPROVE",provider_candidate_only))
+
+    def state_machine_gate_bypass():
+        with tempfile.TemporaryDirectory() as td:
+            store=CatalogueStore(Path(td)/"catalogue.sqlite")
+            edition=store.create({"title":"T","products":[]},"apvp")
+            try:
+                store.transition(edition["id"],"RELEASE_APPROVED","apvp")
+            except ValueError:
+                return
+            raise AssertionError("DRAFT bypassed directly to RELEASE_APPROVED")
+    checks.append(_check("EDITION_RELEASE_GATE_BYPASS_REJECTED",state_machine_gate_bypass))
+
+    def release_approval_gates():
+        with tempfile.TemporaryDirectory() as td:
+            store=CatalogueStore(Path(td)/"catalogue.sqlite")
+            e=store.create({"title":"T","products":[]},"apvp")
+            for state in ("INTERIOR_BUILDING","INTERIOR_VALIDATING","INTERIOR_LOCKED",
+                          "COVER_BUILDING","COVER_VALIDATING","FINAL_VALIDATING"):
+                e=store.transition(e["id"],state,"apvp")
+            blocked=False
+            try: store.transition(e["id"],"RELEASE_APPROVED","apvp")
+            except ValueError: blocked=True
+            assert blocked
+            store.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","apvp")
+            store.add_approval(e["id"],"COMPLIANCE","APPROVED","apvp")
+            assert store.transition(e["id"],"RELEASE_APPROVED","apvp")["state"]=="RELEASE_APPROVED"
+    checks.append(_check("RELEASE_REQUIRES_IP_AND_COMPLIANCE",release_approval_gates))
+
+    def dependency_invalidation():
+        with tempfile.TemporaryDirectory() as td:
+            store=CatalogueStore(Path(td)/"catalogue.sqlite")
+            e=store.create({"title":"T","products":[]},"apvp")
+            record={"product_id":"P","variant_id":"V","display_name":"Fox"}
+            pm1=store.create_product_master(1,record,"pm1","apvp");store.approve_product_master(pm1["id"],"apvp")
+            a=store.create_asset(e["id"],"MASTER_VISUAL",1,"v1.png","a1","apvp",source_record_version="1")
+            pm2=store.create_product_master(1,{**record,"material":"changed"},"pm2","apvp")
+            store.approve_product_master(pm2["id"],"apvp")
+            assert store.get_asset(a["id"])["state"]=="STALE"
+            assert store.get_product_master(pm1["id"])["state"]=="SUPERSEDED"
+    checks.append(_check("UPSTREAM_CHANGE_INVALIDATES_DEPENDANTS",dependency_invalidation))
+
+    def binary_validation_binding():
+        with tempfile.TemporaryDirectory() as td:
+            store=CatalogueStore(Path(td)/"catalogue.sqlite")
+            e=store.create({"title":"T","products":[]},"apvp")
+            a=store.create_asset(e["id"],"PAGE",None,"p.html","correct","apvp")
+            report={"asset_sha256":"wrong","policy_version":"1","validator_id":"exact",
+                    "validator_version":"1","decision":"PASS",
+                    "checks":[{"id":"HASH","status":"PASS"}],"evidence":{"hash":"wrong"},"method":"EXACT"}
+            try: store.add_validation(a["id"],report,"apvp")
+            except ValueError: return
+            raise AssertionError("validation report transferred to a different binary hash")
+    checks.append(_check("VALIDATION_BOUND_TO_ASSET_HASH",binary_validation_binding))
+
+    def deterministic_page():
+        product={"product_id":"P","variant_id":"V","display_name":"Fox","description":"Text"}
+        visual={"state":"LOCKED","sha256":"visual","uri":"fox.png"}
+        brand={"logo_uri":"logo.png","logo_sha256":"logo"}
+        a=compose_product_page(page_number=1,product=product,master_visual=visual,brand=brand)
+        b=compose_product_page(page_number=1,product=product,master_visual=visual,brand=brand)
+        assert a.sha256==b.sha256 and a.html==b.html
+    checks.append(_check("PAGE_COMPOSER_BYTE_DETERMINISTIC",deterministic_page))
+
     passed=sum(1 for c in checks if c["status"]=="PASS")
     return {
       "contract_version":CONTRACT_VERSION,
@@ -86,6 +161,7 @@ def run_conformance():
       "checks_passed":passed,
       "checks_total":len(checks),
       "checks":checks,
+      "check_map":{item["check_id"]:item["status"] for item in checks},
       "invariants":[
         "generation_provider_cannot_approve",
         "missing_policy_blocks",
@@ -93,6 +169,12 @@ def run_conformance():
         "calibrated_ai_bound_to_validator_version",
         "correction_exhausts_to_human_review",
         "canonical_multiview_graph",
-        "true_360_requires_canonical_3d_or_physical_turntable"
+        "true_360_requires_canonical_3d_or_physical_turntable",
+        "generation_provider_cannot_approve",
+        "edition_release_gate_bypass_rejected",
+        "release_requires_ip_and_compliance",
+        "upstream_change_invalidates_dependants",
+        "validation_bound_to_asset_hash",
+        "page_composer_byte_deterministic"
       ]
     }
