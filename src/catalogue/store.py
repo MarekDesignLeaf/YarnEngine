@@ -338,11 +338,17 @@ class CatalogueStore:
         if not a or a["asset_type"]!="MASTER_VISUAL": raise KeyError("Master Visual not found")
         if a["state"]!="VALIDATED": raise ValueError("Master Visual must PASS validation before lock")
         with self._conn() as c:
+            old=[dict(r) for r in c.execute("""SELECT id,version FROM catalogue_assets
+              WHERE edition_id=? AND product_line_id=? AND asset_type='MASTER_VISUAL'
+              AND id<>? AND state IN ('APPROVED','LOCKED')""",
+              (a["edition_id"],a["product_line_id"],asset_id)).fetchall()]
             c.execute("""UPDATE catalogue_assets SET state='SUPERSEDED'
               WHERE edition_id=? AND product_line_id=? AND asset_type='MASTER_VISUAL'
               AND id<>? AND state IN ('APPROVED','LOCKED')""",(a["edition_id"],a["product_line_id"],asset_id))
             c.execute("UPDATE catalogue_assets SET state='LOCKED' WHERE id=?",(asset_id,))
-        self.invalidate_dependencies("ASSET",asset_id,str(a["version"]),actor)
+        # Dependants of a superseded Master Visual must never remain current.
+        for prior in old:
+            self.invalidate_dependencies("ASSET",prior["id"],"SUPERSEDED",actor)
         return self.get_asset(asset_id)
 
     def product_master_for_asset(self, asset:dict):
