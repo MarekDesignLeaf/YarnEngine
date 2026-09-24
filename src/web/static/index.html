@@ -1044,7 +1044,20 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     </div>
   </div>
   <div class="card">
-    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Products</h2><button id="catAll" class="alt">Select all</button><button id="catNone" class="alt">Clear</button></div>
+    <h2>Input</h2>
+    <p class="small muted" style="margin-top:0">Use a prompt, load an already generated JSON model, or build directly from the stored products below.</p>
+    <div class="fields">
+      <label style="grid-column:1/-1"><span>Prompt</span><textarea id="catPrompt" rows="4" placeholder="Example: Create a clean A4 catalogue for the selected products, concise copy, include materials but not costs."></textarea></label>
+      <label style="grid-column:1/-1"><span>Generated model file (JSON)</span><input id="catModelFile" type="file" accept=".json,application/json"></label>
+    </div>
+    <div class="toolbar">
+      <button id="catPromptGenerate">Generate from prompt</button>
+      <button id="catModelLoad" class="alt">Load model</button>
+    </div>
+    <div id="catSource" class="small muted" style="margin-top:8px">Current source: stored products</div>
+  </div>
+  <div class="card">
+    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Stored products</h2><button id="catAll" class="alt">Select all</button><button id="catNone" class="alt">Clear</button></div>
     <div id="catProducts" class="lineGrid"></div>
     <div id="catEmpty" class="muted hidden">No products are available. Add products in Workshop → Products first.</div>
   </div>
@@ -1369,10 +1382,13 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
   <div class="fields">
     <label style="grid-column:1/-1"><span>Name</span><input id="lmName"></label>
     <label style="grid-column:1/-1"><span>Description</span><input id="lmDesc"></label>
-    <label><span>Photo URL</span><input id="lmPhoto" placeholder="https://…"></label>
+    <label><span>Photo URL</span><input id="lmPhoto" placeholder="https://… or uploaded photo"></label>
     <label><span>Product / website URL</span><input id="lmUrl" placeholder="https://…"></label>
+    <label style="grid-column:1/-1"><span>Or upload a photo from this device</span><input id="lmPhotoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+    <div style="grid-column:1/-1"><img id="lmPhotoPreview" class="hidden" alt="Product photo preview" style="max-width:100%;max-height:240px;object-fit:contain;border:1px solid var(--line);border-radius:10px;background:var(--bg-tint)"></div>
   </div>
-  <div class="toolbar"><button id="lmSave">Save product</button><button id="lmDelete" class="danger hidden">Delete product</button></div>
+  <div class="toolbar"><button id="lmSave">Save product</button><button id="lmReadPhoto" class="alt">Read photo</button><button id="lmDelete" class="danger hidden">Delete product</button></div>
+  <p class="small muted" style="margin:6px 0 0">A local photo is stored with OpenCrochet Pro and survives deployment. “Read photo” can suggest only a visible-object name and description; it does not infer specifications.</p>
   <div id="lineModalStatus" class="status hidden"></div>
   <h3>What it's made from</h3>
   <table id="lmMaterials" class="small" style="width:100%"><thead><tr><th>Yarn</th><th>Length / qty</th><th>Cost</th><th>Notes</th><th></th></tr></thead><tbody></tbody></table>
@@ -1620,8 +1636,13 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','catalogue','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='production')loadProduction();if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
- if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='catalogue')loadCatalogueGenerator();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+function setYarnBarForTab(tab){
+ const visible=['calc','patterns','yarns','stash','tools'].includes(tab);
+ $('yarnBar').classList.toggle('hidden',!visible);
+}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{const tab=b.dataset.tab;document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','catalogue','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==tab));setYarnBarForTab(tab);if(tab==='production')loadProduction();if(tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(tab==='projects')loadProjects();if(tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(tab==='stash'){loadStash();loadKit().then(showKitPane);}
+ if(tab==='tools')initTools();if(tab==='lines')loadProductLines();if(tab==='catalogue')loadCatalogueGenerator();if(tab==='worklog')loadWorkLog();if(tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+setYarnBarForTab('calc');
 
 /* ============================ catalogue generator ============================ */
 let CATALOGUE_PRODUCTS=[],CATALOGUE_MANIFEST=null,CATALOGUE_EDITIONS=[];
@@ -1631,8 +1652,7 @@ async function loadCatalogueGenerator(){
   CATALOGUE_PRODUCTS=await api('/api/product-lines');
   renderCatalogueProducts();
   await loadCatalogueEditions();
-  status($('catStatus'),'','');
-  $('catStatus').classList.add('hidden');
+  if(!CATALOGUE_MANIFEST){$('catSource').textContent='Current source: stored products';$('catStatus').classList.add('hidden');}
  }catch(e){status($('catStatus'),e.message,'bad');}
 }
 function renderCatalogueProducts(){
@@ -1656,6 +1676,7 @@ function catalogueManifest(products){
   locale:$('catLanguage').value,
   format:$('catFormat').value,
   options:{include_materials:$('catMaterials').checked,include_estimated_material_cost:$('catCosts').checked},
+  generation:{source:'stored_products'},
   products:products.map((p,index)=>({
    sequence:index+1,product_line_id:p.id,name:p.name,description:p.description||null,
    photo_url:p.photo_url||null,product_url:p.product_url||null,
@@ -1666,18 +1687,56 @@ function catalogueManifest(products){
  };
 }
 function catalogueProductHTML(p,manifest){
- const mats=manifest.options.include_materials?(p.materials||[]).map(m=>`<li>${esc([m.yarn_brand,m.yarn_product].filter(Boolean).join(' ')||m.yarn_id)}${m.length_m?' · '+esc(m.length_m)+' m':''}${m.quantity_g?' · '+esc(m.quantity_g)+' g':''}</li>`).join(''):'';
+ const mats=manifest.options.include_materials?(p.materials||[]).map(m=>`<li>${esc([m.yarn_brand,m.yarn_product].filter(Boolean).join(' ')||m.yarn_id||'Material')}${m.length_m?' · '+esc(m.length_m)+' m':''}${m.quantity_g?' · '+esc(m.quantity_g)+' g':''}</li>`).join(''):'';
  const cost=manifest.options.include_estimated_material_cost&&p.estimated_material_cost?`<p><strong>Estimated material cost:</strong> ${esc(p.estimated_material_cost.currency||'')} ${esc(Number(p.estimated_material_cost.amount).toFixed(2))}</p>`:'';
  return `<article class="catPage"><div class="catProduct">${p.photo_url?`<img src="${esc(p.photo_url)}" alt="">`:'<div class="muted">No product image</div>'}<div><div class="eyebrow">PRODUCT ${esc(p.sequence)}</div><h2>${esc(p.name)}</h2>${p.description?`<p>${esc(p.description)}</p>`:''}${mats?`<h3>Materials</h3><ul>${mats}</ul>`:''}${cost}${p.product_url?`<p class="small">${esc(p.product_url)}</p>`:''}</div></div></article>`;
 }
+function syncCatalogueFields(m){
+ $('catTitle').value=m.title||'Product Catalogue';$('catSubtitle').value=m.subtitle||'';
+ $('catLanguage').value=m.locale||'en-GB';$('catFormat').value=m.format||'A4';
+ $('catMaterials').checked=!!(m.options&&m.options.include_materials);
+ $('catCosts').checked=!!(m.options&&m.options.include_estimated_material_cost);
+}
+function renderCatalogueManifest(manifest,sourceLabel){
+ CATALOGUE_MANIFEST=manifest;
+ syncCatalogueFields(manifest);
+ const products=manifest.products||[],title=esc(manifest.title||'Product Catalogue'),sub=esc(manifest.subtitle||'');
+ $('catPreview').innerHTML=`<article class="catPage" style="display:grid;place-items:center;text-align:center"><div><div class="eyebrow">OPEN CROCHET PRO</div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}<p class="small muted">${products.length} product${products.length===1?'':'s'}</p></div></article>`+products.map(p=>catalogueProductHTML(p,manifest)).join('');
+ $('catManifest').disabled=false;$('catPrint').disabled=false;
+ const persistable=products.length>0&&products.every(p=>p.product_line_id!==null&&p.product_line_id!==undefined&&!isNaN(Number(p.product_line_id)));
+ $('catSave').disabled=!persistable;
+ $('catSource').textContent='Current source: '+sourceLabel;
+ const note=persistable?'':' This preview contains generated model products that are not stored yet, so Save edition is disabled.';
+ status($('catStatus'),`Catalogue preview ready from ${sourceLabel}.${note}`,'good');
+}
 function generateCatalogue(){
  const products=selectedCatalogueProducts();
- if(!products.length){status($('catStatus'),'Select at least one product.','bad');return;}
- CATALOGUE_MANIFEST=catalogueManifest(products);
- const title=esc(CATALOGUE_MANIFEST.title),sub=esc(CATALOGUE_MANIFEST.subtitle||'');
- $('catPreview').innerHTML=`<article class="catPage" style="display:grid;place-items:center;text-align:center"><div><div class="eyebrow">OPEN CROCHET PRO</div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}<p class="small muted">${products.length} product${products.length===1?'':'s'}</p></div></article>`+CATALOGUE_MANIFEST.products.map(p=>catalogueProductHTML(p,CATALOGUE_MANIFEST)).join('');
- $('catManifest').disabled=false;$('catPrint').disabled=false;$('catSave').disabled=false;
- status($('catStatus'),`Catalogue generated from ${products.length} stored product record${products.length===1?'':'s'}. Missing facts were not invented.`,'good');
+ if(!products.length){status($('catStatus'),'Select at least one stored product.','bad');return;}
+ renderCatalogueManifest(catalogueManifest(products),'stored products');
+}
+async function generateCatalogueFromPrompt(){
+ const prompt=$('catPrompt').value.trim();
+ if(!prompt){status($('catStatus'),'Enter a prompt first.','bad');return;}
+ try{
+  status($('catStatus'),'Generating catalogue plan from the prompt…','');
+  const selected=selectedCatalogueProducts();
+  const body={prompt,title:$('catTitle').value.trim(),subtitle:$('catSubtitle').value.trim(),locale:$('catLanguage').value,format:$('catFormat').value,include_materials:$('catMaterials').checked,include_estimated_material_cost:$('catCosts').checked};
+  if(selected.length)body.product_ids=selected.map(p=>p.id);
+  const manifest=await api('/api/catalogue/generate-from-prompt',{method:'POST',body});
+  renderCatalogueManifest(manifest,'prompt');
+ }catch(e){status($('catStatus'),e.message,'bad');}
+}
+async function loadCatalogueModel(){
+ const file=$('catModelFile').files&&$('catModelFile').files[0];
+ if(!file){status($('catStatus'),'Choose a JSON model file first.','bad');return;}
+ if(file.size>2*1024*1024){status($('catStatus'),'Model file is too large (maximum 2 MB).','bad');return;}
+ try{
+  const text=await file.text();let model;
+  try{model=JSON.parse(text);}catch(_){throw new Error('The selected file is not valid JSON.');}
+  status($('catStatus'),'Checking model file…','');
+  const manifest=await api('/api/catalogue/normalize-model',{method:'POST',body:{model}});
+  renderCatalogueManifest(manifest,'model file');
+ }catch(e){status($('catStatus'),e.message,'bad');}
 }
 async function loadCatalogueEditions(){
  try{CATALOGUE_EDITIONS=await api('/api/catalogues');}
@@ -1689,6 +1748,7 @@ async function loadCatalogueEditions(){
 async function saveCatalogueEdition(){
  if(!CATALOGUE_MANIFEST)return;
  const m=CATALOGUE_MANIFEST;
+ if((m.products||[]).some(p=>p.product_line_id===null||p.product_line_id===undefined||isNaN(Number(p.product_line_id)))){status($('catStatus'),'This model-file preview contains products that are not stored in OpenCrochet Pro. Add them to Products first before saving an edition.','bad');return;}
  const payload={title:m.title,subtitle:m.subtitle,locale:m.locale,format:m.format,
    include_materials:m.options.include_materials,
    include_estimated_material_cost:m.options.include_estimated_material_cost,
@@ -1716,6 +1776,8 @@ function openCataloguePrint(){
 $('catAll').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=true);
 $('catNone').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=false);
 $('catGenerate').onclick=generateCatalogue;
+$('catPromptGenerate').onclick=generateCatalogueFromPrompt;
+$('catModelLoad').onclick=loadCatalogueModel;
 $('catSave').onclick=saveCatalogueEdition;
 $('catManifest').onclick=downloadCatalogueManifest;
 $('catPrint').onclick=openCataloguePrint;
@@ -3134,6 +3196,8 @@ function openLineModal(id){
  const l=id?LINES.find(x=>x.id===id):null;
  $('lmTitle').textContent=l?'Edit product':'Add product';
  $('lmName').value=l?.name||'';$('lmDesc').value=l?.description||'';$('lmPhoto').value=l?.photo_url||'';$('lmUrl').value=l?.product_url||'';
+ $('lmPhotoFile').value='';
+ const preview=$('lmPhotoPreview');if(l?.photo_url){preview.src=l.photo_url;preview.classList.remove('hidden');}else{preview.removeAttribute('src');preview.classList.add('hidden');}
  $('lmDelete').classList.toggle('hidden',!l);
  $('lmMatYarn').innerHTML=YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''}</option>`).join('');
  renderLineMaterials(l);
@@ -3152,10 +3216,46 @@ function renderLineMaterials(l){
    Object.assign(LINES.find(x=>x.id===LM_CURRENT),updated);renderLineMaterials(updated);renderProductLines();
  });
 }
-$('lmSave').onclick=async()=>{
- const body={name:$('lmName').value.trim(),description:$('lmDesc').value.trim()||null,photo_url:$('lmPhoto').value.trim()||null,product_url:$('lmUrl').value.trim()||null};
- if(!body.name){status($('lineModalStatus'),'Name is required.','bad');return;}
+function fileDataUrl(file){
+ return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||''));r.onerror=()=>reject(new Error('The photo could not be read.'));r.readAsDataURL(file);});
+}
+async function selectedProductPhotoPayload(){
+ const file=$('lmPhotoFile').files&&$('lmPhotoFile').files[0];
+ if(!file)return null;
+ if(file.size>8*1024*1024)throw new Error('Photo is too large (maximum 8 MB).');
+ if(!['image/jpeg','image/png','image/webp','image/gif'].includes(file.type))throw new Error('Use a JPEG, PNG, WebP or GIF photo.');
+ return {media_type:file.type,data:await fileDataUrl(file)};
+}
+$('lmPhotoFile').onchange=async()=>{
+ const file=$('lmPhotoFile').files&&$('lmPhotoFile').files[0],preview=$('lmPhotoPreview');
+ if(!file){const existing=$('lmPhoto').value.trim();if(existing){preview.src=existing;preview.classList.remove('hidden');}else{preview.removeAttribute('src');preview.classList.add('hidden');}return;}
+ try{const data=await fileDataUrl(file);preview.src=data;preview.classList.remove('hidden');}catch(e){status($('lineModalStatus'),e.message,'bad');}
+};
+$('lmReadPhoto').onclick=async()=>{
  try{
+  const payload=await selectedProductPhotoPayload();
+  if(!payload){status($('lineModalStatus'),'Choose a local photo first.','bad');return;}
+  status($('lineModalStatus'),'Reading the visible product…','');
+  const suggestion=await api('/api/admin/product-photo/read',{method:'POST',body:payload});
+  if(suggestion.name){
+   if(!$('lmName').value.trim()||confirm('Replace the current product name with the photo suggestion?'))$('lmName').value=suggestion.name;
+  }
+  if(suggestion.description){
+   if(!$('lmDesc').value.trim()||confirm('Replace the current description with the photo suggestion?'))$('lmDesc').value=suggestion.description;
+  }
+  status($('lineModalStatus'),`Photo read with ${suggestion.model||'configured model'}. Check the suggested text before saving.`,'good');
+ }catch(e){status($('lineModalStatus'),e.message,'bad');}
+};
+$('lmSave').onclick=async()=>{
+ try{
+  const photoPayload=await selectedProductPhotoPayload();
+  if(photoPayload){
+   status($('lineModalStatus'),'Uploading photo…','');
+   const uploaded=await api('/api/admin/product-photo/upload',{method:'POST',body:photoPayload});
+   $('lmPhoto').value=uploaded.url;
+  }
+  const body={name:$('lmName').value.trim(),description:$('lmDesc').value.trim()||null,photo_url:$('lmPhoto').value.trim()||null,product_url:$('lmUrl').value.trim()||null};
+  if(!body.name){status($('lineModalStatus'),'Name is required.','bad');return;}
    let saved;
    if(LM_CURRENT){saved=await api(`/api/admin/product-lines/${LM_CURRENT}`,{method:'PATCH',body});}
    else{saved=await api('/api/admin/product-lines',{method:'POST',body});LM_CURRENT=saved.id;$('lmDelete').classList.remove('hidden');}
@@ -3281,7 +3381,7 @@ $('btnStashSave').onclick=async()=>{
 async function loadCompanyFooter(){
  try{
    const c=await api('/api/settings/company');
-   const parts=[c.company_name,c.address,c.company_number?('Company no. '+c.company_number):'',c.vat_number?('VAT '+c.vat_number):'',c.email,c.phone,c.website].filter(Boolean);
+   const parts=[c.company_name,c.company_number?('Company no. '+c.company_number):'',c.vat_number?('VAT '+c.vat_number):'',c.email,c.phone,c.website].filter(Boolean);
    $('footCompany').textContent=parts.join(' · ')||'PiLoop · More Than a Toy';
  }catch(e){$('footCompany').textContent='PiLoop · More Than a Toy';}
 }
