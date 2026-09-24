@@ -4581,7 +4581,7 @@ $('wlCsv').onclick=()=>{
   e.length_m??'',e.mass_g??'',e.packages??'',e.stitches??'',e.pieces??'',e.note||''].map(esc2).join(','));
  const blob=new Blob([[head.join(','),...body].join('\n')],{type:'text/csv'});
  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
- a.download=`yarnengine-worklog-${new Date().toISOString().slice(0,10)}.csv`;
+ a.download=`opencrochet-pro-worklog-${new Date().toISOString().slice(0,10)}.csv`;
  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
 };
 

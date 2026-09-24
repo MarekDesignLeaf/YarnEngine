@@ -537,7 +537,7 @@ def admin_backup():
     second copy against volume loss or corruption."""
     data = build_backup_zip(DATA_DIR)
     stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d-%H%M%S")
-    filename = f"yarnengine-backup-{stamp}.zip"
+    filename = f"opencrochet-pro-backup-{stamp}.zip"
     return StreamingResponse(_io.BytesIO(data), media_type="application/zip",
                              headers={"Content-Disposition": f'attachment; filename="{filename}"'})
 

@@ -1,9 +1,9 @@
 source_id,display_name,manufacturer_name,country,base_url,enabled,domain_status,notes
 SRC_ROWAN,Rowan,Rowan,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
-SRC_SIRDAR,Sirdar,Sirdar,UK and Ireland,https://sirdar.com,True,verified,Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work.
+SRC_SIRDAR,Sirdar,Sirdar,UK and Ireland,https://sirdar.com,True,verified,Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro.
 SRC_HAYFIELD,Hayfield,Hayfield,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_STYLECRAFT,Stylecraft,Stylecraft,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
-SRC_KING_COLE,King Cole,King Cole,UK and Ireland,https://www.kingcole.com,True,verified,Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work.
+SRC_KING_COLE,King Cole,King Cole,UK and Ireland,https://www.kingcole.com,True,verified,Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro.
 SRC_JAMES_C_BRETT,James C. Brett,James C. Brett,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_CYGNET_YARNS,Cygnet Yarns,Cygnet Yarns,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_WEST_YORKSHIRE_SPINNERS,West Yorkshire Spinners,West Yorkshire Spinners,UK and Ireland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
@@ -58,7 +58,7 @@ SRC_TUKUWOOL,Tukuwool,Tukuwool,Sweden and Finland,,False,needs_verification,Enti
 SRC_VUONUE,Vuonue,Vuonue,Sweden and Finland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_STEX,Ístex,Ístex,Iceland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_LOPI,Lopi,Lopi,Iceland,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
-SRC_SCHEEPJES,Scheepjes,Scheepjes,Netherlands and Belgium,https://www.scheepjes.com,True,verified,Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work.
+SRC_SCHEEPJES,Scheepjes,Scheepjes,Netherlands and Belgium,https://www.scheepjes.com,True,verified,Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro.
 SRC_DURABLE_YARN,Durable Yarn,Durable Yarn,Netherlands and Belgium,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_HOOOKED,Hoooked,Hoooked,Netherlands and Belgium,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_ANNELL,Annell,Annell,Netherlands and Belgium,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
@@ -187,7 +187,7 @@ SRC_FLEECE_ARTIST,Fleece Artist,Fleece Artist,Canada,,False,needs_verification,E
 SRC_HAND_MAIDEN_FINE_YARN,Hand Maiden Fine Yarn,Hand Maiden Fine Yarn,Canada,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_SWEETGEORGIA_YARNS,SweetGeorgia Yarns,SweetGeorgia Yarns,Canada,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_ANCIENT_ARTS_YARNS,Ancient Arts Yarns,Ancient Arts Yarns,Canada,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
-SRC_MALABRIGO,Malabrigo,Malabrigo,Uruguay Peru South America,https://malabrigoyarn.com,True,verified,Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work.
+SRC_MALABRIGO,Malabrigo,Malabrigo,Uruguay Peru South America,https://malabrigoyarn.com,True,verified,Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro.
 SRC_MANOS_DEL_URUGUAY,Manos del Uruguay,Manos del Uruguay,Uruguay Peru South America,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_AMANO_YARNS,Amano Yarns,Amano Yarns,Uruguay Peru South America,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_MIRASOL_YARN,Mirasol Yarn,Mirasol Yarn,Uruguay Peru South America,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
@@ -226,7 +226,7 @@ SRC_XINAO,Xinao,Xinao,China and Hong Kong,,False,needs_verification,Entity carri
 SRC_NOVETEX,Novetex,Novetex,China and Hong Kong,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_ZHEJIANG_XINAO_TEXTILE,Zhejiang Xinao Textile,Zhejiang Xinao Textile,China and Hong Kong,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_NINGBO_CONSINEE,Ningbo Consinee,Ningbo Consinee,China and Hong Kong,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
-SRC_DROPS_DESIGN_GARNSTUDIO,DROPS,DROPS Design / Garnstudio,International,https://www.garnstudio.com,True,verified,Official domain/catalogue verified during YarnEngine v0.1-v0.5 data work.
+SRC_DROPS_DESIGN_GARNSTUDIO,DROPS,DROPS Design / Garnstudio,International,https://www.garnstudio.com,True,verified,Official domain/catalogue verified during YarnEngine core v0.1-v0.5 data work for OpenCrochet Pro.
 SRC_URTH_YARNS,Urth Yarns,Urth Yarns,International,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_CIRCULO,Circulo,Circulo,International,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
 SRC_PAINTBOX_YARNS,Paintbox Yarns,Paintbox Yarns,International,,False,needs_verification,Entity carried from the original manufacturer/brand seed list; official current domain must be verified before enabling.
