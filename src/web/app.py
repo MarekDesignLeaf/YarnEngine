@@ -77,6 +77,8 @@ from src.pricing.fetch import CannotFetch, MIN_SECONDS_BETWEEN_CHECKS, fetch as 
 from src.pricing.shop_page import read_price
 from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
+from typing import Optional
+from src.production.store import ProductionStore, ProductionError
 import datetime, os, sqlite3, time
 from collections import defaultdict
 from fastapi import Request, Response, Depends
@@ -126,6 +128,7 @@ service = WebService(ROOT, DB_PATH, model_registry=model_registry)
 project_store = ProjectStore(DATA_DIR / 'projects.sqlite')
 swatch_store = SwatchStore(DATA_DIR / 'swatches.sqlite')
 worklog_store = WorkLogStore(DATA_DIR / 'worklog.sqlite')
+production_store = ProductionStore(DATA_DIR / 'production.sqlite')
 crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
@@ -2182,6 +2185,69 @@ def delete_yarn_supplier(yarn_id:str, supplier_id:int):
     finally: store.close()
     return {"status":"deleted","supplier_id":supplier_id}
 
+
+# ------------------------------------------------------------- production orders ---
+def _actor(request: Request):
+    u = getattr(request.state, "user", None)
+    return {"id": u["id"], "username": u["username"]} if u else None
+
+def _production_call(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except KeyError:
+        raise HTTPException(status_code=404, detail="order not found")
+    except ProductionError as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+@app.get("/api/production/stages")
+def get_production_stages():
+    return {"stages": production_store.stages()}
+
+@app.put("/api/admin/production/stages")
+def put_production_stages(payload: dict):
+    names = payload.get("stages")
+    if not isinstance(names, list):
+        raise HTTPException(status_code=422, detail="stages must be a list of names")
+    return {"stages": _production_call(production_store.set_stages, names)}
+
+@app.get("/api/production/orders")
+def list_production_orders(status: Optional[str] = None):
+    if status not in (None, "open", "done", "cancelled"):
+        raise HTTPException(status_code=422, detail="unknown status")
+    return production_store.list(status)
+
+@app.get("/api/production/orders/{order_id}")
+def get_production_order(order_id: int):
+    d = production_store.get(order_id, with_events=True)
+    if d is None:
+        raise HTTPException(status_code=404, detail="order not found")
+    return d
+
+@app.post("/api/production/orders")
+def create_production_order(payload: dict, http_request: Request):
+    line_id = payload.get("product_line_id")
+    name = payload.get("product_name")
+    if line_id is not None:
+        store = service._store()
+        try: line = store.get_product_line(int(line_id))
+        finally: store.close()
+        if line is None:
+            raise HTTPException(status_code=404, detail="product not found")
+        name = line["name"]
+    return _production_call(production_store.create, name, payload.get("quantity"),
+                            user=_actor(http_request), product_line_id=line_id, note=payload.get("note"))
+
+@app.post("/api/production/orders/{order_id}/advance")
+def advance_production_order(order_id: int, http_request: Request, payload: Optional[dict] = None):
+    return _production_call(production_store.advance, order_id, user=_actor(http_request), note=(payload or {}).get("note"))
+
+@app.post("/api/production/orders/{order_id}/back")
+def step_back_production_order(order_id: int, http_request: Request, payload: Optional[dict] = None):
+    return _production_call(production_store.step_back, order_id, user=_actor(http_request), note=(payload or {}).get("note"))
+
+@app.post("/api/production/orders/{order_id}/cancel")
+def cancel_production_order(order_id: int, http_request: Request, payload: Optional[dict] = None):
+    return _production_call(production_store.cancel, order_id, user=_actor(http_request), reason=(payload or {}).get("reason"))
 
 # ------------------------------------------------------------- product lines (catalogue) ---
 @app.get("/api/product-lines")
