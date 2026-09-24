@@ -115,7 +115,9 @@ def normalize_catalogue_model(raw: dict, stored_products: list[dict]) -> dict:
         for seq, item in enumerate(rows, 1):
             if not isinstance(item, dict):
                 raise ValueError("each product must be an object")
-            pid = item.get("product_line_id", item.get("id"))
+            # Only the explicit OpenCrochet product_line_id maps to the database.
+            # A generated model may have its own unrelated "id" field.
+            pid = item.get("product_line_id")
             if pid is not None:
                 try:
                     pid = int(pid)
