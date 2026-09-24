@@ -508,6 +508,64 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 .op-seg .countGroup{flex:1 1 100%}
  .op-seg input.opCount{width:52px}.op-seg .step{min-width:34px;padding:4px 8px}
 .shape-pt-row{grid-template-columns:18px 1fr 1fr 28px;gap:4px}}
+/* ---------- PILOOP header and stitched buttons (2026-09-24) ---------- */
+button{border-radius:999px}
+button:not(.link):not(.flagBtn){outline:1.5px dashed rgba(255,255,255,.55);outline-offset:-5px}
+button.alt:not(.link){outline-color:rgba(47,107,122,.3)}
+button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-dark);outline-offset:2px}
+.appHeader{position:relative;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap;background:#fffdf8;
+  border:1px solid var(--line);border-radius:22px;padding:8px 14px 11px;margin-bottom:12px;box-shadow:var(--shadow-card)}
+.appHeader.menuOpen{z-index:55}
+.appHeader::after{content:'';position:absolute;left:22px;right:22px;bottom:4px;height:2px;border-radius:2px;
+  background:repeating-linear-gradient(90deg,var(--accent) 0 9px,transparent 9px 15px);opacity:.75}
+.appHeader .brand{display:flex;align-items:center;gap:10px;min-width:0}
+.appHeader .brand img{height:44px;width:auto;filter:drop-shadow(0 2px 5px rgba(38,49,58,.12))}
+.appHeader .brandText{display:flex;flex-direction:column;line-height:1.1}
+.appHeader .brandName{font-family:var(--font-display);font-weight:800;font-size:19px;color:var(--accent2-dark)}
+.appHeader .brandSub{font-size:11.5px;color:var(--muted)}
+.appHeader nav.tabs{display:flex;align-items:center;gap:6px;flex:1 1 auto;justify-content:center;flex-wrap:wrap;
+  margin:0;padding:0;background:none;border:0;box-shadow:none;border-radius:0}
+.appHeader .navGroup{position:relative}
+.appHeader .navGroup>summary{list-style:none;cursor:pointer;user-select:none}
+.appHeader .navGroup>summary::-webkit-details-marker{display:none}
+.appHeader nav.tabs>.navGroup>summary,.appHeader nav.tabs>button,.appHeader .accountMenu>summary{
+  display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:8px 16px;border-radius:999px;flex:none;
+  font-family:var(--font-display);font-weight:650;font-size:14.5px;color:var(--ink);background:var(--bg-tint);
+  box-shadow:none;outline:1.5px dashed transparent;outline-offset:-5px;transition:background .15s ease,color .15s ease,outline-color .15s ease}
+.appHeader nav.tabs>.navGroup>summary::after{content:'';width:7px;height:7px;margin-left:2px;border-right:2px solid currentColor;
+  border-bottom:2px solid currentColor;transform:translateY(-2px) rotate(45deg);opacity:.7}
+.appHeader nav.tabs>.navGroup[open]>summary::after{transform:translateY(1px) rotate(225deg)}
+.appHeader nav.tabs>.navGroup>summary:hover,.appHeader nav.tabs>button:not(.active):hover,.appHeader .accountMenu>summary:hover{
+  background:var(--accent2-pale);outline-color:rgba(47,107,122,.45)}
+.appHeader nav.tabs>.navGroup.current>summary{background:var(--accent2);color:#fff;outline-color:rgba(255,255,255,.6)}
+.appHeader nav.tabs>button.navHeart{background:var(--accent-pale);color:var(--accent-dark)}
+.appHeader nav.tabs>button.navHeart:not(.active):hover{background:#f9d3c7;outline-color:rgba(201,74,52,.45)}
+.appHeader nav.tabs>button.navHeart.active{background:var(--accent);color:#fff;outline-color:rgba(255,255,255,.6)}
+.appHeader nav.tabs>button.active{background:var(--accent2);color:#fff;outline-color:rgba(255,255,255,.6)}
+.appHeader .navHeartIcon{width:16px;height:15px;fill:currentColor}
+.appHeader .navMenu{position:absolute;top:calc(100% + 8px);left:0;min-width:200px;display:grid;gap:3px;padding:7px;
+  background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-pop);z-index:60}
+.appHeader .navMenu.right{left:auto;right:0}
+.appHeader .navMenu button,.appHeader nav.tabs .navMenu button{width:100%;justify-content:flex-start;text-align:left;background:transparent;
+  color:var(--ink);box-shadow:none;outline-color:transparent;border-radius:12px;flex:none;font-size:14.5px;padding:9px 14px}
+.appHeader nav.tabs .navMenu button:not(.active):hover,.appHeader .navMenu button.alt:hover{background:var(--accent2-pale);color:var(--accent2-dark);outline-color:rgba(47,107,122,.35)}
+.appHeader nav.tabs .navMenu button.active{background:var(--accent2);color:#fff;outline-color:rgba(255,255,255,.6)}
+.appHeader .headTools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.appHeader .headTools>button{min-height:38px;padding:7px 13px;font-size:14px}
+.appHeader .accountMenu>summary{padding:7px 12px;min-height:38px;font-size:14px}
+.appHeader .personIcon{width:18px;height:18px;fill:currentColor;opacity:.8}
+.appHeader #whoami:empty{display:none}
+@media(max-width:760px){
+  .appHeader{padding:8px 10px 12px;gap:8px}
+  .appHeader .brand img{height:34px}
+  .appHeader .brandSub{display:none}
+  .appHeader .brandName{font-size:16px}
+  .appHeader .headTools{margin-left:auto}
+  .appHeader nav.tabs{order:3;flex-basis:100%;justify-content:flex-start;gap:5px}
+  .appHeader nav.tabs>.navGroup>summary,.appHeader nav.tabs>button{padding:7px 12px;font-size:13.5px;min-height:36px}
+  .appHeader .headTools>button{padding:6px 10px;font-size:13px}
+}
+
 </style>
 </head>
 <body>
@@ -563,19 +621,30 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 
 <!-- ===================== APP ===================== -->
 <div id="viewApp" class="hidden">
-<div class="topbar">
-  <div style="display:flex;align-items:center;gap:14px"><img src="/static/piloop_logo.png" alt="PiLoop" style="height:48px;width:auto"><div><div class="eyebrow">CROCHET & AMIGURUMI · <span>PRODUCTION</span></div><h1>PILOOP OpenCrochet Pro</h1></div></div>
-  <div class="toolbar" style="margin:0">
-    <span class="pill" id="whoami"></span>
-    <button id="btnAccount" class="alt">Account</button>
-    <button id="btnLogout" class="alt">Sign out</button>
-  </div>
-</div>
-<div id="yarnBar" class="yarnbar">
-  <span class="swatch" id="ybSwatch" style="background:#D8CCB4"></span>
-  <div><div class="yb-name" id="ybName">No yarn chosen</div><div class="yb-sub" id="ybSub">Pick a yarn and a shade below</div></div>
-  <div class="yb-specs" id="ybSpecs"></div>
-  <div class="yb-actions">
+<header class="appHeader" id="appHeader">
+  <div class="brand"><img src="/static/piloop_logo.png" alt="PILOOP"><div class="brandText"><span class="brandName">OpenCrochet Pro</span><span class="brandSub">Crochet and amigurumi production</span></div></div>
+  <nav class="tabs" aria-label="Main">
+    <details class="navGroup"><summary>Design</summary><div class="navMenu">
+      <button data-tab="calc" class="active">Calculator</button>
+      <button data-tab="patterns">Pattern library</button>
+      <button data-tab="tools">Tools</button>
+    </div></details>
+    <details class="navGroup"><summary>Materials</summary><div class="navMenu">
+      <button data-tab="yarns">Yarns</button>
+      <button data-tab="stash">My stash</button>
+    </div></details>
+    <details class="navGroup"><summary>Workshop</summary><div class="navMenu">
+      <button data-tab="lines">Products</button>
+      <button data-tab="production">Production</button>
+      <button data-tab="projects">Projects</button>
+      <button data-tab="worklog">Work log</button>
+    </div></details>
+    <button data-tab="heart" class="navHeart"><svg class="navHeartIcon" viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.2 10.6 20C5.4 15.3 2 12.2 2 8.4 2 5.3 4.4 3 7.4 3c1.8 0 3.5.8 4.6 2.1C13.1 3.8 14.8 3 16.6 3 19.6 3 22 5.3 22 8.4c0 3.8-3.4 6.9-8.6 11.6L12 21.2z"/></svg>Living Heart</button>
+    <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
+  </nav>
+  <div class="headTools">
+    <button type="button" id="btnBack" class="alt" title="Back to the previous screen">&larr; Back</button>
+    <button type="button" id="btn3d" class="alt" title="Show or hide the 3D shape preview">3D</button>
     <span class="termsSwitch" role="group" aria-label="Crochet terms">
       <button type="button" id="termsUS" class="flagBtn" title="US terms — sc, hdc, dc" aria-pressed="true">
         <svg viewBox="0 0 24 16" aria-hidden="true"><rect width="24" height="16" fill="#fff"/>
@@ -592,23 +661,17 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
          <path d="M12 0v16M0 8h24" stroke="#c8102e" stroke-width="3.2"/></svg><span>UK</span>
       </button>
     </span>
-    <button type="button" id="btnBack" class="alt" title="Back to the previous screen">&larr; Back</button>
-    <button type="button" id="btn3d" class="alt" title="Show or hide the 3D shape preview">3D</button>
+    <details class="navGroup accountMenu"><summary title="Account"><svg class="personIcon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg><span id="whoami"></span></summary><div class="navMenu right">
+      <button id="btnAccount" class="alt">Account</button>
+      <button id="btnLogout" class="alt">Sign out</button>
+    </div></details>
   </div>
+</header>
+<div id="yarnBar" class="yarnbar">
+  <span class="swatch" id="ybSwatch" style="background:#D8CCB4"></span>
+  <div><div class="yb-name" id="ybName">No yarn chosen</div><div class="yb-sub" id="ybSub">Pick a yarn and a shade below</div></div>
+  <div class="yb-specs" id="ybSpecs"></div>
 </div>
-<nav class="tabs">
-  <button data-tab="calc" class="active">Calculator</button>
-  <button data-tab="patterns">Pattern library</button>
-  <button data-tab="yarns">Yarns</button>
-  <button data-tab="stash">My stash</button>
-  <button data-tab="lines">Products</button>
-  <button data-tab="production">Production</button>
-  <button data-tab="heart">Living Heart</button>
-  <button data-tab="projects">Projects</button>
-  <button data-tab="worklog">Work log</button>
-  <button data-tab="tools">Tools</button>
-  <button data-tab="admin" id="tabAdmin" class="hidden">User admin</button>
-</nav>
 
 <!-- ---------- CALCULATOR ---------- -->
 <section id="tab-calc">
@@ -1522,6 +1585,15 @@ function renderPatternSelect(){const sel=$('pattern');const cur=sel.value;sel.in
 function renderYarnSelect(){if(typeof loadColours==='function')setTimeout(()=>{loadColours();renderYarnBar();},0);$('yarn').innerHTML=`<option value="">— custom (enter diameter) —</option>`+YARNS.map(y=>`<option value="${esc(y.yarn_id)}">${esc(y.brand)} ${esc(y.product)}${y.variant?' '+esc(y.variant):''} (${y.package_mass_g} g / ${y.package_length_m} m)</option>`).join('');}
 function selectPattern(key){$('pattern').value=key;const p=PATTERNS.find(x=>KEY(x)===key);if(!p)return;$('patternPreview').innerHTML=chartSVG(p,{tilesX:Math.max(1,Math.ceil(12/(p.repeat?.width_stitches||1))),tilesY:Math.max(1,Math.ceil(8/(p.rows||[]).length)),cell:22,maxCells:16});}
 $('pattern').onchange=e=>selectPattern(e.target.value);
+/* header menus: close after a choice, one open at a time, mark the group of the open screen */
+function closeHeaderMenus(except){document.querySelectorAll('.appHeader details[open]').forEach(d=>{if(d!==except)d.open=false;});syncMenuOpen();}
+function syncMenuOpen(){const h=document.getElementById('appHeader');if(h)h.classList.toggle('menuOpen',!!h.querySelector('details[open]'));}
+function syncNavGroups(){document.querySelectorAll('.appHeader nav.tabs .navGroup').forEach(g=>g.classList.toggle('current',!!g.querySelector('button.active')));}
+document.querySelectorAll('.appHeader details').forEach(d=>d.addEventListener('toggle',()=>{if(d.open)closeHeaderMenus(d);syncMenuOpen();}));
+document.querySelectorAll('.appHeader nav.tabs button,.appHeader .navMenu button').forEach(b=>b.addEventListener('click',()=>{closeHeaderMenus();setTimeout(syncNavGroups,0);}));
+document.addEventListener('click',e=>{if(!e.target.closest('.appHeader details'))closeHeaderMenus();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeHeaderMenus();});
+syncNavGroups();
 $('btnPickPattern').onclick=()=>document.querySelector('nav.tabs button[data-tab=patterns]').click();
 
 /* ============================ gallery ============================ */
