@@ -2413,6 +2413,45 @@ def create_catalogue(payload:dict,http_request:Request):
     manifest=_catalogue_manifest(payload)
     return catalogue_store.create(manifest,_catalogue_actor(http_request))
 
+@app.get("/api/catalogues/{edition_id}/assets")
+def list_catalogue_assets(edition_id:int):
+    if catalogue_store.get(edition_id) is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    return catalogue_store.list_assets(edition_id)
+
+@app.post("/api/catalogues/{edition_id}/assets")
+def create_catalogue_asset(edition_id:int,payload:dict,http_request:Request):
+    try:
+        return catalogue_store.create_asset(
+          edition_id,str(payload.get("asset_type") or "").upper(),
+          payload.get("product_line_id"),payload.get("uri"),payload.get("sha256"),
+          _catalogue_actor(http_request),payload.get("metadata"),payload.get("source_record_version"))
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=422,detail=str(e))
+
+@app.post("/api/catalogue-assets/{asset_id}/validation")
+def validate_catalogue_asset(asset_id:int,payload:dict,http_request:Request):
+    try:
+        rid=catalogue_store.add_validation(asset_id,payload,_catalogue_actor(http_request))
+        return {"validation_report_id":rid,"asset":catalogue_store.get_asset(asset_id)}
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=422,detail=str(e))
+
+@app.get("/api/catalogues/{edition_id}/approvals")
+def list_catalogue_approvals(edition_id:int):
+    if catalogue_store.get(edition_id) is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    return catalogue_store.approvals(edition_id)
+
+@app.post("/api/catalogues/{edition_id}/approvals")
+def create_catalogue_approval(edition_id:int,payload:dict):
+    try:
+        aid=catalogue_store.add_approval(
+          edition_id,str(payload.get("approval_type") or "").upper(),
+          str(payload.get("decision") or "").upper(),str(payload.get("authority") or ""),
+          payload.get("evidence_ref"),payload.get("asset_id"))
+        return {"approval_id":aid,"release_gates_ok":catalogue_store.release_gates_ok(edition_id)}
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=422,detail=str(e))
+
 @app.post("/api/catalogues/{edition_id}/transition")
 def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
     target=str(payload.get("state") or "").strip().upper()
