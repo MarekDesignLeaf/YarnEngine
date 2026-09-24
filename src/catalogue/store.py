@@ -9,6 +9,8 @@ import json
 import sqlite3
 from pathlib import Path
 from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_checks, consistency_checks
+from .decision import decide
+from .correction import choose_correction
 
 
 class CatalogueStore:
@@ -64,6 +66,34 @@ class CatalogueStore:
               created_at TEXT NOT NULL,
               UNIQUE(edition_id, asset_type, product_line_id, version),
               FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id)
+            );
+            CREATE TABLE IF NOT EXISTS catalogue_generation_runs(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              edition_id INTEGER NOT NULL,
+              product_line_id INTEGER NOT NULL,
+              asset_id INTEGER,
+              provider_id TEXT NOT NULL,
+              model_id TEXT NOT NULL,
+              task TEXT NOT NULL,
+              prompt_hash TEXT NOT NULL,
+              parameters_json TEXT NOT NULL DEFAULT '{}',
+              reference_json TEXT NOT NULL DEFAULT '[]',
+              created_by TEXT,
+              created_at TEXT NOT NULL,
+              FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id),
+              FOREIGN KEY(asset_id) REFERENCES catalogue_assets(id)
+            );
+            CREATE TABLE IF NOT EXISTS catalogue_corrections(
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              parent_asset_id INTEGER NOT NULL,
+              candidate_asset_id INTEGER,
+              action TEXT NOT NULL,
+              reason TEXT NOT NULL,
+              attempt INTEGER NOT NULL,
+              created_by TEXT,
+              created_at TEXT NOT NULL,
+              FOREIGN KEY(parent_asset_id) REFERENCES catalogue_assets(id),
+              FOREIGN KEY(candidate_asset_id) REFERENCES catalogue_assets(id)
             );
             CREATE TABLE IF NOT EXISTS catalogue_validation_reports(
               id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -376,6 +406,90 @@ class CatalogueStore:
         else: decision="PASS"
         return {"decision":decision,"missing_views":missing,"edges":results}
 
+    def record_generation(self, edition_id:int, product_line_id:int, asset_id:int|None,
+                          provider_id:str, model_id:str, task:str, prompt_hash:str,
+                          parameters:dict, references:list|tuple, actor:str|None):
+        now=self._now()
+        if not provider_id or not model_id or not prompt_hash:raise ValueError("generation provenance incomplete")
+        with self._conn() as c:
+            cur=c.execute("""INSERT INTO catalogue_generation_runs
+              (edition_id,product_line_id,asset_id,provider_id,model_id,task,prompt_hash,
+               parameters_json,reference_json,created_by,created_at)
+              VALUES(?,?,?,?,?,?,?,?,?,?,?)""",(edition_id,product_line_id,asset_id,provider_id,model_id,
+              task,prompt_hash,json.dumps(parameters or {},separators=(",",":")),
+              json.dumps(list(references or []),separators=(",",":")),actor,now))
+            return cur.lastrowid
+
+    def generation_runs(self, edition_id:int):
+        with self._conn() as c:
+            rows=c.execute("SELECT * FROM catalogue_generation_runs WHERE edition_id=? ORDER BY id",
+                           (edition_id,)).fetchall()
+            out=[]
+            for r in rows:
+                d=dict(r);d["parameters"]=json.loads(d.pop("parameters_json") or "{}")
+                d["references"]=json.loads(d.pop("reference_json") or "[]");out.append(d)
+            return out
+
+    def validation_history(self, asset_id:int):
+        with self._conn() as c:
+            rows=c.execute("SELECT * FROM catalogue_validation_reports WHERE asset_id=? ORDER BY id",
+                           (asset_id,)).fetchall()
+            out=[]
+            for r in rows:
+                d=dict(r);d["checks"]=json.loads(d.pop("checks_json") or "[]")
+                d["evidence"]=json.loads(d.pop("evidence_json") or "{}");out.append(d)
+            return out
+
+    def decide_and_add_validation(self, asset_id:int, policy:dict, results:list[dict], actor:str|None,
+                                  validator_id:str="decision-engine",validator_version:str="1"):
+        asset=self.get_asset(asset_id)
+        if not asset:raise KeyError("catalogue asset not found")
+        outcome=decide(policy,results)
+        report={"asset_sha256":asset.get("sha256"),"policy_version":policy.get("policy_version") if policy else "MISSING",
+                "validator_id":validator_id,"validator_version":validator_version,
+                "decision":outcome["decision"],"checks":results,
+                "evidence":{"decision_engine":outcome},"method":"EXACT"}
+        if outcome["decision"]=="PASS":
+            rid=self.add_validation(asset_id,report,actor)
+        elif outcome["decision"]=="FAIL":
+            rid=self.add_validation(asset_id,report,actor)
+        else:
+            rid=None
+            with self._conn() as c:
+                c.execute("UPDATE catalogue_assets SET state=? WHERE id=?",
+                          ("HUMAN_REVIEW" if outcome["decision"]=="NEEDS_REVIEW" else "BLOCKED",asset_id))
+        return {"validation_report_id":rid,**outcome,"asset":self.get_asset(asset_id)}
+
+    def plan_correction(self, asset_id:int, failed_checks:list[dict], actor:str|None,
+                        local_edit_allowed:bool=True,max_regenerations:int=2):
+        asset=self.get_asset(asset_id)
+        if not asset:raise KeyError("catalogue asset not found")
+        with self._conn() as c:
+            history=[dict(r) for r in c.execute(
+              "SELECT * FROM catalogue_corrections WHERE parent_asset_id=? ORDER BY id",(asset_id,)).fetchall()]
+        plan=choose_correction(asset_id,failed_checks,history,local_edit_allowed,max_regenerations)
+        now=self._now()
+        with self._conn() as c:
+            cur=c.execute("""INSERT INTO catalogue_corrections
+              (parent_asset_id,action,reason,attempt,created_by,created_at)
+              VALUES(?,?,?,?,?,?)""",(asset_id,plan.action,plan.reason,plan.attempt,actor,now))
+            cid=cur.lastrowid
+        return {"correction_id":cid,"action":plan.action,"reason":plan.reason,
+                "attempt":plan.attempt,"parent_asset_id":asset_id}
+
+    def attach_correction_candidate(self, correction_id:int, candidate_asset_id:int):
+        candidate=self.get_asset(candidate_asset_id)
+        if not candidate:raise KeyError("candidate asset not found")
+        with self._conn() as c:
+            r=c.execute("SELECT * FROM catalogue_corrections WHERE id=?",(correction_id,)).fetchone()
+            if not r:raise KeyError("correction not found")
+            if r["candidate_asset_id"] is not None:raise ValueError("correction already has a candidate")
+            parent=self.get_asset(r["parent_asset_id"])
+            if parent and parent["id"]==candidate_asset_id:raise ValueError("correction must create a new candidate")
+            c.execute("UPDATE catalogue_corrections SET candidate_asset_id=? WHERE id=?",
+                      (candidate_asset_id,correction_id))
+        return candidate
+
     def add_validation(self, asset_id:int, report:dict, actor:str|None):
         asset=self.get_asset(asset_id)
         if not asset: raise KeyError("catalogue asset not found")
@@ -403,6 +517,10 @@ class CatalogueStore:
                 c.execute("UPDATE catalogue_assets SET state='VALIDATED' WHERE id=?",(asset_id,))
             elif decision=="FAIL":
                 c.execute("UPDATE catalogue_assets SET state='FAILED' WHERE id=?",(asset_id,))
+            elif decision=="NEEDS_REVIEW":
+                c.execute("UPDATE catalogue_assets SET state='HUMAN_REVIEW' WHERE id=?",(asset_id,))
+            else:
+                c.execute("UPDATE catalogue_assets SET state='BLOCKED' WHERE id=?",(asset_id,))
         return rid
 
     def add_approval(self, edition_id:int, approval_type:str, decision:str, authority:str,
