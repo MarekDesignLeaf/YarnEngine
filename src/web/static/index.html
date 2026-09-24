@@ -108,6 +108,15 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 .lineCard .body{padding:10px 12px;display:grid;gap:6px;flex:1}
 .lineCard .mats{font-size:12.5px;color:var(--muted)}
 .lineCard .mats li{margin:2px 0}
+.cataloguePreview{display:grid;gap:14px;margin-top:12px}
+.catPage{background:#fff;border:1px solid var(--line);border-radius:12px;padding:22px;min-height:300px;box-shadow:var(--shadow-card)}
+.catPage h1{font-size:30px}.catPage h2{font-size:22px}
+.catProduct{display:grid;grid-template-columns:minmax(150px,34%) 1fr;gap:18px;align-items:start}
+.catProduct img{width:100%;max-height:330px;object-fit:contain;border-radius:10px;background:var(--bg-tint)}
+.catPick{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+.catPick label{display:flex;gap:8px;align-items:flex-start}.catPick input{width:auto;margin-top:3px}
+@media(max-width:650px){.catProduct{grid-template-columns:1fr}.catProduct img{max-height:260px}}
+
 .pcard strong{font-size:13px;line-height:1.25;font-family:var(--font-display)}.pcard .small{font-size:11.5px}
 .chartbox{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}.chartbox > svg{display:block;max-width:100%}
 #ami3dCanvas{height:340px;background:radial-gradient(circle at 50% 30%,var(--accent2-pale),var(--bg-tint));cursor:grab;touch-action:none}
@@ -635,6 +644,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     </div></details>
     <details class="navGroup"><summary>Workshop</summary><div class="navMenu">
       <button data-tab="lines">Products</button>
+      <button data-tab="catalogue">Catalogue Generator</button>
       <button data-tab="production">Production</button>
       <button data-tab="projects">Projects</button>
       <button data-tab="worklog">Work log</button>
@@ -1014,6 +1024,34 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     <div class="toolbar"><input id="lineSearch" placeholder="Search products…" style="flex:1;min-width:160px"></div>
     <div id="lineGrid" class="lineGrid"></div>
     <div id="lineEmpty" class="muted hidden">No products in the catalogue yet.</div>
+  </div>
+</section>
+
+<!-- ---------- CATALOGUE GENERATOR ---------- -->
+<section id="tab-catalogue" class="hidden">
+  <div class="card">
+    <div class="topbar" style="margin-bottom:8px"><div><div class="eyebrow">OPEN CROCHET PRO</div><h2 style="margin:0">Catalogue Generator</h2></div></div>
+    <p class="small muted">Build a deterministic catalogue draft from the approved product records already stored in OpenCrochet Pro. The generator does not invent missing product facts.</p>
+    <div class="fields">
+      <label><span>Catalogue title</span><input id="catTitle" value="Product Catalogue"></label>
+      <label><span>Edition / subtitle</span><input id="catSubtitle" placeholder="e.g. Autumn 2026"></label>
+      <label><span>Language</span><select id="catLanguage"><option value="en-GB">English (UK)</option><option value="cs-CZ">Čeština</option></select></label>
+      <label><span>Page format</span><select id="catFormat"><option value="A4">A4 portrait</option><option value="A4L">A4 landscape</option></select></label>
+    </div>
+    <div class="toolbar">
+      <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input id="catMaterials" type="checkbox" checked style="width:auto"> Include materials</label>
+      <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input id="catCosts" type="checkbox" style="width:auto"> Include estimated material cost</label>
+    </div>
+  </div>
+  <div class="card">
+    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Products</h2><button id="catAll" class="alt">Select all</button><button id="catNone" class="alt">Clear</button></div>
+    <div id="catProducts" class="lineGrid"></div>
+    <div id="catEmpty" class="muted hidden">No products are available. Add products in Workshop → Products first.</div>
+  </div>
+  <div class="card">
+    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Preview</h2><button id="catGenerate">Generate catalogue</button><button id="catManifest" class="alt" disabled>Download manifest</button><button id="catPrint" class="alt" disabled>Open print view</button></div>
+    <div id="catStatus" class="status hidden"></div>
+    <div id="catPreview" class="cataloguePreview"></div>
   </div>
 </section>
 
@@ -1582,8 +1620,83 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='production')loadProduction();if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
- if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','catalogue','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='production')loadProduction();if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
+ if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='catalogue')loadCatalogueGenerator();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
+
+/* ============================ catalogue generator ============================ */
+let CATALOGUE_PRODUCTS=[],CATALOGUE_MANIFEST=null;
+
+async function loadCatalogueGenerator(){
+ try{
+  CATALOGUE_PRODUCTS=await api('/api/product-lines');
+  renderCatalogueProducts();
+  status($('catStatus'),'','');
+  $('catStatus').classList.add('hidden');
+ }catch(e){status($('catStatus'),e.message,'bad');}
+}
+function renderCatalogueProducts(){
+ const box=$('catProducts');
+ $('catEmpty').classList.toggle('hidden',CATALOGUE_PRODUCTS.length>0);
+ box.innerHTML=CATALOGUE_PRODUCTS.map(p=>`<div class="catPick">
+   <label><input type="checkbox" class="catSelect" value="${esc(p.id)}" checked>
+   <span><strong>${esc(p.name)}</strong><span class="small muted" style="display:block">${esc(p.description||'No description')}</span></span></label>
+ </div>`).join('');
+}
+function selectedCatalogueProducts(){
+ const ids=new Set([...document.querySelectorAll('.catSelect:checked')].map(x=>String(x.value)));
+ return CATALOGUE_PRODUCTS.filter(p=>ids.has(String(p.id)));
+}
+function catalogueManifest(products){
+ return {
+  schema:'opencrochet.catalogue.manifest.v1',
+  generated_at:new Date().toISOString(),
+  title:$('catTitle').value.trim()||'Product Catalogue',
+  subtitle:$('catSubtitle').value.trim(),
+  locale:$('catLanguage').value,
+  format:$('catFormat').value,
+  options:{include_materials:$('catMaterials').checked,include_estimated_material_cost:$('catCosts').checked},
+  products:products.map((p,index)=>({
+   sequence:index+1,product_line_id:p.id,name:p.name,description:p.description||null,
+   photo_url:p.photo_url||null,product_url:p.product_url||null,
+   materials:(p.materials||[]).map(m=>({yarn_id:m.yarn_id,yarn_brand:m.yarn_brand,yarn_product:m.yarn_product,length_m:m.length_m,quantity_g:m.quantity_g,notes:m.notes||null})),
+   estimated_material_cost:p.total_cost==null?null:{amount:p.total_cost,currency:p.total_cost_currency||null},
+   source_updated_at:p.updated_at||null
+  }))
+ };
+}
+function catalogueProductHTML(p,manifest){
+ const mats=manifest.options.include_materials?(p.materials||[]).map(m=>`<li>${esc([m.yarn_brand,m.yarn_product].filter(Boolean).join(' ')||m.yarn_id)}${m.length_m?' · '+esc(m.length_m)+' m':''}${m.quantity_g?' · '+esc(m.quantity_g)+' g':''}</li>`).join(''):'';
+ const cost=manifest.options.include_estimated_material_cost&&p.estimated_material_cost?`<p><strong>Estimated material cost:</strong> ${esc(p.estimated_material_cost.currency||'')} ${esc(Number(p.estimated_material_cost.amount).toFixed(2))}</p>`:'';
+ return `<article class="catPage"><div class="catProduct">${p.photo_url?`<img src="${esc(p.photo_url)}" alt="">`:'<div class="muted">No product image</div>'}<div><div class="eyebrow">PRODUCT ${esc(p.sequence)}</div><h2>${esc(p.name)}</h2>${p.description?`<p>${esc(p.description)}</p>`:''}${mats?`<h3>Materials</h3><ul>${mats}</ul>`:''}${cost}${p.product_url?`<p class="small">${esc(p.product_url)}</p>`:''}</div></div></article>`;
+}
+function generateCatalogue(){
+ const products=selectedCatalogueProducts();
+ if(!products.length){status($('catStatus'),'Select at least one product.','bad');return;}
+ CATALOGUE_MANIFEST=catalogueManifest(products);
+ const title=esc(CATALOGUE_MANIFEST.title),sub=esc(CATALOGUE_MANIFEST.subtitle||'');
+ $('catPreview').innerHTML=`<article class="catPage" style="display:grid;place-items:center;text-align:center"><div><div class="eyebrow">OPEN CROCHET PRO</div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}<p class="small muted">${products.length} product${products.length===1?'':'s'}</p></div></article>`+CATALOGUE_MANIFEST.products.map(p=>catalogueProductHTML(p,CATALOGUE_MANIFEST)).join('');
+ $('catManifest').disabled=false;$('catPrint').disabled=false;
+ status($('catStatus'),`Catalogue generated from ${products.length} stored product record${products.length===1?'':'s'}. Missing facts were not invented.`,'good');
+}
+function downloadCatalogueManifest(){
+ if(!CATALOGUE_MANIFEST)return;
+ const blob=new Blob([JSON.stringify(CATALOGUE_MANIFEST,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='opencrochet_catalogue_manifest.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function openCataloguePrint(){
+ if(!CATALOGUE_MANIFEST)return;
+ const body=$('catPreview').innerHTML;
+ const landscape=CATALOGUE_MANIFEST.format==='A4L';
+ const w=window.open('','_blank');
+ if(!w){status($('catStatus'),'Pop-up blocked. Allow pop-ups to open the print view.','bad');return;}
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(CATALOGUE_MANIFEST.title)}</title><style>@page{size:A4 ${landscape?'landscape':'portrait'};margin:14mm}body{font:11pt/1.45 system-ui,Arial,sans-serif;color:#26313a;margin:0}.catPage{break-after:page;min-height:240mm;padding:0}.catProduct{display:grid;grid-template-columns:34% 1fr;gap:12mm}.catProduct img{width:100%;max-height:180mm;object-fit:contain}h1{font-size:30pt}h2{font-size:22pt}.eyebrow{font-size:8pt;letter-spacing:.12em;color:#2f6b7a}.muted{color:#726c62}.small{font-size:9pt}@media print{.catPage:last-child{break-after:auto}}</style></head><body>${body}</body></html>`);
+ w.document.close();w.focus();
+}
+$('catAll').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=true);
+$('catNone').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=false);
+$('catGenerate').onclick=generateCatalogue;
+$('catManifest').onclick=downloadCatalogueManifest;
+$('catPrint').onclick=openCataloguePrint;
 
 /* ============================ data ============================ */
 async function loadData(){
