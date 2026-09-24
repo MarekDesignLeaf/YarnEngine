@@ -1319,7 +1319,6 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
       <label><span>Phone</span><input id="coPhone"></label>
       <label><span>Company number</span><input id="coCompanyNo"></label>
       <label><span>VAT number</span><input id="coVat"></label>
-      <label style="grid-column:1/-1"><span>Address</span><input id="coAddress"></label>
     </div>
     <div class="toolbar"><button id="btnSaveCompany">Save</button></div>
     <div id="companyStatus" class="status hidden"></div>
@@ -3390,11 +3389,11 @@ async function loadCompanyForm(){
  try{
    const c=await api('/api/settings/company');
    $('coName').value=c.company_name||'';$('coWeb').value=c.website||'';$('coEmail').value=c.email||'';
-   $('coPhone').value=c.phone||'';$('coCompanyNo').value=c.company_number||'';$('coVat').value=c.vat_number||'';$('coAddress').value=c.address||'';
+   $('coPhone').value=c.phone||'';$('coCompanyNo').value=c.company_number||'';$('coVat').value=c.vat_number||'';
  }catch(e){}
 }
 $('btnSaveCompany').onclick=async()=>{
- const body={company_name:$('coName').value.trim()||null,website:$('coWeb').value.trim()||null,email:$('coEmail').value.trim()||null,phone:$('coPhone').value.trim()||null,company_number:$('coCompanyNo').value.trim()||null,vat_number:$('coVat').value.trim()||null,address:$('coAddress').value.trim()||null};
+ const body={company_name:$('coName').value.trim()||null,website:$('coWeb').value.trim()||null,email:$('coEmail').value.trim()||null,phone:$('coPhone').value.trim()||null,company_number:$('coCompanyNo').value.trim()||null,vat_number:$('coVat').value.trim()||null};
  try{await api('/api/admin/settings/company',{method:'PUT',body});status($('companyStatus'),t('msg.saved'),'good');loadCompanyFooter();}catch(e){status($('companyStatus'),e.message,'bad');}
 };
 
