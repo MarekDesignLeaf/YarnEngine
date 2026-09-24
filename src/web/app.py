@@ -82,6 +82,9 @@ from src.production.store import ProductionStore, ProductionError
 from src.catalogue.store import CatalogueStore
 from src.catalogue.providers import ProviderRegistry, DeterministicFixtureProvider, GenerationRequest, provenance
 from src.catalogue.interior import InteriorBuilder
+from src.catalogue.cover import CoverBuilder
+from src.catalogue.print_export import PrintExporter
+from src.catalogue.digital import DigitalCatalogueBuilder
 from src.catalogue.ai_input import (CatalogueAIUnavailable, generate_catalogue_plan,
                                     describe_product_photo, ALLOWED_MEDIA as CATALOGUE_PHOTO_MEDIA,
                                     MAX_IMAGE_BYTES as CATALOGUE_PHOTO_MAX_BYTES)
@@ -142,7 +145,12 @@ production_store = ProductionStore(DATA_DIR / 'production.sqlite')
 catalogue_store = CatalogueStore(DATA_DIR / 'catalogue.sqlite')
 catalogue_providers = ProviderRegistry()
 catalogue_providers.register(DeterministicFixtureProvider())
-catalogue_interior = InteriorBuilder(catalogue_store, DATA_DIR / 'catalogue_output')
+CATALOGUE_OUTPUT = DATA_DIR / 'catalogue_output'
+CATALOGUE_OUTPUT.mkdir(parents=True, exist_ok=True)
+catalogue_interior = InteriorBuilder(catalogue_store, CATALOGUE_OUTPUT)
+catalogue_cover = CoverBuilder(catalogue_store, CATALOGUE_OUTPUT)
+catalogue_print = PrintExporter(catalogue_store, CATALOGUE_OUTPUT)
+catalogue_digital = DigitalCatalogueBuilder(catalogue_store, CATALOGUE_OUTPUT)
 crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqlite')
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
@@ -165,6 +173,7 @@ app = FastAPI(
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 app.mount("/media/product-photos", StaticFiles(directory=PRODUCT_PHOTO_DIR), name="product_photos")
+app.mount("/media/catalogues", StaticFiles(directory=CATALOGUE_OUTPUT, html=True), name="catalogue_output")
 
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
@@ -2658,6 +2667,65 @@ def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
         return result
     except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogue-assets/{asset_id}/lock")
+def lock_catalogue_asset(asset_id:int):
+    try:return catalogue_store.lock_asset(asset_id)
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/build-cover")
+def build_catalogue_cover(edition_id:int,payload:dict,http_request:Request):
+    edition=catalogue_store.get(edition_id)
+    if edition is None:raise HTTPException(status_code=404,detail="catalogue edition not found")
+    if edition["state"]=="INTERIOR_LOCKED":
+        catalogue_store.transition(edition_id,"COVER_BUILDING",_catalogue_actor(http_request),{"source":"cover_builder"})
+    elif edition["state"]!="COVER_BUILDING":
+        raise HTTPException(status_code=409,detail="cover build requires INTERIOR_LOCKED or COVER_BUILDING")
+    logo_path=STATIC/"piloop_logo.png"
+    if not logo_path.exists():raise HTTPException(status_code=409,detail="approved application logo asset is missing")
+    brand={"logo_uri":"/static/piloop_logo.png","logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
+    try:
+        asset=catalogue_cover.build(edition_id,brand,_catalogue_actor(http_request),payload.get("product_asset_id"))
+        catalogue_store.transition(edition_id,"COVER_VALIDATING",_catalogue_actor(http_request),{"cover_asset_id":asset["id"]})
+        return {"asset":asset,"edition":catalogue_store.get(edition_id)}
+    except (KeyError,ValueError) as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/print-export")
+def export_catalogue_print(edition_id:int,payload:dict,http_request:Request):
+    try:
+        asset=catalogue_print.export(edition_id,_catalogue_actor(http_request),payload.get("profile"))
+        return {"asset":asset,"download_url":f"/api/catalogue-exports/{asset['id']}/download"}
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.get("/api/catalogue-exports/{asset_id}/download")
+def download_catalogue_export(asset_id:int):
+    asset=catalogue_store.get_asset(asset_id)
+    if not asset or asset["asset_type"]!="EXPORT":raise HTTPException(status_code=404,detail="export not found")
+    path=Path(asset.get("uri") or "")
+    if not path.exists() or not path.is_file():raise HTTPException(status_code=404,detail="export file missing")
+    media="application/pdf" if asset["metadata"].get("format")=="PDF" else "text/html"
+    return FileResponse(path,media_type=media,filename=path.name)
+
+@app.post("/api/catalogues/{edition_id}/digital-build")
+def build_catalogue_digital(edition_id:int,http_request:Request):
+    try:
+        asset=catalogue_digital.build(edition_id,_catalogue_actor(http_request))
+        return {"asset":asset,"url":f"/media/catalogues/{edition_id}/digital/index.html"}
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/products/{product_line_id}/360")
+def register_catalogue_360(edition_id:int,product_line_id:int,payload:dict,http_request:Request):
+    try:return catalogue_store.register_360(edition_id,product_line_id,payload,_catalogue_actor(http_request))
+    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:raise HTTPException(status_code=422,detail=str(e))
+
+@app.get("/api/catalogues/{edition_id}/360")
+def list_catalogue_360(edition_id:int):
+    if catalogue_store.get(edition_id) is None:raise HTTPException(status_code=404,detail="catalogue edition not found")
+    return catalogue_store.list_360(edition_id)
 
 @app.get("/api/catalogue-product-masters")
 def list_catalogue_product_masters(product_line_id:int|None=None):
