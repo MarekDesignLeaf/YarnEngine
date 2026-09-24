@@ -54,7 +54,7 @@ def test_release_is_blocked_without_explicit_gates(tmp_path):
 def test_validation_is_bound_to_binary_hash(tmp_path):
     s=CatalogueStore(tmp_path/"catalogue.sqlite")
     e=s.create(manifest(),"tester")
-    a=s.create_asset(e["id"],"MASTER_VISUAL",1,"asset.png","abc123","tester")
+    a=s.create_asset(e["id"],"PAGE",1,"asset.html","abc123","tester")
     report={"asset_sha256":"wrong","policy_version":"1","validator_id":"hash-check",
             "validator_version":"1","decision":"PASS","checks":[{"id":"HASH","status":"PASS"}],
             "evidence":{"sha256":"wrong"},"method":"EXACT"}
@@ -68,7 +68,7 @@ def test_validation_is_bound_to_binary_hash(tmp_path):
 def test_ai_pass_requires_calibration(tmp_path):
     s=CatalogueStore(tmp_path/"catalogue.sqlite")
     e=s.create(manifest(),"tester")
-    a=s.create_asset(e["id"],"PRODUCT_VIEW",1,"view.png","v1","tester")
+    a=s.create_asset(e["id"],"PAGE",1,"view.html","v1","tester")
     report={"asset_sha256":"v1","policy_version":"1","validator_id":"vision",
             "validator_version":"2","decision":"PASS","checks":[{"id":"IDENTITY","status":"PASS"}],
             "evidence":{"region":[0,0,1,1]},"method":"AI"}
