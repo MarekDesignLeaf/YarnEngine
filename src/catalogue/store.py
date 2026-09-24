@@ -215,7 +215,11 @@ class CatalogueStore:
               (product_line_id,version,state,record_json,record_hash,created_by,created_at)
               VALUES(?,?,?,?,?,?,?)""",(product_line_id,version,"DRAFT",
               json.dumps(record,separators=(",",":"),sort_keys=True),record_hash,actor,now))
-            return self.get_product_master(cur.lastrowid)
+            master_id=cur.lastrowid
+        # Read only after the INSERT transaction has committed. Reading through a
+        # second connection from inside the transaction returned None on a fresh
+        # database and made Product Master creation non-deterministically unusable.
+        return self.get_product_master(master_id)
 
     def get_product_master(self, master_id:int):
         with self._conn() as c:
