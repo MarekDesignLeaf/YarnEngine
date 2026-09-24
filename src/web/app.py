@@ -2595,7 +2595,9 @@ def create_catalogue(payload:dict,http_request:Request):
 def catalogue_apvp_conformance():
     result=run_catalogue_apvp_conformance()
     return {"product":"open-crochet-pro","component":"catalogue-factory",
-            "contract_version":CATALOGUE_APVP_CONTRACT_VERSION,**result}
+            "contract_version":CATALOGUE_APVP_CONTRACT_VERSION,
+            "build_id":os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("GIT_COMMIT_SHA") or "unknown",
+            **result}
 
 @app.get("/api/catalogue/providers")
 def list_catalogue_generation_providers():
