@@ -79,12 +79,13 @@ from src.tools.pricing import price_piece
 from src.worklog.store import WorkLogStore
 from typing import Optional
 from src.production.store import ProductionStore, ProductionError
-import datetime, os, sqlite3, time
+import datetime, os, sqlite3, time, traceback, uuid
 from collections import defaultdict
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
 from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS, RESET_TOKEN_TTL_MINUTES
 from .mailer import send_email
+from .admin_log import AdminLogStore
 
 ROOT = Path(__file__).resolve().parents[2]
 # All mutable state (sqlite files, session secret) lives under DATA_DIR so a
@@ -133,11 +134,20 @@ crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqli
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
 user_store.seed_admin_from_env()
+admin_log_store = AdminLogStore(DATA_DIR / 'admin_logs.sqlite')
 session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
+
+
+def _write_admin_log(**kwargs):
+    """Logging must never be able to break a real user request."""
+    try:
+        return admin_log_store.write(**kwargs)
+    except Exception:
+        return None
 
 app = FastAPI(
     title="PILOOP OpenCrochet Pro",
-    version="M12.1",
+    version="M12.2",
     description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
@@ -199,6 +209,67 @@ async def no_stale_app_shell(request: Request, call_next):
     path = request.url.path
     if path in ("/", "/sw.js", "/manifest.webmanifest") or path.startswith("/static/"):
         response.headers["Cache-Control"] = "no-cache"
+    return response
+
+
+@app.middleware("http")
+async def record_application_log(request: Request, call_next):
+    """Persist API activity and failures for the administrator log viewer.
+
+    Request bodies, cookies and authorization data are intentionally never
+    written.  The log endpoint itself, health checks and static files are
+    excluded so viewing the log does not generate an endless stream of log rows.
+    """
+    path = request.url.path
+    should_log = (
+        path.startswith("/api/")
+        and path != "/api/health"
+        and not path.startswith("/api/admin/logs")
+    )
+    if not should_log:
+        return await call_next(request)
+
+    request_id = uuid.uuid4().hex[:12]
+    request.state.request_id = request_id
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        duration_ms = (time.perf_counter() - started) * 1000
+        user = getattr(request.state, "user", None)
+        _write_admin_log(
+            level="ERROR",
+            event="http.request",
+            method=request.method,
+            path=path,
+            duration_ms=duration_ms,
+            user_id=(user.get("id") if user else None),
+            username=(user.get("username") if user else None),
+            role=(user.get("role") if user else None),
+            request_id=request_id,
+            message=f"{type(exc).__name__}: {str(exc)[:2000]}",
+            details={"traceback": traceback.format_exc(limit=25)},
+        )
+        raise
+
+    duration_ms = (time.perf_counter() - started) * 1000
+    user = getattr(request.state, "user", None)
+    status_code = int(response.status_code)
+    level = "ERROR" if status_code >= 500 else ("WARNING" if status_code >= 400 else "INFO")
+    _write_admin_log(
+        level=level,
+        event="http.request",
+        method=request.method,
+        path=path,
+        status_code=status_code,
+        duration_ms=duration_ms,
+        user_id=(user.get("id") if user else None),
+        username=(user.get("username") if user else None),
+        role=(user.get("role") if user else None),
+        request_id=request_id,
+        message=(f"HTTP {status_code}" if status_code >= 400 else None),
+    )
+    response.headers["X-Request-ID"] = request_id
     return response
 
 def _set_session(response: Response, user_id: int):
@@ -272,9 +343,31 @@ def auth_login(payload: dict, request: Request, response: Response):
     u = user_store.authenticate(username, payload.get("password", ""))
     if u is None:
         _record_failed_login(request, username)
+        _write_admin_log(
+            level="WARNING",
+            event="auth.login.failed",
+            method="POST",
+            path="/api/auth/login",
+            status_code=401,
+            username=str(username or "")[:200],
+            request_id=getattr(request.state, "request_id", None),
+            message="Login failed",
+        )
         raise HTTPException(status_code=401, detail="invalid username or password")
     _login_attempts.pop(_login_rate_limit_key(request, username), None)
     _set_session(response, u["id"])
+    _write_admin_log(
+        level="INFO",
+        event="auth.login.success",
+        method="POST",
+        path="/api/auth/login",
+        status_code=200,
+        user_id=u.get("id"),
+        username=u.get("username"),
+        role=u.get("role"),
+        request_id=getattr(request.state, "request_id", None),
+        message="Login succeeded",
+    )
     return u
 
 @app.post("/api/auth/logout")
@@ -440,6 +533,21 @@ def admin_backup():
     filename = f"yarnengine-backup-{stamp}.zip"
     return StreamingResponse(_io.BytesIO(data), media_type="application/zip",
                              headers={"Content-Disposition": f'attachment; filename="{filename}"'})
+
+
+@app.get("/api/admin/logs")
+def admin_logs(limit: int = 200, offset: int = 0,
+               level: Optional[str] = None, q: Optional[str] = None):
+    """Administrator-only application and audit log.
+
+    The authentication middleware already restricts every /api/admin/* route to
+    the admin role.  This endpoint is read-only and deliberately does not expose
+    request bodies, cookies, passwords or API keys.
+    """
+    try:
+        return admin_log_store.list(limit=limit, offset=offset, level=level, q=q)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
 
 @app.get("/api/admin/ingestion/stats")
@@ -1274,7 +1382,7 @@ def web_manifest():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "version": "M12.1"}
+    return {"status": "ok", "version": "M12.2"}
 
 
 def _existing_pattern_rows():
