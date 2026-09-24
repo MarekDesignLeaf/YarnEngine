@@ -1049,9 +1049,9 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
     <div id="catEmpty" class="muted hidden">No products are available. Add products in Workshop → Products first.</div>
   </div>
   <div class="card">
-    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Preview</h2><button id="catGenerate">Generate catalogue</button><button id="catManifest" class="alt" disabled>Download manifest</button><button id="catPrint" class="alt" disabled>Open print view</button></div>
+    <div class="toolbar" style="margin-top:0"><h2 style="margin:0;flex:1">Preview</h2><button id="catGenerate">Generate catalogue</button><button id="catSave" class="alt" disabled>Save edition</button><button id="catManifest" class="alt" disabled>Download manifest</button><button id="catPrint" class="alt" disabled>Open print view</button></div>
     <div id="catStatus" class="status hidden"></div>
-    <div id="catPreview" class="cataloguePreview"></div>
+    <div id="catPreview" class="cataloguePreview"></div><div id="catEditions" style="margin-top:14px"></div>
   </div>
 </section>
 
@@ -1624,12 +1624,13 @@ document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.
  if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='catalogue')loadCatalogueGenerator();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ catalogue generator ============================ */
-let CATALOGUE_PRODUCTS=[],CATALOGUE_MANIFEST=null;
+let CATALOGUE_PRODUCTS=[],CATALOGUE_MANIFEST=null,CATALOGUE_EDITIONS=[];
 
 async function loadCatalogueGenerator(){
  try{
   CATALOGUE_PRODUCTS=await api('/api/product-lines');
   renderCatalogueProducts();
+  await loadCatalogueEditions();
   status($('catStatus'),'','');
   $('catStatus').classList.add('hidden');
  }catch(e){status($('catStatus'),e.message,'bad');}
@@ -1675,8 +1676,28 @@ function generateCatalogue(){
  CATALOGUE_MANIFEST=catalogueManifest(products);
  const title=esc(CATALOGUE_MANIFEST.title),sub=esc(CATALOGUE_MANIFEST.subtitle||'');
  $('catPreview').innerHTML=`<article class="catPage" style="display:grid;place-items:center;text-align:center"><div><div class="eyebrow">OPEN CROCHET PRO</div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}<p class="small muted">${products.length} product${products.length===1?'':'s'}</p></div></article>`+CATALOGUE_MANIFEST.products.map(p=>catalogueProductHTML(p,CATALOGUE_MANIFEST)).join('');
- $('catManifest').disabled=false;$('catPrint').disabled=false;
+ $('catManifest').disabled=false;$('catPrint').disabled=false;$('catSave').disabled=false;
  status($('catStatus'),`Catalogue generated from ${products.length} stored product record${products.length===1?'':'s'}. Missing facts were not invented.`,'good');
+}
+async function loadCatalogueEditions(){
+ try{CATALOGUE_EDITIONS=await api('/api/catalogues');}
+ catch(e){CATALOGUE_EDITIONS=[];}
+ const box=$('catEditions');if(!box)return;
+ if(!CATALOGUE_EDITIONS.length){box.innerHTML='<p class="small muted">No saved catalogue editions yet.</p>';return;}
+ box.innerHTML='<h3>Saved editions</h3>'+CATALOGUE_EDITIONS.map(x=>`<div class="catPick"><strong>#${esc(x.id)} · ${esc(x.title)}</strong> <span class="badge">${esc(x.state)}</span><span class="small muted" style="display:block">${esc(x.subtitle||'')} · ${esc(x.locale)} · ${esc(x.page_format)}</span></div>`).join('');
+}
+async function saveCatalogueEdition(){
+ if(!CATALOGUE_MANIFEST)return;
+ const m=CATALOGUE_MANIFEST;
+ const payload={title:m.title,subtitle:m.subtitle,locale:m.locale,format:m.format,
+   include_materials:m.options.include_materials,
+   include_estimated_material_cost:m.options.include_estimated_material_cost,
+   product_ids:m.products.map(p=>p.product_line_id)};
+ try{
+  const saved=await api('/api/catalogues',{method:'POST',body:payload});
+  status($('catStatus'),`Catalogue edition #${saved.id} saved in ${saved.state} state.`,'good');
+  await loadCatalogueEditions();
+ }catch(e){status($('catStatus'),e.message,'bad');}
 }
 function downloadCatalogueManifest(){
  if(!CATALOGUE_MANIFEST)return;
@@ -1695,6 +1716,7 @@ function openCataloguePrint(){
 $('catAll').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=true);
 $('catNone').onclick=()=>document.querySelectorAll('.catSelect').forEach(x=>x.checked=false);
 $('catGenerate').onclick=generateCatalogue;
+$('catSave').onclick=saveCatalogueEdition;
 $('catManifest').onclick=downloadCatalogueManifest;
 $('catPrint').onclick=openCataloguePrint;
 
