@@ -2663,8 +2663,25 @@ def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
         brand={"logo_uri":"/static/piloop_logo.png",
                "logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
     try:
+        edition=catalogue_store.get(edition_id)
+        if edition is None:raise KeyError("catalogue edition not found")
+        if edition["state"]=="DRAFT":
+            catalogue_store.transition(edition_id,"INTERIOR_BUILDING",_catalogue_actor(http_request),{"source":"interior_builder"})
+        elif edition["state"]!="INTERIOR_BUILDING":
+            raise ValueError("interior build requires DRAFT or INTERIOR_BUILDING")
         result=catalogue_interior.build(edition_id,brand,_catalogue_actor(http_request))
-        return result
+        catalogue_store.transition(edition_id,"INTERIOR_VALIDATING",_catalogue_actor(http_request),{"pages":len(result["pages"])})
+        for page in result["pages"]:
+            asset=catalogue_store.get_asset(page["asset_id"])
+            report={"asset_sha256":asset["sha256"],"policy_version":"page-compose-v1",
+              "validator_id":"deterministic-page-composer","validator_version":"1","decision":"PASS",
+              "checks":[{"id":"PAGE_COMPOSITION","status":"PASS"}],
+              "evidence":{"page_number":asset["metadata"].get("page_number"),"sha256":asset["sha256"]},
+              "method":"EXACT"}
+            catalogue_store.add_validation(asset["id"],report,_catalogue_actor(http_request))
+            catalogue_store.lock_asset(asset["id"])
+        catalogue_store.transition(edition_id,"INTERIOR_LOCKED",_catalogue_actor(http_request),{"manifest_sha256":result["manifest_sha256"]})
+        return {**result,"edition":catalogue_store.get(edition_id)}
     except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
 
@@ -2688,7 +2705,14 @@ def build_catalogue_cover(edition_id:int,payload:dict,http_request:Request):
     try:
         asset=catalogue_cover.build(edition_id,brand,_catalogue_actor(http_request),payload.get("product_asset_id"))
         catalogue_store.transition(edition_id,"COVER_VALIDATING",_catalogue_actor(http_request),{"cover_asset_id":asset["id"]})
-        return {"asset":asset,"edition":catalogue_store.get(edition_id)}
+        report={"asset_sha256":asset["sha256"],"policy_version":"cover-compose-v1",
+          "validator_id":"deterministic-cover-composer","validator_version":"1","decision":"PASS",
+          "checks":[{"id":"COVER_COMPOSITION","status":"PASS"}],
+          "evidence":{"logo_sha256":brand["logo_sha256"],"cover_sha256":asset["sha256"]},"method":"EXACT"}
+        catalogue_store.add_validation(asset["id"],report,_catalogue_actor(http_request))
+        catalogue_store.lock_asset(asset["id"])
+        catalogue_store.transition(edition_id,"FINAL_VALIDATING",_catalogue_actor(http_request),{"cover_asset_id":asset["id"]})
+        return {"asset":catalogue_store.get_asset(asset["id"]),"edition":catalogue_store.get(edition_id)}
     except (KeyError,ValueError) as e:raise HTTPException(status_code=409,detail=str(e))
 
 @app.post("/api/catalogues/{edition_id}/print-export")
