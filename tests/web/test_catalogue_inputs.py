@@ -180,6 +180,8 @@ def test_shell_has_three_catalogue_inputs_photo_upload_and_hides_irrelevant_yarn
     footer = html[html.index("async function loadCompanyFooter"):html.index("async function loadCompanyForm")]
     assert "c.address" not in footer
     assert "company_number" in footer
+    assert 'id="coAddress"' not in html
+    assert "$('coAddress')" not in html
 
 
 def test_m124_shell_and_cache_version():
