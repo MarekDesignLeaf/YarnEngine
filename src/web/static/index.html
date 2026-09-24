@@ -602,6 +602,7 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
   <button data-tab="yarns">Yarns</button>
   <button data-tab="stash">My stash</button>
   <button data-tab="lines">Products</button>
+  <button data-tab="heart">Living Heart</button>
   <button data-tab="projects">Projects</button>
   <button data-tab="worklog">Work log</button>
   <button data-tab="tools">Tools</button>
@@ -958,6 +959,14 @@ body.has-update-bar #ami3dBlock.pinned{bottom:62px}
 </section>
 
 <!-- ---------- WORK LOG ---------- -->
+<section id="tab-heart" class="hidden">
+  <div class="card">
+    <h2>PILOOP Living Heart</h2>
+    <p class="small muted" style="margin-top:0">The demo collection with the Living Heart. It runs as its own app; nothing here changes calculator data. <a href="https://piloop-livingheart-production.up.railway.app/" target="_blank" rel="noopener">Open in a new window</a></p>
+    <iframe id="heartFrame" title="PILOOP Living Heart" data-src="https://piloop-livingheart-production.up.railway.app/" allow="autoplay" style="width:100%;height:80vh;min-height:560px;border:1px solid var(--line);border-radius:12px;background:#fff"></iframe>
+  </div>
+</section>
+
 <section id="tab-tools" class="hidden">
   <div class="card">
     <h2>Colour schemes</h2>
@@ -1468,7 +1477,7 @@ $('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==b.dataset.tab));if(b.dataset.tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(b.dataset.tab==='projects')loadProjects();if(b.dataset.tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();}if(b.dataset.tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(b.dataset.tab==='stash'){loadStash();loadKit().then(showKitPane);}
  if(b.dataset.tab==='tools')initTools();if(b.dataset.tab==='lines')loadProductLines();if(b.dataset.tab==='worklog')loadWorkLog();if(b.dataset.tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 
 /* ============================ data ============================ */
