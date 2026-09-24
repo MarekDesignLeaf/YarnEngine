@@ -133,7 +133,7 @@ user_store.seed_admin_from_env()
 session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
 
 app = FastAPI(
-    title="Yarn Consumption Engine",
+    title="PILOOP OpenCrochet Pro",
     version="M12.1",
     description="Crochet yarn consumption calculator with a graphical pattern library, uncalibrated geometry baseline and optional calibration.",
 )
@@ -352,13 +352,13 @@ def auth_forgot_password(payload: dict, request: Request):
         try:
             send_email(
                 to=user["email"],
-                subject="Reset your YarnEngine password",
-                html=(f"<p>Someone asked to reset the password for the YarnEngine account "
+                subject="Reset your PILOOP OpenCrochet Pro password",
+                html=(f"<p>Someone asked to reset the password for the PILOOP OpenCrochet Pro account "
                       f"<b>{user['username']}</b>.</p>"
                       f"<p><a href=\"{reset_link}\">Click here to set a new password</a>. "
                       f"This link expires in {RESET_TOKEN_TTL_MINUTES} minutes.</p>"
                       f"<p>If you didn't request this, you can safely ignore this email.</p>"),
-                text=(f"Reset your YarnEngine password: {reset_link} "
+                text=(f"Reset your PILOOP OpenCrochet Pro password: {reset_link} "
                       f"(expires in {RESET_TOKEN_TTL_MINUTES} minutes). "
                       f"If you didn't request this, ignore this email."),
             )

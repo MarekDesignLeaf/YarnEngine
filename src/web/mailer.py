@@ -20,7 +20,7 @@ import urllib.error
 import urllib.request
 
 RESEND_API_URL = "https://api.resend.com/emails"
-DEFAULT_FROM = "YarnEngine <onboarding@resend.dev>"
+DEFAULT_FROM = "PILOOP OpenCrochet Pro <onboarding@resend.dev>"
 
 
 def send_email(to: str, subject: str, html: str, text: str | None = None) -> bool:
