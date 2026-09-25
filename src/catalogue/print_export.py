@@ -52,7 +52,9 @@ def _minimal_pdf(lines_per_page:list[list[str]], title:str)->bytes:
 class PrintExporter:
     DEFAULT_PROFILE={"profile_id":"A4_PRINT_V1","page_size":"A4","bleed_mm":3,
                      "target_ppi":300,"reproducibility":"BYTE_IDENTICAL",
-                     "pdf_profile":"PDF-1.4"}
+                     "pdf_profile":"PDF-1.4","renderer_version":"minimal-pdf-v1",
+                     "font_bundle_hash":"builtin-helvetica",
+                     "object_order_policy":"stable-source-order-v1"}
 
     def __init__(self, store, output_root:Path):
         self.store=store;self.output_root=Path(output_root)
@@ -63,6 +65,9 @@ class PrintExporter:
         if edition["state"] not in {"COVER_VALIDATING","FINAL_VALIDATING","RELEASE_APPROVED","EXPORTED"}:
             raise ValueError("print export requires validated cover/final stage")
         p=dict(self.DEFAULT_PROFILE);p.update(profile or {})
+        p.setdefault("release_timestamp",edition.get("released_at") or edition.get("created_at"))
+        from .governance import validate_reproducibility_profile
+        validate_reproducibility_profile(p)
         assets=self.store.list_assets(edition_id)
         pages=sorted([a for a in assets if a["asset_type"]=="PAGE" and a["state"] not in {"STALE","SUPERSEDED"}],
                      key=lambda a:int(a["metadata"].get("page_number") or 0))
