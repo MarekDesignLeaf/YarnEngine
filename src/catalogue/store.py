@@ -7,6 +7,7 @@ from __future__ import annotations
 import datetime as _dt
 import json
 import sqlite3
+import hashlib
 from pathlib import Path
 from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_checks, consistency_checks
 from .decision import decide
@@ -176,6 +177,8 @@ class CatalogueStore:
             acols={r["name"] for r in c.execute("PRAGMA table_info(catalogue_approvals)").fetchall()}
             if "actor" not in acols:
                 c.execute("ALTER TABLE catalogue_approvals ADD COLUMN actor TEXT")
+            if "subject_hash" not in acols:
+                c.execute("ALTER TABLE catalogue_approvals ADD COLUMN subject_hash TEXT")
     @staticmethod
     def _now():
         return _dt.datetime.now(_dt.timezone.utc).isoformat()
@@ -615,17 +618,24 @@ class CatalogueStore:
                 c.execute("UPDATE catalogue_assets SET state='BLOCKED' WHERE id=?",(asset_id,))
         return rid
 
+    def _edition_subject_hash(self, edition_id:int):
+        row=self.get(edition_id)
+        if not row: raise KeyError("catalogue edition not found")
+        raw=json.dumps(row["manifest"],sort_keys=True,separators=(",",":")).encode("utf-8")
+        return hashlib.sha256(raw).hexdigest()
+
     def add_approval(self, edition_id:int, approval_type:str, decision:str, authority:str,
                      evidence_ref:str|None=None, asset_id:int|None=None, actor:str|None=None):
         if not self.get(edition_id): raise KeyError("catalogue edition not found")
         if decision not in {"APPROVED","NOT_APPLICABLE","REJECTED"}: raise ValueError("invalid approval decision")
         if not authority: raise ValueError("approval authority is required")
+        subject_hash=self._edition_subject_hash(edition_id)
         now=self._now()
         with self._conn() as c:
             cur=c.execute("""INSERT INTO catalogue_approvals
-              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,created_at,actor)
-              VALUES(?,?,?,?,?,?,?,?)""",
-              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,now,actor))
+              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,created_at,actor,subject_hash)
+              VALUES(?,?,?,?,?,?,?,?,?)""",
+              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,now,actor,subject_hash))
             return cur.lastrowid
 
     def approvals(self, edition_id:int):
@@ -634,9 +644,12 @@ class CatalogueStore:
               "SELECT * FROM catalogue_approvals WHERE edition_id=? ORDER BY id",(edition_id,)).fetchall()]
 
     def release_gates_ok(self, edition_id:int):
+        current_hash=self._edition_subject_hash(edition_id)
         approvals=self.approvals(edition_id)
         latest={}
-        for a in approvals: latest[a["approval_type"]]=a
+        for a in approvals:
+            if a.get("subject_hash")==current_hash:
+                latest[a["approval_type"]]=a
         for gate in ("IP_DISCLOSURE","COMPLIANCE"):
             a=latest.get(gate)
             if not a or a["decision"] not in {"APPROVED","NOT_APPLICABLE"}: return False
