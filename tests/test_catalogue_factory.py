@@ -187,3 +187,35 @@ def test_multiview_graph_is_fail_closed_until_complete(tmp_path):
     r=s.validate_view_consistency(e["id"],1,"tester")
     assert r["decision"]=="BLOCKED"
     assert "AZ090" in r["missing_views"]
+
+
+def test_release_approvals_are_bound_to_exact_manifest_hash(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite")
+    e=s.create(manifest(),"tester")
+    s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    s.add_approval(e["id"],"COMPLIANCE","APPROVED","RELEASE_AUTHORITY",actor="tester")
+    assert s.release_gates_ok(e["id"]) is True
+    with s._conn() as db:
+        changed={**e["manifest"],"subtitle":"changed after approval"}
+        db.execute("UPDATE catalogue_editions SET manifest_json=? WHERE id=?",
+                   (__import__("json").dumps(changed,separators=(",",":")),e["id"]))
+    assert s.release_gates_ok(e["id"]) is False
+
+
+def test_release_timestamp_is_written_only_at_released(tmp_path):
+    s=CatalogueStore(tmp_path/"catalogue.sqlite")
+    e=s.create(manifest(),"tester")
+    s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    s.add_approval(e["id"],"COMPLIANCE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    path=[
+      ("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+      ("INTERIOR_APPROVED","DECISION_ENGINE"),("INTERIOR_LOCKED","ORCHESTRATOR"),
+      ("COVER_BUILDING","ORCHESTRATOR"),("COVER_VALIDATING","ORCHESTRATOR"),
+      ("COVER_APPROVED","DECISION_ENGINE"),("COVER_LOCKED","ORCHESTRATOR"),
+      ("FINAL_VALIDATING","ORCHESTRATOR"),("RELEASE_APPROVED","DECISION_ENGINE"),
+      ("EXPORTING","ORCHESTRATOR"),("EXPORTED","ORCHESTRATOR")
+    ]
+    for state,role in path:e=s.transition(e["id"],state,"tester",actor_role=role)
+    assert e["approved_at"] and e["exported_at"] and e["released_at"] is None
+    e=s.transition(e["id"],"RELEASED","tester",actor_role="RELEASE_AUTHORITY")
+    assert e["released_at"] is not None
