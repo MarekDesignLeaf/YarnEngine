@@ -47,7 +47,7 @@ def _to_interior_locked(store,eid):
 def test_cover_requires_interior_lock(tmp_path):
     s=CatalogueStore(tmp_path/"c.sqlite");e,pm,mv,page=_setup(s)
     b=CoverBuilder(s,tmp_path/"out")
-    with pytest.raises(ValueError,match="INTERIOR_LOCKED"):
+    with pytest.raises(ValueError,match="COVER_BUILDING"):
         b.build(e["id"],{"logo_uri":"logo.png","logo_sha256":"logo"},"tester",mv["id"])
     _to_interior_locked(s,e["id"])
     s.transition(e["id"],"COVER_BUILDING","tester",actor_role="ORCHESTRATOR")
