@@ -19,6 +19,7 @@ SESSION_COOKIE = "ye_session"
 SESSION_DAYS = 30
 PBKDF2_ITERATIONS = 200_000
 RESET_TOKEN_TTL_MINUTES = 30
+CATALOGUE_ROLES = {"OPERATOR","HUMAN_REVIEWER","CR_AUTHORITY","RELEASE_AUTHORITY","LEGAL_AUTHORITY"}
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users(
@@ -38,6 +39,14 @@ CREATE TABLE IF NOT EXISTS password_resets(
   expires_at TEXT NOT NULL,
   used INTEGER NOT NULL DEFAULT 0,
   created_at TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS catalogue_role_assignments(
+  user_id INTEGER NOT NULL,
+  role TEXT NOT NULL,
+  assigned_at TEXT NOT NULL,
+  assigned_by TEXT,
+  PRIMARY KEY(user_id,role),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 """
 
@@ -166,6 +175,44 @@ class UserStore:
             return None
         r = self.conn.execute("SELECT * FROM users WHERE email=?", (e,)).fetchone()
         return dict(r) if r else None
+
+    def catalogue_roles(self, user_id:int) -> list[str]:
+        rows=self.conn.execute(
+            "SELECT role FROM catalogue_role_assignments WHERE user_id=? ORDER BY role",(user_id,)).fetchall()
+        return [r["role"] for r in rows]
+
+    def catalogue_role_assignment_count(self) -> int:
+        return int(self.conn.execute("SELECT COUNT(*) FROM catalogue_role_assignments").fetchone()[0])
+
+    def has_catalogue_role(self, user_id:int, role:str) -> bool:
+        if role not in CATALOGUE_ROLES:
+            return False
+        row=self.conn.execute(
+            "SELECT 1 FROM catalogue_role_assignments WHERE user_id=? AND role=?",(user_id,role)).fetchone()
+        if row:
+            return True
+        # Bootstrap compatibility: before the first explicit assignment exists,
+        # active admins retain catalogue authority so existing installations are
+        # not locked out. The first assignment switches the system to explicit RBAC.
+        if self.catalogue_role_assignment_count()==0:
+            u=self.get(user_id)
+            return bool(u and u["active"] and u["role"]=="admin")
+        return False
+
+    def set_catalogue_roles(self, user_id:int, roles:list[str], assigned_by:str|None=None):
+        if self.get(user_id) is None:
+            raise ValueError("user not found")
+        normalized=sorted({str(r).strip().upper() for r in roles})
+        bad=[r for r in normalized if r not in CATALOGUE_ROLES]
+        if bad:
+            raise ValueError("invalid catalogue roles: "+", ".join(bad))
+        now=_now()
+        with self.conn:
+            self.conn.execute("DELETE FROM catalogue_role_assignments WHERE user_id=?",(user_id,))
+            self.conn.executemany(
+                "INSERT INTO catalogue_role_assignments(user_id,role,assigned_at,assigned_by) VALUES(?,?,?,?)",
+                [(user_id,r,now,assigned_by) for r in normalized])
+        return self.catalogue_roles(user_id)
 
     def create_password_reset(self, user_id: int) -> str:
         """Issue a one-time password-reset token for user_id, invalidating any
