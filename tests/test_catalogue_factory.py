@@ -20,10 +20,16 @@ def test_catalogue_happy_path_and_audit(tmp_path):
     e=s.create(manifest(),"tester")
     s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","tester")
     s.add_approval(e["id"],"COMPLIANCE","NOT_APPLICABLE","tester")
-    states=["INTERIOR_BUILDING","INTERIOR_VALIDATING","INTERIOR_LOCKED","COVER_BUILDING",
-            "COVER_VALIDATING","FINAL_VALIDATING","RELEASE_APPROVED","EXPORTED"]
-    for state in states:
-        e=s.transition(e["id"],state,"tester")
+    states=[
+      ("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+      ("INTERIOR_APPROVED","DECISION_ENGINE"),("INTERIOR_LOCKED","ORCHESTRATOR"),
+      ("COVER_BUILDING","ORCHESTRATOR"),("COVER_VALIDATING","ORCHESTRATOR"),
+      ("COVER_APPROVED","DECISION_ENGINE"),("COVER_LOCKED","ORCHESTRATOR"),
+      ("FINAL_VALIDATING","ORCHESTRATOR"),("RELEASE_APPROVED","DECISION_ENGINE"),
+      ("EXPORTING","ORCHESTRATOR"),("EXPORTED","ORCHESTRATOR")
+    ]
+    for state,role in states:
+        e=s.transition(e["id"],state,"tester",actor_role=role)
     assert e["state"]=="EXPORTED"
     events=s.events(e["id"])
     assert len(events)==1+len(states)
@@ -33,22 +39,31 @@ def test_catalogue_happy_path_and_audit(tmp_path):
 def test_failed_catalogue_requires_correction(tmp_path):
     s=CatalogueStore(tmp_path/"catalogue.sqlite")
     e=s.create(manifest(),"tester")
-    for state in ["INTERIOR_BUILDING","INTERIOR_VALIDATING","FAILED","CORRECTING","INTERIOR_VALIDATING"]:
-        e=s.transition(e["id"],state,"tester")
+    path=[
+      ("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+      ("INTERIOR_FAILED","DECISION_ENGINE"),("INTERIOR_BUILDING","ORCHESTRATOR"),
+      ("INTERIOR_VALIDATING","ORCHESTRATOR")
+    ]
+    for state,role in path:e=s.transition(e["id"],state,"tester",actor_role=role)
     assert e["state"]=="INTERIOR_VALIDATING"
 
 
 def test_release_is_blocked_without_explicit_gates(tmp_path):
     s=CatalogueStore(tmp_path/"catalogue.sqlite")
     e=s.create(manifest(),"tester")
-    for state in ["INTERIOR_BUILDING","INTERIOR_VALIDATING","INTERIOR_LOCKED","COVER_BUILDING",
-                  "COVER_VALIDATING","FINAL_VALIDATING"]:
-        e=s.transition(e["id"],state,"tester")
+    path=[
+      ("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+      ("INTERIOR_APPROVED","DECISION_ENGINE"),("INTERIOR_LOCKED","ORCHESTRATOR"),
+      ("COVER_BUILDING","ORCHESTRATOR"),("COVER_VALIDATING","ORCHESTRATOR"),
+      ("COVER_APPROVED","DECISION_ENGINE"),("COVER_LOCKED","ORCHESTRATOR"),
+      ("FINAL_VALIDATING","ORCHESTRATOR")
+    ]
+    for state,role in path:e=s.transition(e["id"],state,"tester",actor_role=role)
     with pytest.raises(ValueError, match="approvals"):
-        s.transition(e["id"],"RELEASE_APPROVED","tester")
-    s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","tester")
-    s.add_approval(e["id"],"COMPLIANCE","APPROVED","compliance-owner","evidence:1")
-    assert s.transition(e["id"],"RELEASE_APPROVED","tester")["state"]=="RELEASE_APPROVED"
+        s.transition(e["id"],"RELEASE_APPROVED","tester",actor_role="DECISION_ENGINE")
+    s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    s.add_approval(e["id"],"COMPLIANCE","APPROVED","RELEASE_AUTHORITY","evidence:1",actor="tester")
+    assert s.transition(e["id"],"RELEASE_APPROVED","tester",actor_role="DECISION_ENGINE")["state"]=="RELEASE_APPROVED"
 
 
 def test_validation_is_bound_to_binary_hash(tmp_path):
