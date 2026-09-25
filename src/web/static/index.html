@@ -123,7 +123,7 @@ textarea{min-height:130px;font-family:ui-monospace,SFMono-Regular,Consolas,monos
 #ami3dCanvas:active{cursor:grabbing}
 #ami3dCanvas canvas{display:block;width:100%;height:100%}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:8px;font-size:12.5px}.legend span{display:inline-flex;align-items:center;gap:4px}.legend svg{width:22px;height:22px}
-.modal{position:fixed;inset:0;background:rgba(38,49,58,.55);display:grid;place-items:center;padding:14px;z-index:20}.modal-card{background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:18px;box-shadow:var(--shadow-pop)}
+.modal{position:fixed;inset:0;background:rgba(38,49,58,.55);display:grid;place-items:center;padding:14px;z-index:100}.modal-card{background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:18px;box-shadow:var(--shadow-pop)}
 .modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
 /* One row, one box. Cells in these tables wrap onto two and three lines --
    a fibre list, a long product name -- and with nothing but a hairline
@@ -575,6 +575,15 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
   .appHeader .headTools>button{padding:6px 10px;font-size:13px}
 }
 
+/* Keep the complete materials table and its actions within reach. */
+#tab-yarns>.grid2{grid-template-columns:minmax(0,1fr)}
+#tab-yarns .tablewrap{max-height:65vh;overflow:auto;scrollbar-gutter:stable}
+#yarnTable{width:100%;table-layout:fixed}
+#yarnTable th,#yarnTable td{overflow-wrap:anywhere}
+#yarnTable th:last-child,#yarnTable td:last-child{width:90px}
+#yarnModal .modal-card{max-height:calc(100dvh - 28px);overscroll-behavior:contain}
+#yarnModal .modal-head{position:sticky;top:-18px;background:#fff;z-index:2;padding:12px 0;border-bottom:1px solid var(--line)}
+#ymClose{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -931,6 +940,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
 
 <!-- ---------- YARNS ---------- -->
 <section id="tab-yarns" class="hidden">
+  <div class="toolbar" style="justify-content:flex-end;margin-bottom:12px"><button type="button" id="closeMaterials" class="alt">Close materials · Back to calculator</button></div>
   <div class="grid2">
     <div class="card"><h2>Yarn database</h2>
       <div class="toolbar">
@@ -1383,7 +1393,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
 </div></div>
 
 <div id="yarnModal" class="modal hidden"><div class="modal-card" style="max-width:560px">
-  <div class="modal-head"><h2 id="ymName" style="margin:0"></h2><button id="ymClose" class="alt">✕</button></div>
+  <div class="modal-head"><h2 id="ymName" style="margin:0"></h2><button type="button" id="ymClose" class="alt" aria-label="Close yarn details">✕ Close</button></div>
   <img id="ymPhoto" class="hidden" style="max-width:100%;max-height:220px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px">
   <p id="ymDesc" class="small muted"></p>
   <div class="fields three">
@@ -3087,8 +3097,17 @@ async function openYarnModal(yarnId){
  refreshYarnShades(yarnId);
  await refreshYarnSuppliers(yarnId);
  $('yarnModal').classList.remove('hidden');
+ $('ymClose').focus();
 }
-$('ymClose').onclick=()=>$('yarnModal').classList.add('hidden');
+function closeYarnModal(){
+ $('yarnModal').classList.add('hidden');
+ const trigger=document.querySelector('#yarnTable button[data-detail="'+CSS.escape(ymCurrent||'')+'"]');
+ if(trigger)trigger.focus();
+}
+$('ymClose').onclick=closeYarnModal;
+$('yarnModal').addEventListener('click',e=>{if(e.target===$('yarnModal'))closeYarnModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('yarnModal').classList.contains('hidden')&&$('photoOverlay').classList.contains('hidden'))closeYarnModal();});
+$('closeMaterials').onclick=()=>document.querySelector('nav.tabs button[data-tab=calc]').click();
 /* What the yarn actually comes in — the reason to open a yarn's details at all
    is usually to see whether it is made in the colour you want. */
 async function refreshYarnShades(yarnId){
