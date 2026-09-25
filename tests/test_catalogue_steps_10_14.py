@@ -70,9 +70,14 @@ def test_print_export_writes_valid_pdf_and_manifest(tmp_path):
     s.transition(e["id"],"EXPORTING","tester",actor_role="ORCHESTRATOR")
     export=PrintExporter(s,tmp_path/"out").export(e["id"],"tester")
     data=Path(export["uri"]).read_bytes()
-    assert data.startswith(b"%PDF-1.4")
+    assert data.startswith(b"%PDF-1.6")
+    assert b"/GTS_PDFXVersion (PDF/X-4)" in data
+    assert b"/OutputIntents" in data
+    assert b"/TrimBox" in data and b"/BleedBox" in data
     manifest=json.loads((tmp_path/"out"/str(e["id"])/"print_export_manifest.json").read_text())
     assert manifest["export_sha256"]==export["sha256"]
+    assert manifest["preflight"]["decision"]=="PASS"
+    assert manifest["profile"]["pdf_profile"]=="PDF/X-4"
 
 
 def test_digital_catalogue_has_lazy_loading_and_deep_links(tmp_path):
