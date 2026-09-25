@@ -31,6 +31,7 @@ from .governance import (
 from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_checks
 from .providers import DeterministicFixtureProvider, GenerationRequest
 from .store import CatalogueStore, EDITION_TRANSITIONS, EDITION_TERMINAL_STATES
+from .state_machine_v1_5 import runtime_binding_report
 from .threed import validate_360_manifest
 
 CONTRACT_VERSION="catalogue-factory-apvp-v1"
@@ -418,6 +419,9 @@ def run_conformance():
     def ac31():
         assert NORMATIVE_STATE_MACHINE_VERSION=="1.5.0"
         assert NORMATIVE_STATE_MACHINE_SHA256=="17a1f5761facfedeb8c64e77aaee770a69575ae3539ff0322356826350390e49"
+        binding=runtime_binding_report()
+        assert binding["decision"]=="PASS", binding
+        assert binding["transition_id_count"]==77
         required={"INTERIOR_FAILED","COVER_FAILED","FINAL_FAILED","EXPORTING","EXPORT_FAILED",
                   "EXPORT_HUMAN_REVIEW","RELEASED","WITHDRAWN","SUPERSEDED","DISCARDED"}
         states=set(EDITION_TRANSITIONS)
