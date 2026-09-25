@@ -62,10 +62,10 @@ class PrintExporter:
     def export(self, edition_id:int, actor:str|None, profile:dict|None=None):
         edition=self.store.get(edition_id)
         if not edition:raise KeyError("catalogue edition not found")
-        if edition["state"] not in {"COVER_VALIDATING","FINAL_VALIDATING","RELEASE_APPROVED","EXPORTED"}:
-            raise ValueError("print export requires validated cover/final stage")
+        if edition["state"]!="EXPORTING":
+            raise ValueError("print export requires EXPORTING state")
         p=dict(self.DEFAULT_PROFILE);p.update(profile or {})
-        p.setdefault("release_timestamp",edition.get("released_at") or edition.get("created_at"))
+        p.setdefault("release_timestamp",edition.get("approved_at") or edition.get("created_at"))
         from .governance import validate_reproducibility_profile
         validate_reproducibility_profile(p)
         assets=self.store.list_assets(edition_id)
