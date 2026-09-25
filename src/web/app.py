@@ -2595,6 +2595,11 @@ def create_catalogue(payload:dict,http_request:Request):
 def _cached_catalogue_apvp_conformance(build_id:str):
     return run_catalogue_apvp_conformance()
 
+@app.get("/api/catalogue/state-machine")
+def catalogue_state_machine_binding():
+    from src.catalogue.state_machine_v1_5 import runtime_binding_report
+    return runtime_binding_report()
+
 @app.get("/api/catalogue/apvp/conformance")
 def catalogue_apvp_conformance():
     build_id=os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("GIT_COMMIT_SHA") or "unknown"
