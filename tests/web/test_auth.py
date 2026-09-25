@@ -148,3 +148,43 @@ def test_seed_admin_from_env(tmp_path, monkeypatch):
     assert seeded["role"] == "admin"
     assert store.authenticate("marek", "seeded-pass-9")
     assert store.seed_admin_from_env() is None  # only when empty
+
+
+def test_catalogue_roles_switch_from_admin_bootstrap_to_explicit_rbac(auth_client):
+    c, store = auth_client
+    admin_user=store.create("marek", "correct-horse-1", role="admin")
+    reviewer=store.create("reviewer", "review-pass-2", role="user")
+
+    admin=TestClient(appmod.app)
+    admin.post("/api/auth/login",json={"username":"marek","password":"correct-horse-1"})
+    user=TestClient(appmod.app)
+    user.post("/api/auth/login",json={"username":"reviewer","password":"review-pass-2"})
+
+    # Before any explicit assignment exists, the existing admin is the bootstrap authority.
+    assert store.has_catalogue_role(admin_user["id"],"RELEASE_AUTHORITY") is True
+    assert store.has_catalogue_role(reviewer["id"],"RELEASE_AUTHORITY") is False
+
+    r=admin.put(f"/api/admin/users/{reviewer['id']}/catalogue-roles",
+                json={"roles":["HUMAN_REVIEWER","RELEASE_AUTHORITY"]})
+    assert r.status_code==200
+    assert set(r.json()["roles"])=={"HUMAN_REVIEWER","RELEASE_AUTHORITY"}
+
+    # Once explicit RBAC exists, roles are no longer inherited from admin status.
+    assert store.has_catalogue_role(admin_user["id"],"RELEASE_AUTHORITY") is False
+    assert store.has_catalogue_role(reviewer["id"],"RELEASE_AUTHORITY") is True
+
+    # Admin can explicitly grant itself only the authorities it needs.
+    r=admin.put(f"/api/admin/users/{admin_user['id']}/catalogue-roles",
+                json={"roles":["CR_AUTHORITY","LEGAL_AUTHORITY"]})
+    assert r.status_code==200
+    assert store.has_catalogue_role(admin_user["id"],"LEGAL_AUTHORITY") is True
+    assert store.has_catalogue_role(admin_user["id"],"RELEASE_AUTHORITY") is False
+
+
+def test_catalogue_role_assignment_rejects_unknown_roles(auth_client):
+    c, store = auth_client
+    admin_user=store.create("marek","correct-horse-1",role="admin")
+    c.post("/api/auth/login",json={"username":"marek","password":"correct-horse-1"})
+    r=c.put(f"/api/admin/users/{admin_user['id']}/catalogue-roles",
+            json={"roles":["RELEASE_AUTHORITY","SUPERUSER"]})
+    assert r.status_code==422
