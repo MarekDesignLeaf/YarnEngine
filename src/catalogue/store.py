@@ -12,28 +12,14 @@ from .multiview import VIEW_ORDER, neighbours, validate_view_metadata, identity_
 from .decision import decide
 from .correction import choose_correction
 from .threed import validate_canonical_3d, validate_360_manifest
+from .state_machine_v1_5 import TRANSITIONS, TERMINAL_STATES, allowed_targets, select_transition
 
-EDITION_TRANSITIONS={
-  "DRAFT":{"INTERIOR_BUILDING","BLOCKED","SUPERSEDED","DISCARDED"},
-  "INTERIOR_BUILDING":{"INTERIOR_VALIDATING","BLOCKED","CHANGE_REQUESTED","DISCARDED"},
-  "INTERIOR_VALIDATING":{"INTERIOR_LOCKED","FAILED","BLOCKED","HUMAN_REVIEW","DISCARDED"},
-  "FAILED":{"CORRECTING","SUPERSEDED","HUMAN_REVIEW","DISCARDED"},
-  "CORRECTING":{"INTERIOR_VALIDATING","BLOCKED","DISCARDED"},
-  "HUMAN_REVIEW":{"INTERIOR_LOCKED","CORRECTING","BLOCKED","CHANGE_REQUESTED","DISCARDED"},
-  "INTERIOR_LOCKED":{"COVER_BUILDING","CHANGE_REQUESTED","SUPERSEDED","DISCARDED"},
-  "COVER_BUILDING":{"COVER_VALIDATING","BLOCKED","SUPERSEDED","DISCARDED"},
-  "COVER_VALIDATING":{"FINAL_VALIDATING","FAILED","BLOCKED","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
-  "FINAL_VALIDATING":{"RELEASE_APPROVED","FAILED","BLOCKED","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
-  "CHANGE_REQUESTED":{"DRAFT","SUPERSEDED","HUMAN_REVIEW","DISCARDED"},
-  "BLOCKED":{"DRAFT","CORRECTING","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
-  "RELEASE_APPROVED":{"EXPORTED","PUBLISHED","SUPERSEDED","DISCARDED"},
-  "EXPORTED":{"PUBLISHED","SUPERSEDED","DISCARDED"},
-  "PUBLISHED":{"WITHDRAWN"},
-  "WITHDRAWN":set(),
-  "SUPERSEDED":set(),
-  "DISCARDED":set(),
-}
-EDITION_TERMINAL_STATES={"WITHDRAWN","SUPERSEDED","DISCARDED"}
+# Compatibility views backed by the normative v1.5 transition table.
+EDITION_TRANSITIONS={}
+for _t in TRANSITIONS:
+    EDITION_TRANSITIONS.setdefault(_t.source,set()).add(_t.target)
+EDITION_TERMINAL_STATES=set(TERMINAL_STATES)
+
 
 
 class CatalogueStore:
@@ -181,6 +167,13 @@ class CatalogueStore:
               FOREIGN KEY(edition_id) REFERENCES catalogue_editions(id)
             );
             """)
+            cols={r["name"] for r in c.execute("PRAGMA table_info(catalogue_editions)").fetchall()}
+            for name in ("approved_at","exported_at","withdrawn_at"):
+                if name not in cols:
+                    c.execute(f"ALTER TABLE catalogue_editions ADD COLUMN {name} TEXT")
+            acols={r["name"] for r in c.execute("PRAGMA table_info(catalogue_approvals)").fetchall()}
+            if "actor" not in acols:
+                c.execute("ALTER TABLE catalogue_approvals ADD COLUMN actor TEXT")
     @staticmethod
     def _now():
         return _dt.datetime.now(_dt.timezone.utc).isoformat()
@@ -621,15 +614,16 @@ class CatalogueStore:
         return rid
 
     def add_approval(self, edition_id:int, approval_type:str, decision:str, authority:str,
-                     evidence_ref:str|None=None, asset_id:int|None=None):
+                     evidence_ref:str|None=None, asset_id:int|None=None, actor:str|None=None):
         if not self.get(edition_id): raise KeyError("catalogue edition not found")
         if decision not in {"APPROVED","NOT_APPLICABLE","REJECTED"}: raise ValueError("invalid approval decision")
-        if not authority.strip(): raise ValueError("approval authority is required")
+        if not authority: raise ValueError("approval authority is required")
         now=self._now()
         with self._conn() as c:
             cur=c.execute("""INSERT INTO catalogue_approvals
-              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,created_at)
-              VALUES(?,?,?,?,?,?,?)""",(edition_id,asset_id,approval_type,decision,authority,evidence_ref,now))
+              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,created_at,actor)
+              VALUES(?,?,?,?,?,?,?,?)""",
+              (edition_id,asset_id,approval_type,decision,authority,evidence_ref,now,actor))
             return cur.lastrowid
 
     def approvals(self, edition_id:int):
@@ -646,20 +640,28 @@ class CatalogueStore:
             if not a or a["decision"] not in {"APPROVED","NOT_APPLICABLE"}: return False
         return True
 
-    def transition(self, edition_id: int, target: str, actor: str | None, details: dict | None=None):
-        allowed=EDITION_TRANSITIONS
+    def transition(self, edition_id:int, target:str, actor:str|None, details:dict|None=None,
+                   actor_role:str="ORCHESTRATOR", trigger:str|None=None):
         row=self.get(edition_id)
         if not row: raise KeyError("catalogue edition not found")
         source=row["state"]
+        spec=select_transition(source,target,actor_role,trigger)
         if target=="RELEASE_APPROVED" and not self.release_gates_ok(edition_id):
-            raise ValueError("IP disclosure and compliance approvals are required before release")
-        if target not in allowed.get(source,set()):
-            raise ValueError(f"invalid catalogue transition {source} -> {target}")
+            raise ValueError("IP disclosure and compliance approvals are required before release approval")
         now=self._now()
+        approved_at=now if target=="RELEASE_APPROVED" else row.get("approved_at")
+        exported_at=now if target=="EXPORTED" else row.get("exported_at")
+        released_at=now if target=="RELEASED" else row.get("released_at")
+        withdrawn_at=now if target=="WITHDRAWN" else row.get("withdrawn_at")
+        audit=dict(details or {})
+        audit.update({"transition_id":spec.id,"trigger":spec.trigger,"guard":spec.guard,
+                      "actor_role":actor_role,"gate":spec.gate})
         with self._conn() as c:
-            c.execute("UPDATE catalogue_editions SET state=?,updated_at=?,released_at=CASE WHEN ?='RELEASE_APPROVED' THEN ? ELSE released_at END WHERE id=?",
-                      (target,now,target,now,edition_id))
+            c.execute("""UPDATE catalogue_editions SET state=?,updated_at=?,approved_at=?,exported_at=?,
+                         released_at=?,withdrawn_at=? WHERE id=?""",
+                      (target,now,approved_at,exported_at,released_at,withdrawn_at,edition_id))
             c.execute("""INSERT INTO catalogue_events
               (edition_id,event,from_state,to_state,actor,details_json,created_at)
-              VALUES(?,?,?,?,?,?,?)""",(edition_id,"state.changed",source,target,actor,json.dumps(details or {},separators=(",",":")),now))
+              VALUES(?,?,?,?,?,?,?)""",
+              (edition_id,"state.changed",source,target,actor,json.dumps(audit,separators=(",",":")),now))
         return self.get(edition_id)
