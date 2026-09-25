@@ -1,0 +1,44 @@
+name: Catalogue Factory
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/catalogue/**"
+      - "src/web/app.py"
+      - "tests/test_catalogue_factory.py"
+      - "tests/test_catalogue_steps_5_9.py"
+      - "tests/test_catalogue_steps_10_14.py"
+      - ".github/workflows/catalogue-factory.yml"
+  workflow_dispatch:
+
+jobs:
+  catalogue-factory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pytest
+      - name: Run Catalogue Factory regression suite
+        env:
+          PYTHONPATH: .
+        run: |
+          pytest -q             tests/test_catalogue_factory.py             tests/test_catalogue_steps_5_9.py             tests/test_catalogue_steps_10_14.py
+      - name: Run APVP contract directly
+        env:
+          PYTHONPATH: .
+        run: |
+          python - <<'PY'
+          from src.catalogue.apvp_contract import run_conformance
+          r=run_conformance()
+          print(r)
+          assert r["decision"]=="PASS"
+          assert r["acceptance_criteria_passed"]==32
+          assert r["acceptance_criteria_total"]==32
+          PY
