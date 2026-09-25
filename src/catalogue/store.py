@@ -13,6 +13,28 @@ from .decision import decide
 from .correction import choose_correction
 from .threed import validate_canonical_3d, validate_360_manifest
 
+EDITION_TRANSITIONS={
+  "DRAFT":{"INTERIOR_BUILDING","BLOCKED","SUPERSEDED","DISCARDED"},
+  "INTERIOR_BUILDING":{"INTERIOR_VALIDATING","BLOCKED","CHANGE_REQUESTED","DISCARDED"},
+  "INTERIOR_VALIDATING":{"INTERIOR_LOCKED","FAILED","BLOCKED","HUMAN_REVIEW","DISCARDED"},
+  "FAILED":{"CORRECTING","SUPERSEDED","HUMAN_REVIEW","DISCARDED"},
+  "CORRECTING":{"INTERIOR_VALIDATING","BLOCKED","DISCARDED"},
+  "HUMAN_REVIEW":{"INTERIOR_LOCKED","CORRECTING","BLOCKED","CHANGE_REQUESTED","DISCARDED"},
+  "INTERIOR_LOCKED":{"COVER_BUILDING","CHANGE_REQUESTED","SUPERSEDED","DISCARDED"},
+  "COVER_BUILDING":{"COVER_VALIDATING","BLOCKED","SUPERSEDED","DISCARDED"},
+  "COVER_VALIDATING":{"FINAL_VALIDATING","FAILED","BLOCKED","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
+  "FINAL_VALIDATING":{"RELEASE_APPROVED","FAILED","BLOCKED","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
+  "CHANGE_REQUESTED":{"DRAFT","SUPERSEDED","HUMAN_REVIEW","DISCARDED"},
+  "BLOCKED":{"DRAFT","CORRECTING","HUMAN_REVIEW","SUPERSEDED","DISCARDED"},
+  "RELEASE_APPROVED":{"EXPORTED","PUBLISHED","SUPERSEDED","DISCARDED"},
+  "EXPORTED":{"PUBLISHED","SUPERSEDED","DISCARDED"},
+  "PUBLISHED":{"WITHDRAWN"},
+  "WITHDRAWN":set(),
+  "SUPERSEDED":set(),
+  "DISCARDED":set(),
+}
+EDITION_TERMINAL_STATES={"WITHDRAWN","SUPERSEDED","DISCARDED"}
+
 
 class CatalogueStore:
     def __init__(self, path: Path | str):
@@ -412,6 +434,14 @@ class CatalogueStore:
                           "neighbours":list(neighbours(token))})
         return {"product_line_id":product_line_id,"nodes":nodes}
 
+    def revalidation_scope_for_view(self, edition_id:int, product_line_id:int, view_token:str):
+        token=str(view_token or "").upper()
+        if token not in VIEW_ORDER: raise ValueError("unknown view token")
+        graph=self.view_graph(edition_id,product_line_id)
+        by={n["view_token"]:n["asset"] for n in graph["nodes"] if n["asset"]}
+        scope=[token,*neighbours(token)]
+        return {"view_tokens":scope,"asset_ids":[by[t]["id"] for t in scope if t in by]}
+
     def validate_view_consistency(self, edition_id:int, product_line_id:int, actor:str|None):
         graph=self.view_graph(edition_id,product_line_id)
         by={n["view_token"]:n["asset"] for n in graph["nodes"] if n["asset"]}
@@ -617,23 +647,7 @@ class CatalogueStore:
         return True
 
     def transition(self, edition_id: int, target: str, actor: str | None, details: dict | None=None):
-        allowed={
-          "DRAFT":{"INTERIOR_BUILDING","BLOCKED","SUPERSEDED"},
-          "INTERIOR_BUILDING":{"INTERIOR_VALIDATING","BLOCKED","CHANGE_REQUESTED"},
-          "INTERIOR_VALIDATING":{"INTERIOR_LOCKED","FAILED","BLOCKED","HUMAN_REVIEW"},
-          "FAILED":{"CORRECTING","SUPERSEDED"},
-          "CORRECTING":{"INTERIOR_VALIDATING","BLOCKED"},
-          "HUMAN_REVIEW":{"INTERIOR_LOCKED","CORRECTING","BLOCKED"},
-          "INTERIOR_LOCKED":{"COVER_BUILDING","CHANGE_REQUESTED"},
-          "COVER_BUILDING":{"COVER_VALIDATING","BLOCKED"},
-          "COVER_VALIDATING":{"FINAL_VALIDATING","FAILED","BLOCKED","HUMAN_REVIEW"},
-          "FINAL_VALIDATING":{"RELEASE_APPROVED","FAILED","BLOCKED","HUMAN_REVIEW"},
-          "CHANGE_REQUESTED":{"DRAFT","SUPERSEDED"},
-          "BLOCKED":{"DRAFT","CORRECTING","SUPERSEDED"},
-          "RELEASE_APPROVED":{"EXPORTED","PUBLISHED"},
-          "EXPORTED":{"PUBLISHED"},
-          "PUBLISHED":set(),"SUPERSEDED":set()
-        }
+        allowed=EDITION_TRANSITIONS
         row=self.get(edition_id)
         if not row: raise KeyError("catalogue edition not found")
         source=row["state"]
