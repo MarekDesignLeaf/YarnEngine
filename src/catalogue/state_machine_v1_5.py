@@ -144,3 +144,44 @@ def select_transition(source:str,target:str,actor_role:str,trigger:str|None=None
     if len(candidates)>1 and not trigger:
         raise ValueError(f"transition {source} -> {target} is ambiguous; trigger is required")
     return candidates[0]
+
+
+def runtime_binding_report():
+    expected_ids={f"E{i:02d}" for i in range(1,78)}
+    actual_ids={t.id for t in TRANSITIONS}
+    critical={
+      "E01":("DRAFT","INTERIOR_BUILDING","OPERATOR"),
+      "E03":("INTERIOR_BUILDING","INTERIOR_VALIDATING","ORCHESTRATOR"),
+      "E04":("INTERIOR_VALIDATING","INTERIOR_APPROVED","DECISION_ENGINE"),
+      "E21":("INTERIOR_APPROVED","INTERIOR_LOCKED","ORCHESTRATOR"),
+      "E24":("INTERIOR_LOCKED","COVER_BUILDING","ORCHESTRATOR"),
+      "E27":("COVER_BUILDING","COVER_VALIDATING","ORCHESTRATOR"),
+      "E28":("COVER_VALIDATING","COVER_APPROVED","DECISION_ENGINE"),
+      "E49":("COVER_APPROVED","COVER_LOCKED","ORCHESTRATOR"),
+      "E50":("COVER_LOCKED","FINAL_VALIDATING","ORCHESTRATOR"),
+      "E51":("FINAL_VALIDATING","RELEASE_APPROVED","DECISION_ENGINE"),
+      "E67":("RELEASE_APPROVED","EXPORTING","ORCHESTRATOR"),
+      "E68":("EXPORTING","EXPORTED","ORCHESTRATOR"),
+      "E74":("EXPORTED","RELEASED","RELEASE_AUTHORITY"),
+      "E75":("RELEASED","WITHDRAWN","LEGAL_AUTHORITY"),
+    }
+    failures=[]
+    if actual_ids!=expected_ids:
+        failures.append({"check":"transition_ids","missing":sorted(expected_ids-actual_ids),
+                         "extra":sorted(actual_ids-expected_ids)})
+    for tid,(source,target,role) in critical.items():
+        if not any(t.id==tid and t.source==source and t.target==target and t.actor_role==role for t in TRANSITIONS):
+            failures.append({"check":"critical_transition","id":tid,
+                             "expected":[source,target,role]})
+    if TERMINAL_STATES!=frozenset({"WITHDRAWN","SUPERSEDED","DISCARDED"}):
+        failures.append({"check":"terminal_states","actual":sorted(TERMINAL_STATES)})
+    return {
+      "decision":"PASS" if not failures else "FAIL",
+      "spec_version":VERSION,
+      "normative_yaml_sha256":SHA256,
+      "source_file":"catalogue_factory_state_machines_v1_5.yaml",
+      "transition_id_count":len(actual_ids),
+      "expanded_transition_count":len(TRANSITIONS),
+      "terminal_states":sorted(TERMINAL_STATES),
+      "failures":failures,
+    }
