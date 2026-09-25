@@ -1,14 +1,14 @@
 """Reproducible print export.
 
-The exporter writes a deterministic, valid PDF using only standard PDF objects.
-It intentionally keeps the rendering profile explicit and records every source
-page hash. A production PDF/X renderer can replace this adapter without changing
-the export contract.
+The exporter writes a deterministic raster-first PDF/X-4 profile with explicit
+trim/bleed geometry, an sRGB output intent, XMP identification and a structural
+preflight result recorded in the immutable export manifest.
 """
 from __future__ import annotations
 from hashlib import sha256
 from pathlib import Path
 import json
+from .pdfx4 import Pdfx4Profile, build_pdfx4, structural_preflight
 
 
 def _pdf_escape(s:str)->str:
@@ -50,11 +50,12 @@ def _minimal_pdf(lines_per_page:list[list[str]], title:str)->bytes:
 
 
 class PrintExporter:
-    DEFAULT_PROFILE={"profile_id":"A4_PRINT_V1","page_size":"A4","bleed_mm":3,
+    DEFAULT_PROFILE={"profile_id":"A4_PRINT_X4_V1","page_size":"A4","bleed_mm":3,
                      "target_ppi":300,"reproducibility":"BYTE_IDENTICAL",
-                     "pdf_profile":"PDF-1.4","renderer_version":"minimal-pdf-v1",
-                     "font_bundle_hash":"builtin-helvetica",
-                     "object_order_policy":"stable-source-order-v1"}
+                     "pdf_profile":"PDF/X-4","renderer_version":"pdfx4-raster-v1",
+                     "font_bundle_hash":"raster-no-pdf-fonts",
+                     "object_order_policy":"stable-source-order-v1",
+                     "output_condition_identifier":"sRGB IEC61966-2.1"}
 
     def __init__(self, store, output_root:Path):
         self.store=store;self.output_root=Path(output_root)
@@ -85,13 +86,21 @@ class PrintExporter:
               str(m.get("description") or ""),
               "Page source SHA256: "+str(a.get("sha256") or "")
             ])
-        pdf=_minimal_pdf(lines,edition["title"])
+        pdf_profile=Pdfx4Profile(
+          bleed_mm=float(p.get("bleed_mm",3)),
+          target_ppi=int(p.get("target_ppi",300)),
+          output_condition_identifier=str(p.get("output_condition_identifier") or "sRGB IEC61966-2.1"))
+        pdf=build_pdfx4(lines,edition["title"],str(p["release_timestamp"]),pdf_profile)
+        preflight=structural_preflight(pdf,len(lines))
+        if preflight["decision"]!="PASS":
+            raise ValueError("PDF/X-4 structural preflight failed: "+json.dumps(preflight,sort_keys=True))
         digest=sha256(pdf).hexdigest()
         out=self.output_root/str(edition_id);out.mkdir(parents=True,exist_ok=True)
         path=out/"catalogue.pdf";path.write_bytes(pdf)
-        manifest={"schema":"opencrochet.print.export.v1","edition_id":edition_id,
+        manifest={"schema":"opencrochet.print.export.v2","edition_id":edition_id,
                   "profile":p,"cover_sha256":covers[-1].get("sha256"),
-                  "page_sha256":[a.get("sha256") for a in pages],"export_sha256":digest}
+                  "page_sha256":[a.get("sha256") for a in pages],
+                  "preflight":preflight,"export_sha256":digest}
         (out/"print_export_manifest.json").write_text(json.dumps(manifest,sort_keys=True,separators=(",",":")),encoding="utf-8")
         asset=self.store.create_asset(edition_id,"EXPORT",None,str(path),digest,actor,{
           "format":"PDF","profile":p,"export_manifest":manifest
