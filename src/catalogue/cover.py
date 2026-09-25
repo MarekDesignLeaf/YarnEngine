@@ -21,8 +21,8 @@ class CoverBuilder:
     def build(self, edition_id:int, brand:dict, actor:str|None, product_asset_id:int|None=None):
         edition=self.store.get(edition_id)
         if not edition: raise KeyError("catalogue edition not found")
-        if edition["state"]!="INTERIOR_LOCKED":
-            raise ValueError("cover can be built only after INTERIOR_LOCKED")
+        if edition["state"]!="COVER_BUILDING":
+            raise ValueError("cover can be built only in COVER_BUILDING")
         logo=brand.get("logo_uri"); logo_hash=brand.get("logo_sha256")
         if not logo or not logo_hash: raise ValueError("approved immutable logo asset is required")
         visual=None
