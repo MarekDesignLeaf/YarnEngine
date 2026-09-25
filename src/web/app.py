@@ -209,6 +209,16 @@ def _require_admin(request: Request):
     if u is not None and u["role"] != "admin":
         raise HTTPException(status_code=403, detail="admin only")
 
+def _require_catalogue_role(request: Request, role: str):
+    if _auth_disabled():
+        return
+    u=getattr(request.state,"user",None)
+    if u is None:
+        raise HTTPException(status_code=401,detail="login required")
+    if not user_store.has_catalogue_role(int(u["id"]),role):
+        raise HTTPException(status_code=403,detail=f"catalogue role {role} required")
+
+
 @app.middleware("http")
 async def require_login(request: Request, call_next):
     path = request.url.path
@@ -2381,6 +2391,25 @@ def step_back_production_order(order_id: int, http_request: Request, payload: Op
 def cancel_production_order(order_id: int, http_request: Request, payload: Optional[dict] = None):
     return _production_call(production_store.cancel, order_id, user=_actor(http_request), reason=(payload or {}).get("reason"))
 
+@app.get("/api/admin/catalogue-roles")
+def list_catalogue_role_assignments(http_request:Request):
+    _require_admin(http_request)
+    return {"assignments":[{"user_id":u["id"],"username":u["username"],
+                            "roles":user_store.catalogue_roles(u["id"])}
+                           for u in user_store.list()]}
+
+@app.put("/api/admin/users/{user_id}/catalogue-roles")
+def set_catalogue_role_assignments(user_id:int,payload:dict,http_request:Request):
+    _require_admin(http_request)
+    roles=payload.get("roles")
+    if not isinstance(roles,list):
+        raise HTTPException(status_code=422,detail="roles must be a list")
+    try:
+        assigned=user_store.set_catalogue_roles(user_id,roles,_catalogue_actor(http_request))
+        return {"user_id":user_id,"roles":assigned}
+    except ValueError as e:
+        raise HTTPException(status_code=422,detail=str(e))
+
 # ------------------------------------------------------------- catalogue factory ---
 def _catalogue_actor(request: Request):
     u=getattr(request.state,"user",None)
@@ -2835,7 +2864,7 @@ def create_catalogue_product_master(payload:dict,http_request:Request):
 
 @app.post("/api/catalogue-product-masters/{master_id}/approve")
 def approve_catalogue_product_master(master_id:int,http_request:Request):
-    _require_admin(http_request)
+    _require_catalogue_role(http_request,"HUMAN_REVIEWER")
     try: return catalogue_store.approve_product_master(master_id,_catalogue_actor(http_request))
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
@@ -2862,7 +2891,7 @@ def create_catalogue_asset(edition_id:int,payload:dict,http_request:Request):
 
 @app.post("/api/catalogue-assets/{asset_id}/master-visual/lock")
 def lock_catalogue_master_visual(asset_id:int,http_request:Request):
-    _require_admin(http_request)
+    _require_catalogue_role(http_request,"HUMAN_REVIEWER")
     try:return catalogue_store.lock_master_visual(asset_id,_catalogue_actor(http_request))
     except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
@@ -2896,8 +2925,8 @@ def list_catalogue_approvals(edition_id:int):
 
 @app.post("/api/catalogues/{edition_id}/approvals")
 def create_catalogue_approval(edition_id:int,payload:dict,http_request:Request):
-    _require_admin(http_request)
     approval_type=str(payload.get("approval_type") or "").upper()
+    _require_catalogue_role(http_request,"RELEASE_AUTHORITY" if approval_type in {"IP_DISCLOSURE","COMPLIANCE"} else "HUMAN_REVIEWER")
     decision=str(payload.get("decision") or "").upper()
     authority="RELEASE_AUTHORITY" if approval_type in {"IP_DISCLOSURE","COMPLIANCE"} else "HUMAN_REVIEWER"
     actor=_catalogue_actor(http_request) or "admin"
@@ -2912,7 +2941,7 @@ def create_catalogue_approval(edition_id:int,payload:dict,http_request:Request):
 
 @app.post("/api/catalogues/{edition_id}/final-approve")
 def final_approve_catalogue(edition_id:int,http_request:Request):
-    _require_admin(http_request)
+    _require_catalogue_role(http_request,"RELEASE_AUTHORITY")
     edition=catalogue_store.get(edition_id)
     if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
     if edition["state"]!="FINAL_VALIDATING":
@@ -2931,7 +2960,7 @@ def final_approve_catalogue(edition_id:int,http_request:Request):
 
 @app.post("/api/catalogues/{edition_id}/release")
 def release_catalogue(edition_id:int,http_request:Request):
-    _require_admin(http_request)
+    _require_catalogue_role(http_request,"RELEASE_AUTHORITY")
     edition=catalogue_store.get(edition_id)
     if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
     assets=catalogue_store.list_assets(edition_id)
@@ -2949,7 +2978,7 @@ def release_catalogue(edition_id:int,http_request:Request):
 
 @app.post("/api/catalogues/{edition_id}/withdraw")
 def withdraw_catalogue(edition_id:int,payload:dict,http_request:Request):
-    _require_admin(http_request)
+    _require_catalogue_role(http_request,"LEGAL_AUTHORITY")
     reason=str(payload.get("reason") or "").strip()
     if not reason: raise HTTPException(status_code=422,detail="withdrawal reason is required")
     try:
@@ -2960,7 +2989,6 @@ def withdraw_catalogue(edition_id:int,payload:dict,http_request:Request):
 
 @app.post("/api/catalogues/{edition_id}/transition")
 def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
-    _require_admin(http_request)
     target=str(payload.get("state") or "").strip().upper()
     if not target: raise HTTPException(status_code=422,detail="target state is required")
     edition=catalogue_store.get(edition_id)
@@ -2972,6 +3000,7 @@ def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
     if not roles:
         raise HTTPException(status_code=409,detail="this transition is system controlled")
     role=roles[0]
+    _require_catalogue_role(http_request,role)
     trigger=payload.get("trigger")
     try:
         return catalogue_store.transition(edition_id,target,_catalogue_actor(http_request),
