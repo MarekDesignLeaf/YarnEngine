@@ -139,15 +139,21 @@ def run_conformance():
         td,s=_new_store()
         try:
             e=s.create({"title":"T","products":[]},"apvp")
-            for st in ("INTERIOR_BUILDING","INTERIOR_VALIDATING","INTERIOR_LOCKED",
-                       "COVER_BUILDING","COVER_VALIDATING","FINAL_VALIDATING"):
-                e=s.transition(e["id"],st,"apvp")
-            try:s.transition(e["id"],"RELEASE_APPROVED","apvp")
+            path=(
+              ("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+              ("INTERIOR_APPROVED","DECISION_ENGINE"),("INTERIOR_LOCKED","ORCHESTRATOR"),
+              ("COVER_BUILDING","ORCHESTRATOR"),("COVER_VALIDATING","ORCHESTRATOR"),
+              ("COVER_APPROVED","DECISION_ENGINE"),("COVER_LOCKED","ORCHESTRATOR"),
+              ("FINAL_VALIDATING","ORCHESTRATOR")
+            )
+            for st,role in path:
+                e=s.transition(e["id"],st,"apvp",actor_role=role)
+            try:s.transition(e["id"],"RELEASE_APPROVED","apvp",actor_role="DECISION_ENGINE")
             except ValueError:pass
             else:raise AssertionError("release passed without approvals")
-            s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","apvp")
-            s.add_approval(e["id"],"COMPLIANCE","APPROVED","apvp")
-            assert s.transition(e["id"],"RELEASE_APPROVED","apvp")["state"]=="RELEASE_APPROVED"
+            s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="apvp")
+            s.add_approval(e["id"],"COMPLIANCE","APPROVED","RELEASE_AUTHORITY",actor="apvp")
+            assert s.transition(e["id"],"RELEASE_APPROVED","apvp",actor_role="DECISION_ENGINE")["state"]=="RELEASE_APPROVED"
         finally:td.cleanup()
     checks.append(_check("RELEASE_REQUIRES_IP_AND_COMPLIANCE",release_approval_gates))
 
@@ -316,12 +322,14 @@ def run_conformance():
         td,s=_new_store()
         try:
             e=s.create({"title":"T","products":[]},"apvp")
-            for st in ("INTERIOR_BUILDING","CHANGE_REQUESTED"):
-                e=s.transition(e["id"],st,"apvp")
-            assert "RELEASE_APPROVED" not in EDITION_TRANSITIONS["CHANGE_REQUESTED"]
-            try:s.transition(e["id"],"RELEASE_APPROVED","apvp")
+            e=s.transition(e["id"],"INTERIOR_BUILDING","apvp",actor_role="OPERATOR")
+            e=s.transition(e["id"],"INTERIOR_VALIDATING","apvp",actor_role="ORCHESTRATOR")
+            e=s.transition(e["id"],"INTERIOR_HUMAN_REVIEW","apvp",actor_role="DECISION_ENGINE")
+            e=s.transition(e["id"],"INTERIOR_CHANGE_REQUESTED","apvp",actor_role="HUMAN_REVIEWER")
+            assert "RELEASE_APPROVED" not in EDITION_TRANSITIONS["INTERIOR_CHANGE_REQUESTED"]
+            try:s.transition(e["id"],"RELEASE_APPROVED","apvp",actor_role="CR_AUTHORITY")
             except ValueError:return
-            raise AssertionError("rejected/open change request reached approval")
+            raise AssertionError("open change request reached release approval")
         finally:td.cleanup()
     checks.append(_check("AC16",ac16))
 
@@ -337,8 +345,11 @@ def run_conformance():
     checks.append(_check("AC18",ac18))
 
     def ac19():
-        assert {"DRAFT","CORRECTING","HUMAN_REVIEW","SUPERSEDED","DISCARDED"} <= EDITION_TRANSITIONS["BLOCKED"]
-        assert "RELEASE_APPROVED" not in EDITION_TRANSITIONS["HUMAN_REVIEW"]
+        assert {"INTERIOR_VALIDATING","INTERIOR_HUMAN_REVIEW"} <= EDITION_TRANSITIONS["INTERIOR_BLOCKED"]
+        assert {"COVER_VALIDATING","COVER_HUMAN_REVIEW"} <= EDITION_TRANSITIONS["COVER_BLOCKED"]
+        assert {"FINAL_VALIDATING","FINAL_HUMAN_REVIEW"} <= EDITION_TRANSITIONS["FINAL_BLOCKED"]
+        assert "RELEASE_APPROVED" not in EDITION_TRANSITIONS["INTERIOR_HUMAN_REVIEW"]
+        assert "RELEASE_APPROVED" not in EDITION_TRANSITIONS["COVER_HUMAN_REVIEW"]
     checks.append(_check("AC19",ac19))
 
     def ac20():release_approval_gates()
@@ -407,6 +418,14 @@ def run_conformance():
     def ac31():
         assert NORMATIVE_STATE_MACHINE_VERSION=="1.5.0"
         assert NORMATIVE_STATE_MACHINE_SHA256=="17a1f5761facfedeb8c64e77aaee770a69575ae3539ff0322356826350390e49"
+        required={"INTERIOR_FAILED","COVER_FAILED","FINAL_FAILED","EXPORTING","EXPORT_FAILED",
+                  "EXPORT_HUMAN_REVIEW","RELEASED","WITHDRAWN","SUPERSEDED","DISCARDED"}
+        states=set(EDITION_TRANSITIONS)
+        for targets in EDITION_TRANSITIONS.values(): states.update(targets)
+        assert required <= states
+        assert "EXPORTING" in EDITION_TRANSITIONS["RELEASE_APPROVED"]
+        assert "RELEASED" in EDITION_TRANSITIONS["EXPORTED"]
+        assert EDITION_TRANSITIONS["RELEASED"]=={"WITHDRAWN"}
         ac17();ac18()
     checks.append(_check("AC31",ac31))
 
