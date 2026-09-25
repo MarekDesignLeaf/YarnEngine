@@ -2746,15 +2746,25 @@ def build_catalogue_cover(edition_id:int,payload:dict,http_request:Request):
 
 @app.post("/api/catalogues/{edition_id}/print-export")
 def export_catalogue_print(edition_id:int,payload:dict,http_request:Request):
+    edition=catalogue_store.get(edition_id)
+    if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    profile=dict(catalogue_print.DEFAULT_PROFILE)
+    profile.update(payload.get("profile") or {})
+    profile.setdefault("release_timestamp",edition.get("approved_at") or edition.get("created_at"))
+    from src.catalogue.governance import validate_reproducibility_profile
     try:
-        edition=catalogue_store.get(edition_id)
-        if edition is None: raise KeyError("catalogue edition not found")
+        validate_reproducibility_profile(profile)
+    except ValueError as e:
+        raise HTTPException(status_code=422,detail=str(e))
+    transitioned=False
+    try:
         if edition["state"]=="RELEASE_APPROVED":
             catalogue_store.transition(edition_id,"EXPORTING",_catalogue_actor(http_request),
-                                       {"profile":payload.get("profile") or {}},actor_role="ORCHESTRATOR")
+                                       {"profile":profile},actor_role="ORCHESTRATOR")
+            transitioned=True
         elif edition["state"]!="EXPORTING":
             raise ValueError("print export requires RELEASE_APPROVED or EXPORTING")
-        asset=catalogue_print.export(edition_id,_catalogue_actor(http_request),payload.get("profile"))
+        asset=catalogue_print.export(edition_id,_catalogue_actor(http_request),profile)
         report={"asset_sha256":asset["sha256"],"policy_version":"export-v1",
           "validator_id":"deterministic-export","validator_version":"1","decision":"PASS",
           "checks":[{"id":"EXPORT_REPRODUCIBILITY","status":"PASS"}],
@@ -2766,8 +2776,17 @@ def export_catalogue_print(edition_id:int,payload:dict,http_request:Request):
         return {"asset":catalogue_store.get_asset(asset["id"]),
                 "edition":catalogue_store.get(edition_id),
                 "download_url":f"/api/catalogue-exports/{asset['id']}/download"}
-    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
-    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e:
+        current=catalogue_store.get(edition_id)
+        if current and current["state"]=="EXPORTING":
+            try:
+                catalogue_store.transition(edition_id,"EXPORT_FAILED",_catalogue_actor(http_request),
+                                           {"error":str(e)[:500]},actor_role="ORCHESTRATOR")
+            except Exception:
+                pass
+        raise HTTPException(status_code=409,detail=str(e))
 
 @app.get("/api/catalogue-exports/{asset_id}/download")
 def download_catalogue_export(asset_id:int):
@@ -2896,6 +2915,10 @@ def final_approve_catalogue(edition_id:int,http_request:Request):
     assets=catalogue_store.list_assets(edition_id)
     bad=[a["id"] for a in assets if a["state"] in {"FAILED","BLOCKED","STALE"}]
     if bad: raise HTTPException(status_code=409,detail={"message":"current dependencies are not releasable","asset_ids":bad})
+    pages=[a for a in assets if a["asset_type"]=="PAGE" and a["state"]=="LOCKED"]
+    covers=[a for a in assets if a["asset_type"]=="COVER" and a["state"]=="LOCKED"]
+    if not pages or not covers:
+        raise HTTPException(status_code=409,detail="final approval requires locked pages and locked cover")
     try:
         return catalogue_store.transition(edition_id,"RELEASE_APPROVED",_catalogue_actor(http_request),
           {"decision":"PASS","validated_asset_count":len(assets)},actor_role="DECISION_ENGINE")
@@ -2904,9 +2927,18 @@ def final_approve_catalogue(edition_id:int,http_request:Request):
 @app.post("/api/catalogues/{edition_id}/release")
 def release_catalogue(edition_id:int,http_request:Request):
     _require_admin(http_request)
+    edition=catalogue_store.get(edition_id)
+    if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    assets=catalogue_store.list_assets(edition_id)
+    bad=[a["id"] for a in assets if a["state"] in {"FAILED","BLOCKED","STALE"}]
+    exports=[a for a in assets if a["asset_type"]=="EXPORT" and a["state"]=="LOCKED"]
+    if bad or not exports or not catalogue_store.release_gates_ok(edition_id):
+        raise HTTPException(status_code=409,detail={"message":"release dependencies are not current",
+                                                    "blocking_asset_ids":bad,"locked_export_count":len(exports)})
     try:
         return catalogue_store.transition(edition_id,"RELEASED",_catalogue_actor(http_request),
-                                         {"publication":"approved"},actor_role="RELEASE_AUTHORITY")
+                                         {"publication":"approved","export_asset_id":exports[-1]["id"]},
+                                         actor_role="RELEASE_AUTHORITY")
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
 
