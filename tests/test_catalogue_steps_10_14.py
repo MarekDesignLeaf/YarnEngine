@@ -39,8 +39,9 @@ def _setup(store):
 
 
 def _to_interior_locked(store,eid):
-    for s in ("INTERIOR_BUILDING","INTERIOR_VALIDATING","INTERIOR_LOCKED"):
-        store.transition(eid,s,"tester")
+    for s,role in (("INTERIOR_BUILDING","OPERATOR"),("INTERIOR_VALIDATING","ORCHESTRATOR"),
+                   ("INTERIOR_APPROVED","DECISION_ENGINE"),("INTERIOR_LOCKED","ORCHESTRATOR")):
+        store.transition(eid,s,"tester",actor_role=role)
 
 
 def test_cover_requires_interior_lock(tmp_path):
@@ -49,6 +50,7 @@ def test_cover_requires_interior_lock(tmp_path):
     with pytest.raises(ValueError,match="INTERIOR_LOCKED"):
         b.build(e["id"],{"logo_uri":"logo.png","logo_sha256":"logo"},"tester",mv["id"])
     _to_interior_locked(s,e["id"])
+    s.transition(e["id"],"COVER_BUILDING","tester",actor_role="ORCHESTRATOR")
     a=b.build(e["id"],{"logo_uri":"logo.png","logo_sha256":"logo"},"tester",mv["id"])
     assert a["asset_type"]=="COVER"
     assert Path(a["uri"]).exists()
@@ -56,9 +58,16 @@ def test_cover_requires_interior_lock(tmp_path):
 
 def test_print_export_writes_valid_pdf_and_manifest(tmp_path):
     s=CatalogueStore(tmp_path/"c.sqlite");e,pm,mv,page=_setup(s);_to_interior_locked(s,e["id"])
-    s.transition(e["id"],"COVER_BUILDING","tester")
+    s.transition(e["id"],"COVER_BUILDING","tester",actor_role="ORCHESTRATOR")
     cover=CoverBuilder(s,tmp_path/"out").build(e["id"],{"logo_uri":"logo.png","logo_sha256":"logo"},"tester",mv["id"])
-    s.transition(e["id"],"COVER_VALIDATING","tester")
+    s.transition(e["id"],"COVER_VALIDATING","tester",actor_role="ORCHESTRATOR")
+    s.transition(e["id"],"COVER_APPROVED","tester",actor_role="DECISION_ENGINE")
+    s.transition(e["id"],"COVER_LOCKED","tester",actor_role="ORCHESTRATOR")
+    s.transition(e["id"],"FINAL_VALIDATING","tester",actor_role="ORCHESTRATOR")
+    s.add_approval(e["id"],"IP_DISCLOSURE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    s.add_approval(e["id"],"COMPLIANCE","NOT_APPLICABLE","RELEASE_AUTHORITY",actor="tester")
+    s.transition(e["id"],"RELEASE_APPROVED","tester",actor_role="DECISION_ENGINE")
+    s.transition(e["id"],"EXPORTING","tester",actor_role="ORCHESTRATOR")
     export=PrintExporter(s,tmp_path/"out").export(e["id"],"tester")
     data=Path(export["uri"]).read_bytes()
     assert data.startswith(b"%PDF-1.4")
