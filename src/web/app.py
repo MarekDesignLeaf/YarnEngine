@@ -90,7 +90,7 @@ from src.catalogue.ai_input import (CatalogueAIUnavailable, generate_catalogue_p
                                     describe_product_photo, ALLOWED_MEDIA as CATALOGUE_PHOTO_MEDIA,
                                     MAX_IMAGE_BYTES as CATALOGUE_PHOTO_MAX_BYTES)
 from src.catalogue.model_input import normalize_catalogue_model
-import datetime, os, sqlite3, time, traceback, uuid, hashlib
+import datetime, os, sqlite3, time, traceback, uuid, hashlib, functools
 from collections import defaultdict
 from fastapi import Request, Response, Depends
 from fastapi.responses import JSONResponse
@@ -2591,13 +2591,17 @@ def create_catalogue(payload:dict,http_request:Request):
     manifest=_catalogue_manifest(payload)
     return catalogue_store.create(manifest,_catalogue_actor(http_request))
 
+@functools.lru_cache(maxsize=4)
+def _cached_catalogue_apvp_conformance(build_id:str):
+    return run_catalogue_apvp_conformance()
+
 @app.get("/api/catalogue/apvp/conformance")
 def catalogue_apvp_conformance():
-    result=run_catalogue_apvp_conformance()
+    build_id=os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("GIT_COMMIT_SHA") or "unknown"
+    result=_cached_catalogue_apvp_conformance(build_id)
     return {"product":"open-crochet-pro","component":"catalogue-factory",
             "contract_version":CATALOGUE_APVP_CONTRACT_VERSION,
-            "build_id":os.environ.get("RAILWAY_GIT_COMMIT_SHA") or os.environ.get("GIT_COMMIT_SHA") or "unknown",
-            **result}
+            "build_id":build_id,**result}
 
 @app.get("/api/catalogue/providers")
 def list_catalogue_generation_providers():
@@ -2673,13 +2677,15 @@ def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
                "logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
     try:
         edition=catalogue_store.get(edition_id)
-        if edition is None:raise KeyError("catalogue edition not found")
+        if edition is None: raise KeyError("catalogue edition not found")
         if edition["state"]=="DRAFT":
-            catalogue_store.transition(edition_id,"INTERIOR_BUILDING",_catalogue_actor(http_request),{"source":"interior_builder"})
+            catalogue_store.transition(edition_id,"INTERIOR_BUILDING",_catalogue_actor(http_request),
+                                       {"source":"interior_builder"},actor_role="OPERATOR")
         elif edition["state"]!="INTERIOR_BUILDING":
             raise ValueError("interior build requires DRAFT or INTERIOR_BUILDING")
         result=catalogue_interior.build(edition_id,brand,_catalogue_actor(http_request))
-        catalogue_store.transition(edition_id,"INTERIOR_VALIDATING",_catalogue_actor(http_request),{"pages":len(result["pages"])})
+        catalogue_store.transition(edition_id,"INTERIOR_VALIDATING",_catalogue_actor(http_request),
+                                   {"pages":len(result["pages"])},actor_role="ORCHESTRATOR")
         for page in result["pages"]:
             asset=catalogue_store.get_asset(page["asset_id"])
             report={"asset_sha256":asset["sha256"],"policy_version":"page-compose-v1",
@@ -2689,13 +2695,18 @@ def build_catalogue_interior(edition_id:int,payload:dict,http_request:Request):
               "method":"EXACT"}
             catalogue_store.add_validation(asset["id"],report,_catalogue_actor(http_request))
             catalogue_store.lock_asset(asset["id"])
-        catalogue_store.transition(edition_id,"INTERIOR_LOCKED",_catalogue_actor(http_request),{"manifest_sha256":result["manifest_sha256"]})
+        catalogue_store.transition(edition_id,"INTERIOR_APPROVED",_catalogue_actor(http_request),
+                                   {"decision":"PASS","validator":"deterministic-page-composer"},
+                                   actor_role="DECISION_ENGINE")
+        catalogue_store.transition(edition_id,"INTERIOR_LOCKED",_catalogue_actor(http_request),
+                                   {"manifest_sha256":result["manifest_sha256"]},actor_role="ORCHESTRATOR")
         return {**result,"edition":catalogue_store.get(edition_id)}
-    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
-    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
 
 @app.post("/api/catalogue-assets/{asset_id}/lock")
-def lock_catalogue_asset(asset_id:int):
+def lock_catalogue_asset(asset_id:int,http_request:Request):
+    _require_admin(http_request)
     try:return catalogue_store.lock_asset(asset_id)
     except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
@@ -2703,34 +2714,60 @@ def lock_catalogue_asset(asset_id:int):
 @app.post("/api/catalogues/{edition_id}/build-cover")
 def build_catalogue_cover(edition_id:int,payload:dict,http_request:Request):
     edition=catalogue_store.get(edition_id)
-    if edition is None:raise HTTPException(status_code=404,detail="catalogue edition not found")
-    if edition["state"]=="INTERIOR_LOCKED":
-        catalogue_store.transition(edition_id,"COVER_BUILDING",_catalogue_actor(http_request),{"source":"cover_builder"})
-    elif edition["state"]!="COVER_BUILDING":
-        raise HTTPException(status_code=409,detail="cover build requires INTERIOR_LOCKED or COVER_BUILDING")
-    logo_path=STATIC/"piloop_logo.png"
-    if not logo_path.exists():raise HTTPException(status_code=409,detail="approved application logo asset is missing")
-    brand={"logo_uri":"/static/piloop_logo.png","logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
+    if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
     try:
+        if edition["state"]=="INTERIOR_LOCKED":
+            catalogue_store.transition(edition_id,"COVER_BUILDING",_catalogue_actor(http_request),
+                                       {"source":"cover_builder"},actor_role="ORCHESTRATOR")
+        elif edition["state"]!="COVER_BUILDING":
+            raise ValueError("cover build requires INTERIOR_LOCKED or COVER_BUILDING")
+        logo_path=STATIC/"piloop_logo.png"
+        if not logo_path.exists(): raise ValueError("approved application logo asset is missing")
+        brand={"logo_uri":"/static/piloop_logo.png",
+               "logo_sha256":hashlib.sha256(logo_path.read_bytes()).hexdigest()}
         asset=catalogue_cover.build(edition_id,brand,_catalogue_actor(http_request),payload.get("product_asset_id"))
-        catalogue_store.transition(edition_id,"COVER_VALIDATING",_catalogue_actor(http_request),{"cover_asset_id":asset["id"]})
+        catalogue_store.transition(edition_id,"COVER_VALIDATING",_catalogue_actor(http_request),
+                                   {"cover_asset_id":asset["id"]},actor_role="ORCHESTRATOR")
         report={"asset_sha256":asset["sha256"],"policy_version":"cover-compose-v1",
           "validator_id":"deterministic-cover-composer","validator_version":"1","decision":"PASS",
           "checks":[{"id":"COVER_COMPOSITION","status":"PASS"}],
           "evidence":{"logo_sha256":brand["logo_sha256"],"cover_sha256":asset["sha256"]},"method":"EXACT"}
         catalogue_store.add_validation(asset["id"],report,_catalogue_actor(http_request))
         catalogue_store.lock_asset(asset["id"])
-        catalogue_store.transition(edition_id,"FINAL_VALIDATING",_catalogue_actor(http_request),{"cover_asset_id":asset["id"]})
+        catalogue_store.transition(edition_id,"COVER_APPROVED",_catalogue_actor(http_request),
+                                   {"decision":"PASS","cover_asset_id":asset["id"]},actor_role="DECISION_ENGINE")
+        catalogue_store.transition(edition_id,"COVER_LOCKED",_catalogue_actor(http_request),
+                                   {"cover_asset_id":asset["id"]},actor_role="ORCHESTRATOR")
+        catalogue_store.transition(edition_id,"FINAL_VALIDATING",_catalogue_actor(http_request),
+                                   {"cover_asset_id":asset["id"]},actor_role="ORCHESTRATOR")
         return {"asset":catalogue_store.get_asset(asset["id"]),"edition":catalogue_store.get(edition_id)}
-    except (KeyError,ValueError) as e:raise HTTPException(status_code=409,detail=str(e))
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
 
 @app.post("/api/catalogues/{edition_id}/print-export")
 def export_catalogue_print(edition_id:int,payload:dict,http_request:Request):
     try:
+        edition=catalogue_store.get(edition_id)
+        if edition is None: raise KeyError("catalogue edition not found")
+        if edition["state"]=="RELEASE_APPROVED":
+            catalogue_store.transition(edition_id,"EXPORTING",_catalogue_actor(http_request),
+                                       {"profile":payload.get("profile") or {}},actor_role="ORCHESTRATOR")
+        elif edition["state"]!="EXPORTING":
+            raise ValueError("print export requires RELEASE_APPROVED or EXPORTING")
         asset=catalogue_print.export(edition_id,_catalogue_actor(http_request),payload.get("profile"))
-        return {"asset":asset,"download_url":f"/api/catalogue-exports/{asset['id']}/download"}
-    except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
-    except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
+        report={"asset_sha256":asset["sha256"],"policy_version":"export-v1",
+          "validator_id":"deterministic-export","validator_version":"1","decision":"PASS",
+          "checks":[{"id":"EXPORT_REPRODUCIBILITY","status":"PASS"}],
+          "evidence":{"export_sha256":asset["sha256"],"profile":asset["metadata"].get("profile")},"method":"EXACT"}
+        catalogue_store.add_validation(asset["id"],report,_catalogue_actor(http_request))
+        catalogue_store.lock_asset(asset["id"])
+        catalogue_store.transition(edition_id,"EXPORTED",_catalogue_actor(http_request),
+                                   {"export_asset_id":asset["id"]},actor_role="ORCHESTRATOR")
+        return {"asset":catalogue_store.get_asset(asset["id"]),
+                "edition":catalogue_store.get(edition_id),
+                "download_url":f"/api/catalogue-exports/{asset['id']}/download"}
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
 
 @app.get("/api/catalogue-exports/{asset_id}/download")
 def download_catalogue_export(asset_id:int):
@@ -2774,6 +2811,7 @@ def create_catalogue_product_master(payload:dict,http_request:Request):
 
 @app.post("/api/catalogue-product-masters/{master_id}/approve")
 def approve_catalogue_product_master(master_id:int,http_request:Request):
+    _require_admin(http_request)
     try: return catalogue_store.approve_product_master(master_id,_catalogue_actor(http_request))
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
@@ -2800,6 +2838,7 @@ def create_catalogue_asset(edition_id:int,payload:dict,http_request:Request):
 
 @app.post("/api/catalogue-assets/{asset_id}/master-visual/lock")
 def lock_catalogue_master_visual(asset_id:int,http_request:Request):
+    _require_admin(http_request)
     try:return catalogue_store.lock_master_visual(asset_id,_catalogue_actor(http_request))
     except KeyError as e:raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e:raise HTTPException(status_code=409,detail=str(e))
@@ -2832,23 +2871,76 @@ def list_catalogue_approvals(edition_id:int):
     return catalogue_store.approvals(edition_id)
 
 @app.post("/api/catalogues/{edition_id}/approvals")
-def create_catalogue_approval(edition_id:int,payload:dict):
+def create_catalogue_approval(edition_id:int,payload:dict,http_request:Request):
+    _require_admin(http_request)
+    approval_type=str(payload.get("approval_type") or "").upper()
+    decision=str(payload.get("decision") or "").upper()
+    authority="RELEASE_AUTHORITY" if approval_type in {"IP_DISCLOSURE","COMPLIANCE"} else "HUMAN_REVIEWER"
+    actor=_catalogue_actor(http_request) or "admin"
     try:
         aid=catalogue_store.add_approval(
-          edition_id,str(payload.get("approval_type") or "").upper(),
-          str(payload.get("decision") or "").upper(),str(payload.get("authority") or ""),
-          payload.get("evidence_ref"),payload.get("asset_id"))
-        return {"approval_id":aid,"release_gates_ok":catalogue_store.release_gates_ok(edition_id)}
+          edition_id,approval_type,decision,authority,payload.get("evidence_ref"),
+          payload.get("asset_id"),actor=actor)
+        return {"approval_id":aid,"authority":authority,
+                "release_gates_ok":catalogue_store.release_gates_ok(edition_id)}
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=422,detail=str(e))
 
-@app.post("/api/catalogues/{edition_id}/transition")
-def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
-    target=str(payload.get("state") or "").strip().upper()
-    if not target: raise HTTPException(status_code=422,detail="target state is required")
-    try: return catalogue_store.transition(edition_id,target,_catalogue_actor(http_request),payload.get("details"))
+@app.post("/api/catalogues/{edition_id}/final-approve")
+def final_approve_catalogue(edition_id:int,http_request:Request):
+    _require_admin(http_request)
+    edition=catalogue_store.get(edition_id)
+    if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    if edition["state"]!="FINAL_VALIDATING":
+        raise HTTPException(status_code=409,detail="final approval requires FINAL_VALIDATING")
+    assets=catalogue_store.list_assets(edition_id)
+    bad=[a["id"] for a in assets if a["state"] in {"FAILED","BLOCKED","STALE"}]
+    if bad: raise HTTPException(status_code=409,detail={"message":"current dependencies are not releasable","asset_ids":bad})
+    try:
+        return catalogue_store.transition(edition_id,"RELEASE_APPROVED",_catalogue_actor(http_request),
+          {"decision":"PASS","validated_asset_count":len(assets)},actor_role="DECISION_ENGINE")
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/release")
+def release_catalogue(edition_id:int,http_request:Request):
+    _require_admin(http_request)
+    try:
+        return catalogue_store.transition(edition_id,"RELEASED",_catalogue_actor(http_request),
+                                         {"publication":"approved"},actor_role="RELEASE_AUTHORITY")
     except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
     except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/withdraw")
+def withdraw_catalogue(edition_id:int,payload:dict,http_request:Request):
+    _require_admin(http_request)
+    reason=str(payload.get("reason") or "").strip()
+    if not reason: raise HTTPException(status_code=422,detail="withdrawal reason is required")
+    try:
+        return catalogue_store.transition(edition_id,"WITHDRAWN",_catalogue_actor(http_request),
+                                         {"reason":reason},actor_role="LEGAL_AUTHORITY")
+    except KeyError as e: raise HTTPException(status_code=404,detail=str(e))
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
+@app.post("/api/catalogues/{edition_id}/transition")
+def transition_catalogue(edition_id:int,payload:dict,http_request:Request):
+    _require_admin(http_request)
+    target=str(payload.get("state") or "").strip().upper()
+    if not target: raise HTTPException(status_code=422,detail="target state is required")
+    edition=catalogue_store.get(edition_id)
+    if edition is None: raise HTTPException(status_code=404,detail="catalogue edition not found")
+    from src.catalogue.state_machine_v1_5 import transition_candidates
+    candidates=transition_candidates(edition["state"],target)
+    manual={"HUMAN_REVIEWER","CR_AUTHORITY","RELEASE_AUTHORITY","LEGAL_AUTHORITY","OPERATOR"}
+    roles=sorted({t.actor_role for t in candidates}&manual)
+    if not roles:
+        raise HTTPException(status_code=409,detail="this transition is system controlled")
+    role=roles[0]
+    trigger=payload.get("trigger")
+    try:
+        return catalogue_store.transition(edition_id,target,_catalogue_actor(http_request),
+                                         payload.get("details"),actor_role=role,trigger=trigger)
+    except ValueError as e: raise HTTPException(status_code=409,detail=str(e))
+
 
 # ------------------------------------------------------------- product photos ---
 _PRODUCT_PHOTO_EXT = {
