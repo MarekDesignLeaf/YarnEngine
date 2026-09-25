@@ -19,6 +19,8 @@ EDITION_TRANSITIONS={}
 for _t in TRANSITIONS:
     EDITION_TRANSITIONS.setdefault(_t.source,set()).add(_t.target)
 EDITION_TERMINAL_STATES=set(TERMINAL_STATES)
+for _terminal in EDITION_TERMINAL_STATES:
+    EDITION_TRANSITIONS.setdefault(_terminal,set())
 
 
 
