@@ -658,7 +658,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
       <button data-tab="projects">Projects</button>
       <button data-tab="worklog">Work log</button>
     </div></details>
-    <button data-tab="heart" class="navHeart"><svg class="navHeartIcon" viewBox="0 0 24 22" aria-hidden="true"><path d="M12 21.2 10.6 20C5.4 15.3 2 12.2 2 8.4 2 5.3 4.4 3 7.4 3c1.8 0 3.5.8 4.6 2.1C13.1 3.8 14.8 3 16.6 3 19.6 3 22 5.3 22 8.4c0 3.8-3.4 6.9-8.6 11.6L12 21.2z"/></svg>Living Heart</button>
+
     <button data-tab="admin" id="tabAdmin" class="hidden">Admin</button>
   </nav>
   <div class="headTools">
@@ -1145,13 +1145,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
   </div>
 </section>
 
-<section id="tab-heart" class="hidden">
-  <div class="card">
-    <h2>PILOOP Living Heart</h2>
-    <p class="small muted" style="margin-top:0">The demo collection with the Living Heart. It runs as its own app; nothing here changes calculator data. <a href="https://piloop-livingheart-production.up.railway.app/" target="_blank" rel="noopener">Open in a new window</a></p>
-    <iframe id="heartFrame" title="PILOOP Living Heart" data-src="https://piloop-livingheart-production.up.railway.app/" allow="autoplay" style="width:100%;height:80vh;min-height:560px;border:1px solid var(--line);border-radius:12px;background:#fff"></iframe>
-  </div>
-</section>
+
 
 <section id="tab-tools" class="hidden">
   <div class="card">
@@ -1683,7 +1677,7 @@ function setYarnBarForTab(tab){
  const visible=['calc','patterns','yarns','stash','tools'].includes(tab);
  $('yarnBar').classList.toggle('hidden',!visible);
 }
-document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{const tab=b.dataset.tab;document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','catalogue','production','heart','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==tab));setYarnBarForTab(tab);if(tab==='production')loadProduction();if(tab==='heart'){const f=$('heartFrame');if(!f.src)f.src=f.dataset.src;}if(tab==='projects')loadProjects();if(tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(tab==='stash'){loadStash();loadKit().then(showKitPane);}
+document.querySelectorAll('nav.tabs button').forEach(b=>b.onclick=()=>{const tab=b.dataset.tab;document.querySelectorAll('nav.tabs button').forEach(x=>x.classList.toggle('active',x===b));['calc','patterns','yarns','stash','lines','catalogue','production','projects','worklog','tools','admin'].forEach(n=>$('tab-'+n).classList.toggle('hidden',n!==tab));setYarnBarForTab(tab);if(tab==='production')loadProduction();if(tab==='projects')loadProjects();if(tab==='admin'){loadUsers();loadCompanyForm();loadIngestionStats();loadVisionForm();loadAdminLogs();startAdminLogAuto();}else{stopAdminLogAuto();}if(tab==='patterns'){renderGallery();if(!STITCHES)loadStitches();}if(tab==='stash'){loadStash();loadKit().then(showKitPane);}
  if(tab==='tools')initTools();if(tab==='lines')loadProductLines();if(tab==='catalogue')loadCatalogueGenerator();if(tab==='worklog')loadWorkLog();if(tab==='calc'&&calcMode==='ami')setTimeout(()=>{window.YE3D&&window.YE3D.resize&&window.YE3D.resize();scheduleAmi3D();},50);});
 setYarnBarForTab('calc');
 
