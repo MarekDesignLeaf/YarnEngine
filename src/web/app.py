@@ -156,6 +156,16 @@ crochet_cal_store = CrochetCalibrationStore(DATA_DIR / 'crochet_calibration.sqli
 operation_map = load_operation_map(ROOT)
 user_store = UserStore(DATA_DIR / 'users.sqlite')
 user_store.seed_admin_from_env()
+# One-time owner-authorised invitation. The temporary setup secret is supplied
+# exclusively through Railway Variables and never exposed by an HTTP endpoint.
+_setup_karl_password = os.environ.get("KARL_SETUP_PASSWORD", "")
+if _setup_karl_password:
+    if user_store.admin_count() < 1:
+        raise RuntimeError("Invitation provisioning requires an existing administrator")
+    if not user_store.get_by_username("karl_hilco"):
+        user_store.create("karl_hilco", _setup_karl_password, role="user",
+                          active=True, email="kmaersch@hilcoglobal.com")
+del _setup_karl_password
 admin_log_store = AdminLogStore(DATA_DIR / 'admin_logs.sqlite')
 session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
 
