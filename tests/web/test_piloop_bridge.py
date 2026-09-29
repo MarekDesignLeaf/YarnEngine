@@ -346,7 +346,7 @@ def test_password_change_and_reset_end_other_sessions_and_old_owner_cookies_are_
     monkeypatch.delenv("YARNENGINE_AUTH_DISABLED", raising=False)
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "0")
     # Isolate revocation stamps from other tests sharing the app's settings store.
-    monkeypatch.setattr(appmod, "_SESSIONS_VALID_AFTER", f"auth.sessions_valid_after.{tmp_path.name}.")
+    monkeypatch.setattr(appmod, "_SESSIONS_VALID_AFTER", f"auth.sessions_valid_after.{__import__('uuid').uuid4().hex}.")
     phone, laptop = TestClient(appmod.app), TestClient(appmod.app)
     try:
         # A pre-existing 30-day cookie in the old format (no issue time) for the owner.
