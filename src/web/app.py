@@ -176,6 +176,21 @@ piloop_bridge = _start_piloop_bridge()
 PILOOP_SSO_ORIGIN = os.environ.get('PILOOP_SSO_ORIGIN', 'https://piloop.co.uk').strip().rstrip('/')
 
 
+def _report_piloop_bridge_state():
+    """One secret-free start-up line so operators can verify the linked owner from logs."""
+    if piloop_bridge is None:
+        print("PILOOP bridge: disabled", flush=True)
+        return
+    linked = os.environ.get('PILOOP_SSO_ADMIN_USERNAME', '').strip()
+    user = user_store.get_by_username(linked) if linked else None
+    ok = bool(user and user["active"] and user["role"] == "admin")
+    print("PILOOP bridge: enabled; linked owner " + ("verified (active admin)" if ok else
+          "NOT verified - SSO and account management will refuse requests"), flush=True)
+
+
+_report_piloop_bridge_state()
+
+
 def _linked_owner_username() -> str:
     return os.environ.get('PILOOP_SSO_ADMIN_USERNAME', '').strip()
 
