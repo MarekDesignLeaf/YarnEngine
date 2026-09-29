@@ -39,6 +39,9 @@ class PiloopBridge:
         )""")
         self.conn.commit()
 
+    def close(self):
+        self.conn.close()
+
     def _use_once(self, namespace: str, nonce: str, expiry: int):
         if not re.fullmatch(r"[a-zA-Z0-9_-]{16,100}", nonce):
             raise ValueError("invalid nonce")

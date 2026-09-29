@@ -160,8 +160,32 @@ user_store = UserStore(DATA_DIR / 'users.sqlite')
 user_store.seed_admin_from_env()
 admin_log_store = AdminLogStore(DATA_DIR / 'admin_logs.sqlite')
 session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
-piloop_bridge = (PiloopBridge(os.environ['PILOOP_BRIDGE_SECRET'], DATA_DIR / 'piloop_bridge.sqlite')
-                 if os.environ.get('PILOOP_BRIDGE_SECRET') else None)
+def _start_piloop_bridge():
+    # An invalid optional bridge secret must never stop OpenCrochet Pro or its normal login.
+    secret = os.environ.get('PILOOP_BRIDGE_SECRET', '')
+    if not secret:
+        return None
+    try:
+        return PiloopBridge(secret, DATA_DIR / 'piloop_bridge.sqlite')
+    except (ValueError, OSError, sqlite3.Error) as exc:
+        print(f"PILOOP bridge disabled: {type(exc).__name__}: {exc}", flush=True)
+        return None
+
+
+piloop_bridge = _start_piloop_bridge()
+PILOOP_SSO_ORIGIN = os.environ.get('PILOOP_SSO_ORIGIN', 'https://piloop.co.uk').strip().rstrip('/')
+
+
+def _linked_owner_username() -> str:
+    return os.environ.get('PILOOP_SSO_ADMIN_USERNAME', '').strip()
+
+
+def _is_linked_owner(user) -> bool:
+    """The PILOOP-linked OpenCrochet administrator. Independent of whether the bridge is
+    currently enabled, so the owner keeps full authority when signing in directly."""
+    linked = _linked_owner_username()
+    return bool(user and linked and user.get('role') == 'admin' and user.get('active', True)
+                and user.get('username') == linked)
 
 
 def _write_admin_log(**kwargs):
@@ -222,8 +246,7 @@ def _require_catalogue_role(request: Request, role: str):
         raise HTTPException(status_code=401,detail="login required")
     # The explicitly linked owner has every catalogue authority, including after
     # the site switches from legacy admin fallback to explicit catalogue RBAC.
-    linked = os.environ.get('PILOOP_SSO_ADMIN_USERNAME', '').strip()
-    if piloop_bridge and linked and u['role'] == 'admin' and u['username'] == linked:
+    if _is_linked_owner(u):
         return
     if not user_store.has_catalogue_role(int(u["id"]),role):
         raise HTTPException(status_code=403,detail=f"catalogue role {role} required")
@@ -530,7 +553,7 @@ def auth_reset_password(payload: dict, response: Response):
 async def auth_piloop_sso(request: Request):
     if piloop_bridge is None:
         raise HTTPException(status_code=503, detail="PILOOP SSO not configured")
-    if request.headers.get("origin") != "https://piloop.co.uk":
+    if request.headers.get("origin") != PILOOP_SSO_ORIGIN:
         raise HTTPException(status_code=403, detail="untrusted SSO origin")
     if request.headers.get("content-type", "").split(";")[0] != "application/x-www-form-urlencoded":
         raise HTTPException(status_code=415, detail="unsupported SSO request")
@@ -646,6 +669,10 @@ def admin_update_user(user_id: int, payload: dict, request: Request):
         raise HTTPException(status_code=404, detail="user not found")
     me = request.state.user
     try:
+        if _is_linked_owner(target) and (payload.get("active", True) is False
+                                         or payload.get("role", "admin") != "admin"):
+            raise ValueError("the PILOOP-linked owner cannot be deactivated or demoted; "
+                             "unset PILOOP_SSO_ADMIN_USERNAME first")
         if "active" in payload:
             if user_id == me["id"] and not payload["active"]:
                 raise ValueError("you cannot deactivate your own account")
@@ -666,6 +693,8 @@ def admin_update_user(user_id: int, payload: dict, request: Request):
 def admin_delete_user(user_id: int, request: Request):
     if user_id == request.state.user["id"]:
         raise HTTPException(status_code=422, detail="you cannot delete your own account")
+    if _is_linked_owner(user_store.get(user_id)):
+        raise HTTPException(status_code=422, detail="the PILOOP-linked owner cannot be deleted")
     if not user_store.delete(user_id):
         raise HTTPException(status_code=404, detail="user not found")
     return {"status": "deleted", "user_id": user_id}
