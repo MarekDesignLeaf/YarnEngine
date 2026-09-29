@@ -283,8 +283,9 @@ class SessionSigner:
             raise ValueError("session secret required")
         self.key = secret.encode("utf-8")
 
-    def issue(self, user_id: int, days: int = SESSION_DAYS) -> str:
-        exp = int((datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(days=days)).timestamp())
+    def issue(self, user_id: int, days: int = SESSION_DAYS, seconds: int | None = None) -> str:
+        lifetime = datetime.timedelta(seconds=seconds) if seconds else datetime.timedelta(days=days)
+        exp = int((datetime.datetime.now(datetime.timezone.utc) + lifetime).timestamp())
         nonce = secrets.token_hex(8)
         body = f"{user_id}:{exp}:{nonce}"
         sig = hmac.new(self.key, body.encode(), hashlib.sha256).hexdigest()

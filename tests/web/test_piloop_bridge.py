@@ -293,3 +293,39 @@ def test_migrated_admin_functions_work_through_bridge_and_are_closed_locally(tmp
         bridge.close()
         issuer.close()
         store.conn.close()
+
+
+def test_piloop_signout_ends_opencrochet_session_and_sso_session_is_short(tmp_path, monkeypatch):
+    from src.web import app as appmod
+    from src.web.auth import UserStore
+    import base64 as b64
+    store = UserStore(tmp_path / "users.db")
+    store.create("owner_local", "owner-pass-1234", role="admin")
+    bridge = PiloopBridge(SECRET, tmp_path / "bridge.db")
+    issuer = PiloopBridge(SECRET, tmp_path / "issuer.db")
+    monkeypatch.setattr(appmod, "user_store", store)
+    monkeypatch.setattr(appmod, "piloop_bridge", bridge)
+    monkeypatch.setenv("PILOOP_SSO_ADMIN_USERNAME", "owner_local")
+    monkeypatch.delenv("YARNENGINE_AUTH_DISABLED", raising=False)
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "0")
+    client = TestClient(appmod.app)
+    try:
+        ok = client.post("/api/auth/piloop-sso", data={"assertion": issuer.mint_owner_assertion()},
+                         headers={"Origin": "https://piloop.co.uk"}, follow_redirects=False)
+        assert ok.status_code == 303 and "Max-Age=28800" in ok.headers["set-cookie"]
+        token = client.cookies.get("ye_session")
+        exp = int(b64.urlsafe_b64decode(token.encode()).decode().split(":")[1])
+        assert exp - time.time() <= 8 * 3600 + 5
+        assert client.get("/api/auth/me").status_code == 200
+        assert client.post("/api/auth/piloop-signout", headers={"Origin": "https://evil.example"},
+                           follow_redirects=False).status_code == 403
+        assert client.get("/api/auth/me").status_code == 200
+        out = client.post("/api/auth/piloop-signout", headers={"Origin": "https://piloop.co.uk"},
+                          follow_redirects=False)
+        assert out.status_code == 303 and out.headers["location"] == "https://piloop.co.uk/continue"
+        assert client.get("/api/auth/me").status_code == 401
+    finally:
+        client.close()
+        bridge.close()
+        issuer.close()
+        store.conn.close()

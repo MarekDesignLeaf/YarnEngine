@@ -222,7 +222,7 @@ app.mount("/media/catalogues", StaticFiles(directory=CATALOGUE_OUTPUT, html=True
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
                 "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status",
-                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/piloop-sso",
+                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/piloop-sso", "/api/auth/piloop-signout",
                 "/api/piloop-bridge/v1", "/api/piloop-bridge/v1/backup", "/api/catalogue/apvp/conformance"}
 
 _PILOOP_MANAGED_PREFIXES = ("/api/admin/users", "/api/admin/catalogue-roles", "/api/admin/backup",
@@ -379,10 +379,27 @@ async def record_application_log(request: Request, call_next):
     response.headers["X-Request-ID"] = request_id
     return response
 
-def _set_session(response: Response, user_id: int):
+def _set_session(response: Response, user_id: int, seconds: int | None = None):
     secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
-    response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id), max_age=SESSION_DAYS*86400,
+    lifetime = seconds or SESSION_DAYS * 86400
+    response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id, seconds=lifetime), max_age=lifetime,
                         httponly=True, samesite="lax", secure=secure, path="/")
+
+
+PILOOP_SSO_SESSION_SECONDS = 8 * 3600  # same lifetime as a PILOOP owner session
+
+
+@app.post("/api/auth/piloop-signout")
+async def auth_piloop_signout(request: Request):
+    """Called by PILOOP (top-level form POST) when the owner locks the site or another
+    person signs in on the same browser: ends this browser's OpenCrochet session."""
+    if request.headers.get("origin") != PILOOP_SSO_ORIGIN:
+        raise HTTPException(status_code=403, detail="untrusted sign-out origin")
+    secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
+    response = RedirectResponse(PILOOP_SSO_ORIGIN + "/continue", status_code=303,
+                                headers={"Cache-Control": "no-store", "Referrer-Policy": "no-referrer"})
+    response.delete_cookie(SESSION_COOKIE, path="/", secure=secure, httponly=True, samesite="lax")
+    return response
 
 @app.get("/api/auth/status")
 def auth_status():
@@ -619,7 +636,7 @@ async def auth_piloop_sso(request: Request):
     response = RedirectResponse("/", status_code=303, headers={
         "Cache-Control": "no-store", "Referrer-Policy": "no-referrer",
     })
-    _set_session(response, user["id"])
+    _set_session(response, user["id"], seconds=PILOOP_SSO_SESSION_SECONDS)
     _write_admin_log(level="INFO", event="auth.piloop.sso", method="POST",
                      path="/api/auth/piloop-sso", status_code=303,
                      user_id=user["id"], username=user["username"], role="admin",
