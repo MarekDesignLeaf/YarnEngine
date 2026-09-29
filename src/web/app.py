@@ -488,7 +488,10 @@ def auth_me(request: Request):
     u = _current_user(request)
     if u is None:
         raise HTTPException(status_code=401, detail="login required")
-    return {**u, "admin_console": _admin_console()}
+    extra = {"admin_console": _admin_console()}
+    if extra["admin_console"] == "piloop" and u.get("role") == "admin":
+        extra["admin_console_url"] = PILOOP_SSO_ORIGIN + "/admin/return"
+    return {**u, **extra}
 
 @app.post("/api/auth/change-password")
 def auth_change_password(payload: dict, request: Request):

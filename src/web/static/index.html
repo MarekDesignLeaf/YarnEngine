@@ -1646,7 +1646,7 @@ async function boot(){
   try{const st=await api('/api/auth/status');$('btnShowRegister').classList.toggle('hidden',!st.registration_open);}catch(e){}
   return;
  }
- showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');
+ showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');if(typeof updateBackButton==='function')updateBackButton();
  $('tabAdmin').classList.toggle('hidden',ME.role!=='admin'||ME.admin_console==='piloop');
  $('btnNewLine').classList.toggle('hidden',ME.role!=='admin');
  await loadData();
@@ -3704,11 +3704,18 @@ function pushView(){
  const v=currentView();
  const last=history.state&&history.state.ye;
  if(last&&last.tab===v.tab&&last.mode===v.mode)return;
- history.pushState({ye:v},'',location.pathname);
+ const depth=((history.state&&history.state.depth)||0)+1;
+ history.pushState({ye:v,depth},'',location.pathname);
  updateBackButton();
 }
+// On the first screen there is nothing to go back to inside the app. When the
+// administrator arrived from PILOOP administration, Back returns there instead.
+function adminHomeUrl(){return (ME&&ME.role==='admin'&&ME.admin_console==='piloop'&&ME.admin_console_url)||'';}
 function updateBackButton(){
- $('btnBack').disabled=!(history.state&&history.state.ye&&history.length>1);
+ const depth=(history.state&&history.state.depth)||0;
+ const home=adminHomeUrl();
+ $('btnBack').disabled=!(depth>0||home);
+ $('btnBack').title=depth>0?'Back to the previous screen':(home?'Back to PILOOP administration':'Back to the previous screen');
 }
 window.addEventListener('popstate',e=>{
  if($('makeView')&&!$('makeView').classList.contains('hidden')){closeMake();return;}
@@ -3716,7 +3723,10 @@ window.addEventListener('popstate',e=>{
  const v=(e.state&&e.state.ye)||{tab:'calc',mode:calcMode};
  applyView(v,false);updateBackButton();
 });
-$('btnBack').onclick=()=>history.back();
+$('btnBack').onclick=()=>{
+ const depth=(history.state&&history.state.depth)||0;
+ if(depth>0)history.back();else if(adminHomeUrl())location.href=adminHomeUrl();
+};
 document.querySelectorAll('nav.tabs button').forEach(b=>b.addEventListener('click',()=>setTimeout(pushView,0)));
 
 /* The 3D preview is a header control now: it can be turned off anywhere and
@@ -4803,7 +4813,7 @@ $('wlCsv').onclick=()=>{
  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
 };
 
-history.replaceState({ye:{tab:'calc',mode:calcMode}},'',location.pathname);
+history.replaceState({ye:{tab:'calc',mode:calcMode},depth:0},'',location.pathname);updateBackButton();
 apply3dToggle();updateBackButton();renderYarnBar();
 boot();
 if('serviceWorker' in navigator){
