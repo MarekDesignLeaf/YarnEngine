@@ -49,6 +49,7 @@ class PiloopBridge:
                 (namespace + ":" + nonce, expiry))
             self.conn.commit()
         except sqlite3.IntegrityError as exc:
+            self.conn.rollback()  # release write lock for other process/replica
             raise ValueError("replayed request") from exc
 
     def mint_owner_assertion(self):
