@@ -81,8 +81,10 @@ def test_owner_sso_and_management_reuse_yarn_user_store(tmp_path, monkeypatch):
                          follow_redirects=False)
         assert ok.status_code == 303
         assert "ye_session=" in ok.headers.get("set-cookie", "")
-        assert client.get("/api/auth/me").json()["username"] == "owner_local"
-        assert client.get("/api/admin/users").status_code == 200
+        me = client.get("/api/auth/me").json()
+        assert me["username"] == "owner_local" and me["role"] == "admin"
+        # User administration is now served by PILOOP, not the local admin routes.
+        assert client.get("/api/admin/users").status_code == 403
         assert client.post("/api/auth/piloop-sso", data={"assertion": token},
                            headers={"Origin": "https://piloop.co.uk"},
                            follow_redirects=False).status_code == 401
@@ -227,4 +229,67 @@ def test_ordinary_user_cannot_mint_forge_or_reuse_owner_sso(tmp_path, monkeypatc
         client.close()
         bridge.close()
         forger.close()
+        store.conn.close()
+
+
+def test_migrated_admin_functions_work_through_bridge_and_are_closed_locally(tmp_path, monkeypatch):
+    from src.web import app as appmod
+    from src.web.auth import UserStore
+    store = UserStore(tmp_path / "users.db")
+    owner = store.create("owner_local", "owner-pass-1234", role="admin")
+    other = store.create("other_admin", "other-pass-12345", role="admin")
+    victim = store.create("leaving_user", "leaving-pass-1234", role="user")
+    bridge = PiloopBridge(SECRET, tmp_path / "bridge.db")
+    issuer = PiloopBridge(SECRET, tmp_path / "issuer.db")
+    monkeypatch.setattr(appmod, "user_store", store)
+    monkeypatch.setattr(appmod, "piloop_bridge", bridge)
+    monkeypatch.setenv("PILOOP_SSO_ADMIN_USERNAME", "owner_local")
+    monkeypatch.delenv("YARNENGINE_AUTH_DISABLED", raising=False)
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "0")
+    client = TestClient(appmod.app)
+
+    def call(payload, path="/api/piloop-bridge/v1"):
+        body = json.dumps(payload).encode()
+        headers = {"Content-Type": "application/json", **issuer.sign_api("POST", path, body)}
+        return client.post(path, content=body, headers=headers)
+    try:
+        assert call({"action": "logs", "limit": 5}).status_code == 200
+        assert call({"action": "ingestion_stats"}).status_code == 200
+        vision = call({"action": "vision_get"}).json()
+        assert "configured" in vision and "api_key" not in json.dumps(vision).lower().replace("key_", "")
+        company = call({"action": "company_set", "company": {"company_name": "Test Ltd", "evil": "x"}})
+        assert company.status_code == 200 and company.json()["company_name"] == "Test Ltd"
+        assert call({"action": "company_get"}).json()["company_name"] == "Test Ltd"
+        assert call({"action": "company_set", "company": {"company_name": "x" * 500}}).status_code == 422
+        reset = call({"action": "update", "user_id": victim["id"], "password": "brand-new-pass-12345",
+                      "email": "leaver@example.com"})
+        assert reset.status_code == 200 and store.authenticate("leaving_user", "brand-new-pass-12345")
+        assert call({"action": "delete", "user_id": owner["id"]}).status_code == 422
+        assert call({"action": "delete", "user_id": victim["id"]}).status_code == 200
+        assert store.get(victim["id"]) is None
+        backup = call({"action": "backup"}, "/api/piloop-bridge/v1/backup")
+        assert backup.status_code == 200 and backup.content[:2] == b"PK"
+        body = b'{"action":"backup"}'
+        stolen = issuer.sign_api("POST", "/api/piloop-bridge/v1", body)  # signed for another path
+        assert client.post("/api/piloop-bridge/v1/backup", content=body,
+                           headers={"Content-Type": "application/json", **stolen}).status_code == 403
+        # The OpenCrochet Admin tab is gone while the bridge is active.
+        assert client.post("/api/auth/login", json={"username": "other_admin",
+                                                    "password": "other-pass-12345"}).status_code == 200
+        assert client.get("/api/auth/me").json()["admin_console"] == "piloop"
+        for method, path in (("get", "/api/admin/users"), ("get", "/api/admin/backup"),
+                             ("get", "/api/admin/logs"), ("get", "/api/admin/ingestion/stats"),
+                             ("get", "/api/admin/settings/vision"), ("get", "/api/admin/catalogue-roles"),
+                             ("delete", f"/api/admin/users/{other['id']}")):
+            assert getattr(client, method)(path).status_code == 403, path
+        assert client.put("/api/admin/settings/company", json={"company_name": "y"}).status_code == 403
+        assert client.get("/api/settings/company").status_code == 200  # public footer info still works
+        # Break-glass: without the bridge the local administration returns.
+        monkeypatch.setattr(appmod, "piloop_bridge", None)
+        assert client.get("/api/auth/me").json()["admin_console"] == "local"
+        assert client.get("/api/admin/users").status_code == 200
+    finally:
+        client.close()
+        bridge.close()
+        issuer.close()
         store.conn.close()

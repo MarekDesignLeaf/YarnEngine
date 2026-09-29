@@ -223,7 +223,27 @@ app.mount("/media/catalogues", StaticFiles(directory=CATALOGUE_OUTPUT, html=True
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
                 "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status",
                 "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/piloop-sso",
-                "/api/piloop-bridge/v1", "/api/catalogue/apvp/conformance"}
+                "/api/piloop-bridge/v1", "/api/piloop-bridge/v1/backup", "/api/catalogue/apvp/conformance"}
+
+_PILOOP_MANAGED_PREFIXES = ("/api/admin/users", "/api/admin/catalogue-roles", "/api/admin/backup",
+                            "/api/admin/logs", "/api/admin/ingestion/", "/api/admin/settings/vision")
+
+
+def _moved_to_piloop(path: str, method: str) -> bool:
+    """Admin functions migrated to PILOOP administration (business actions such as
+    product lines, production steps, yarn and supplier edits stay in OpenCrochet)."""
+    if path == "/api/admin/settings/company" and method.upper() != "GET":
+        return True
+    for prefix in _PILOOP_MANAGED_PREFIXES:
+        base = prefix.rstrip("/")
+        if path == base or path.startswith(base + "/"):
+            return True
+    return False
+
+
+def _admin_console() -> str:
+    return "piloop" if piloop_bridge is not None else "local"
+
 
 def _auth_disabled() -> bool:
     return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
@@ -279,6 +299,11 @@ async def require_login(request: Request, call_next):
     request.state.user = user
     if path.startswith("/api/admin/") and user["role"] != "admin":
         return JSONResponse(status_code=403, content={"detail": "admin only"})
+    if piloop_bridge is not None and _moved_to_piloop(path, request.method):
+        # System administration now lives in PILOOP /admin. The local routes return
+        # automatically as a break-glass path whenever the bridge is not configured.
+        return JSONResponse(status_code=403, content={
+            "detail": "This administration function is managed in PILOOP administration (piloop.co.uk/admin)."})
     return await call_next(request)
 
 @app.middleware("http")
@@ -362,7 +387,8 @@ def _set_session(response: Response, user_id: int):
 @app.get("/api/auth/status")
 def auth_status():
     return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "open") == "open",
-            "has_admin": user_store.admin_count() > 0, "auth_disabled": _auth_disabled()}
+            "has_admin": user_store.admin_count() > 0, "auth_disabled": _auth_disabled(),
+            "admin_console": _admin_console()}
 
 @app.post("/api/auth/register")
 def auth_register(payload: dict, response: Response):
@@ -462,7 +488,7 @@ def auth_me(request: Request):
     u = _current_user(request)
     if u is None:
         raise HTTPException(status_code=401, detail="login required")
-    return u
+    return {**u, "admin_console": _admin_console()}
 
 @app.post("/api/auth/change-password")
 def auth_change_password(payload: dict, request: Request):
@@ -617,6 +643,36 @@ async def admin_piloop_bridge(request: Request):
         owner = user_store.get_by_username(linked) if linked else None
         if not owner or not owner["active"] or owner["role"] != "admin":
             raise HTTPException(status_code=503, detail="linked owner not configured")
+        # System administration migrated from the former OpenCrochet Admin tab.
+        # Values are validated by the same functions the old admin routes used.
+        if action == "logs":
+            return admin_log_store.list(limit=max(1, min(int(data.get("limit", 100)), 200)),
+                                        offset=max(0, int(data.get("offset", 0))),
+                                        level=(data.get("level") or None), q=(data.get("q") or None))
+        if action == "ingestion_stats":
+            return admin_ingestion_stats()
+        if action == "vision_get":
+            return get_vision_settings()
+        if action in ("vision_set", "vision_clear"):
+            patch = {"api_key": ""} if action == "vision_clear" else {
+                k: data[k] for k in ("api_key", "model") if isinstance(data.get(k), str)}
+            result = update_vision_settings(patch)
+            _write_admin_log(level="INFO", event="admin.vision." + action.split("_")[1], method="POST",
+                             path="/api/piloop-bridge/v1", status_code=200, username=owner["username"],
+                             role="admin", message="Vision settings changed from PILOOP administration")
+            return result
+        if action == "vision_test":
+            return test_vision_settings()
+        if action == "company_get":
+            return get_company_settings()
+        if action == "company_set":
+            fields = data.get("company") if isinstance(data.get("company"), dict) else {}
+            result = update_company_settings(CompanySettingsRequest(**{
+                k: str(v) for k, v in fields.items() if k in _COMPANY_FIELDS}))
+            _write_admin_log(level="INFO", event="admin.company.update", method="POST",
+                             path="/api/piloop-bridge/v1", status_code=200, username=owner["username"],
+                             role="admin", message="Company information changed from PILOOP administration")
+            return result
         if action == "list":
             return {"users": [{**u, "catalogue_roles": user_store.catalogue_roles(u["id"]),
                                 "linked_owner": u["id"] == owner["id"]}
@@ -657,11 +713,38 @@ async def admin_piloop_bridge(request: Request):
             roles = user_store.set_catalogue_roles(user_id, data.get("roles", []),
                                                     assigned_by="PILOOP owner bridge")
             return {"user_id": user_id, "catalogue_roles": roles}
+        if action == "delete":
+            if not user_store.delete(user_id):
+                raise HTTPException(status_code=404, detail="user not found")
+            _write_admin_log(level="INFO", event="admin.user.delete", method="POST",
+                             path="/api/piloop-bridge/v1", status_code=200, username=owner["username"],
+                             role="admin", message=f"Deleted user {target['username']} from PILOOP administration")
+            return {"status": "deleted", "user_id": user_id}
         raise ValueError("unsupported bridge action")
     except HTTPException:
         raise
     except (ValueError, KeyError, TypeError):
         raise HTTPException(status_code=422, detail="invalid bridge operation")
+
+
+@app.post("/api/piloop-bridge/v1/backup")
+async def admin_piloop_bridge_backup(request: Request):
+    """Signed server-to-server backup download for PILOOP administration."""
+    if piloop_bridge is None:
+        raise HTTPException(status_code=503, detail="PILOOP bridge not configured")
+    body = await request.body()
+    try:
+        piloop_bridge.verify_api("POST", "/api/piloop-bridge/v1/backup", body,
+                                 {k.lower(): v for k, v in request.headers.items()})
+    except ValueError:
+        raise HTTPException(status_code=403, detail="unauthorized bridge request")
+    owner = user_store.get_by_username(_linked_owner_username()) if _linked_owner_username() else None
+    if not owner or not owner["active"] or owner["role"] != "admin":
+        raise HTTPException(status_code=503, detail="linked owner not configured")
+    _write_admin_log(level="INFO", event="admin.backup", method="POST",
+                     path="/api/piloop-bridge/v1/backup", status_code=200, username=owner["username"],
+                     role="admin", message="Backup downloaded through PILOOP administration")
+    return admin_backup()
 
 
 @app.get("/api/admin/users")

@@ -14,3 +14,25 @@ Optional. Disabled unless `PILOOP_BRIDGE_SECRET` (>= 32 bytes, identical to PILO
 - The linked owner holds every catalogue authority, even without the bridge. It cannot be demoted, deactivated or deleted through the bridge or through `/api/admin/users`.
 
 Full audit, staging procedure, deployment and rollback: `piloop-private-website` → `AUDIT_2026-09-29.md`, `ADMIN_RUNBOOK.md`.
+
+## Administration moved to PILOOP
+
+While the bridge is enabled, the OpenCrochet **Admin** tab is hidden (`/api/auth/me` returns `admin_console: "piloop"`). The following routes return 403 to browser sessions:
+- `/api/admin/users*`
+- `/api/admin/catalogue-roles`
+- `/api/admin/backup`
+- `/api/admin/logs`
+- `/api/admin/ingestion/*`
+- `/api/admin/settings/vision*`
+- `PUT /api/admin/settings/company`
+
+PILOOP administration performs these through signed bridge actions:
+- `logs`, `ingestion_stats`
+- `vision_get`, `vision_set`, `vision_test`, `vision_clear`
+- `company_get`, `company_set`
+- user `update` / `delete`
+- `POST /api/piloop-bridge/v1/backup` (signed for that exact path)
+
+Business routes stay in OpenCrochet: product lines, production stages, product photos, yarn and supplier edits.
+
+**Break-glass:** remove `PILOOP_BRIDGE_SECRET` and redeploy. The local Admin tab and routes return automatically.

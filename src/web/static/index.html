@@ -1647,7 +1647,7 @@ async function boot(){
   return;
  }
  showApp();$('whoami').textContent=ME.username+(ME.role==='admin'?' · admin':'');
- $('tabAdmin').classList.toggle('hidden',ME.role!=='admin');
+ $('tabAdmin').classList.toggle('hidden',ME.role!=='admin'||ME.admin_console==='piloop');
  $('btnNewLine').classList.toggle('hidden',ME.role!=='admin');
  await loadData();
 }
@@ -2800,7 +2800,7 @@ let dsgManualParts=[{name:'Head',category:'HEAD',archetype:'sphere',copies:1,hei
 
 api('/api/design/status').then(s=>{
  dsgArchetypes=s.archetypes||{};dsgCategories=s.categories||[];
- if(!s.vision_configured)status($('dsgStatus'),(ME&&ME.role==='admin')?'Reading photos automatically needs an API key — add one under Admin → Reading photos. You can still describe the parts yourself in the meantime.':'Reading photos automatically is not switched on yet. You can still describe the parts yourself — everything else works the same.','warn');
+ if(!s.vision_configured)status($('dsgStatus'),(ME&&ME.role==='admin')?'Reading photos automatically needs an API key — add one in administration under Reading photos. You can still describe the parts yourself in the meantime.':'Reading photos automatically is not switched on yet. You can still describe the parts yourself — everything else works the same.','warn');
 }).catch(()=>{});
 
 $('dsgPhotos').addEventListener('change',async()=>{
