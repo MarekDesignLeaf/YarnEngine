@@ -86,11 +86,15 @@ def test_self_service_and_admin_email_management(auth_client):
     store.create("marek", "correct-horse-1", role="admin")
     c.post("/api/auth/login", json={"username": "marek", "password": "correct-horse-1"})
 
-    r = c.put("/api/auth/email", json={"email": "marek@designleaf.co.uk"})
+    # Changing the reset email requires the current password (account-takeover protection).
+    assert c.put("/api/auth/email", json={"email": "attacker@example.com"}).status_code == 401
+    assert c.put("/api/auth/email", json={"email": "attacker@example.com",
+                                          "current_password": "wrong-password-1"}).status_code == 401
+    r = c.put("/api/auth/email", json={"email": "marek@designleaf.co.uk", "current_password": "correct-horse-1"})
     assert r.status_code == 200 and r.json()["email"] == "marek@designleaf.co.uk"
     assert c.get("/api/auth/me").json()["email"] == "marek@designleaf.co.uk"
 
-    bad = c.put("/api/auth/email", json={"email": "not-an-email"})
+    bad = c.put("/api/auth/email", json={"email": "not-an-email", "current_password": "correct-horse-1"})
     assert bad.status_code == 422
 
     created = c.post("/api/admin/users", json={"username": "sarah", "password": "correct-horse-2", "email": "sarah@example.com"})

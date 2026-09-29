@@ -329,3 +329,54 @@ def test_piloop_signout_ends_opencrochet_session_and_sso_session_is_short(tmp_pa
         bridge.close()
         issuer.close()
         store.conn.close()
+
+
+def test_password_change_and_reset_end_other_sessions_and_old_owner_cookies_are_revoked(tmp_path, monkeypatch):
+    from src.web import app as appmod
+    from src.web.auth import UserStore
+    import base64 as b64, hmac as _hmac, hashlib as _hl
+    store = UserStore(tmp_path / "users.db")
+    owner = store.create("owner_local", "owner-pass-1234", role="admin")
+    guest = store.create("guest_user", "guest-pass-12345", role="user")
+    bridge = PiloopBridge(SECRET, tmp_path / "bridge.db")
+    issuer = PiloopBridge(SECRET, tmp_path / "issuer.db")
+    monkeypatch.setattr(appmod, "user_store", store)
+    monkeypatch.setattr(appmod, "piloop_bridge", bridge)
+    monkeypatch.setenv("PILOOP_SSO_ADMIN_USERNAME", "owner_local")
+    monkeypatch.delenv("YARNENGINE_AUTH_DISABLED", raising=False)
+    monkeypatch.setenv("SESSION_COOKIE_SECURE", "0")
+    phone, laptop = TestClient(appmod.app), TestClient(appmod.app)
+    try:
+        # A pre-existing 30-day cookie in the old format (no issue time) for the owner.
+        exp = int(time.time()) + 30 * 86400
+        body = f"{owner['id']}:{exp}:{'ab' * 8}"
+        sig = _hmac.new(appmod.session_signer.key, body.encode(), _hl.sha256).hexdigest()
+        phone.cookies.set("ye_session", b64.urlsafe_b64encode(f"{body}:{sig}".encode()).decode())
+        assert phone.get("/api/auth/me").status_code == 200
+        monkeypatch.setattr(appmod, "_SESSIONS_VALID_AFTER", "auth.sessions_valid_after.test.")
+        appmod._revoke_sessions(owner["id"])  # what the one-time start-up reset does
+        assert phone.get("/api/auth/me").status_code == 401
+        # Password change signs out other devices but keeps the current one.
+        for c in (phone, laptop):
+            c.cookies.clear()
+            time.sleep(1.1)
+            assert c.post("/api/auth/login", json={"username": "guest_user",
+                                                   "password": "guest-pass-12345"}).status_code == 200
+        time.sleep(1.1)
+        assert laptop.post("/api/auth/change-password", json={"current_password": "guest-pass-12345",
+                                                              "new_password": "guest-new-pass-12345"}).status_code == 200
+        assert laptop.get("/api/auth/me").status_code == 200
+        assert phone.get("/api/auth/me").status_code == 401
+        # Reset from PILOOP administration signs the user out everywhere.
+        time.sleep(1.1)
+        body = json.dumps({"action": "update", "user_id": guest["id"], "password": "reset-by-owner-12345"}).encode()
+        r = laptop.post("/api/piloop-bridge/v1", content=body, headers={
+            "Content-Type": "application/json", **issuer.sign_api("POST", "/api/piloop-bridge/v1", body)})
+        assert r.status_code == 200
+        assert laptop.get("/api/auth/me").status_code == 401
+    finally:
+        phone.close()
+        laptop.close()
+        bridge.close()
+        issuer.close()
+        store.conn.close()

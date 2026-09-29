@@ -248,12 +248,35 @@ def _admin_console() -> str:
 def _auth_disabled() -> bool:
     return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
 
+_SESSIONS_VALID_AFTER = "auth.sessions_valid_after."
+
+
+def _sessions_valid_after(user_id: int) -> int:
+    store = service._store()
+    try:
+        return int(store.get_setting(_SESSIONS_VALID_AFTER + str(user_id), "0") or 0)
+    finally:
+        store.close()
+
+
+def _revoke_sessions(user_id: int, keep_after: int | None = None):
+    """End every existing session of this user (password change/reset, security events)."""
+    store = service._store()
+    try:
+        store.set_setting(_SESSIONS_VALID_AFTER + str(user_id), str(keep_after or int(time.time())))
+    finally:
+        store.close()
+
+
 def _current_user(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
-    uid = session_signer.verify(token)
-    if uid is None:
+    verified = session_signer.verify_with_issued(token)
+    if verified is None:
+        return None
+    uid, issued = verified
+    if issued < _sessions_valid_after(uid):
         return None
     u = user_store.get(uid)
     if not u or not u["active"]:
@@ -519,11 +542,18 @@ def auth_change_password(payload: dict, request: Request):
         user_store.set_password(u["id"], payload.get("new_password", ""))
     except ValueError as e:
         raise HTTPException(status_code=422, detail=str(e))
-    return {"status": "ok"}
+    # Every other device is signed out; this browser gets a fresh session.
+    _revoke_sessions(u["id"])
+    response = JSONResponse({"status": "ok"})
+    _set_session(response, u["id"])
+    return response
 
 @app.put("/api/auth/email")
 def auth_update_email(payload: dict, request: Request):
     u = request.state.user
+    # The email receives password-reset links, so changing it needs the current password.
+    if not user_store.authenticate(u["username"], payload.get("current_password", "") or ""):
+        raise HTTPException(status_code=401, detail="enter your current password to change the email")
     try:
         user_store.set_email(u["id"], payload.get("email", ""))
     except ValueError as e:
@@ -726,6 +756,9 @@ async def admin_piloop_bridge(request: Request):
                 if not isinstance(data["password"], str) or not 16 <= len(data["password"]) <= 256:
                     raise ValueError("New password must be 16–256 characters")
                 user_store.set_password(user_id, data["password"])
+                _revoke_sessions(user_id)
+            if data.get("active") is False:
+                _revoke_sessions(user_id)
             if "email" in data:
                 user_store.set_email(user_id, data["email"])
             return {"user": UserStore.public(user_store.get(user_id))}
@@ -3992,3 +4025,27 @@ def calculate(request: CalculationRequest, http_request: Request):
         stitches=(project.get("stitches") or 0) * (project.get("rows") or 0) or None,
         pieces=1)
     return result
+
+def _one_time_owner_session_reset():
+    """Security migration (2026-09-30): end every OpenCrochet session of the linked owner
+    that was issued before issue times were recorded (long-lived 30-day cookies)."""
+    linked = _linked_owner_username()
+    owner = user_store.get_by_username(linked) if linked else None
+    if not owner:
+        return
+    store = service._store()
+    try:
+        key = "auth.owner_session_reset_2026_09_30"
+        if store.get_setting(key, ""):
+            return
+        store.set_setting(_SESSIONS_VALID_AFTER + str(owner["id"]), str(int(time.time())))
+        store.set_setting(key, "done")
+        print("Security: previous sessions of the linked owner were ended", flush=True)
+    finally:
+        store.close()
+
+
+try:
+    _one_time_owner_session_reset()
+except Exception as exc:  # never block start-up
+    print(f"Owner session reset skipped: {type(exc).__name__}", flush=True)

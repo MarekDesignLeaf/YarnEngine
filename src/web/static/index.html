@@ -1377,7 +1377,7 @@ button:not(.link):not(.flagBtn):focus-visible{outline:2px solid var(--accent2-da
 
 <div id="accountModal" class="modal hidden"><div class="modal-card" style="max-width:460px">
   <div class="modal-head"><h2 style="margin:0">Account</h2><button id="accClose" class="alt">✕</button></div>
-  <div class="fields" style="grid-template-columns:1fr"><label><span>Email (used for password reset)</span><input id="accEmail" type="email"></label></div>
+  <div class="fields" style="grid-template-columns:1fr"><label><span>Email (used for password reset; needs your current password below)</span><input id="accEmail" type="email"></label></div>
   <div class="toolbar"><button id="accEmailSave" class="alt">Save email</button></div>
   <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
     <div class="fields" style="grid-template-columns:1fr"><label><span>Current password</span><input id="accCur" type="password"></label><label><span>New password</span><input id="accNew" type="password"></label></div>
@@ -1669,7 +1669,7 @@ $('btnResetSave').onclick=async()=>{
  }catch(e){status($('loginStatus'),e.message,'bad');}};
 $('btnLogout').onclick=async()=>{await api('/api/auth/logout',{method:'POST'});location.reload();};
 $('btnAccount').onclick=()=>{$('accEmail').value=(ME&&ME.email)||'';$('accountModal').classList.remove('hidden');};$('accClose').onclick=()=>$('accountModal').classList.add('hidden');
-$('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'PUT',body:{email:$('accEmail').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
+$('accEmailSave').onclick=async()=>{try{ME=await api('/api/auth/email',{method:'PUT',body:{email:$('accEmail').value,current_password:$('accCur').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 $('accSave').onclick=async()=>{try{await api('/api/auth/change-password',{method:'POST',body:{current_password:$('accCur').value,new_password:$('accNew').value}});status($('accStatus'),t('msg.saved'),'good');}catch(e){status($('accStatus'),e.message,'bad');}};
 
 /* ============================ tabs ============================ */

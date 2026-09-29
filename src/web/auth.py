@@ -285,13 +285,16 @@ class SessionSigner:
 
     def issue(self, user_id: int, days: int = SESSION_DAYS, seconds: int | None = None) -> str:
         lifetime = datetime.timedelta(seconds=seconds) if seconds else datetime.timedelta(days=days)
-        exp = int((datetime.datetime.now(datetime.timezone.utc) + lifetime).timestamp())
-        nonce = secrets.token_hex(8)
+        now = datetime.datetime.now(datetime.timezone.utc)
+        exp = int((now + lifetime).timestamp())
+        # Nonce carries the issue time so sessions can be revoked per user ("n<iat>-<random>").
+        nonce = f"n{int(now.timestamp())}-{secrets.token_hex(8)}"
         body = f"{user_id}:{exp}:{nonce}"
         sig = hmac.new(self.key, body.encode(), hashlib.sha256).hexdigest()
         return base64.urlsafe_b64encode(f"{body}:{sig}".encode()).decode()
 
-    def verify(self, token: str) -> int | None:
+    def verify_with_issued(self, token: str) -> tuple[int, int] | None:
+        """(user_id, issued_at). Tokens from before issue times were recorded report 0."""
         try:
             raw = base64.urlsafe_b64decode(token.encode()).decode()
             user_id, exp, nonce, sig = raw.split(":")
@@ -301,9 +304,14 @@ class SessionSigner:
                 return None
             if int(exp) < int(datetime.datetime.now(datetime.timezone.utc).timestamp()):
                 return None
-            return int(user_id)
+            issued = int(nonce[1:].split("-", 1)[0]) if nonce.startswith("n") and "-" in nonce else 0
+            return int(user_id), issued
         except Exception:
             return None
+
+    def verify(self, token: str) -> int | None:
+        result = self.verify_with_issued(token)
+        return result[0] if result else None
 
 
 def session_secret_from_env(data_dir: Path) -> str:
