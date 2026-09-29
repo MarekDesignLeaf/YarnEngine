@@ -93,7 +93,9 @@ from src.catalogue.model_input import normalize_catalogue_model
 import datetime, os, sqlite3, time, traceback, uuid, hashlib, functools
 from collections import defaultdict
 from fastapi import Request, Response, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
+from urllib.parse import parse_qs
+from .piloop_bridge import PiloopBridge
 from .auth import UserStore, SessionSigner, session_secret_from_env, SESSION_COOKIE, SESSION_DAYS, RESET_TOKEN_TTL_MINUTES
 from .mailer import send_email
 from .admin_log import AdminLogStore
@@ -158,6 +160,8 @@ user_store = UserStore(DATA_DIR / 'users.sqlite')
 user_store.seed_admin_from_env()
 admin_log_store = AdminLogStore(DATA_DIR / 'admin_logs.sqlite')
 session_signer = SessionSigner(session_secret_from_env(DATA_DIR))
+piloop_bridge = (PiloopBridge(os.environ['PILOOP_BRIDGE_SECRET'], DATA_DIR / 'piloop_bridge.sqlite')
+                 if os.environ.get('PILOOP_BRIDGE_SECRET') else None)
 
 
 def _write_admin_log(**kwargs):
@@ -179,7 +183,8 @@ app.mount("/media/catalogues", StaticFiles(directory=CATALOGUE_OUTPUT, html=True
 # ---------------------------------------------------------------- auth ---
 PUBLIC_PATHS = {"/", "/sw.js", "/manifest.webmanifest", "/api/health", "/api/auth/login",
                 "/api/auth/register", "/api/auth/logout", "/api/auth/me", "/api/auth/status",
-                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/catalogue/apvp/conformance"}
+                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/piloop-sso",
+                "/api/piloop-bridge/v1", "/api/catalogue/apvp/conformance"}
 
 def _auth_disabled() -> bool:
     return os.environ.get("YARNENGINE_AUTH_DISABLED") == "1"
@@ -215,6 +220,11 @@ def _require_catalogue_role(request: Request, role: str):
     u=getattr(request.state,"user",None)
     if u is None:
         raise HTTPException(status_code=401,detail="login required")
+    # The explicitly linked owner has every catalogue authority, including after
+    # the site switches from legacy admin fallback to explicit catalogue RBAC.
+    linked = os.environ.get('PILOOP_SSO_ADMIN_USERNAME', '').strip()
+    if piloop_bridge and linked and u['role'] == 'admin' and u['username'] == linked:
+        return
     if not user_store.has_catalogue_role(int(u["id"]),role):
         raise HTTPException(status_code=403,detail=f"catalogue role {role} required")
 
@@ -511,6 +521,110 @@ def auth_reset_password(payload: dict, response: Response):
         raise HTTPException(status_code=400, detail="invalid or expired reset link")
     _set_session(response, user["id"])
     return user
+
+
+# --------------------------------------------------- PILOOP private owner bridge ---
+# Intentionally excluded from the ordinary user-cookie middleware: these routes
+# authenticate only with the signed, short-lived assertions and bridge API HMAC.
+@app.post("/api/auth/piloop-sso")
+async def auth_piloop_sso(request: Request):
+    if piloop_bridge is None:
+        raise HTTPException(status_code=503, detail="PILOOP SSO not configured")
+    if request.headers.get("origin") != "https://piloop.co.uk":
+        raise HTTPException(status_code=403, detail="untrusted SSO origin")
+    if request.headers.get("content-type", "").split(";")[0] != "application/x-www-form-urlencoded":
+        raise HTTPException(status_code=415, detail="unsupported SSO request")
+    body = await request.body()
+    if len(body) > 4096:
+        raise HTTPException(status_code=413, detail="SSO request too large")
+    try:
+        fields = parse_qs(body.decode("utf-8"), strict_parsing=True)
+        token = fields["assertion"][0]
+        if len(fields["assertion"]) != 1:
+            raise ValueError("duplicate assertion")
+        piloop_bridge.redeem_owner_assertion(token)
+    except (UnicodeDecodeError, KeyError, ValueError):
+        raise HTTPException(status_code=401, detail="invalid or expired SSO assertion")
+    linked = os.environ.get("PILOOP_SSO_ADMIN_USERNAME", "").strip()
+    user = user_store.get_by_username(linked) if linked else None
+    if not user or not user["active"] or user["role"] != "admin":
+        raise HTTPException(status_code=503, detail="linked owner administrator is not configured")
+    response = RedirectResponse("/", status_code=303, headers={
+        "Cache-Control": "no-store", "Referrer-Policy": "no-referrer",
+    })
+    _set_session(response, user["id"])
+    _write_admin_log(level="INFO", event="auth.piloop.sso", method="POST",
+                     path="/api/auth/piloop-sso", status_code=303,
+                     user_id=user["id"], username=user["username"], role="admin",
+                     message="Verified one-time PILOOP owner SSO")
+    return response
+
+
+@app.post("/api/piloop-bridge/v1")
+async def admin_piloop_bridge(request: Request):
+    if piloop_bridge is None:
+        raise HTTPException(status_code=503, detail="PILOOP bridge not configured")
+    body = await request.body()
+    try:
+        piloop_bridge.verify_api("POST", "/api/piloop-bridge/v1", body,
+                                 {k.lower(): v for k, v in request.headers.items()})
+    except ValueError:
+        raise HTTPException(status_code=403, detail="unauthorized bridge request")
+    try:
+        data = json.loads(body)
+        if not isinstance(data, dict):
+            raise ValueError("invalid body")
+        action = data.get("action")
+        linked = os.environ.get("PILOOP_SSO_ADMIN_USERNAME", "").strip()
+        owner = user_store.get_by_username(linked) if linked else None
+        if not owner or not owner["active"] or owner["role"] != "admin":
+            raise HTTPException(status_code=503, detail="linked owner not configured")
+        if action == "list":
+            return {"users": [{**u, "catalogue_roles": user_store.catalogue_roles(u["id"]),
+                                "linked_owner": u["id"] == owner["id"]}
+                               for u in user_store.list()]}
+        if action == "create":
+            password = data.get("password", "")
+            if not isinstance(password, str) or not 16 <= len(password) <= 256:
+                raise ValueError("New password must be 16–256 characters")
+            role = data.get("role", "user")
+            user = user_store.create(data.get("username", ""), password,
+                                     role=role, active=bool(data.get("active", True)),
+                                     email=data.get("email") or None)
+            return {"user": user}
+        user_id = int(data.get("user_id", 0))
+        target = user_store.get(user_id)
+        if target is None:
+            raise HTTPException(status_code=404, detail="user not found")
+        if user_id == owner["id"]:
+            raise ValueError("The linked owner account can only be managed directly in OpenCrochet Pro")
+        if action == "update":
+            if "role" in data and data["role"] not in ("admin", "user"):
+                raise ValueError("invalid role")
+            last_admin = target["role"] == "admin" and user_store.admin_count() <= 1
+            if last_admin and (data.get("role", "admin") != "admin" or data.get("active") is False):
+                raise ValueError("Cannot deactivate or demote the final administrator")
+            if "role" in data:
+                user_store.set_role(user_id, data["role"])
+            if "active" in data:
+                user_store.set_active(user_id, bool(data["active"]))
+            if "password" in data:
+                if not isinstance(data["password"], str) or not 16 <= len(data["password"]) <= 256:
+                    raise ValueError("New password must be 16–256 characters")
+                user_store.set_password(user_id, data["password"])
+            if "email" in data:
+                user_store.set_email(user_id, data["email"])
+            return {"user": UserStore.public(user_store.get(user_id))}
+        if action == "catalogue_roles":
+            roles = user_store.set_catalogue_roles(user_id, data.get("roles", []),
+                                                    assigned_by="PILOOP owner bridge")
+            return {"user_id": user_id, "catalogue_roles": roles}
+        raise ValueError("unsupported bridge action")
+    except HTTPException:
+        raise
+    except (ValueError, KeyError, TypeError):
+        raise HTTPException(status_code=422, detail="invalid bridge operation")
+
 
 @app.get("/api/admin/users")
 def admin_users():
