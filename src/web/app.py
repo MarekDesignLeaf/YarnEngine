@@ -503,6 +503,13 @@ def auth_login(payload: dict, request: Request, response: Response):
         )
         raise HTTPException(status_code=401, detail="invalid username or password")
     _login_attempts.pop(_login_rate_limit_key(request, username), None)
+    if piloop_bridge is not None and _is_linked_owner(u):
+        # One administration only: the owner's administrator account enters OpenCrochet
+        # exclusively through PILOOP /admin (break-glass: remove the bridge secret).
+        _write_admin_log(level="WARNING", event="auth.login.owner_direct_refused", method="POST",
+                         path="/api/auth/login", status_code=403, username=u.get("username"),
+                         role="admin", message="Direct login of the PILOOP-linked owner refused")
+        raise HTTPException(status_code=403, detail="This administrator account signs in only through PILOOP administration (piloop.co.uk/admin).")
     _set_session(response, u["id"])
     _write_admin_log(
         level="INFO",
@@ -600,6 +607,8 @@ def auth_forgot_password(payload: dict, request: Request):
         user = user_store.get_by_username(identifier)
         if user is None and "@" in identifier:
             user = user_store.get_by_email(identifier)
+    if user and piloop_bridge is not None and _is_linked_owner(user):
+        user = None  # the linked owner is never reset by email while PILOOP manages it
     if user and user.get("active") and user.get("email"):
         token = user_store.create_password_reset(user["id"])
         reset_link = f"{str(request.base_url).rstrip('/')}/?reset_token={token}"
@@ -633,6 +642,9 @@ def auth_reset_password(payload: dict, response: Response):
         raise HTTPException(status_code=422, detail=str(e))
     if user is None:
         raise HTTPException(status_code=400, detail="invalid or expired reset link")
+    _revoke_sessions(user["id"])
+    if piloop_bridge is not None and _is_linked_owner(user_store.get(user["id"])):
+        raise HTTPException(status_code=403, detail="This administrator account signs in only through PILOOP administration (piloop.co.uk/admin).")
     _set_session(response, user["id"])
     return user
 
@@ -4035,7 +4047,7 @@ def _one_time_owner_session_reset():
         return
     store = service._store()
     try:
-        key = "auth.owner_session_reset_2026_09_30"
+        key = "auth.owner_session_reset_2026_09_30b"
         if store.get_setting(key, ""):
             return
         store.set_setting(_SESSIONS_VALID_AFTER + str(owner["id"]), str(int(time.time())))

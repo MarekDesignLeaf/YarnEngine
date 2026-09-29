@@ -345,6 +345,8 @@ def test_password_change_and_reset_end_other_sessions_and_old_owner_cookies_are_
     monkeypatch.setenv("PILOOP_SSO_ADMIN_USERNAME", "owner_local")
     monkeypatch.delenv("YARNENGINE_AUTH_DISABLED", raising=False)
     monkeypatch.setenv("SESSION_COOKIE_SECURE", "0")
+    # Isolate revocation stamps from other tests sharing the app's settings store.
+    monkeypatch.setattr(appmod, "_SESSIONS_VALID_AFTER", f"auth.sessions_valid_after.{tmp_path.name}.")
     phone, laptop = TestClient(appmod.app), TestClient(appmod.app)
     try:
         # A pre-existing 30-day cookie in the old format (no issue time) for the owner.
@@ -353,7 +355,6 @@ def test_password_change_and_reset_end_other_sessions_and_old_owner_cookies_are_
         sig = _hmac.new(appmod.session_signer.key, body.encode(), _hl.sha256).hexdigest()
         phone.cookies.set("ye_session", b64.urlsafe_b64encode(f"{body}:{sig}".encode()).decode())
         assert phone.get("/api/auth/me").status_code == 200
-        monkeypatch.setattr(appmod, "_SESSIONS_VALID_AFTER", "auth.sessions_valid_after.test.")
         appmod._revoke_sessions(owner["id"])  # what the one-time start-up reset does
         assert phone.get("/api/auth/me").status_code == 401
         # Password change signs out other devices but keeps the current one.
