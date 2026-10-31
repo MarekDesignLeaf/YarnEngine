@@ -176,6 +176,17 @@ piloop_bridge = _start_piloop_bridge()
 PILOOP_SSO_ORIGIN = os.environ.get('PILOOP_SSO_ORIGIN', 'https://piloop.co.uk').strip().rstrip('/')
 
 
+def _public_base_url() -> str:
+    """Never derive password-reset links from an untrusted HTTP Host header."""
+    from urllib.parse import urlsplit
+    base = os.environ.get("YARNENGINE_PUBLIC_BASE_URL", "https://yarnengine-production.up.railway.app").strip().rstrip("/")
+    parsed = urlsplit(base)
+    if (parsed.scheme != "https" or not parsed.hostname or parsed.username or
+            parsed.password or parsed.path or parsed.query or parsed.fragment):
+        raise RuntimeError("YARNENGINE_PUBLIC_BASE_URL must be an HTTPS origin with no path")
+    return base
+
+
 def _report_piloop_bridge_state():
     """One secret-free start-up line so operators can verify the linked owner from logs."""
     if piloop_bridge is None:
@@ -260,10 +271,12 @@ def _sessions_valid_after(user_id: int) -> int:
 
 
 def _revoke_sessions(user_id: int, keep_after: int | None = None):
-    """End every existing session of this user (password change/reset, security events)."""
+    """End every session issued under the prior persistent generation."""
     store = service._store()
     try:
-        store.set_setting(_SESSIONS_VALID_AFTER + str(user_id), str(keep_after or int(time.time())))
+        key = _SESSIONS_VALID_AFTER + str(user_id)
+        previous = int(store.get_setting(key, "0") or 0)
+        store.set_setting(key, str(previous + 1))
     finally:
         store.close()
 
@@ -272,11 +285,11 @@ def _current_user(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
-    verified = session_signer.verify_with_issued(token)
+    verified = session_signer.verify_with_generation(token)
     if verified is None:
         return None
-    uid, issued = verified
-    if issued < _sessions_valid_after(uid):
+    uid, _issued, generation = verified
+    if generation != _sessions_valid_after(uid):
         return None
     u = user_store.get(uid)
     if not u or not u["active"]:
@@ -405,7 +418,8 @@ async def record_application_log(request: Request, call_next):
 def _set_session(response: Response, user_id: int, seconds: int | None = None):
     secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
     lifetime = seconds or SESSION_DAYS * 86400
-    response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id, seconds=lifetime), max_age=lifetime,
+    response.set_cookie(SESSION_COOKIE, session_signer.issue(
+        user_id, seconds=lifetime, generation=_sessions_valid_after(user_id)), max_age=lifetime,
                         httponly=True, samesite="lax", secure=secure, path="/")
 
 
@@ -611,7 +625,7 @@ def auth_forgot_password(payload: dict, request: Request):
         user = None  # the linked owner is never reset by email while PILOOP manages it
     if user and user.get("active") and user.get("email"):
         token = user_store.create_password_reset(user["id"])
-        reset_link = f"{str(request.base_url).rstrip('/')}/?reset_token={token}"
+        reset_link = f"{_public_base_url()}/?reset_token={token}"
         try:
             send_email(
                 to=user["email"],
