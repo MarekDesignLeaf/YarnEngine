@@ -115,3 +115,14 @@ def test_service_worker_never_caches_private_pages():
     assert 'SHELL.includes(u.pathname)' in worker
     assert "e.request.method" in worker
     assert 'u.origin!==self.location.origin' in worker
+
+
+def test_registration_is_closed_without_explicit_opt_in(monkeypatch, tmp_path):
+    monkeypatch.setenv("YARNENGINE_AUTH_DISABLED", "0")
+    monkeypatch.delenv("YARNENGINE_REGISTRATION", raising=False)
+    users = UserStore(tmp_path / "users.sqlite")
+    monkeypatch.setattr(appmod, "user_store", users)
+    client = TestClient(appmod.app)
+    assert client.get("/api/auth/status").json()["registration_open"] is False
+    assert client.post("/api/auth/register", json={
+        "username": "firstuser", "password": "secure-password-123"}).status_code == 403
