@@ -176,6 +176,17 @@ piloop_bridge = _start_piloop_bridge()
 PILOOP_SSO_ORIGIN = os.environ.get('PILOOP_SSO_ORIGIN', 'https://piloop.co.uk').strip().rstrip('/')
 
 
+def _public_base_url() -> str:
+    """Never derive password-reset links from an untrusted HTTP Host header."""
+    from urllib.parse import urlsplit
+    base = os.environ.get("YARNENGINE_PUBLIC_BASE_URL", "https://yarnengine-production.up.railway.app").strip().rstrip("/")
+    parsed = urlsplit(base)
+    if (parsed.scheme != "https" or not parsed.hostname or parsed.username or
+            parsed.password or parsed.path or parsed.query or parsed.fragment):
+        raise RuntimeError("YARNENGINE_PUBLIC_BASE_URL must be an HTTPS origin with no path")
+    return base
+
+
 def _report_piloop_bridge_state():
     """One secret-free start-up line so operators can verify the linked owner from logs."""
     if piloop_bridge is None:
@@ -260,10 +271,12 @@ def _sessions_valid_after(user_id: int) -> int:
 
 
 def _revoke_sessions(user_id: int, keep_after: int | None = None):
-    """End every existing session of this user (password change/reset, security events)."""
+    """End every session issued under the prior persistent generation."""
     store = service._store()
     try:
-        store.set_setting(_SESSIONS_VALID_AFTER + str(user_id), str(keep_after or int(time.time())))
+        key = _SESSIONS_VALID_AFTER + str(user_id)
+        previous = int(store.get_setting(key, "0") or 0)
+        store.set_setting(key, str(previous + 1))
     finally:
         store.close()
 
@@ -272,11 +285,11 @@ def _current_user(request: Request):
     token = request.cookies.get(SESSION_COOKIE)
     if not token:
         return None
-    verified = session_signer.verify_with_issued(token)
+    verified = session_signer.verify_with_generation(token)
     if verified is None:
         return None
-    uid, issued = verified
-    if issued < _sessions_valid_after(uid):
+    uid, _issued, generation = verified
+    if generation != _sessions_valid_after(uid):
         return None
     u = user_store.get(uid)
     if not u or not u["active"]:
@@ -405,7 +418,8 @@ async def record_application_log(request: Request, call_next):
 def _set_session(response: Response, user_id: int, seconds: int | None = None):
     secure = os.environ.get("SESSION_COOKIE_SECURE", "0") == "1"
     lifetime = seconds or SESSION_DAYS * 86400
-    response.set_cookie(SESSION_COOKIE, session_signer.issue(user_id, seconds=lifetime), max_age=lifetime,
+    response.set_cookie(SESSION_COOKIE, session_signer.issue(
+        user_id, seconds=lifetime, generation=_sessions_valid_after(user_id)), max_age=lifetime,
                         httponly=True, samesite="lax", secure=secure, path="/")
 
 
@@ -426,13 +440,13 @@ async def auth_piloop_signout(request: Request):
 
 @app.get("/api/auth/status")
 def auth_status():
-    return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "open") == "open",
+    return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "closed") == "open",
             "has_admin": user_store.admin_count() > 0, "auth_disabled": _auth_disabled(),
             "admin_console": _admin_console()}
 
 @app.post("/api/auth/register")
 def auth_register(payload: dict, response: Response):
-    if os.environ.get("YARNENGINE_REGISTRATION", "open") != "open":
+    if os.environ.get("YARNENGINE_REGISTRATION", "closed") != "open":
         raise HTTPException(status_code=403, detail="registration is closed")
     try:
         # The very first account becomes administrator if none was seeded from the environment.
@@ -611,7 +625,7 @@ def auth_forgot_password(payload: dict, request: Request):
         user = None  # the linked owner is never reset by email while PILOOP manages it
     if user and user.get("active") and user.get("email"):
         token = user_store.create_password_reset(user["id"])
-        reset_link = f"{str(request.base_url).rstrip('/')}/?reset_token={token}"
+        reset_link = f"{_public_base_url()}/?reset_token={token}"
         try:
             send_email(
                 to=user["email"],
@@ -1886,7 +1900,11 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
     except ValueError as e:
         raise HTTPException(status_code=422,detail=str(e))
     result={"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
-            "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
+            "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,
+                          "interval_type":("calibrated_model_interval" if production else "heuristic_uncalibrated_range"),
+                          "interval_note":("The baseline interval is a heuristic estimate, not a statistically validated 95% interval."
+                                           if production is None else "Model-dependent prediction interval; verify calibration evidence."),
+                          "in_domain":pred.in_domain,"warnings":pred.warnings},
             "audit":{**audit,"yarn_diameter_mm":diameter,"yarn_diameter_source":diameter_source,"yarn_diameter_warnings":list(diameter_warnings)},
             "model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
     copies=max(1,int(payload.get("copies") or 1))
@@ -2438,23 +2456,46 @@ def editor_save(request: SavePatternRequest):
     if not report.valid:
         raise HTTPException(status_code=422,detail=[{"code":i.code,"message":i.message} for i in report.issues])
 
-    safe=re.sub(r"[^A-Za-z0-9_.-]+","_",editor.pattern_id)
-    dest=ROOT/"data/patterns"/f"user_{safe}_{editor.version}.json"
-    if dest.exists():
-        raise HTTPException(status_code=409,detail="pattern version already exists")
-    dest.write_text(json.dumps(canonical,indent=2),encoding="utf-8")
-
-    meta_path=ROOT/"data/library/pattern_metadata.json"
-    meta=json.loads(meta_path.read_text())
-    entry={
-      "pattern_id":editor.pattern_id,"version":editor.version,"name":editor.name,
-      "family_id":request.family_id,"tags":request.tags,"difficulty":request.difficulty,
-      "techniques":request.techniques,"source_type":"user_created","source_reference":None,
-      "license_id":None,"active":True
+    # User-authored patterns belong in the persistent database, not ROOT/data:
+    # Railway replaces the application image on every deployment.
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    checksum = canonical_checksum(canonical)
+    entry = {
+        "pattern_id": editor.pattern_id, "version": editor.version, "name": editor.name,
+        "family_id": request.family_id, "tags": request.tags, "difficulty": request.difficulty,
+        "techniques": request.techniques, "source_type": "user_created",
+        "source_reference": "web_editor", "license_id": None, "active": True,
     }
-    meta["patterns"].append(entry)
-    meta_path.write_text(json.dumps(meta,indent=2),encoding="utf-8")
-    return {"status":"saved","path":str(dest.relative_to(ROOT)),"pattern":canonical,"metadata":entry}
+    store = service._store()
+    try:
+        with store.conn:
+            if store.conn.execute(
+                "SELECT 1 FROM patterns WHERE pattern_id=? AND version=?",
+                (editor.pattern_id, editor.version),
+            ).fetchone():
+                raise HTTPException(status_code=409, detail="pattern version already exists")
+            store.conn.execute(
+                """INSERT INTO patterns(
+                    pattern_id, version, name, family_id, difficulty, tags_json,
+                    techniques_json, pattern_json, source_type, source_reference,
+                    license_id, checksum, active, created_at, updated_at
+                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (editor.pattern_id, editor.version, editor.name, request.family_id,
+                 request.difficulty, json.dumps(request.tags), json.dumps(request.techniques),
+                 json.dumps(canonical), "user_created", "web_editor",
+                 None, checksum, 1, now, now),
+            )
+            store.conn.execute(
+                """INSERT INTO provenance_audit(
+                    entity_type, entity_id, version, source_type, source_reference,
+                    license_id, evidence_level, checksum, imported_at
+                ) VALUES(?,?,?,?,?,?,?,?,?)""",
+                ("pattern", editor.pattern_id, editor.version, "user_created",
+                 "web_editor", None, "user_declared", checksum, now),
+            )
+    finally:
+        store.close()
+    return {"status": "saved", "path": None, "pattern": canonical, "metadata": entry}
 
 
 @app.post("/api/yarns")

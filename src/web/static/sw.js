@@ -1,10 +1,10 @@
-const CACHE="opencrochet-pro-m12-v7";
+const CACHE="opencrochet-pro-m12-v8";
 const SHELL=["/static/manifest.webmanifest","/static/icon-192.png","/static/icon-512.png","/static/apple-touch-icon.png"];
 // true when this worker replaces an older one (an update), false on first install
 let isUpdate=false;
 self.addEventListener("install",e=>{isUpdate=!!self.registration.active;self.skipWaiting();e.waitUntil(caches.open(CACHE).then(c=>c.addAll(SHELL)));});
 self.addEventListener("activate",e=>e.waitUntil(
- caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+ caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith("opencrochet-pro-")&&k!==CACHE).map(k=>caches.delete(k))))
  .then(()=>self.clients.claim())
  .then(()=>{
   // An installed PWA is resumed, not reloaded, when reopened, so an old page can
@@ -18,9 +18,14 @@ self.addEventListener("activate",e=>e.waitUntil(
   })));
  })
 ));
+// Cache only explicit public PWA assets. Never cache user documents, media,
+// authenticated pages, API responses or content from other origins.
 self.addEventListener("fetch",e=>{
  if(e.request.method!=="GET")return;
  const u=new URL(e.request.url);
- if(u.pathname.startsWith("/api/"))return;
- e.respondWith(fetch(e.request).then(r=>{const x=r.clone();caches.open(CACHE).then(c=>c.put(e.request,x));return r}).catch(()=>caches.match(e.request)));
+ if(u.origin!==self.location.origin||!SHELL.includes(u.pathname))return;
+ e.respondWith(fetch(e.request).then(r=>{
+   if(r.ok&&r.type==="basic"){const copy=r.clone();e.waitUntil(caches.open(CACHE).then(c=>c.put(e.request,copy)));}
+   return r;
+ }).catch(()=>caches.match(e.request)));
 });

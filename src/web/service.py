@@ -169,7 +169,8 @@ class WebService:
             confidence = {
                 "level": "uncalibrated_baseline",
                 "label": "Uncalibrated estimate",
-                "explanation": "Stitch geometry baseline (no measured swatch or approved calibration model yet). Add a measured swatch to replace it with a calibrated figure.",
+                "explanation": "Uncalibrated crochet geometry. The shown bounds are heuristic sensitivity bands, NOT statistically validated 95% intervals. Add a measured swatch for a calibration-based estimate.",
+                "interval_type": "heuristic_uncalibrated_range",
                 "lower_m": pred.lower_95_m * (1 + req.allowance_percent / 100.0),
                 "upper_m": pred.upper_95_m * (1 + req.allowance_percent / 100.0),
                 "yarn_diameter_mm": diameter, "yarn_diameter_source": diameter_source,

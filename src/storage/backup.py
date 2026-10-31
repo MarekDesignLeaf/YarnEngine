@@ -27,18 +27,26 @@ def _strip_secrets(db_path: Path) -> None:
     """
     conn = sqlite3.connect(str(db_path))
     try:
-        has_settings = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='settings'").fetchone()
-        if has_settings:
-            conn.execute("DELETE FROM settings WHERE key LIKE ?", (SECRET_SETTING_PREFIX + "%",))
-            conn.commit()
+        # Current YarnEngine uses app_settings; support the historical settings
+        # table as well. The old implementation missed app_settings and leaked
+        # stored API keys into the exported database.
+        for table in ("settings", "app_settings"):
+            exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+            if exists:
+                conn.execute(f"DELETE FROM {table} WHERE key LIKE ?",
+                             (SECRET_SETTING_PREFIX + "%",))
+        conn.commit()
     finally:
         conn.close()
 
 
 def build_backup_zip(data_dir: Path) -> bytes:
-    """Return an in-memory zip containing a consistent snapshot of every
-    *.sqlite file found directly under data_dir, with credentials removed."""
+    """Return consistent SQLite snapshots plus all approved persistent media assets.
+
+    Never include the session-signing secret or SQLite journal/WAL files. The
+    database snapshots are already consistent due to sqlite3.Connection.backup.
+    """
     data_dir = Path(data_dir)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -54,4 +62,18 @@ def build_backup_zip(data_dir: Path) -> bytes:
                     src_conn.close()
                 _strip_secrets(tmp_path)
                 zf.write(tmp_path, arcname=db_file.name)
+        # Database-only backups silently lost user photos and generated catalogues.
+        # Keep paths relative so an operator can restore them onto a fresh volume.
+        for directory in ("product_photos", "catalogue_output"):
+            media_root = data_dir / directory
+            if not media_root.is_dir() or media_root.is_symlink():
+                continue
+            for source in sorted(media_root.rglob("*")):
+                if not source.is_file() or source.is_symlink():
+                    continue
+                relative = source.relative_to(data_dir)
+                if (source.name.startswith(".") or source.name.endswith(
+                        (".tmp", ".sqlite", ".sqlite-wal", ".sqlite-shm", ".sqlite-journal"))):
+                    continue
+                zf.write(source, arcname=relative.as_posix())
     return buf.getvalue()

@@ -60,7 +60,7 @@ def fetch(url: str, *, session: requests.Session | None = None) -> str:
     target = check_url(url)
     caller = session or requests
     try:
-        response = caller.get(target, timeout=TIMEOUT_SECONDS, allow_redirects=True,
+        response = caller.get(target, timeout=TIMEOUT_SECONDS, allow_redirects=False,
                               headers={"User-Agent": USER_AGENT,
                                        "Accept": "text/html,application/xhtml+xml",
                                        "Accept-Language": "en-GB,en;q=0.9"},
@@ -71,6 +71,8 @@ def fetch(url: str, *, session: requests.Session | None = None) -> str:
     except requests.RequestException:
         raise CannotFetch("The shop's site could not be reached.")
     with response:
+        if 300 <= response.status_code < 400:
+            raise CannotFetch("The shop redirected to another page; for security, enter the final product URL directly.")
         if response.status_code == 404:
             raise CannotFetch("That page is gone from the shop — the product may have been "
                               "discontinued or the link may have changed.")
