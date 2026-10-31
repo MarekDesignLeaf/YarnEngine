@@ -440,13 +440,13 @@ async def auth_piloop_signout(request: Request):
 
 @app.get("/api/auth/status")
 def auth_status():
-    return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "open") == "open",
+    return {"registration_open": os.environ.get("YARNENGINE_REGISTRATION", "closed") == "open",
             "has_admin": user_store.admin_count() > 0, "auth_disabled": _auth_disabled(),
             "admin_console": _admin_console()}
 
 @app.post("/api/auth/register")
 def auth_register(payload: dict, response: Response):
-    if os.environ.get("YARNENGINE_REGISTRATION", "open") != "open":
+    if os.environ.get("YARNENGINE_REGISTRATION", "closed") != "open":
         raise HTTPException(status_code=403, detail="registration is closed")
     try:
         # The very first account becomes administrator if none was seeded from the environment.
@@ -1900,7 +1900,11 @@ def complex_consumption_calculate(payload:dict, http_request:Request):
     except ValueError as e:
         raise HTTPException(status_code=422,detail=str(e))
     result={"program_type":kind,"program_analysis":analysed,"calculation":calc.__dict__,
-            "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,"in_domain":pred.in_domain,"warnings":pred.warnings},
+            "prediction":{"estimate_m":pred.estimate_m,"lower_95_m":pred.lower_95_m,"upper_95_m":pred.upper_95_m,
+                          "interval_type":("calibrated_model_interval" if production else "heuristic_uncalibrated_range"),
+                          "interval_note":("The baseline interval is a heuristic estimate, not a statistically validated 95% interval."
+                                           if production is None else "Model-dependent prediction interval; verify calibration evidence."),
+                          "in_domain":pred.in_domain,"warnings":pred.warnings},
             "audit":{**audit,"yarn_diameter_mm":diameter,"yarn_diameter_source":diameter_source,"yarn_diameter_warnings":list(diameter_warnings)},
             "model_id":production["model_id"] if production else UNCALIBRATED_BASELINE_MODEL_ID}
     copies=max(1,int(payload.get("copies") or 1))
