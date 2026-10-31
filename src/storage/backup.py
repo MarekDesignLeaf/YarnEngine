@@ -27,11 +27,16 @@ def _strip_secrets(db_path: Path) -> None:
     """
     conn = sqlite3.connect(str(db_path))
     try:
-        has_settings = conn.execute(
-            "SELECT 1 FROM sqlite_master WHERE type='table' AND name='settings'").fetchone()
-        if has_settings:
-            conn.execute("DELETE FROM settings WHERE key LIKE ?", (SECRET_SETTING_PREFIX + "%",))
-            conn.commit()
+        # Current YarnEngine uses app_settings; support the historical settings
+        # table as well. The old implementation missed app_settings and leaked
+        # stored API keys into the exported database.
+        for table in ("settings", "app_settings"):
+            exists = conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()
+            if exists:
+                conn.execute(f"DELETE FROM {table} WHERE key LIKE ?",
+                             (SECRET_SETTING_PREFIX + "%",))
+        conn.commit()
     finally:
         conn.close()
 
