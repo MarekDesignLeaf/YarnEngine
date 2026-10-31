@@ -278,7 +278,7 @@ def test_catalogue_prompt_endpoint_supports_zero_stored_products(monkeypatch):
 def test_m125_shell_and_cache_version():
     client = TestClient(appmod.app)
     assert client.get("/api/health").json()["version"] == "M12.5"
-    assert 'opencrochet-pro-m12-v7' in client.get("/sw.js").text
+    assert 'opencrochet-pro-m12-v8' in client.get("/sw.js").text
     html = client.get("/").text
     assert "body.product_ids=selected.map(p=>p.id);" in html
     assert "Prompt</strong> can work by itself" in html
