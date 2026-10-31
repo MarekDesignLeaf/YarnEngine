@@ -1,0 +1,35 @@
+name: Full regression and security gates
+
+on:
+  push:
+    branches:
+      - main
+      - "fix/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PYTHONPATH: .
+      YARNENGINE_AUTH_DISABLED: "1"
+      YARNENGINE_REGISTRATION: "open"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install runtime and test dependencies
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install pytest httpx
+      - name: Compile all Python modules
+        run: python -m compileall -q src
+      - name: Full test suite
+        run: python -m pytest -q tests
