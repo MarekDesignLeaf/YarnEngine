@@ -2452,23 +2452,46 @@ def editor_save(request: SavePatternRequest):
     if not report.valid:
         raise HTTPException(status_code=422,detail=[{"code":i.code,"message":i.message} for i in report.issues])
 
-    safe=re.sub(r"[^A-Za-z0-9_.-]+","_",editor.pattern_id)
-    dest=ROOT/"data/patterns"/f"user_{safe}_{editor.version}.json"
-    if dest.exists():
-        raise HTTPException(status_code=409,detail="pattern version already exists")
-    dest.write_text(json.dumps(canonical,indent=2),encoding="utf-8")
-
-    meta_path=ROOT/"data/library/pattern_metadata.json"
-    meta=json.loads(meta_path.read_text())
-    entry={
-      "pattern_id":editor.pattern_id,"version":editor.version,"name":editor.name,
-      "family_id":request.family_id,"tags":request.tags,"difficulty":request.difficulty,
-      "techniques":request.techniques,"source_type":"user_created","source_reference":None,
-      "license_id":None,"active":True
+    # User-authored patterns belong in the persistent database, not ROOT/data:
+    # Railway replaces the application image on every deployment.
+    now = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    checksum = canonical_checksum(canonical)
+    entry = {
+        "pattern_id": editor.pattern_id, "version": editor.version, "name": editor.name,
+        "family_id": request.family_id, "tags": request.tags, "difficulty": request.difficulty,
+        "techniques": request.techniques, "source_type": "user_created",
+        "source_reference": "web_editor", "license_id": None, "active": True,
     }
-    meta["patterns"].append(entry)
-    meta_path.write_text(json.dumps(meta,indent=2),encoding="utf-8")
-    return {"status":"saved","path":str(dest.relative_to(ROOT)),"pattern":canonical,"metadata":entry}
+    store = service._store()
+    try:
+        with store.conn:
+            if store.conn.execute(
+                "SELECT 1 FROM patterns WHERE pattern_id=? AND version=?",
+                (editor.pattern_id, editor.version),
+            ).fetchone():
+                raise HTTPException(status_code=409, detail="pattern version already exists")
+            store.conn.execute(
+                """INSERT INTO patterns(
+                    pattern_id, version, name, family_id, difficulty, tags_json,
+                    techniques_json, pattern_json, source_type, source_reference,
+                    license_id, checksum, active, created_at, updated_at
+                ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                (editor.pattern_id, editor.version, editor.name, request.family_id,
+                 request.difficulty, json.dumps(request.tags), json.dumps(request.techniques),
+                 json.dumps(canonical), "user_created", "web_editor",
+                 None, checksum, 1, now, now),
+            )
+            store.conn.execute(
+                """INSERT INTO provenance_audit(
+                    entity_type, entity_id, version, source_type, source_reference,
+                    license_id, evidence_level, checksum, imported_at
+                ) VALUES(?,?,?,?,?,?,?,?,?)""",
+                ("pattern", editor.pattern_id, editor.version, "user_created",
+                 "web_editor", None, "user_declared", checksum, now),
+            )
+    finally:
+        store.close()
+    return {"status": "saved", "path": None, "pattern": canonical, "metadata": entry}
 
 
 @app.post("/api/yarns")
